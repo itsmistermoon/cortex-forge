@@ -7,18 +7,20 @@ tags: []
 aliases: []
 role: 
 context: 
+sources: []
+confidence: high
 ---
 
 # {{title}}
 
-**Rol:** 
-**Contexto:** 
+**Role:** 
+**Context:** 
 
-[Descripción de la entidad — persona, organización, herramienta, servicio]
+[Description of the entity — person, organization, tool, or service]
 
-## Relaciones
+## Relationships
 - 
 
 ---
 
-- {{date:YYYY-MM-DD}}: Página creada
+- {{date:YYYY-MM-DD}} [{agent}]: Page created

@@ -6,28 +6,39 @@ updated: {{date:YYYY-MM-DD}}
 tags: []
 status: active
 repo: 
+domains: []
+sources: []
+confidence: high
 ---
 
 # {{title}}
 
-**Estado:** activo
+**Status:** active
 **Repo:** 
 
-## Objetivo
+## Goal
 
-[Qué busca lograr este proyecto]
+[What this project aims to achieve]
 
-## Stack / Tecnologías
+## Stack / Technologies
 - 
 
-## Decisiones clave
+## Key decisions
 
 - 
 
-## Próximos pasos
+## Next steps
 
 - [ ] 
 
+## Knowledge applied
+
+- 
+
+## Recurring issues
+
+- 
+
 ---
 
-- {{date:YYYY-MM-DD}}: Página creada
+- {{date:YYYY-MM-DD}} [{agent}]: Page created

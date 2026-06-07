@@ -5,12 +5,14 @@ created: {{date:YYYY-MM-DD}}
 updated: {{date:YYYY-MM-DD}}
 tags: []
 aliases: []
+sources: []
+confidence: high
 ---
 
 # {{title}}
 
-[Verdad compilada — mejor entendimiento actual. Se reescribe completo cuando hay evidencia nueva.]
+[Compiled truth — best current understanding. Rewrite in full when new evidence arrives.]
 
 ---
 
-- {{date:YYYY-MM-DD}}: Página creada
+- {{date:YYYY-MM-DD}} [{agent}]: Page created

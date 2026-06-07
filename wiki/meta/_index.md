@@ -1,27 +1,26 @@
-# Meta — Información del vault
+# Meta — Vault metadata
 
-[//]: # "Metadata, configuración y guías del vault."
+[//]: # "Vault metadata, configuration, and guides."
 
-## Estructura
+## Structure
 
 ```
-.second-brain/
-├── .raw/              ← Fuentes inmutables
+{your-vault}/
+├── .raw/              ← Immutable original sources
 ├── wiki/
-│   ├── concepts/      ← Conceptos
-│   ├── entities/      ← Entidades
-│   ├── sources/       ← Fuentes
-│   ├── pages/         ← Proyectos y decisiones
-│   ├── hot/           ← Cache de sesión por proyecto
-│   ├── meta/          ← Metadata del vault
-│   └── index.md       ← Índice maestro
+│   ├── concepts/      ← Concepts
+│   ├── entities/      ← Entities
+│   ├── sources/       ← Sources
+│   ├── pages/         ← Projects and decisions
+│   ├── meta/          ← Vault metadata
+│   └── index.md       ← Master index
 ├── templates/         ← 5 templates
 ├── bin/               ← Scripts
-├── skills/wiki/       ← Skills para agentes
-├── AGENTS.md          ← Reglas para el LLM
+├── skills/            ← Agent skills
+├── AGENTS.md          ← Agent operating rules
 └── README.md
 ```
 
-## Plugins de Obsidian instalados
+## Obsidian plugins (optional)
 
 Templater, Dataview, Obsidian Git, Calendar, Excalidraw, Banners

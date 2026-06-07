@@ -19,7 +19,7 @@ Five layers, each with a distinct role:
 | **Wiki** | `wiki/` | Synthesized knowledge | Agent writes and maintains |
 | **Hot** | `.hot/` | Per-project session cache | Read on session start, write via /cortex-crystallize |
 | **Meta** | `wiki/meta/` | Vault metadata and guides | Agent maintains |
-| **Skills** | `skills/wiki/` | Invocable agent skills | Extend, don't modify |
+| **Skills** | `skills/` | Invocable agent skills | Extend, don't modify |
 
 ## Wiki taxonomy
 
@@ -40,7 +40,7 @@ The skill accepts two input modes:
 - **URL** — agent downloads content, saves to `.raw/`, synthesizes
 - **`.raw/` file** — agent reads the file and synthesizes directly
 
-See full creation/omission criteria in `skills/wiki/cortex-assimilate.md`.
+See full creation/omission criteria in `skills/cortex-assimilate.md`.
 
 ## Hot Cache protocol
 
@@ -56,11 +56,15 @@ See full creation/omission criteria in `skills/wiki/cortex-assimilate.md`.
 
 ## Available skills
 
-- `/cortex-crystallize` — Snapshot session context into `.hot/{project}.md`
-- `/cortex-imprint` — Archive a valuable session synthesis as a permanent wiki page
+**Vault** (`skills/` — operate inside the vault):
 - `cortex-assimilate` — Ingest a source: `.raw/` → synthesized wiki page
 - `cortex-recall` — Query the vault: search → synthesize answer with citations
-- `cortex-prune` — Health check: detect orphans, dead links, stale claims, contradictions
+- `cortex-imprint` — Archive a valuable session synthesis as a permanent wiki page
+- `cortex-prune` — Health check: detect orphans, dead links, stale claims, missing provenance
+
+**Global** (`skills/{name}/SKILL.md` — installed to `~/.agents/skills/` via `/cortex-forge-setup`):
+- `/cortex-crystallize` — Snapshot session context into `.hot/{project}.md`, works from any repo
+- `/cortex-forge-setup` — Initial setup: configure vault path and install global skills
 
 ## On session close
 

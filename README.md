@@ -18,7 +18,7 @@ Five layers, each with a distinct role:
 | **Wiki** | `wiki/` | Synthesized knowledge | Agent writes and maintains |
 | **Hot** | `.hot/` | Per-project session cache | Read on session start |
 | **Meta** | `wiki/meta/` | Vault metadata and guides | Agent maintains |
-| **Skills** | `skills/wiki/` | Invocable agent skills | Extend, don't modify |
+| **Skills** | `skills/` | Invocable agent skills | Extend, don't modify |
 
 ## Skills
 

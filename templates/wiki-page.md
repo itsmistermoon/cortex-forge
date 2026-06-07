@@ -8,20 +8,20 @@ tags: []
 
 # {{title}}
 
-[Verdad compilada — mejor entendimiento actual. Se reescribe completo cuando hay evidencia nueva.]
+[Compiled truth — best current understanding. Rewrite in full when new evidence arrives.]
 
 ---
 
-- {{date:YYYY-MM-DD}}: Página creada
+- {{date:YYYY-MM-DD}} [{agent}]: Page created
 
 ---
 
-## Templates disponibles
+## Available templates
 
-| Tipo | Archivo | Uso |
-|------|---------|-----|
-| Concepto | `concept.md` | Ideas, patrones, frameworks |
-| Entidad | `entity.md` | Personas, herramientas, servicios |
-| Fuente | `source.md` | Artículos, docs, referencias externas |
-| Proyecto | `project.md` | Proyectos activos con repo y status |
-| Decisión | `decision.md` | ADRs y decisiones técnicas |
+| Type | File | Use |
+|------|------|-----|
+| Concept | `concept.md` | Ideas, patterns, frameworks |
+| Entity | `entity.md` | People, tools, services |
+| Source | `source.md` | Articles, docs, external references |
+| Project | `project.md` | Active projects with repo and status |
+| Decision | `decision.md` | ADRs and technical decisions |

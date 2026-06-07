@@ -7,28 +7,30 @@ tags: []
 source_url: 
 source_date: 
 source_author: 
+sources: []
+confidence: high
 ---
 
 # {{title}}
 
 **URL:** 
-**Fecha original:** 
-**Autor:** 
+**Original date:** 
+**Author:** 
 
-## Resumen
+## Summary
 
-[Qué dice esta fuente, en 3-5 líneas]
+[What this source says, in 3-5 lines]
 
-## Ideas clave
+## Key ideas
 
 1. 
 2. 
 3. 
 
-## Conexiones
-- Conceptos relacionados: 
-- Proyectos: 
+## Connections
+- Related concepts: 
+- Projects: 
 
 ---
 
-- {{date:YYYY-MM-DD}}: Página creada
+- {{date:YYYY-MM-DD}} [{agent}]: Page created

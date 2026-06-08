@@ -85,7 +85,7 @@ Five layers, each with a distinct role:
 | **Source** | `wiki/sources/` | Articles, docs, external references | `templates/source.md` |
 | **Page** | `wiki/pages/` | Active projects with repo and status | `templates/project.md` |
 
-Each page follows: YAML frontmatter + compiled truth + chronological changelog.
+Each page follows: YAML frontmatter + compiled truth + chronological changelog. **All wiki content must be written in English** — this is a public repo.
 
 ## On session close
 

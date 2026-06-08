@@ -15,7 +15,7 @@ Objetivo: que el Hot Cache Protocol funcione en todos los agentes soportados.
   - [x] Ingestar una fuente con `cortex-assimilate`
   - [ ] Consultar conocimiento con `cortex-recall` — falló, usó búsqueda manual
 - [ ] Codex — parcial
-  - [ ] Correr `/cortex-forge-setup` desde Codex — muestra el bloque JSON a agregar
+  - [ ] Correr `/cortex-forge-setup` desde Codex — verificar que detecta config existente y ofrece "Update"
   - [x] Pegar bloque en `~/.codex/hooks.json` (SessionStart + Stop)
   - [x] Verificar que `.hot/` se inyecta en contexto al iniciar sesión — hook nativo confirmado
   - [ ] Ejecutar `cortex-crystallize` y confirmar que `.hot/` se actualiza al cerrar

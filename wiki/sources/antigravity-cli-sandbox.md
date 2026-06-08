@@ -5,6 +5,7 @@ source: https://antigravity.google/docs/cli-sandbox
 slug: antigravity-cli-sandbox
 section: Antigravity CLI / Agent Capabilities
 fetched: 2026-06-08
+confidence: high
 raw: .raw/antigravity-cli/cli-sandbox.md
 ---
 

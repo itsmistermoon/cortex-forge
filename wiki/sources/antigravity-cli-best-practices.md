@@ -5,6 +5,7 @@ source: https://antigravity.google/docs/cli-best-practices
 slug: antigravity-cli-best-practices
 section: Antigravity CLI
 fetched: 2026-06-08
+confidence: high
 raw: .raw/antigravity-cli/cli-best-practices.md
 ---
 

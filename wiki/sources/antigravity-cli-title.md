@@ -5,6 +5,7 @@ source: https://antigravity.google/docs/cli-title
 slug: antigravity-cli-title
 section: Antigravity CLI / Customizations
 fetched: 2026-06-08
+confidence: high
 raw: .raw/antigravity-cli/cli-title.md
 ---
 

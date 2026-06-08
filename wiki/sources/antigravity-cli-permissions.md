@@ -5,6 +5,7 @@ source: https://antigravity.google/docs/cli-permissions
 slug: antigravity-cli-permissions
 section: Antigravity CLI / Agent Capabilities
 fetched: 2026-06-08
+confidence: high
 raw: .raw/antigravity-cli/cli-permissions.md
 ---
 

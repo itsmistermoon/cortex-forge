@@ -5,6 +5,7 @@ source: https://antigravity.google/docs/cli-troubleshooting
 slug: antigravity-cli-troubleshooting
 section: Antigravity CLI
 fetched: 2026-06-08
+confidence: high
 raw: .raw/antigravity-cli/cli-troubleshooting.md
 ---
 

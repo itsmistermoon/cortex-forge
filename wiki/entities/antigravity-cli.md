@@ -3,6 +3,17 @@ type: entity
 title: "Antigravity CLI"
 slug: antigravity-cli
 fetched: 2026-06-08
+sources:
+  - wiki/sources/antigravity-cli-permissions.md
+  - wiki/sources/antigravity-cli-sandbox.md
+  - wiki/sources/antigravity-cli-settings.md
+  - wiki/sources/antigravity-cli-plugins.md
+  - wiki/sources/antigravity-cli-statusline.md
+  - wiki/sources/antigravity-cli-title.md
+  - wiki/sources/antigravity-cli-best-practices.md
+  - wiki/sources/antigravity-cli-troubleshooting.md
+  - wiki/sources/antigravity-cli-reference.md
+confidence: high
 ---
 
 # Antigravity CLI

@@ -529,3 +529,26 @@ chmod +x ~/.claude/hooks/{load-hot-cache,update-hot-cache}.sh
   - Si el script usa `cat` o `jq` sobre stdin y degrada con fallback, **puede** completar el snapshot
   - **No validado en sesión real** — solo inferencia desde documentación. La validación es la siguiente acción sugerida
 - **Siguiente paso natural (no ejecutado)**: abrir sesión CommandCode nueva, ejecutar cualquier tarea trivial, cerrar limpio con `/exit`, verificar que `.hot/cortex-forge.md` actualizó su `mtime`. Si actualizó → hook funcional; si no → investigar exit code, logs de CommandCode (`--debug` flag), y eventualmente portar el script al wire format CommandCode
+## 2026-06-08 13:22 -04 — Antigravity (validación hooks PreInvocation + Stop)
+
+**Nota:** sesión terminada por ajuste de cuota antes del cierre formal. Entrada reconstruida por Claude Code desde log copiado por el usuario.
+
+#### What was done
+
+**`cortex-reactivate-antigravity.sh` (PreInvocation / Zone 1):**
+- Sin payload → `{"injectSteps":[]}` — comportamiento correcto cuando no hay `.hot/` que inyectar o `invocationNum != 0`
+- Con payload `invocationNum=0` + ruta de workspace → Zone 1 inyectada correctamente en el contexto de la sesión
+- Fix del awk (salía en el primer `---` del frontmatter) confirmado funcional
+
+**`cortex-crystallize-antigravity.sh` (Stop / Zone 2):**
+- Payload de prueba: `fullyIdle=true`, `terminationReason="model_stop"`
+- Script salió con `{"decision":""}` — sin error
+- `.hot/cortex-forge.md` recibió nueva entrada en `## History` con summary generado por `agy -p`
+- Guard anti-duplicación de frontmatter confirmado: los `---` no se repiten
+
+#### Discarded
+- _(ninguno)_
+
+#### Fragile context
+- La síntesis generada por `agy -p` en la prueba fue genérica ("web search for 'example'") — el modelo sintetizó sin contexto real de sesión porque el payload era mock. En sesión real el output debería ser más descriptivo.
+- La validación fue con payload simulado, no con un cierre real de sesión nativo. El flujo completo (sesión productiva → `fullyIdle==true` automático → snapshot) sigue pendiente de verificación en uso orgánico.

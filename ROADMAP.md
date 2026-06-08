@@ -9,9 +9,9 @@ Objetivo: que el Hot Cache Protocol funcione en todos los agentes soportados.
 - [ ] Antigravity CLI — parcial
   - [ ] Correr `/cortex-forge-setup` desde Antigravity — muestra el bloque JSON a agregar
   - [x] Configurar hooks en `~/.gemini/config/hooks.json` (PreInvocation + Stop) — migrado a `cortex-reactivate-antigravity.sh` + `cortex-crystallize-antigravity.sh`; symlink a `~/.gemini/antigravity-cli/hooks.json` por bug agy-cli #49
-  - [ ] **PROBAR**: `cortex-reactivate-antigravity.sh` inyecta Zone 1 de `.hot/` al inicio — fix del awk que salía en el primer `---` del frontmatter
-  - [ ] **PROBAR**: `cortex-crystallize-antigravity.sh` escribe Zone 1+2 al cerrar con `agy -p` — verificar que `fullyIdle==true` + `terminationReason=="model_stop"` gatilla y que `agy -p` funciona desde un hook
-  - [ ] **VERIFICAR**: contradicción en path de `settings.json` — codelab dice `~/.gemini/antigravity-cli/`, otros docs dicen `~/.gemini/config/`
+  - [x] **PROBAR**: `cortex-reactivate-antigravity.sh` inyecta Zone 1 de `.hot/` al inicio — sin payload devuelve `{"injectSteps":[]}` (correcto); con `invocationNum=0` + workspace inyecta Zone 1 correctamente
+  - [x] **PROBAR**: `cortex-crystallize-antigravity.sh` escribe Zone 1+2 al cerrar con `agy -p` — `fullyIdle==true` + `terminationReason=="model_stop"` gatilla; guard anti-duplicación de frontmatter confirmado; script sale con `{"decision":""}` sin error
+  - [x] **VERIFICAR**: contradicción en path de `settings.json` — no existe `~/.gemini/config/settings.json`; el archivo real es `~/.gemini/antigravity-cli/settings.json`
   - [x] Ingestar una fuente con `cortex-assimilate`
   - [ ] Consultar conocimiento con `cortex-recall` — falló, usó búsqueda manual
 - [ ] Codex — parcial

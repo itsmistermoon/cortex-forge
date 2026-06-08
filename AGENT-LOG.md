@@ -283,28 +283,31 @@ el ruido visual es de UI, no de parsing.
 
 ## 2026-06-08 16:40 — Codex (vault protocol review)
 
-**Qué ocurrió:** sesión de revisión del protocolo. El agente fue consultado sobre por
-qué falló en invocar `cortex-recall` proactivamente.
+**Qué ocurrió:** sesión de revisión del protocolo. El agente fue evaluado por dos
+fallos: no invocar `cortex-recall` proactivamente, y no seguir el flujo de
+`cortex-assimilate` al recibir una URL con respuesta SPA.
 
 **Qué falló:**
-- `cortex-recall` no fue invocado proactivamente ante consultas sobre el vault.
-- El protocolo está escrito como regla, no como guardrail ejecutable: `AGENTS.md` dice
-  "use cortex-recall as your first action" pero no hay verificación técnica que bloquee
-  una respuesta si no se hizo.
-- Las instrucciones mezclan intención y mecanismo: no definen qué significa "usar
-  cortex-recall" en términos verificables, qué evidencia devolver, ni qué hacer si la
-  skill no está disponible.
+- `cortex-recall` no fue invocado proactivamente ante consultas sobre el vault — el
+  agente respondió desde contexto activo.
+- `cortex-assimilate` no fue cargado correctamente al recibir una URL. El fetch
+  retornó contenido SPA y el agente no siguió el flujo de detección (paso 3a) ni
+  declaró la situación — procedió sin contenido legible.
+- Raíz común: el protocolo está escrito como regla, no como guardrail ejecutable.
+  No hay verificación técnica que bloquee una respuesta si los pasos no se siguieron.
+- Las instrucciones no definen qué significa "usar la skill" en términos verificables,
+  qué evidencia devolver, ni qué hacer si la skill no está disponible.
 
-**Qué funcionó:** autodiagnóstico preciso y articulado.
+**Qué funcionó:** autodiagnóstico preciso y articulado al ser consultado directamente.
 
 **Observaciones / sugerencias:**
-1. Agregar a `AGENTS.md` un criterio de cumplimiento verificable — ejemplo: "toda
-   respuesta sobre conocimiento del vault debe incluir al menos una cita de `wiki/`
-   y una línea confirmando que se consultó `cortex-recall`". Si la skill no está
-   disponible, declararlo explícitamente.
-2. Un hook de salida o pre-respuesta podría verificar que la consulta pasó por el
-   canal correcto; si no, abortar o forzar nota de incumplimiento.
-3. Separar mejor "contenido del vault" de "contexto de sesión" en `AGENTS.md` —
-   explicitar cuál manda según el tipo de consulta.
-4. Agregar ejemplos de flujo correcto e incorrecto para casos concretos como
-   "¿Antigravity CLI tiene hooks?" o "¿Qué dice el vault sobre X?".
+1. Agregar criterio de cumplimiento verificable en `AGENTS.md` — cita obligatoria a
+   `wiki/` en respuestas sobre vault; declaración explícita si skill no disponible.
+2. Hook de salida o pre-respuesta que verifique que la consulta pasó por el canal
+   correcto.
+3. En `cortex-assimilate`: STOP explícito antes del paso 4 si no hay contenido
+   legible — nunca guardar shell HTML a `.raw/`.
+4. Separar mejor "contenido del vault" de "contexto de sesión" en `AGENTS.md`.
+
+**Aplicado:** contratos verificables y hardening implementados en `AGENTS.md` y
+skills `cortex-recall`, `cortex-assimilate`, `cortex-crystallize` — commit `ee7cbe5`.

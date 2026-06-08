@@ -31,6 +31,7 @@ Objetivo: que el Hot Cache Protocol funcione en todos los agentes soportados.
 
 ## Fase 2 — Hardening del protocolo
 
+- [x] **Multi-vault**: `~/.cortex-forge/config.yml` con `vaults: {name: path}` + `default:`; vault resuelto por CWD primero, luego default; `cortex-forge-setup` registra/deregistra el vault actual (toggle por CWD); legacy `vault:` soportado en `cortex-crystallize`
 - [ ] Versionado de schema en `AGENTS.md` y templates (`schema_version:`)
 - [ ] `cortex-prune` automático vía hook periódico
 - [ ] Detección de hot cache stale (sin actualizar en N días)

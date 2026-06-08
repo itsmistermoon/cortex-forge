@@ -16,10 +16,16 @@ Behavior depends on where the skill is invoked:
 ## Steps
 
 1. Detect active repo: find nearest `.git` from CWD. If none, ask.
-2. Read `~/.cortex-forge/config.yml` to get vault path. If missing, prompt to run `/cortex-forge-setup` first.
+2. **Resolve vault** from `~/.cortex-forge/config.yml`. If missing, prompt to run `/cortex-forge-setup` first.
+   - Config supports two formats — handle both:
+     - New: `vaults: {name: path, ...}` + `default: name`
+     - Legacy: `vault: path` (treat as single vault named after its `basename`)
+   - Check if CWD is inside any registered vault (CWD starts with a vault path) → use that vault.
+   - If not, use the `default` vault.
+   - If no default and multiple vaults → ask the user to pick one.
 3. Determine mode:
-   - If active repo contains `wiki/`, `AGENTS.md`, and `skills/` → **it IS a vault** → use standard mode, regardless of what config says.
-   - Otherwise, compare active repo path with vault path from config: if they match → standard mode; if not → cross-vault mode.
+   - If active repo contains `wiki/`, `AGENTS.md`, and `skills/` → **it IS a vault** → standard mode.
+   - Otherwise → cross-vault mode (snapshot project repo + update linked vault page).
 4. Create `.hot/` if it doesn't exist. Add `.hot/` to `.gitignore` if not already there.
 5. Read `.hot/{project}.md` in full if it exists.
 6. **Update current state** (see limits below). Update `agent:` and `updated:` in the file frontmatter to reflect the current agent and date.

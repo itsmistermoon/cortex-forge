@@ -1,5 +1,5 @@
 ---
-title: "TASTE: Gestión — Documentación CommandCode"
+title: "TASTE: Management — CommandCode Documentation"
 type: source
 created: 2026-06-08
 updated: 2026-06-08
@@ -11,7 +11,7 @@ sources: []
 confidence: high
 ---
 
-# TASTE: Gestión — Documentación CommandCode
+# TASTE: Management — CommandCode Documentation
 
 **URL:** https://commandcode.ai/docs/taste/manage
 **Original date:** 2026
@@ -19,13 +19,13 @@ confidence: high
 
 ## Summary
 
-Documentación de operaciones de gestión de TASTE. Cubre los cuatro comandos principales del flujo push/pull hacia Command Code Studio (plataforma centralizada). Usa una metáfora Git para describir la sincronización de perfiles. No distingue explícitamente entre ámbito global y per-project en esta página.
+Documentation for TASTE management operations. Covers the four main commands for the push/pull flow toward Command Code Studio (centralized platform). Uses a Git metaphor to describe profile synchronization. Does not explicitly distinguish between global and per-project scope on this page.
 
 ## Key ideas
 
-1. El flujo de gestión es Git-like: push hacia Studio, pull desde Studio hacia proyectos locales.
-2. Cuatro operaciones: `push`, `pull`, `list`, `open`.
-3. Command Code Studio actúa como repositorio centralizado de perfiles TASTE para compartir entre proyectos y equipos.
+1. The management flow is Git-like: push to Studio, pull from Studio to local projects.
+2. Four operations: `push`, `pull`, `list`, `open`.
+3. Command Code Studio acts as a centralized repository of TASTE profiles for sharing across projects and teams.
 
 ## Connections
 - Related concepts: [[wiki/concepts/commandcode-taste]]
@@ -33,3 +33,4 @@ Documentación de operaciones de gestión de TASTE. Cubre los cuatro comandos pr
 ---
 
 - 2026-06-08 [Claude Code]: Page created
+- 2026-06-08 [Claude Code]: Translated to English

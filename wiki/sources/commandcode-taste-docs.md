@@ -1,5 +1,5 @@
 ---
-title: "TASTE — Documentación oficial CommandCode"
+title: "TASTE — Official CommandCode Documentation"
 type: source
 created: 2026-06-08
 updated: 2026-06-08
@@ -11,7 +11,7 @@ sources: []
 confidence: high
 ---
 
-# TASTE — Documentación oficial CommandCode
+# TASTE — Official CommandCode Documentation
 
 **URL:** https://commandcode.ai/docs/taste
 **Original date:** 2026
@@ -19,13 +19,13 @@ confidence: high
 
 ## Summary
 
-Documentación oficial de TASTE. Describe el modelo `taste-1` (meta neuro-simbólico con reinforcement learning continuo) y el mecanismo de aprendizaje por señales implícitas (aceptaciones, rechazos, ediciones). Énfasis en portabilidad: las preferencias no quedan bloqueadas en un proyecto sino que son transferibles y componibles, similares a Git.
+Official TASTE documentation. Describes the `taste-1` model (meta neuro-symbolic with continuous reinforcement learning) and the learning mechanism via implicit signals (acceptances, rejections, edits). Emphasis on portability: preferences are not locked to a single project but are transferable and composable, similar to Git.
 
 ## Key ideas
 
-1. TASTE usa el modelo propietario `taste-1` con arquitectura neuro-simbólica que separa conocimiento del modelo (neural) de preferencias del usuario (simbólico).
-2. La portabilidad es explícita: las preferencias aprendidas pueden usarse en todos los proyectos del usuario.
-3. La documentación no especifica paths de almacenamiento — esa información está en `/docs/taste/commands`.
+1. TASTE uses the proprietary `taste-1` model with a neuro-symbolic architecture that separates model knowledge (neural) from user preferences (symbolic).
+2. Portability is explicit: learned preferences can be used across all of the user's projects.
+3. The documentation does not specify storage paths — that information is in `/docs/taste/commands`.
 
 ## Connections
 - Related concepts: [[wiki/concepts/commandcode-taste]]
@@ -34,3 +34,4 @@ Documentación oficial de TASTE. Describe el modelo `taste-1` (meta neuro-simbó
 ---
 
 - 2026-06-08 [Claude Code]: Page created
+- 2026-06-08 [Claude Code]: Translated to English

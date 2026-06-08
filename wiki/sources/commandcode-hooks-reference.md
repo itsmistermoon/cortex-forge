@@ -19,15 +19,15 @@ confidence: high
 
 ## Summary
 
-Referencia técnica completa del sistema de hooks de CommandCode. Define la estructura de datos HookDefinition/HookEntry, los tres tipos de eventos (PreToolUse, PostToolUse, Stop), el wire format de entrada/salida (JSON en stdin/stdout), los campos de control de comportamiento y la semántica de exit codes.
+Complete technical reference for the CommandCode hooks system. Defines the HookDefinition/HookEntry data structure, the three event types (PreToolUse, PostToolUse, Stop), the wire format for input/output (JSON on stdin/stdout), the behavioral control fields, and the semantics of exit codes.
 
 ## Key ideas
 
-1. Wire format de entrada: JSON en stdin con session context, tool details y environment info. Salida: JSON en stdout con campos opcionales `continue`, `systemMessage`, `permissionDecision`, `decision`, `additionalContext`.
-2. Exit codes: `0` → ejecutar JSON output; `2` → bloquear (PreToolUse) / reintentar (PostToolUse/Stop); otros → error no bloqueante.
-3. Tres eventos: `PreToolUse` (secuencial, puede bloquear), `PostToolUse` (paralelo, puede reintentar), `Stop` (paralelo, puede reintentar la respuesta).
-4. `permissionDecision: "deny"` en PreToolUse bloquea la tool con feedback al modelo. `additionalContext` inyecta contexto sin bloquear.
-5. Cada hook recibe stdin aislado — los hooks no pueden comunicarse entre sí dentro del mismo evento.
+1. Input wire format: JSON on stdin with session context, tool details, and environment info. Output: JSON on stdout with optional fields `continue`, `systemMessage`, `permissionDecision`, `decision`, `additionalContext`.
+2. Exit codes: `0` → execute JSON output; `2` → block (PreToolUse) / retry (PostToolUse/Stop); others → non-blocking error.
+3. Three events: `PreToolUse` (sequential, can block), `PostToolUse` (parallel, can retry), `Stop` (parallel, can retry the response).
+4. `permissionDecision: "deny"` in PreToolUse blocks the tool with feedback to the model. `additionalContext` injects context without blocking.
+5. Each hook receives isolated stdin — hooks cannot communicate with each other within the same event.
 
 ## Connections
 
@@ -37,3 +37,4 @@ Referencia técnica completa del sistema de hooks de CommandCode. Define la estr
 ---
 
 - 2026-06-08 [claude-sonnet-4-6]: Page created
+- 2026-06-08 [Claude Code]: Translated to English

@@ -12,35 +12,36 @@ confidence: medium
 
 # Progressive Disclosure via Hooks
 
-Patrón de carga de contexto que evita inyectar todo al inicio de sesión y en cambio carga información solo cuando es relevante para la tarea actual.
+Context loading pattern that avoids injecting everything at session start, instead loading information only when it is relevant to the current task.
 
-## El problema que resuelve
+## The problem it solves
 
-Cargar todo el contexto disponible al iniciar una sesión tiene dos costos:
-- **Tokens consumidos** antes de que el usuario haga su primera pregunta
-- **Ruido en el contexto**: información irrelevante compite con la información relevante
+Loading all available context at session start has two costs:
+- **Tokens consumed** before the user asks their first question
+- **Context noise**: irrelevant information competes with relevant information
 
-## El patrón
+## The pattern
 
-En lugar de un archivo de instrucciones monolítico que se carga siempre completo, se distribuye el contexto entre hooks y skills:
+Instead of a monolithic instructions file that is always loaded in full, context is distributed across hooks and skills:
 
-- **Hooks (SessionStart)**: cargan solo el estado mínimo necesario — pendientes, decisiones activas, contexto frágil (hot cache)
-- **Skills**: cargan expertise específico cuando se activan para una tarea concreta; permanecen inactivas (sin consumir contexto) hasta que se necesitan
+- **Hooks (SessionStart)**: load only the minimum necessary state — pending items, active decisions, fragile context (hot cache)
+- **Skills**: load specific expertise when activated for a concrete task; remain inactive (consuming no context) until needed
 
-## Aplicación en Cortex Forge
+## Application in Cortex Forge
 
-La separación entre hot cache y wiki es una instancia de este patrón:
-- El hot cache (`## Current state` únicamente) se inyecta al inicio — es el mínimo viable
-- El contenido de `wiki/` se carga bajo demanda vía `cortex-recall` cuando el usuario consulta sobre un tema
-- La History del hot cache **no** se inyecta (fue el fix del 2026-06-08 a `load-hot-cache.sh`)
+The separation between hot cache and wiki is an instance of this pattern:
+- The hot cache (`## Current state` only) is injected at startup — it is the minimum viable
+- The content of `wiki/` is loaded on demand via `cortex-recall` when the user queries a topic
+- The History section of the hot cache is **not** injected (this was the 2026-06-08 fix to `load-hot-cache.sh`)
 
-## Tensión con visibilidad
+## Tension with visibility
 
-En Codex, el contexto inyectado por hooks es visible en el chat (`hook context:`). El patrón de progressive disclosure reduce el impacto de esta visibilidad al minimizar el volumen inyectado — menos ruido visible, menos tokens consumidos.
+In Codex, context injected by hooks is visible in the chat (`hook context:`). The progressive disclosure pattern reduces the impact of this visibility by minimizing the injected volume — less visible noise, fewer tokens consumed.
 
 ## Connections
 - Related concepts: [[wiki/concepts/agent-hook-compatibility]], [[wiki/concepts/antigravity-hooks]]
 
 ---
 
-- 2026-06-08 [Claude Code]: Página creada — concepto extraído del video de Gemini CLI hooks; instanciado en el fix de History del hot cache
+- 2026-06-08 [Claude Code]: Page created — concept extracted from the Gemini CLI hooks video; instantiated in the hot cache History fix
+- 2026-06-08 [Claude Code]: Translated to English

@@ -12,73 +12,74 @@ confidence: high
 
 # Understand Anything
 
-Plugin multi-plataforma que convierte un codebase, knowledge base o documentación en un **grafo de conocimiento interactivo** explorable, buscable y consultable. Compatible con Claude Code, Codex, Cursor, Copilot, Gemini CLI, OpenCode, Vibe CLI, Trae, Hermes, Cline, KIMI CLI y Antigravity.
+Multi-platform plugin that converts a codebase, knowledge base, or documentation into an **interactive knowledge graph** that is browsable, searchable, and queryable. Compatible with Claude Code, Codex, Cursor, Copilot, Gemini CLI, OpenCode, Vibe CLI, Trae, Hermes, Cline, KIMI CLI, and Antigravity.
 
-**Origen:** [github.com/Lum1104/Understand-Anything](https://github.com/Lum1104/Understand-Anything) — MIT License, Lum1104.
-**Ingestado:** 2026-06-08 desde README principal (350 líneas).
+**Origin:** [github.com/Lum1104/Understand-Anything](https://github.com/Lum1104/Understand-Anything) — MIT License, Lum1104.
+**Ingested:** 2026-06-08 from main README (350 lines).
 
-## Qué ofrece
+## What it offers
 
-- **Grafo estructural** de archivos, funciones, clases y dependencias — navegable, buscable, con resúmenes en lenguaje natural por nodo.
-- **Vista de dominio** que mapea código a procesos de negocio (dominios, flujos, pasos).
-- **Análisis de knowledge bases tipo Karpathy** — extrae wikilinks, categorías, entidades, claims y relaciones implícitas.
-- **Tours guiados** autogenerados, búsqueda fuzzy + semántica, análisis de impacto de diffs, UI adaptativa por persona (junior dev / PM / power user), visualización por capas arquitectónicas, callouts de 12 patrones de programación.
+- **Structural graph** of files, functions, classes, and dependencies — browsable, searchable, with natural-language summaries per node.
+- **Domain view** that maps code to business processes (domains, flows, steps).
+- **Karpathy-style knowledge base analysis** — extracts wikilinks, categories, entities, claims, and implicit relationships.
+- **Auto-generated guided tours**, fuzzy + semantic search, diff impact analysis, persona-adaptive UI (junior dev / PM / power user), architectural layer visualization, callouts for 12 programming patterns.
 
-## Comandos principales
+## Main Commands
 
-| Comando | Función |
+| Command | Function |
 |---------|---------|
-| `/understand` | Pipeline multi-agente que escanea el proyecto y construye el grafo → `.understand-anything/knowledge-graph.json` |
-| `/understand-dashboard` | Abre el dashboard web interactivo |
-| `/understand-chat {query}` | Pregunta libre sobre el codebase |
-| `/understand-diff` | Impacto de cambios no commiteados |
-| `/understand-explain {path}` | Deep-dive en un archivo o función |
-| `/understand-onboard` | Genera guía de onboarding para nuevos miembros |
-| `/understand-domain` | Extrae conocimiento de dominio de negocio |
-| `/understand-knowledge {path}` | Analiza un wiki tipo Karpathy |
+| `/understand` | Multi-agent pipeline that scans the project and builds the graph → `.understand-anything/knowledge-graph.json` |
+| `/understand-dashboard` | Opens the interactive web dashboard |
+| `/understand-chat {query}` | Free-form question about the codebase |
+| `/understand-diff` | Impact of uncommitted changes |
+| `/understand-explain {path}` | Deep-dive into a file or function |
+| `/understand-onboard` | Generates an onboarding guide for new team members |
+| `/understand-domain` | Extracts business domain knowledge |
+| `/understand-knowledge {path}` | Analyzes a Karpathy-style wiki |
 
-Soporta incremental (solo re-analiza archivos cambiados), scoped subdirectory, idioma configurable (`--language zh|ja|ko|ru|...`), y post-commit hook con `--auto-update`.
+Supports incremental mode (re-analyzes only changed files), scoped subdirectory, configurable language (`--language zh|ja|ko|ru|...`), and post-commit hook with `--auto-update`.
 
-## Arquitectura interna
+## Internal Architecture
 
-**Híbrido tree-sitter + LLM.** El lado determinista (tree-sitter) parsea sintaxis, extrae imports/exports/definiciones/herencia, construye un `importMap` pre-resuelto, y hace fingerprint-based change detection. El lado semántico (LLM) produce resúmenes, tags, asignación de capa arquitectónica, mapeo de dominio de negocio, tours guiados y callouts de conceptos.
+**tree-sitter + LLM hybrid.** The deterministic side (tree-sitter) parses syntax, extracts imports/exports/definitions/inheritance, builds a pre-resolved `importMap`, and performs fingerprint-based change detection. The semantic side (LLM) produces summaries, tags, architectural layer assignment, business domain mapping, guided tours, and concept callouts.
 
-**Pipeline multi-agente (5 agentes base + 1 para dominio + 1 para knowledge base):**
+**Multi-agent pipeline (5 base agents + 1 for domain + 1 for knowledge base):**
 
-| Agente | Rol |
+| Agent | Role |
 |--------|-----|
-| `project-scanner` | Descubrir archivos, detectar lenguajes y frameworks |
-| `file-analyzer` | Extraer funciones, clases, imports; producir nodos y edges |
-| `architecture-analyzer` | Identificar capas arquitectónicas |
-| `tour-builder` | Generar tours guiados de aprendizaje |
-| `graph-reviewer` | Validar completitud e integridad referencial (inline por defecto; `--review` para revisión LLM completa) |
-| `domain-analyzer` | Extraer dominios, flujos y pasos (usado por `/understand-domain`) |
-| `article-analyzer` | Extraer entidades, claims y relaciones implícitas (usado por `/understand-knowledge`) |
+| `project-scanner` | Discover files, detect languages and frameworks |
+| `file-analyzer` | Extract functions, classes, imports; produce nodes and edges |
+| `architecture-analyzer` | Identify architectural layers |
+| `tour-builder` | Generate guided learning tours |
+| `graph-reviewer` | Validate completeness and referential integrity (inline by default; `--review` for full LLM review) |
+| `domain-analyzer` | Extract domains, flows, and steps (used by `/understand-domain`) |
+| `article-analyzer` | Extract entities, claims, and implicit relationships (used by `/understand-knowledge`) |
 
-File analyzers corren en paralelo (hasta 5 concurrentes, batches de 20-30 archivos).
+File analyzers run in parallel (up to 5 concurrent, batches of 20-30 files).
 
-## Compatibilidad multi-plataforma
+## Multi-platform Compatibility
 
-| Plataforma | Estado | Instalación |
+| Platform | Status | Installation |
 |------------|--------|-------------|
-| Claude Code | Nativo | Plugin marketplace |
+| Claude Code | Native | Plugin marketplace |
 | Cursor | Auto-discovery | `.cursor-plugin/plugin.json` |
 | VS Code + Copilot | Auto-discovery | `.copilot-plugin/plugin.json` |
-| Copilot CLI | Soportado | `copilot plugin install` |
-| Codex, OpenCode, Antigravity, Gemini CLI, Pi Agent, Vibe CLI, Hermes, Cline, KIMI CLI, Trae | Soportado | `curl … install.sh \| bash -s <platform>` |
+| Copilot CLI | Supported | `copilot plugin install` |
+| Codex, OpenCode, Antigravity, Gemini CLI, Pi Agent, Vibe CLI, Hermes, Cline, KIMI CLI, Trae | Supported | `curl … install.sh \| bash -s <platform>` |
 
-## Modelo de compartición del grafo
+## Graph Sharing Model
 
-El grafo es JSON puro. Se commitea una vez y el equipo lo consume sin re-ejecutar el pipeline. Ignorar `.understand-anything/intermediate/` y `.understand-anything/diff-overlay.json` (scratch local). Para grafos >10 MB usar **git-lfs**.
+The graph is pure JSON. It is committed once and the team consumes it without re-running the pipeline. Ignore `.understand-anything/intermediate/` and `.understand-anything/diff-overlay.json` (local scratch). For graphs >10 MB use **git-lfs**.
 
-## Relevance para el vault
+## Relevance to the vault
 
-Tres áreas de transferencia directa a proyectos del usuario:
+Three areas of direct transfer to user projects:
 
-1. **Patrón Karpathy wiki** — la skill `cortex-assimilate` produce páginas que podrían alimentar `/understand-knowledge` para graficar el vault completo.
-2. **Híbrido tree-sitter + LLM** — patrón replicable para análisis incremental de código.
-3. **Matriz de compatibilidad multi-plataforma** — solapa con [[wiki/concepts/agent-hook-compatibility|Agent Hook Compatibility]] (la del vault sobre lifecycle hooks). Ambas mantienen una matriz plataforma × evento, pero esta mide instalación del plugin; la del vault mide hooks de lifecycle.
+1. **Karpathy wiki pattern** — the `cortex-assimilate` skill produces pages that could feed `/understand-knowledge` to graph the entire vault.
+2. **tree-sitter + LLM hybrid** — replicable pattern for incremental code analysis.
+3. **Multi-platform compatibility matrix** — overlaps with [[wiki/concepts/agent-hook-compatibility|Agent Hook Compatibility]] (the vault's page on lifecycle hooks). Both maintain a platform × event matrix, but this one measures plugin installation; the vault's measures lifecycle hooks.
 
 ---
 
-- 2026-06-08 [CommandCode]: Página creada — síntesis del README principal (350 líneas, descargado a `.raw/understand-anything.md`)
+- 2026-06-08 [CommandCode]: Page created — synthesis of main README (350 lines, downloaded to `.raw/understand-anything.md`)
+- 2026-06-08 [Claude Code]: Translated to English

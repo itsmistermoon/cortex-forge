@@ -12,83 +12,84 @@ confidence: high
 
 # Multi-agent analysis pipeline
 
-Patrón de orquestación donde un comando único dispara **N agentes especializados** que colaboran para analizar un corpus (código, wiki, documentación) y producir un artefacto estructurado (grafo, índice, reporte). Implementado por Understand Anything en `/understand` con 5-7 agentes.
+Orchestration pattern where a single command triggers **N specialized agents** that collaborate to analyze a corpus (code, wiki, documentation) and produce a structured artifact (graph, index, report). Implemented by Understand Anything in `/understand` with 5-7 agents.
 
-## Estructura típica
+## Typical structure
 
-**Comando orquestador** (`/understand`) que:
-1. Recibe input (path del proyecto, scope, flags).
-2. Pasa al `project-scanner` para descubrir archivos.
-3. Distribuye trabajo a `file-analyzer`s **en paralelo** (batches de 20-30 archivos, hasta 5 concurrentes).
-4. Consolida resultados en `architecture-analyzer` y `tour-builder`.
-5. Valida con `graph-reviewer` (inline por defecto; opt-in para revisión LLM completa).
-6. Persiste grafo final en JSON.
+**Orchestrator command** (`/understand`) that:
+1. Receives input (project path, scope, flags).
+2. Passes to `project-scanner` to discover files.
+3. Distributes work to `file-analyzer`s **in parallel** (batches of 20-30 files, up to 5 concurrent).
+4. Consolidates results in `architecture-analyzer` and `tour-builder`.
+5. Validates with `graph-reviewer` (inline by default; opt-in for full LLM review).
+6. Persists final graph as JSON.
 
-**Agentes opcionales según comando:**
-- `domain-analyzer` → para `/understand-domain`.
-- `article-analyzer` → para `/understand-knowledge` (wikis Karpathy).
+**Optional agents depending on command:**
+- `domain-analyzer` → for `/understand-domain`.
+- `article-analyzer` → for `/understand-knowledge` (Karpathy wikis).
 
-## Lo que cada agente tiene
+## What each agent has
 
-| Propiedad | Valor |
-|-----------|-------|
-| Rol | Una responsabilidad estrecha y nombrable |
-| Input | Output del agente anterior, o subset del corpus |
-| Output | Estructura validable (JSON, lista, índice) |
-| Estado | Sin estado entre invocaciones (cada agente es stateless) |
-| Validación | Heurística rápida inline; revisión LLM completa solo si `--review` |
+| Property | Value |
+|----------|-------|
+| Role | A single, nameable responsibility |
+| Input | Output of the previous agent, or subset of the corpus |
+| Output | Validatable structure (JSON, list, index) |
+| State | Stateless between invocations (each agent is stateless) |
+| Validation | Fast inline heuristic; full LLM review only if `--review` |
 
-## Por qué dividir en agentes en vez de un prompt monolítico
+## Why split into agents instead of a monolithic prompt
 
-**Tres razones técnicas:**
+**Three technical reasons:**
 
-1. **Paralelización real.** File analyzers corren concurrentemente. Un prompt monolítico es secuencial por construcción (la generación es lineal dentro de un context window).
-2. **Context window manejable.** Cada agente opera sobre un batch pequeño (20-30 archivos). Un prompt monolítico que cargue todo el codebase revienta el context en proyectos medianos.
-3. **Validación por capa.** El `graph-reviewer` puede detectar "este nodo no tiene edges, esta función está duplicada en dos archivos" sin contaminarse del trabajo de generación. Con un prompt monolítico, el validador y el generador compiten por el mismo context.
+1. **Real parallelization.** File analyzers run concurrently. A monolithic prompt is sequential by construction (generation is linear within a context window).
+2. **Manageable context window.** Each agent operates on a small batch (20-30 files). A monolithic prompt loading the entire codebase blows up the context in medium-sized projects.
+3. **Per-layer validation.** The `graph-reviewer` can detect "this node has no edges, this function is duplicated across two files" without being contaminated by the generation work. With a monolithic prompt, the validator and generator compete for the same context.
 
-**Razón de diseño:**
+**Design reason:**
 
-4. **Composable.** Si cambias `file-analyzer` (e.g. para soportar un nuevo lenguaje), el resto del pipeline no se entera. Un prompt monolítico es frágil a cambios.
+4. **Composable.** If you change `file-analyzer` (e.g. to support a new language), the rest of the pipeline is unaffected. A monolithic prompt is fragile to changes.
 
-## Patrón de orquestación
+## Orchestration pattern
 
-No es un grafo DAG completo ni un loop reactivo. Es una **pipeline lineal con un fan-out** en el paso de file analyzers:
+It is not a full DAG nor a reactive loop. It is a **linear pipeline with a fan-out** at the file analyzer step:
 
 ```
 project-scanner
        ↓
-   file-analyzer (×N paralelo, batches)
+   file-analyzer (×N parallel, batches)
        ↓
    architecture-analyzer
        ↓
    tour-builder ←─┐
        ↓          │
-   graph-reviewer ┘ (loop si falla validación)
+   graph-reviewer ┘ (loop if validation fails)
        ↓
    output
 ```
 
-`graph-reviewer` puede invocar de nuevo un sub-paso si detecta problemas (e.g. "faltan edges en estos 3 archivos" → re-dispara file-analyzer sobre ellos).
+`graph-reviewer` can re-invoke a sub-step if it detects problems (e.g. "edges missing in these 3 files" → re-triggers file-analyzer on them).
 
 ## Incremental
 
-Si el corpus ya tiene un grafo previo, el `project-scanner` compara fingerprints (ver [[wiki/concepts/treesitter-llm-hybrid-parsing]]) y solo encola file-analyzer para archivos cuyo fingerprint cambió. Resultado: re-analizar un proyecto de 10k archivos después de editar 3 toma segundos, no horas.
+If the corpus already has a previous graph, `project-scanner` compares fingerprints (see [[wiki/concepts/treesitter-llm-hybrid-parsing]]) and only enqueues file-analyzer for files whose fingerprint changed. Result: re-analyzing a 10k-file project after editing 3 files takes seconds, not hours.
 
-**Trade-off:** el grafo previo debe confiarse como base estructural. Si hubo errores en runs anteriores, persisten. Por eso existe `--review` (re-validación completa) como opt-in.
+**Trade-off:** the previous graph must be trusted as the structural base. If there were errors in previous runs, they persist. That is why `--review` (full re-validation) exists as an opt-in.
 
-## Cuándo NO usar este patrón
+## When NOT to use this pattern
 
-- **Corpus <100 archivos.** El overhead de orquestación no se amortiza. Un solo agente con buenos prompts funciona.
-- **Análisis que requiere contexto global del corpus** (e.g. "explica la arquitectura del sistema entero"). Aquí los agentes especializados pierden el panorama; un solo agente con mucho contexto lo hace mejor.
-- **Cuando los roles no se dividen limpiamente.** Si los "agentes" terminarían haciendo trabajo que se solapa, no son agentes — son prompts disfrazados.
+- **Corpus <100 files.** The orchestration overhead does not amortize. A single agent with good prompts works fine.
+- **Analysis requiring global context of the corpus** (e.g. "explain the entire system architecture"). Here specialized agents lose the big picture; a single agent with a lot of context does it better.
+- **When roles do not divide cleanly.** If the "agents" end up doing overlapping work, they are not agents — they are disguised prompts.
 
-## Aplicabilidad en el vault
+## Applicability in the vault
 
-El vault `cortex-forge` no implementa este patrón (su pipeline es single-agent: la skill `cortex-assimilate` lee → sintetiza → escribe). Podría aplicar a:
+The `cortex-forge` vault does not implement this pattern (its pipeline is single-agent: the `cortex-assimilate` skill reads → synthesizes → writes). It could apply to:
 
-- `cortex-prune` si crece: dividir en `orphan-detector`, `link-validator`, `staleness-checker`, ejecutados en paralelo sobre `wiki/`.
-- Análisis del vault completo con `/understand-knowledge` (tercer proyecto, vía Understand Anything).
+- `cortex-prune` if it grows: split into `orphan-detector`, `link-validator`, `staleness-checker`, executed in parallel over `wiki/`.
+- Full vault analysis with `/understand-knowledge` (third project, via Understand Anything).
 
 ---
 
-- 2026-06-08 [CommandCode]: Página creada — concepto extraído del pipeline `/understand`, con énfasis en las razones técnicas del split (paralelización, context window, validación por capa) y los trade-offs del patrón
+- 2026-06-08 [CommandCode]: Page created — concept extracted from the `/understand` pipeline, with emphasis on the technical reasons for the split (parallelization, context window, per-layer validation) and the pattern's trade-offs
+- 2026-06-08 [Claude Code]: Translated to English

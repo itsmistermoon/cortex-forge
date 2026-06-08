@@ -2,7 +2,7 @@
 title: agent-hook-compatibility
 type: concept
 created: 2026-06-07
-updated: 2026-06-07
+updated: 2026-06-08
 tags: [multi-agent, hooks, cortex-forge, compatibility]
 aliases: [hook matrix, agent lifecycle]
 sources:
@@ -15,36 +15,36 @@ confidence: high
 
 # Agent Hook Compatibility
 
-Cortex Forge's Hot Cache Protocol requiere dos eventos de lifecycle por agente: uno al **inicio de sesión** (inyectar contexto) y uno al **cierre** (guardar snapshot). No todos los agentes exponen ambos.
+Cortex Forge's Hot Cache Protocol requires two lifecycle events per agent: one at **session start** (inject context) and one at **close** (save snapshot). Not all agents expose both.
 
-## Matriz de compatibilidad
+## Compatibility Matrix
 
-| Agente | SessionStart equiv. | Stop equiv. | Estado hot cache |
+| Agent | SessionStart equiv. | Stop equiv. | Hot cache status |
 |--------|---------------------|-------------|-----------------|
-| Claude Code | `SessionStart` | `SessionEnd` + `PreCompact` | ✅ completo — automático vía hooks |
-| Antigravity CLI | `PreInvocation (invocationNum==0)` | `Stop (fullyIdle==true)` | documentado, sin probar |
-| Codex | `SessionStart` | `Stop` | ✅ completo — automático vía hooks; hook context visible en UI |
-| CommandCode | **no existe** | `Stop` | parcial — solo cierre automático |
+| Claude Code | `SessionStart` | `SessionEnd` + `PreCompact` | ✅ full — automatic via hooks |
+| Antigravity CLI | `PreInvocation (invocationNum==0)` | `Stop (fullyIdle==true)` | documented, untested |
+| Codex | `SessionStart` | `Stop` | ✅ full — automatic via hooks; hook context visible in UI |
+| CommandCode | **does not exist** | `Stop` | partial — close only, automatic |
 
-## Modo degradado por agente
+## Degraded mode per agent
 
 ### Claude Code
-Configurado vía `cortex-forge-setup`. Los hooks `load-hot-cache.sh` y `update-hot-cache.sh` corren automáticamente. No requiere acción del agente.
+Configured via `cortex-forge-setup`. The `load-hot-cache.sh` and `update-hot-cache.sh` hooks run automatically. No agent action required.
 
-**Detalles de SessionStart (doc oficial):**
-- El evento tiene un campo `source` con valores `startup`, `resume`, `clear`, `compact` — igual que Codex. Filtrar por `startup` si se quiere limitar el hook al inicio real de sesión.
-- `asyncRewake`: campo disponible para hooks que corren en background y necesitan despertar al agente al terminar — útil para operaciones lentas que no deben bloquear el inicio.
-- `PreCompact` puede bloquearse con exit 2 — el hook `update-hot-cache.sh` de Cortex Forge ya lo usa para guardar snapshot antes de compactar.
+**SessionStart details (official docs):**
+- The event has a `source` field with values `startup`, `resume`, `clear`, `compact` — same as Codex. Filter by `startup` if you want to limit the hook to the real session start.
+- `asyncRewake`: field available for hooks that run in background and need to wake the agent when done — useful for slow operations that should not block startup.
+- `PreCompact` can be blocked with exit 2 — Cortex Forge's `update-hot-cache.sh` hook already uses this to save a snapshot before compaction.
 
 ### Antigravity CLI
-Antigravity hereda la ruta de Gemini CLI. Config global en `~/.gemini/config/hooks.json`; config de proyecto en `.agents/hooks.json`.
+Antigravity inherits the Gemini CLI path. Global config at `~/.gemini/config/hooks.json`; project config at `.agents/hooks.json`.
 
-**⚠ Bug conocido (agy-cli issue #49)**: si usas comandos del CLI para configurar hooks, escribe en `~/.gemini/antigravity-cli/hooks.json` (incorrecto) en lugar de `~/.gemini/config/hooks.json` (correcto). **Crear el archivo manualmente** o usar symlink:
+**⚠ Known bug (agy-cli issue #49)**: if you use CLI commands to configure hooks, it writes to `~/.gemini/antigravity-cli/hooks.json` (incorrect) instead of `~/.gemini/config/hooks.json` (correct). **Create the file manually** or use a symlink:
 ```bash
 ln -s ~/.gemini/config/hooks.json ~/.gemini/antigravity-cli/hooks.json
 ```
 
-Configurar en `~/.gemini/config/hooks.json`:
+Configure in `~/.gemini/config/hooks.json`:
 ```json
 {
   "PreInvocation": [{ "condition": "invocationNum == 0", "command": "bash ~/.gemini/config/hooks/load-hot-cache-antigravity.sh" }],
@@ -52,10 +52,10 @@ Configurar en `~/.gemini/config/hooks.json`:
 }
 ```
 
-Los scripts deben vivir en `~/.gemini/config/hooks/`, no en `~/.claude/hooks/`.
+Scripts must live in `~/.gemini/config/hooks/`, not in `~/.claude/hooks/`.
 
 ### Codex
-Configurar en `~/.codex/hooks.json`:
+Configure in `~/.codex/hooks.json`:
 ```json
 {
   "SessionStart": [{ "command": "bash {vault}/bin/hooks/load-hot-cache.sh" }],
@@ -63,22 +63,22 @@ Configurar en `~/.codex/hooks.json`:
 }
 ```
 
-**Hallazgos validados en sesión (2026-06-08):**
-- Wire format idéntico al de Claude Code — el script `load-hot-cache.sh` es compatible sin modificaciones.
-- `SessionStart` puede dispararse más de una vez por sesión: tiene un campo `source` con valores `startup`, `resume`, `clear`. Filtrar por `source` en el matcher si se quiere limitar a inicio real.
-- El `hook context:` es visible en el chat por diseño de la UI de Codex. No hay mecanismo para suprimirlo hoy (`suppressOutput` está reservado para uso futuro). El contexto llega correctamente al modelo — el ruido es solo visual.
-- **Costo de contexto**: `additionalContext` consume tokens del context window de la sesión como cualquier mensaje. Para un hot cache de pocos KB es negligible con ventanas de 200k+ tokens, pero es un costo real compartido con Claude Code y toda implementación de Capa 2.
-- Primera ejecución requiere aprobación manual de los hooks (`Trust: New hook - review required`).
+**Findings validated in session (2026-06-08):**
+- Wire format identical to Claude Code — the `load-hot-cache.sh` script is compatible without modifications.
+- `SessionStart` may fire more than once per session: it has a `source` field with values `startup`, `resume`, `clear`. Filter by `source` in the matcher if you want to limit to the real start.
+- The `hook context:` is visible in chat by design in the Codex UI. There is no mechanism to suppress it today (`suppressOutput` is reserved for future use). The context reaches the model correctly — the noise is visual only.
+- **Context cost**: `additionalContext` consumes tokens from the session context window like any message. For a hot cache of a few KB it is negligible with 200k+ token windows, but it is a real cost shared with Claude Code and every Layer 2 implementation.
+- First run requires manual hook approval (`Trust: New hook - review required`).
 
 ### CommandCode
-No tiene hook de SessionStart. El contexto se inyecta por `AGENTS.md`: la regla global de leer `.hot/{proyecto}.md` al iniciar es cumplida por el agente si lee el archivo de instrucciones. El cierre es automático vía hook `Stop`.
+Has no SessionStart hook. Context is injected via `AGENTS.md`: the global rule to read `.hot/{project}.md` on startup is fulfilled by the agent if it reads the instructions file. Closing is automatic via the `Stop` hook.
 
-Configurar bajo la clave `hooks` en `settings.json`:
-- **User scope**: `~/.commandcode/settings.json` (no commiteado; aplica a todos los proyectos del usuario)
-- **Project scope**: `.commandcode/settings.json` (commiteado al repo; aplica a quien clone)
-- **Precedencia**: project > user
+Configure under the `hooks` key in `settings.json`:
+- **User scope**: `~/.commandcode/settings.json` (not committed; applies to all of the user's projects)
+- **Project scope**: `.commandcode/settings.json` (committed to the repo; applies to anyone who clones)
+- **Precedence**: project > user
 
-Ejemplo (project scope) para el hot cache:
+Example (project scope) for the hot cache:
 ```json
 {
   "hooks": {
@@ -87,62 +87,63 @@ Ejemplo (project scope) para el hot cache:
 }
 ```
 
-**Orden de ejecución y短路** (de la doc oficial de Configuration):
-- `PreToolUse` corre **secuencialmente**; si un handler bloquea (exit code != 0), los siguientes `PreToolUse` se saltan.
-- `PostToolUse` corre en **paralelo** (la tool ya terminó).
-- Múltiples handlers bajo un mismo matcher corren en el orden listado.
-- Wire format: array anidado `hooks: [{ matcher, hooks: [{ type: "command", command, timeout? }] }]`, distinto del formato plano de Codex/Claude Code.
+**Execution order and short-circuit** (from the official Configuration docs):
+- `PreToolUse` runs **sequentially**; if a handler blocks (exit code != 0), subsequent `PreToolUse` handlers are skipped.
+- `PostToolUse` runs in **parallel** (the tool has already finished).
+- Multiple handlers under the same matcher run in listed order.
+- Wire format: nested array `hooks: [{ matcher, hooks: [{ type: "command", command, timeout? }] }]`, different from the flat format used by Codex/Claude Code.
 
-**⚠ Plan mode**: CommandCode deshabilita los hooks completamente en plan mode — el hook `Stop` no corre al cerrar una sesión de planificación. Tener esto en cuenta al operar el crystallize protocol.
+**⚠ Plan mode**: CommandCode disables hooks entirely in plan mode — the `Stop` hook does not run when closing a planning session. Keep this in mind when operating the crystallize protocol.
 
-**Implicación**: en CommandCode el hot cache es de solo salida en la primera sesión. A partir de la segunda sesión, el contexto previo ya está en `.hot/` y `AGENTS.md` instruye al agente a leerlo — el ciclo se cierra vía instrucción, no vía hook.
+**Implication**: in CommandCode the hot cache is write-only in the first session. From the second session onward, the previous context is already in `.hot/` and `AGENTS.md` instructs the agent to read it — the cycle closes via instruction, not via hook.
 
-### Wire format I/O de CommandCode
+### CommandCode Wire Format I/O
 
-Los hooks reciben JSON en `stdin` con session context, tool details y environment info. Devuelven JSON en `stdout` con campos opcionales:
+Hooks receive JSON on `stdin` with session context, tool details, and environment info. They return JSON on `stdout` with optional fields:
 
-| Campo | Evento | Efecto |
+| Field | Event | Effect |
 |-------|--------|--------|
-| `permissionDecision: "deny"` | PreToolUse | Bloquea la tool; el modelo recibe el mensaje |
-| `permissionDecision: "allow"` | PreToolUse | Permite explícitamente; útil junto con `additionalContext` |
-| `decision: "block"` | PostToolUse | Advisory retry (tool ya ejecutó) |
-| `systemMessage` | cualquiera | Mensaje de política inyectado al contexto del modelo |
-| `additionalContext` | cualquiera | Contexto no bloqueante para el modelo |
-| `continue` | Stop | Controla si la sesión continúa |
+| `permissionDecision: "deny"` | PreToolUse | Blocks the tool; the model receives the message |
+| `permissionDecision: "allow"` | PreToolUse | Explicitly allows; useful together with `additionalContext` |
+| `decision: "block"` | PostToolUse | Advisory retry (tool already executed) |
+| `systemMessage` | any | Policy message injected into the model's context |
+| `additionalContext` | any | Non-blocking context for the model |
+| `continue` | Stop | Controls whether the session continues |
 
-Exit codes: `0` → ejecutar JSON output; `2` → bloquear/reintentar según evento; otros → error no bloqueante (tool procede).
+Exit codes: `0` → execute JSON output; `2` → block/retry depending on event; others → non-blocking error (tool proceeds).
 
-### Seguridad y performance (best practices)
+### Security and performance (best practices)
 
-- **Nunca `eval`**: parsear stdin con `jq -r`. Los inputs vienen del modelo y son no confiables.
-- **Siempre quoting**: `grep -qE` sobre `printf` con quoting, no variables sueltas en shell.
-- **Timeout**: PreToolUse < 10s para no lagear la UI. Operaciones lentas → PostToolUse o background.
-- **Debugging**: flag `--debug` genera logs con matcher results y payload. Se puede iterar con mock payloads locales sin levantar CommandCode.
-- **Plan mode**: hooks están deshabilitados en plan mode — no asumir que corren siempre.
-- **`chmod +x`**: todos los scripts deben ser ejecutables.
+- **Never `eval`**: parse stdin with `jq -r`. Inputs come from the model and are untrusted.
+- **Always quote**: `grep -qE` over `printf` with quoting, not bare variables in shell.
+- **Timeout**: PreToolUse < 10s to avoid lagging the UI. Slow operations → PostToolUse or background.
+- **Debugging**: `--debug` flag generates logs with matcher results and payload. Can iterate with local mock payloads without launching CommandCode.
+- **Plan mode**: hooks are disabled in plan mode — do not assume they always run.
+- **`chmod +x`**: all scripts must be executable.
 
-> Fuentes: `wiki/sources/commandcode-hooks-configuration`, `commandcode-hooks-reference`, `commandcode-hooks-examples`, `commandcode-hooks-best-practices` (2026-06-08). Ver [[wiki/entities/commandcode]] para el perfil completo del agente.
+> Sources: `wiki/sources/commandcode-hooks-configuration`, `commandcode-hooks-reference`, `commandcode-hooks-examples`, `commandcode-hooks-best-practices` (2026-06-08). See [[wiki/entities/commandcode]] for the full agent profile.
 
-## Patrones de uso comunes (aplicables a todos los agentes)
+## Common usage patterns (applicable to all agents)
 
-Patrones extraídos de los ejemplos oficiales de CommandCode; el mecanismo de output varía por agente pero la lógica es portable:
+Patterns extracted from official CommandCode examples; the output mechanism varies per agent but the logic is portable:
 
-| Patrón | Evento | Mecanismo | Caso típico |
+| Pattern | Event | Mechanism | Typical use case |
 |--------|--------|-----------|-------------|
-| **Enforcement de seguridad** | PreToolUse | `permissionDecision: "deny"` + `systemMessage` | Bloquear `rm -rf /`, `curl \| sh` |
-| **Context injection condicional** | PreToolUse | `permissionDecision: "allow"` + `additionalContext` | Advertir sobre archivos `.env`, `.pem` sin bloquear |
-| **Observabilidad pura** | Pre o PostToolUse | exit `0`, escribe a log local | Auditoría de tool calls con timestamp y session ID |
-| **Completion gate** | Stop | exit `2` + `systemMessage` | Bloquear cierre si hay marcadores `DO NOT SHIP`; hasta 3 reintentos |
+| **Security enforcement** | PreToolUse | `permissionDecision: "deny"` + `systemMessage` | Block `rm -rf /`, `curl \| sh` |
+| **Conditional context injection** | PreToolUse | `permissionDecision: "allow"` + `additionalContext` | Warn about `.env`, `.pem` files without blocking |
+| **Pure observability** | Pre or PostToolUse | exit `0`, writes to local log | Tool call audit with timestamp and session ID |
+| **Completion gate** | Stop | exit `2` + `systemMessage` | Block close if `DO NOT SHIP` markers exist; up to 3 retries |
 
-## Regla de fallback universal
+## Universal fallback rule
 
-Si un agente no tiene hook de inicio, `AGENTS.md` actúa como fallback: la instrucción explícita de leer `.hot/{proyecto}.md` es interpretada por cualquier agente que procese el archivo de instrucciones antes de operar. Es menos confiable que un hook (depende de que el agente respete AGENTS.md), pero cubre el gap.
+If an agent has no startup hook, `AGENTS.md` acts as a fallback: the explicit instruction to read `.hot/{project}.md` is interpreted by any agent that processes the instructions file before operating. It is less reliable than a hook (depends on the agent respecting AGENTS.md), but covers the gap.
 
 ---
 
-- 2026-06-07 [claude-sonnet-4-6]: Página creada — matriz inicial basada en documentación oficial de cada agente; CommandCode verificado contra commandcode.ai/docs/hooks/reference
-- 2026-06-08 [claude-sonnet-4-6]: Codex actualizado con hallazgos de sesión real — wire format confirmado, comportamiento de SessionStart multi-source, visibilidad de hook context, costo de contexto
-- 2026-06-08 [claude-sonnet-4-6]: Antigravity corregido — config global es `~/.gemini/config/hooks.json`; bug de alineación de rutas documentado (agy-cli issue #49)
-- 2026-06-08 [CommandCode / MiniMax-M3]: Ampliada con scopes (user/project), precedencia, orden PreToolUse (secuencial, cortocircuito) vs PostToolUse (paralelo), wire format anidado. Fuente: wiki/sources/commandcode-hooks-configuration
-- 2026-06-08 [claude-sonnet-4-6]: Agregado I/O schema completo de CommandCode (campos de control, exit codes), sección de seguridad/performance (best practices), y tabla de patrones de uso comunes portable entre agentes. Fuentes: commandcode-hooks-reference, commandcode-hooks-examples, commandcode-hooks-best-practices
-- 2026-06-08 [claude-sonnet-4-6]: Claude Code SessionStart — campo `source` documentado (startup|resume|clear|compact), `asyncRewake` agregado, `PreCompact` con exit 2 confirmado. CommandCode — gotcha de plan mode documentado. Fuente: handoff desde second-brain
+- 2026-06-07 [claude-sonnet-4-6]: Page created — initial matrix based on official documentation of each agent; CommandCode verified against commandcode.ai/docs/hooks/reference
+- 2026-06-08 [claude-sonnet-4-6]: Codex updated with findings from real session — wire format confirmed, multi-source SessionStart behavior, hook context visibility, context cost
+- 2026-06-08 [claude-sonnet-4-6]: Antigravity corrected — global config is `~/.gemini/config/hooks.json`; path alignment bug documented (agy-cli issue #49)
+- 2026-06-08 [CommandCode / MiniMax-M3]: Expanded with scopes (user/project), precedence, PreToolUse order (sequential, short-circuit) vs PostToolUse (parallel), nested wire format. Source: wiki/sources/commandcode-hooks-configuration
+- 2026-06-08 [claude-sonnet-4-6]: Added full CommandCode I/O schema (control fields, exit codes), security/performance section (best practices), and table of common usage patterns portable across agents. Sources: commandcode-hooks-reference, commandcode-hooks-examples, commandcode-hooks-best-practices
+- 2026-06-08 [claude-sonnet-4-6]: Claude Code SessionStart — `source` field documented (startup|resume|clear|compact), `asyncRewake` added, `PreCompact` with exit 2 confirmed. CommandCode — plan mode gotcha documented. Source: handoff from second-brain
+- 2026-06-08 [Claude Code]: Translated to English

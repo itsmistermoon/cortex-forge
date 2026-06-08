@@ -1,5 +1,5 @@
 ---
-title: "TASTE: Referencia de Comandos — Documentación CommandCode"
+title: "TASTE: Command Reference — CommandCode Documentation"
 type: source
 created: 2026-06-08
 updated: 2026-06-08
@@ -11,7 +11,7 @@ sources: []
 confidence: high
 ---
 
-# TASTE: Referencia de Comandos — Documentación CommandCode
+# TASTE: Command Reference — CommandCode Documentation
 
 **URL:** https://commandcode.ai/docs/taste/commands
 **Original date:** 2026
@@ -19,13 +19,13 @@ confidence: high
 
 ## Summary
 
-Referencia completa de comandos `npx taste` / `cmd taste`. Especifica paths exactos de almacenamiento (la fuente más autoritativa para esto), flags `-g` para ámbito global, y `--all` para push del proyecto completo. Cinco comandos: push, pull, list, lint, open.
+Complete reference for `npx taste` / `cmd taste` commands. Specifies exact storage paths (the most authoritative source for this), the `-g` flag for global scope, and `--all` for pushing the full project. Five commands: push, pull, list, lint, open.
 
 ## Key ideas
 
-1. **Paths de almacenamiento confirmados**: per-project en `.commandcode/taste/`, global en `~/.commandcode/taste/`, remoto en `commandcode.ai/username/taste`.
-2. El flag `-g` es el mecanismo para operar sobre el ámbito global en lugar del per-project.
-3. `npx taste` y `cmd taste` son equivalentes; el segundo requiere instalación global previa.
+1. **Confirmed storage paths**: per-project at `.commandcode/taste/`, global at `~/.commandcode/taste/`, remote at `commandcode.ai/username/taste`.
+2. The `-g` flag is the mechanism for operating on global scope instead of per-project.
+3. `npx taste` and `cmd taste` are equivalent; the latter requires prior global installation.
 
 ## Connections
 - Related concepts: [[wiki/concepts/commandcode-taste]]
@@ -33,3 +33,4 @@ Referencia completa de comandos `npx taste` / `cmd taste`. Especifica paths exac
 ---
 
 - 2026-06-08 [Claude Code]: Page created
+- 2026-06-08 [Claude Code]: Translated to English

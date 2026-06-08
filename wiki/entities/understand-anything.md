@@ -12,31 +12,32 @@ confidence: high
 
 # Understand Anything (entity)
 
-Herramienta/plugin mantenido por **Lum1104** que construye grafos de conocimiento navegables sobre codebases, knowledge bases y documentación. Multi-plataforma: Claude Code, Codex, Cursor, Copilot, Gemini CLI, OpenCode, Vibe CLI, Trae, Hermes, Cline, KIMI, Antigravity.
+Tool/plugin maintained by **Lum1104** that builds navigable knowledge graphs over codebases, knowledge bases, and documentation. Multi-platform: Claude Code, Codex, Cursor, Copilot, Gemini CLI, OpenCode, Vibe CLI, Trae, Hermes, Cline, KIMI, Antigravity.
 
-**Tipo:** Plugin de AI coding (no SaaS, no hosted service — se ejecuta localmente).
-**Licencia:** MIT.
+**Type:** AI coding plugin (not SaaS, not a hosted service — runs locally).
+**License:** MIT.
 **Repo:** [github.com/Lum1104/Understand-Anything](https://github.com/Lum1104/Understand-Anything).
-**Output:** directorio `.understand-anything/` con `knowledge-graph.json` (grafo estructural + summaries semánticos) y `intermediate/` (scratch).
-**Stack:** tree-sitter (parsing determinista) + LLM (resúmenes semánticos) + pipeline multi-agente (5-7 agentes).
-**Instalación típica:** `curl … install.sh | bash -s <platform>` o marketplace nativo según plataforma.
+**Output:** `.understand-anything/` directory with `knowledge-graph.json` (structural graph + semantic summaries) and `intermediate/` (scratch).
+**Stack:** tree-sitter (deterministic parsing) + LLM (semantic summaries) + multi-agent pipeline (5-7 agents).
+**Typical install:** `curl … install.sh | bash -s <platform>` or native marketplace depending on platform.
 
-## Rol en el vault
+## Role in the vault
 
-Entidad de referencia. Citada en [[wiki/sources/understand-anything]] y origen de los conceptos:
+Reference entity. Cited in [[wiki/sources/understand-anything]] and origin of the concepts:
 - [[wiki/concepts/karpathy-wiki-pattern]]
 - [[wiki/concepts/treesitter-llm-hybrid-parsing]]
 - [[wiki/concepts/multi-agent-analysis-pipeline]]
 
-## Por qué tiene página propia
+## Why it has its own page
 
-No es una herramienta incidental. Su compatibilidad multi-plataforma y su capacidad de graficar wikis tipo Karpathy la hacen directamente relevante para dos proyectos del usuario:
+Not an incidental tool. Its multi-platform compatibility and ability to graph Karpathy-style wikis make it directly relevant to two of the user's projects:
 
-1. **`cortex-forge`** — graficar el vault completo (wiki/) como knowledge graph navegable, en línea con la visión de Karpathy sobre wikis LLM.
-2. **`second-brain`** — aplicar `/understand-knowledge` para descubrir relaciones implícitas entre páginas.
+1. **`cortex-forge`** — graph the entire vault (`wiki/`) as a navigable knowledge graph, in line with Karpathy's vision for LLM wikis.
+2. **`second-brain`** — apply `/understand-knowledge` to discover implicit relationships between pages.
 
-Si en el futuro se usa activamente, crear página de proyecto en `wiki/pages/understand-anything.md` y mover este contenido.
+If actively used in the future, create a project page at `wiki/pages/understand-anything.md` and move this content there.
 
 ---
 
-- 2026-06-08 [CommandCode]: Página creada — entidad de referencia para el plugin y sus derivados conceptuales
+- 2026-06-08 [CommandCode]: Page created — reference entity for the plugin and its derived concepts
+- 2026-06-08 [Claude Code]: Translated to English

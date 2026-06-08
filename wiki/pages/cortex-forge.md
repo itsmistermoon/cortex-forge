@@ -21,54 +21,55 @@ confidence: high
 
 ## Goal
 
-Vault con protocolo de hot cache que sincroniza contexto entre múltiples agentes (Claude Code, Codex, Antigravity, CommandCode) sin token bloat al inicio de sesión. El conocimiento sintetizado vive en `wiki/`; el contexto efímero por proyecto vive en `.hot/{project}.md`; los originales en `.raw/`.
+Vault with a hot cache protocol that synchronizes context across multiple agents (Claude Code, Codex, Antigravity, CommandCode) without token bloat at session start. Synthesized knowledge lives in `wiki/`; ephemeral per-project context lives in `.hot/{project}.md`; originals in `.raw/`.
 
 ## Stack / Technologies
-- 5 capas: `.raw/`, `wiki/`, `.hot/`, `wiki/meta/`, `skills/`
-- 4 tipos de página wiki: concepts, entities, sources, projects
-- 6 skills de vault: assimilate, recall, prune, imprint, crystallize, forge-setup
-- Hooks nativos (Stop/SessionStart) + fallback `AGENTS.md` (Capa 1) para agentes sin hook de inicio
-- Scripts bash portables: `load-hot-cache*.sh` (input) y `update-hot-cache*.sh` (output)
+- 5 layers: `.raw/`, `wiki/`, `.hot/`, `wiki/meta/`, `skills/`
+- 4 wiki page types: concepts, entities, sources, projects
+- 6 vault skills: assimilate, recall, prune, imprint, crystallize, forge-setup
+- Native hooks (Stop/SessionStart) + `AGENTS.md` fallback (Layer 1) for agents without a session-start hook
+- Portable bash scripts: `load-hot-cache*.sh` (input) and `update-hot-cache*.sh` (output)
 
 ## Key decisions
 
-- **Capa 1 (AGENTS.md) + Capa 2 (hooks nativos)** son complementarias, no excluyentes. Capa 1 cubre agentes sin hook de inicio (CommandCode); Capa 2 es más confiable.
-- **Hot cache corta en `## History`** — solo se inyecta `## Current state` al contexto. Decisión tomada 2026-06-08 tras observar que History llenaba tokens sin valor operativo.
-- **Wire format oficial de CommandCode es anidado** (`hooks: [{ matcher, hooks: [{ type, command, timeout? }] }]`), distinto del plano de Claude Code/Codex. Scripts de hot cache no son drop-in entre agentes.
-- **Project pages solo para proyectos del usuario** — entidades third-party (Understand Anything, Antigravity) van a `entities/`, no a `pages/`.
-- **No retroescribir `.raw/`** — es inmutable. Cualquier corrección va en la página wiki que la referencia.
+- **Layer 1 (AGENTS.md) + Layer 2 (native hooks)** are complementary, not exclusive. Layer 1 covers agents without a session-start hook (CommandCode); Layer 2 is more reliable.
+- **Hot cache cuts at `## History`** — only `## Current state` is injected into context. Decision made 2026-06-08 after observing that History filled tokens without operational value.
+- **CommandCode's official wire format is nested** (`hooks: [{ matcher, hooks: [{ type, command, timeout? }] }]`), unlike the flat format used by Claude Code/Codex. Hot cache scripts are not drop-in across agents.
+- **Project pages only for user's own projects** — third-party entities (Understand Anything, Antigravity) go in `entities/`, not `pages/`.
+- **Do not retrowrite `.raw/`** — it is immutable. Any correction goes in the wiki page that references it.
 
 ## Next steps
 
-- [ ] Re-probar Antigravity CLI con Capa 2 verificada en sesión real
-- [ ] Re-probar CommandCode como experimento de control post-Capa 1
-- [ ] Probar `/understand-knowledge` sobre el vault propio (grafo de `wiki/`)
-- [ ] Resolver pendientes de Fase 1 del ROADMAP.md para cada agente
-- [ ] MOCs por área temática (Fase 3)
+- [ ] Re-test Antigravity CLI with Layer 2 verified in a real session
+- [ ] Re-test CommandCode as a control experiment post-Layer 1
+- [ ] Run `/understand-knowledge` on the vault itself (graph of `wiki/`)
+- [ ] Resolve Phase 1 ROADMAP.md pending items for each agent
+- [ ] MOCs by thematic area (Phase 3)
 
 ## Knowledge applied
 
-- [[wiki/concepts/agent-hook-compatibility]] — Matriz de lifecycle hooks por agente
-- [[wiki/concepts/progressive-disclosure-hooks]] — Carga just-in-time de contexto
-- [[wiki/concepts/antigravity-hooks]] — Configuración específica de Antigravity
-- [[wiki/concepts/karpathy-wiki-pattern]] — Wikis optimizados para consumo por LLM
-- [[wiki/concepts/treesitter-llm-hybrid-parsing]] — Parser determinista + LLM para interpretaciones
-- [[wiki/concepts/multi-agent-analysis-pipeline]] — Orquestación de N agentes especializados
+- [[wiki/concepts/agent-hook-compatibility]] — Lifecycle hook matrix per agent
+- [[wiki/concepts/progressive-disclosure-hooks]] — Just-in-time context loading
+- [[wiki/concepts/antigravity-hooks]] — Antigravity-specific configuration
+- [[wiki/concepts/karpathy-wiki-pattern]] — Wikis optimized for LLM consumption
+- [[wiki/concepts/treesitter-llm-hybrid-parsing]] — Deterministic parser + LLM for interpretations
+- [[wiki/concepts/multi-agent-analysis-pipeline]] — Orchestration of N specialized agents
 
 ## Recurring issues
 
-- `cortex-recall` falla en todos los agentes probados durante sesión — caen en búsqueda manual pese a MANDATORY en `AGENTS.md`. Pendiente diagnosticar causa raíz común.
-- Codex hooks apuntan a `~/.claude/hooks/` por convención pendiente; funcional pero no idiomático.
-- Capa 2 de Antigravity instalada pero no verificada en sesión real.
+- `cortex-recall` fails in all agents tested during session — they fall back to manual search despite MANDATORY in `AGENTS.md`. Root cause pending diagnosis.
+- Codex hooks point to `~/.claude/hooks/` by pending convention; functional but not idiomatic.
+- Antigravity Layer 2 installed but not verified in a real session.
 
 ## Sources
 
-- [[wiki/sources/commandcode-hooks-configuration]] — Wire format y scopes de CommandCode
-- [[wiki/sources/codex-hooks]] — Lifecycle y trust de Codex
-- [[wiki/sources/antigravity-hooks]] — Configuración de Antigravity/Gemini CLI
-- [[wiki/sources/gemini-cli-hooks-video]] — Video oficial hooks & skills
-- [[wiki/sources/understand-anything]] — Patrón de grafos de conocimiento
+- [[wiki/sources/commandcode-hooks-configuration]] — CommandCode wire format and scopes
+- [[wiki/sources/codex-hooks]] — Codex lifecycle and trust
+- [[wiki/sources/antigravity-hooks]] — Antigravity/Gemini CLI configuration
+- [[wiki/sources/gemini-cli-hooks-video]] — Official hooks & skills video
+- [[wiki/sources/understand-anything]] — Knowledge graph pattern
 
 ---
 
-- 2026-06-08 [CommandCode / MiniMax-M3]: Page created retroactively — vault ya activo desde 2026-06-07 pero sin project page; consolidado para habilitar project linking futuro
+- 2026-06-08 [CommandCode / MiniMax-M3]: Page created retroactively — vault already active since 2026-06-07 but without a project page; consolidated to enable future project linking
+- 2026-06-08 [Claude Code]: Translated to English

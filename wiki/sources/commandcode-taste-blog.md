@@ -1,5 +1,5 @@
 ---
-title: "TASTE: Skills, Rules y Aprendizaje Continuo — Blog CommandCode"
+title: "TASTE: Skills, Rules and Continuous Learning — CommandCode Blog"
 type: source
 created: 2026-06-08
 updated: 2026-06-08
@@ -11,7 +11,7 @@ sources: []
 confidence: medium
 ---
 
-# TASTE: Skills, Rules y Aprendizaje Continuo — Blog CommandCode
+# TASTE: Skills, Rules and Continuous Learning — CommandCode Blog
 
 **URL:** https://commandcode.ai/blog/taste-skills-rules
 **Original date:** 2026
@@ -19,13 +19,13 @@ confidence: medium
 
 ## Summary
 
-Artículo introductorio que posiciona TASTE dentro del three-layer stack de CommandCode (TASTE > Skills > Rules). Explica el bucle de aprendizaje continuo (generar → observar → extraer → aprender → aplicar), el almacenamiento per-project en archivos `taste.md`, y el modelo subyacente `taste-1`. Presenta resultados empíricos de reducción de ciclos de edición tras un mes de uso.
+Introductory article that positions TASTE within CommandCode's three-layer stack (TASTE > Skills > Rules). Explains the continuous learning loop (generate → observe → extract → learn → apply), per-project storage in `taste.md` files, and the underlying `taste-1` model. Presents empirical results showing reduced edit cycles after one month of use.
 
 ## Key ideas
 
-1. TASTE es auto-gestionado: crea y mantiene sus propios archivos cada sesión sin intervención del usuario.
-2. El alcance primario es per-project; los archivos viven en `.commandcode/taste/` y pueden dividirse automáticamente por dominio (API, frontend, backend).
-3. Cada regla aprendida incluye un score de confianza (0.0–1.0) basado en consistencia observada, no configurada manualmente.
+1. TASTE is self-managed: it creates and maintains its own files each session without user intervention.
+2. Primary scope is per-project; files live in `.commandcode/taste/` and can be automatically split by domain (API, frontend, backend).
+3. Each learned rule includes a confidence score (0.0–1.0) based on observed consistency, not manually configured.
 
 ## Connections
 - Related concepts: [[wiki/concepts/commandcode-taste]]
@@ -34,3 +34,4 @@ Artículo introductorio que posiciona TASTE dentro del three-layer stack de Comm
 ---
 
 - 2026-06-08 [Claude Code]: Page created
+- 2026-06-08 [Claude Code]: Translated to English

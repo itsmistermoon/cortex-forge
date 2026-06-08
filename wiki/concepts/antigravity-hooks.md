@@ -13,28 +13,28 @@ confidence: medium
 
 # Antigravity Hooks
 
-Antigravity Hooks definen el patrón de configuración y ejecución para extender el lifecycle del agente en el ecosistema [[google-antigravity]] / Gemini CLI. Permiten insertar pasos de verificación, inicialización y carga de contexto en el loop del agente.
+Antigravity Hooks define the configuration and execution pattern for extending the agent lifecycle in the [[google-antigravity]] / Gemini CLI ecosystem. They allow inserting verification, initialization, and context loading steps into the agent loop.
 
-## Archivo de configuración
+## Configuration file
 
-Antigravity hereda la ruta de Gemini CLI. Los hooks globales se leen desde:
+Antigravity inherits the Gemini CLI path. Global hooks are read from:
 
 ```
 ~/.gemini/config/hooks.json
 ```
 
-La diferencia con Gemini CLI (que usa `settings.json`) es que Antigravity usa un `hooks.json` separado — mismo directorio, archivo distinto.
+The difference from Gemini CLI (which uses `settings.json`) is that Antigravity uses a separate `hooks.json` — same directory, different file.
 
-### Bug conocido en agy-cli (issue #49)
+### Known bug in agy-cli (issue #49)
 
-Hay un bug de alineación de rutas en el CLI:
+There is a path alignment bug in the CLI:
 
-- **Ruta de lectura (correcta)**: `~/.gemini/config/hooks.json`
-- **Ruta de escritura (errónea)**: `~/.gemini/antigravity-cli/hooks.json`
+- **Read path (correct)**: `~/.gemini/config/hooks.json`
+- **Write path (incorrect)**: `~/.gemini/antigravity-cli/hooks.json`
 
-Si se crean o modifican hooks usando comandos del CLI, el archivo se escribe en la ruta incorrecta y los hooks no se ejecutan.
+If hooks are created or modified using CLI commands, the file is written to the wrong path and hooks are not executed.
 
-**Solución mientras no se parchee**: crear y editar `hooks.json` manualmente en la ruta correcta, o crear un symlink:
+**Workaround until patched**: create and edit `hooks.json` manually at the correct path, or create a symlink:
 
 ```bash
 ln -s ~/.gemini/config/hooks.json ~/.gemini/antigravity-cli/hooks.json
@@ -42,27 +42,27 @@ ln -s ~/.gemini/config/hooks.json ~/.gemini/antigravity-cli/hooks.json
 
 ## Scopes
 
-- **Global**: `~/.gemini/config/hooks.json` — disponible en todos los proyectos
-- **Workspace**: `.agents/hooks.json` en el root del proyecto
+- **Global**: `~/.gemini/config/hooks.json` — available in all projects
+- **Workspace**: `.agents/hooks.json` in the project root
 
-## Ruta de scripts
+## Scripts path
 
-No hay ruta impuesta por la plataforma. Los scripts pueden vivir en cualquier directorio absoluto. Convención recomendada para Cortex Forge: `~/.gemini/config/hooks/` (alineado con el scope global).
+There is no platform-imposed path. Scripts can live in any absolute directory. Recommended convention for Cortex Forge: `~/.gemini/config/hooks/` (aligned with the global scope).
 
-## Mecanismos
+## Mechanisms
 
-### 1. Configuración JSON
-Mapeo estático de eventos a scripts o comandos. Eventos soportados incluyen lifecycle de sesión (`SessionStart`, `Stop`) y eventos de herramientas.
+### 1. JSON configuration
+Static mapping of events to scripts or commands. Supported events include session lifecycle (`SessionStart`, `Stop`) and tool events.
 
 ### 2. SDK (Python)
-Hooks programáticos para observar, modificar o bloquear tool calls y acciones del agente de forma dinámica.
+Programmatic hooks to observe, modify, or block tool calls and agent actions dynamically.
 
 ### 3. SessionStart
-Evento disparado al inicio de sesión. Caso de uso principal: cargar contexto de sesión anterior (hot cache), verificar estado del entorno, inicializar dependencias.
+Event fired at session start. Primary use case: load previous session context (hot cache), verify environment state, initialize dependencies.
 
 ## Skills folder
 
-La carpeta estandarizada agnóstica de proveedor es `.agents/skills/`. Gemini CLI también lee desde `.gemini/skills/`. Para máxima compatibilidad multi-agente, usar `.agents/skills/`.
+The standardized provider-agnostic folder is `.agents/skills/`. Gemini CLI also reads from `.gemini/skills/`. For maximum multi-agent compatibility, use `.agents/skills/`.
 
 ## Connections
 - Related concepts: [[wiki/concepts/agent-hook-compatibility]], [[wiki/concepts/progressive-disclosure-hooks]]
@@ -71,5 +71,6 @@ La carpeta estandarizada agnóstica de proveedor es `.agents/skills/`. Gemini CL
 ---
 
 - 2026-06-07 [Antigravity]: Page created
-- 2026-06-08 [Claude Code]: Actualizado con hallazgos del video oficial de Gemini CLI — scopes y ruta de scripts aclarados; skills folder estandarizado
-- 2026-06-08 [Claude Code]: Bug de alineación de rutas documentado (issue #49 de agy-cli) — ruta de lectura vs escritura del CLI difieren; solución: edición manual o symlink
+- 2026-06-08 [Claude Code]: Updated with findings from official Gemini CLI video — scopes and scripts path clarified; skills folder standardized
+- 2026-06-08 [Claude Code]: Path alignment bug documented (agy-cli issue #49) — CLI read vs write paths differ; workaround: manual edit or symlink
+- 2026-06-08 [Claude Code]: Translated to English

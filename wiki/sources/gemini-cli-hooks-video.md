@@ -15,24 +15,24 @@ confidence: medium
 # Gemini CLI Hooks & Skills — Google Cloud Live
 
 **URL:** https://www.youtube.com/watch?v=ZXYuiEMm21s
-**Autor:** Jack Weatherspoon, Gemini CLI team — Google Cloud Live
-**Formato:** transcript de video (auto-subtítulos, calidad media)
+**Author:** Jack Weatherspoon, Gemini CLI team — Google Cloud Live
+**Format:** video transcript (auto-subtitles, medium quality)
 
 ## Summary
 
-Video de demostración avanzada de Gemini CLI con foco en hooks, skills y plan mode. El presentador (Jack Weatherspoon, del equipo de Gemini CLI) construye una aplicación en vivo para ilustrar cada feature.
+Advanced Gemini CLI demo video focused on hooks, skills, and plan mode. The presenter (Jack Weatherspoon, Gemini CLI team) builds an application live to illustrate each feature.
 
-Relevante para Cortex Forge porque Antigravity CLI hereda del ecosistema Gemini CLI — su sistema de hooks y skills tiene el mismo origen y convenciones base.
+Relevant to Cortex Forge because Antigravity CLI inherits from the Gemini CLI ecosystem — its hooks and skills system shares the same origin and base conventions.
 
 ## Key Ideas
 
-1. **Hooks se configuran en `settings.json`**: la configuración de hooks va dentro del bloque `hooks:` de `settings.json`, el archivo central de configuración de Gemini CLI. No en un `hooks.json` separado.
-2. **Scripts pueden vivir en cualquier ruta**: "wherever you want" — no hay ruta de scripts impuesta por la plataforma. Solo el path en `settings.json` tiene que ser correcto.
-3. **Context injection vía stdout**: los hooks envían contexto a Gemini CLI mediante stdout. El contenido se inyecta en el turno actual antes de que el modelo responda.
-4. **Session start hook para cargar contexto**: caso de uso explícito — cargar los últimos 5 commits de git, cargar contexto de sesión anterior, etc. Es el equivalente exacto del hot cache protocol de Cortex Forge.
-5. **Dos scopes**: user-scope (disponible en todos los proyectos, vive en `~/.gemini/`) y workspace-scope (específico del proyecto, vive en `.gemini/` local o `.agents/`).
-6. **Skills standardized folder**: `.agents/skills` es la carpeta estandarizada agnóstica de proveedor. Gemini CLI también lee desde `.gemini/skills`. El estándar multi-agente es `.agents/`.
-7. **Progressive disclosure**: patrón central de hooks y skills — en lugar de cargar todo el contexto al inicio, se carga solo cuando se necesita. Ver [[wiki/concepts/progressive-disclosure-hooks]].
+1. **Hooks are configured in `settings.json`**: hook configuration goes inside the `hooks:` block of `settings.json`, the central configuration file for Gemini CLI. Not in a separate `hooks.json`.
+2. **Scripts can live at any path**: "wherever you want" — there is no platform-imposed script path. Only the path in `settings.json` needs to be correct.
+3. **Context injection via stdout**: hooks send context to Gemini CLI through stdout. The content is injected into the current turn before the model responds.
+4. **Session start hook for loading context**: explicit use case — load the last 5 git commits, load previous session context, etc. This is the exact equivalent of Cortex Forge's hot cache protocol.
+5. **Two scopes**: user-scope (available across all projects, lives in `~/.gemini/`) and workspace-scope (project-specific, lives in local `.gemini/` or `.agents/`).
+6. **Skills standardized folder**: `.agents/skills` is the standardized provider-agnostic folder. Gemini CLI also reads from `.gemini/skills`. The multi-agent standard is `.agents/`.
+7. **Progressive disclosure**: central pattern for hooks and skills — instead of loading all context upfront, context is loaded only when needed. See [[wiki/concepts/progressive-disclosure-hooks]].
 
 ## Connections
 - Related concepts: [[wiki/concepts/antigravity-hooks]], [[wiki/concepts/agent-hook-compatibility]], [[wiki/concepts/progressive-disclosure-hooks]]
@@ -40,4 +40,5 @@ Relevante para Cortex Forge porque Antigravity CLI hereda del ecosistema Gemini 
 
 ---
 
-- 2026-06-08 [Claude Code]: Página creada — transcript de video descargado con yt-dlp; relevancia: Antigravity hereda convenciones de Gemini CLI
+- 2026-06-08 [Claude Code]: Page created — video transcript downloaded with yt-dlp; relevance: Antigravity inherits Gemini CLI conventions
+- 2026-06-08 [Claude Code]: Translated to English

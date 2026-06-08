@@ -12,70 +12,71 @@ confidence: high
 
 # Tree-sitter + LLM hybrid parsing
 
-Patrón de análisis de código que divide el trabajo entre un **parser determinista** (tree-sitter) y un **LLM semántico** según lo que cada uno hace mejor. Aplicado por Understand Anything en su pipeline `/understand`.
+Code analysis pattern that divides work between a **deterministic parser** (tree-sitter) and a **semantic LLM** based on what each does best. Applied by Understand Anything in its `/understand` pipeline.
 
-## El split
+## The split
 
-**Tree-sitter (determinista)** — produce los **hechos objetivos** del código:
+**Tree-sitter (deterministic)** — produces the **objective facts** of the code:
 
-- Árbol de sintaxis concreta (CST).
-- Imports, exports, definiciones de funciones/clases.
-- Call sites, herencia, type signatures.
-- `importMap` pre-resuelto.
-- Fingerprints estructurales para change detection incremental.
+- Concrete syntax tree (CST).
+- Imports, exports, function/class definitions.
+- Call sites, inheritance, type signatures.
+- Pre-resolved `importMap`.
+- Structural fingerprints for incremental change detection.
 
-**Misma entrada → misma salida, siempre.** Reproducible por construcción.
+**Same input → same output, always.** Reproducible by construction.
 
-**LLM (semántico)** — produce las **interpretaciones** que el parser no puede:
+**LLM (semantic)** — produces the **interpretations** the parser cannot:
 
-- Resúmenes en lenguaje natural de qué hace cada función.
-- Tags semánticos (e.g. "auth-handler", "payment-flow").
-- Asignación de capa arquitectónica (API, Service, Data, UI, Utility).
-- Mapeo a dominio de negocio.
-- Tours guiados de aprendizaje.
-- Callouts de conceptos de programación en contexto.
+- Natural language summaries of what each function does.
+- Semantic tags (e.g. "auth-handler", "payment-flow").
+- Architectural layer assignment (API, Service, Data, UI, Utility).
+- Business domain mapping.
+- Guided learning tours.
+- Programming concept callouts in context.
 
-**Misma entrada → salidas que pueden variar** entre runs (depende del modelo, temperatura, prompt).
+**Same input → outputs that may vary** between runs (depends on model, temperature, prompt).
 
-## Por qué el split es importante
+## Why the split matters
 
-Si delegas todo al LLM:
-- Pierdes reproducibilidad estructural (mismas funciones podrían mapearse a nodos distintos entre runs).
-- Gastas tokens re-derivando hechos que el parser ya conoce.
-- No puedes hacer incremental fiable (¿qué cambió?).
+If you delegate everything to the LLM:
+- You lose structural reproducibility (the same functions could map to different nodes between runs).
+- You spend tokens re-deriving facts the parser already knows.
+- You cannot do reliable incremental analysis (what changed?).
 
-Si delegas todo al parser:
-- No tienes resúmenes.
-- No puedes inferir intención.
-- No hay mapping a dominio de negocio.
+If you delegate everything to the parser:
+- You have no summaries.
+- You cannot infer intent.
+- There is no business domain mapping.
 
-**El split da:**
-- Reproducibilidad estructural (los edges son hechos).
-- Semántica variable pero etiquetable (los resúmenes son hipótesis).
-- Incremental fiable vía fingerprinting estructural (solo re-analiza archivos cuyo CST cambió).
+**The split gives you:**
+- Structural reproducibility (edges are facts).
+- Variable but labelable semantics (summaries are hypotheses).
+- Reliable incremental processing via structural fingerprinting (only re-analyzes files whose CST changed).
 
-## Pre-resolución de imports
+## Import pre-resolution
 
-Detalle clave del diseño: tree-sitter **no solo** extrae `import x from y` — **resuelve** `x` contra el `importMap` del proyecto completo y pasa el mapa pre-resuelto a los file analyzers. Resultado: el LLM no re-deriva dependencias; consume un grafo de imports ya materializado.
+Key design detail: tree-sitter **not only** extracts `import x from y` — it **resolves** `x` against the project's complete `importMap` and passes the pre-resolved map to the file analyzers. Result: the LLM does not re-derive dependencies; it consumes an already-materialized import graph.
 
-**Trade-off:** coste upfront del scan completo del proyecto. Beneficio: ahorro de tokens en cada archivo analizado (lo cual escala mal sin esto).
+**Trade-off:** upfront cost of a full project scan. Benefit: token savings on each analyzed file (which scales poorly without this).
 
-## Fingerprinting para incremental
+## Fingerprinting for incremental
 
-Tree-sitter produce un hash estructural del CST (no del texto fuente). Si el código se reformatea sin cambios semánticos (e.g. prettier), el fingerprint **no cambia** y no se re-analiza. Si se cambia un `import`, el fingerprint cambia y se re-analiza solo el archivo afectado.
+Tree-sitter produces a structural hash of the CST (not of the source text). If code is reformatted without semantic changes (e.g. prettier), the fingerprint **does not change** and the file is not re-analyzed. If an `import` is changed, the fingerprint changes and only the affected file is re-analyzed.
 
-**Lección:** hashear la **forma semántica**, no el texto crudo. El texto es presentación; la forma es lo que importa para el análisis.
+**Lesson:** hash the **semantic shape**, not the raw text. Text is presentation; shape is what matters for analysis.
 
-## Aplicabilidad transferible
+## Transferable applicability
 
-El patrón es replicable en cualquier sistema que analice código + documentación:
+The pattern is replicable in any system that analyzes code + documentation:
 
-- **Documentación:** parser markdown (remark/markdown-it) extrae estructura, LLM extrae intención.
-- **Wikis:** parser de wikilinks + frontmatter (ver [[wiki/concepts/karpathy-wiki-pattern]]) extrae edges, LLM extrae claims implícitos.
-- **Logs/queries:** parser regex/AST extrae hechos, LLM extrae causalidad.
+- **Documentation:** markdown parser (remark/markdown-it) extracts structure, LLM extracts intent.
+- **Wikis:** wikilink + frontmatter parser (see [[wiki/concepts/karpathy-wiki-pattern]]) extracts edges, LLM extracts implicit claims.
+- **Logs/queries:** regex/AST parser extracts facts, LLM extracts causality.
 
-**Regla:** el parser maneja **lo que es verificable**; el LLM maneja **lo que requiere interpretación**. Mezclar las dos responsabilidades en una sola capa (todo al LLM, o todo a regex) es la causa más común de pipelines de análisis que no escalan.
+**Rule:** the parser handles **what is verifiable**; the LLM handles **what requires interpretation**. Mixing both responsibilities in a single layer (everything to the LLM, or everything to regex) is the most common cause of analysis pipelines that do not scale.
 
 ---
 
-- 2026-06-08 [CommandCode]: Página creada — concepto extraído de la arquitectura interna de Understand Anything, con énfasis en las decisiones de diseño (pre-resolución, fingerprinting estructural) que lo hacen eficiente
+- 2026-06-08 [CommandCode]: Page created — concept extracted from the internal architecture of Understand Anything, with emphasis on the design decisions (pre-resolution, structural fingerprinting) that make it efficient
+- 2026-06-08 [Claude Code]: Translated to English

@@ -15,23 +15,23 @@ confidence: high
 
 # CommandCode TASTE
 
-TASTE es el sistema de personalización continua de [[wiki/entities/commandcode]] (ver [[wiki/concepts/agent-hook-compatibility]] para contexto del agente). Aprende de las acciones del usuario —aceptaciones, rechazos, ediciones— y genera archivos `taste.md` que condicionan la generación de código en futuras sesiones. No requiere configuración manual inicial; el sistema los crea y mantiene solo.
+TASTE is the continuous personalization system of [[wiki/entities/commandcode]] (see [[wiki/concepts/agent-hook-compatibility]] for agent context). It learns from user actions — acceptances, rejections, edits — and generates `taste.md` files that condition code generation in future sessions. No manual initial configuration is required; the system creates and maintains them automatically.
 
-## Alcance: per-project y global
+## Scope: per-project and global
 
-TASTE tiene **dos ámbitos con paths concretos**:
+TASTE has **two scopes with concrete paths**:
 
-| Ámbito      | Path                        | Flag CLI       |
+| Scope       | Path                        | CLI flag       |
 |-------------|-----------------------------|----------------|
-| Per-project | `.commandcode/taste/`       | (por defecto)  |
+| Per-project | `.commandcode/taste/`       | (default)      |
 | Global      | `~/.commandcode/taste/`     | `-g`           |
-| Remoto      | `commandcode.ai/username/taste` | (Studio)   |
+| Remote      | `commandcode.ai/username/taste` | (Studio)   |
 
-El ámbito per-project es el primario. Los archivos pueden dividirse automáticamente por dominio (APIs, componentes frontend, backend) a medida que el proyecto crece. El ámbito global permite llevar preferencias aprendidas a cualquier proyecto sin reaprender desde cero.
+The per-project scope is the primary one. Files can be split automatically by domain (APIs, frontend components, backend) as the project grows. The global scope allows carrying learned preferences to any project without relearning from scratch.
 
-## Formato de archivos
+## File format
 
-Los archivos `taste.md` son legibles e inspeccionables. Cada entrada incluye un score de confianza (0.0–1.0) basado en consistencia observada:
+`taste.md` files are human-readable and inspectable. Each entry includes a confidence score (0.0–1.0) based on observed consistency:
 
 ```
 ## TypeScript
@@ -39,54 +39,55 @@ Los archivos `taste.md` son legibles e inspeccionables. Cada entrada incluye un 
 - Prefer explicit return types on exported functions. Confidence: 0.65
 ```
 
-Las puntuaciones altas indican patrones establecidos; las bajas, preferencias aún en formación.
+High scores indicate established patterns; low scores indicate preferences still forming.
 
-## Bucle de aprendizaje
+## Learning loop
 
 ```
-generar → observar (aceptar/rechazar/editar) → extraer → aprender → aplicar
+generate → observe (accept/reject/edit) → extract → learn → apply
 ```
 
-La retroalimentación es **implícita**: no requiere anotación explícita. El modelo subyacente es `taste-1`, arquitectura neuro-simbólica que separa el conocimiento del LLM (neural) de las preferencias del usuario (simbólico).
+Feedback is **implicit**: no explicit annotation required. The underlying model is `taste-1`, a neuro-symbolic architecture that separates LLM knowledge (neural) from user preferences (symbolic).
 
-Fórmula conceptual: `output = LLM(prompt | taste(user))`
+Conceptual formula: `output = LLM(prompt | taste(user))`
 
-## Gestión: comandos CLI
+## Management: CLI commands
 
 ```bash
-# Ámbito per-project
-npx taste push --all              # sube toda la carpeta .commandcode/taste/ al Studio
-npx taste pull username/proyecto  # trae un perfil desde Studio al proyecto local
+# Per-project scope
+npx taste push --all              # uploads entire .commandcode/taste/ folder to Studio
+npx taste pull username/project   # pulls a profile from Studio to the local project
 
-# Ámbito global
-npx taste push [paquete] -g       # sube al ámbito global
-npx taste pull [paquete] -g       # baja al ámbito global
+# Global scope
+npx taste push [package] -g       # pushes to global scope
+npx taste pull [package] -g       # pulls to global scope
 
-# Otros
-npx taste list                    # lista perfiles disponibles en Studio
-npx taste lint                    # valida formato del paquete
-npx taste open                    # abre paquetes en el editor
+# Other
+npx taste list                    # lists available profiles in Studio
+npx taste lint                    # validates package format
+npx taste open                    # opens packages in editor
 ```
 
-`npx taste` y `cmd taste` son equivalentes.
+`npx taste` and `cmd taste` are equivalent.
 
 ## Three-layer stack
 
-| Capa       | Fuente              | Actualización     | Resultado  |
+| Layer      | Source              | Update            | Result     |
 |------------|---------------------|-------------------|------------|
-| **TASTE**  | Auto-aprendido      | Cada sesión, auto | Personal   |
-| **Skills** | Autor del usuario   | Manual            | Universal  |
-| **Rules**  | Usuario escribe     | Manual            | Universal  |
+| **TASTE**  | Auto-learned        | Each session, auto | Personal  |
+| **Skills** | User-authored       | Manual            | Universal  |
+| **Rules**  | User-written        | Manual            | Universal  |
 
-"Skills aumentan capacidad. Taste aumenta alineación."
+"Skills increase capability. Taste increases alignment."
 
-## Relevancia para cortex-forge
+## Relevance for cortex-forge
 
-El pendiente [[wiki/pages/cortex-forge]] sobre scope de TASTE rule para `cortex-recall` queda resuelto por esta ingesta:
+The pending [[wiki/pages/cortex-forge]] item about TASTE rule scope for `cortex-recall` is resolved by this ingestion:
 
-- **La decisión es contextual**: si la rule es específica del vault → `.commandcode/taste/` (per-project); si debe aplicar en cualquier proyecto donde se use `cortex-recall` → `~/.commandcode/taste/` (global con `-g`).
-- `cortex-forge-setup` puede poblar ambas ubicaciones; la pregunta es cuál ofrece como default al usuario.
+- **The decision is contextual**: if the rule is vault-specific → `.commandcode/taste/` (per-project); if it should apply in any project where `cortex-recall` is used → `~/.commandcode/taste/` (global with `-g`).
+- `cortex-forge-setup` can populate both locations; the question is which one to offer as the default to the user.
 
 ---
 
-- 2026-06-08 [Claude Code]: Page created desde 4 fuentes CommandCode oficiales
+- 2026-06-08 [Claude Code]: Page created from 4 official CommandCode sources
+- 2026-06-08 [Claude Code]: Translated to English

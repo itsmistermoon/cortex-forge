@@ -12,57 +12,58 @@ confidence: high
 
 # Karpathy-pattern LLM wiki
 
-Patrón de diseño de wikis/knowledge bases optimizados para ser **leídos y consultados por LLMs**, no solo por humanos. Formalizado informalmente por Andrej Karpathy en [gist #442a6bf555914893e9891c11519de94f](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f).
+Design pattern for wikis/knowledge bases optimized to be **read and queried by LLMs**, not just by humans. Informally formalized by Andrej Karpathy in [gist #442a6bf555914893e9891c11519de94f](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f).
 
-## Estructura canónica
+## Canonical structure
 
-- **`index.md`** como punto de entrada — el LLM lo lee primero para orientarse.
-- **Wikilinks explícitos** `[[page-name]]` entre documentos — el parser determinista los extrae como edges del grafo.
-- **Categorías/tags** declarados en frontmatter — el parser los extrae como metadatos.
-- **Carpetas por tipo** (concept, entity, source, project) — navegación predecible.
+- **`index.md`** as entry point — the LLM reads it first to orient itself.
+- **Explicit wikilinks** `[[page-name]]` between documents — the deterministic parser extracts them as graph edges.
+- **Categories/tags** declared in frontmatter — the parser extracts them as metadata.
+- **Folders by type** (concept, entity, source, project) — predictable navigation.
 
-## Qué lo distingue de un wiki tradicional
+## What distinguishes it from a traditional wiki
 
-Un wiki humano (MediaWiki, Notion, Obsidian publish) optimiza para **lectura humana**: sidebar de navegación, búsqueda full-text, breadcrumbs. Un wiki Karpathy optimiza para **consumo por LLM**:
+A human wiki (MediaWiki, Notion, Obsidian publish) optimizes for **human reading**: navigation sidebar, full-text search, breadcrumbs. A Karpathy wiki optimizes for **LLM consumption**:
 
-- Frontmatter estructurado (no HTML装飾).
-- Títulos en H1 únicos por archivo (no múltiples H1).
-- Compiled truth en prosa, no bullets decorativos.
-- Changelog al pie para que un agente sepa qué ha cambiado.
-- Wikilinks en texto plano, no en campos de metadata separados.
+- Structured frontmatter (no HTML decoration).
+- Unique H1 titles per file (no multiple H1s).
+- Compiled truth in prose, not decorative bullets.
+- Changelog at the bottom so an agent knows what has changed.
+- Wikilinks in plain text, not in separate metadata fields.
 
-## El parser determinista
+## The deterministic parser
 
-Un wiki Karpathy es **parseable sin LLM** por un script pequeño. La pipeline de Understand Anything lo hace así:
+A Karpathy wiki is **parseable without an LLM** by a small script. The Understand Anything pipeline does it as follows:
 
-1. **Parser determinista** lee `index.md` + archivos en `wiki/`, extrae:
-   - Wikilinks `[[...]]` → edges del grafo.
-   - Categorías del frontmatter → tags visuales en el grafo.
-   - Estructura de carpetas → clusters.
+1. **Deterministic parser** reads `index.md` + files in `wiki/`, extracts:
+   - Wikilinks `[[...]]` → graph edges.
+   - Categories from frontmatter → visual tags in the graph.
+   - Folder structure → clusters.
 
-2. **LLM agent** complementa con:
-   - Entidades no explícitamente linkeadas.
-   - Claims implícitos entre páginas.
-   - Resúmenes semánticos por nodo.
+2. **LLM agent** complements with:
+   - Entities not explicitly linked.
+   - Implicit claims between pages.
+   - Semantic summaries per node.
 
-El resultado: **grafo navegable con base estructural reproducible** (los wikilinks son hechos objetivos) y **capa semántica subjetiva** (las inferencias del LLM son hipótesis etiquetables).
+The result: **navigable graph with a reproducible structural base** (wikilinks are objective facts) and **subjective semantic layer** (LLM inferences are labelable hypotheses).
 
-## Aplicabilidad directa
+## Direct applicability
 
-El vault `cortex-forge` ya implementa este patrón (ver [[wiki/index]]): index.md como entry point, frontmatter por página, `templates/` para tipo de página, categorías `wiki/concepts/`, `wiki/entities/`, `wiki/sources/`, `wiki/pages/`. Faltaría:
+The `cortex-forge` vault already implements this pattern (see [[wiki/index]]): index.md as entry point, frontmatter per page, `templates/` for page types, categories `wiki/concepts/`, `wiki/entities/`, `wiki/sources/`, `wiki/pages/`. Still missing:
 
-- Adoptar `[[wikilinks]]` explícitos (hoy hay pocos).
-- Validar que el parser determinista puede extraer el grafo desde el filesystem actual.
-- Evaluar `/understand-knowledge` para graficar el vault completo.
+- Adopting explicit `[[wikilinks]]` (currently there are few).
+- Validating that the deterministic parser can extract the graph from the current filesystem.
+- Evaluating `/understand-knowledge` to graph the complete vault.
 
-## Por qué funciona
+## Why it works
 
-**Trade-off fundamental:** un wiki humano premia la presentación (CSS, imágenes, navegación). Un wiki Karpathy premia la **recuperabilidad por máquina**. Para un vault cuyo consumidor principal es un agente, el segundo es estrictamente superior. El coste: la presentación es más austera, los wikilinks rompen en wikis grandes, y el diseño de la página está limitado por lo que un parser puede extraer.
+**Fundamental trade-off:** a human wiki rewards presentation (CSS, images, navigation). A Karpathy wiki rewards **machine retrievability**. For a vault whose primary consumer is an agent, the second is strictly superior. The cost: presentation is more austere, wikilinks break in large wikis, and page design is limited by what a parser can extract.
 
-## Lección transferible
+## Transferable lesson
 
-> Si el consumidor primario del vault es un agente, optimiza el vault para el agente, no para el humano. La presentación es un subproducto de la estructura.
+> If the primary consumer of the vault is an agent, optimize the vault for the agent, not for the human. Presentation is a byproduct of structure.
 
 ---
 
-- 2026-06-08 [CommandCode]: Página creada — concepto extraído de la fuente Understand Anything, con contraste explícito entre el patrón Karpathy y wikis humanos tradicionales
+- 2026-06-08 [CommandCode]: Page created — concept extracted from the Understand Anything source, with explicit contrast between the Karpathy pattern and traditional human wikis
+- 2026-06-08 [Claude Code]: Translated to English

@@ -1,6 +1,31 @@
+---
+name: cortex-assimilate
+description: Ingest a URL or file into the vault — saves to .raw/, synthesizes wiki pages, updates index.
+---
+
 # cortex-assimilate
 
 Ingest a new source and synthesize wiki pages from it.
+
+## Steps
+
+1. **Resolve vault** — read `~/.cortex-forge/config.yml`:
+   - Check if CWD is inside any registered vault → use that vault.
+   - If not, use the `default` vault.
+   - If no default and multiple vaults → ask the user to pick one.
+   - If no vaults registered → stop and prompt to run `/cortex-forge-setup`.
+
+2. **Receive input** — URL or `.raw/` file path.
+
+3. **Download or read**:
+   - URL → download content, save to `{vault}/.raw/{slug}.md` (never overwrite if exists).
+   - `.raw/` file → read directly.
+
+4. **Synthesize** — determine what to create (see criteria below) and create pages at the correct path inside the resolved vault.
+
+5. Update `{vault}/wiki/index.md` with new pages.
+
+6. **Project linking** — check `{vault}/wiki/pages/` for active projects whose `domains:` match the source; propose the update before writing.
 
 ## When to invoke
 
@@ -10,26 +35,6 @@ Invoke automatically when the user provides new content in any of these forms:
 - "add / include {source}"
 - URL provided directly (no additional context)
 - File name visible in `.raw/` that has no wiki page yet
-
-## Input modes
-
-### URL mode
-1. Download content from the URL
-2. Save to `.raw/{slug}.md` (never overwrite if already exists)
-3. Continue with synthesis flow
-
-### `.raw/` file mode
-1. Read the indicated file in `.raw/`
-2. Continue with synthesis flow
-
-## Synthesis flow
-
-1. Read the source content
-2. Determine what to create (see criteria below)
-3. For each piece: use the corresponding template as a structural guide
-4. Create pages at the correct path
-5. Update `wiki/index.md` with new pages
-6. **Project linking** — see section below
 
 ## Types, paths, and templates
 
@@ -67,21 +72,6 @@ Invoke automatically when the user provides new content in any of these forms:
 Only create if it's an active project (with a repo, status, and its own decisions).
 Do not create project pages for third-party projects mentioned only as context.
 
-## Project linking
-
-After completing the synthesis, check whether the source is relevant to any active project:
-
-1. Read `domains:` from each `wiki/pages/` file with `status: active`
-2. Compare against the source's content and tags
-3. If there's a match, **propose** the update to the user — never write without confirmation
-
-The proposal must include:
-- Which project matches and why
-- Which section of `wiki/pages/{project}.md` would be updated ("Connections" or "Next steps")
-- The exact text to be added
-
-If the user confirms, add the link and update `updated:` in the project page.
-
 ## Provenance
 
 Always populate in every page created or updated:
@@ -96,8 +86,6 @@ confidence: high | medium | low
 - `high` — primary source: book, paper, official documentation, source code
 - `medium` — secondary source: video, opinion article, technical blog, transcript
 - `low` — agent inference without direct source, or second-hand source
-
-For `source` type pages: `sources` points to the `.raw/` origin file (`[.raw/{slug}.md]`); `confidence` reflects the source medium.
 
 ## Rules
 

@@ -36,6 +36,8 @@ Setup for Cortex Forge. Run from inside a vault directory (one containing `wiki/
    - `{vault}/skills/cortex-crystallize/` → `~/.agents/skills/cortex-crystallize/`
    - `{vault}/skills/cortex-forge-setup/` → `~/.agents/skills/cortex-forge-setup/`
    - `{vault}/skills/cortex-recall/` → `~/.agents/skills/cortex-recall/`
+   - `{vault}/skills/cortex-assimilate/` → `~/.agents/skills/cortex-assimilate/`
+   - `{vault}/skills/cortex-imprint/` → `~/.agents/skills/cortex-imprint/`
    - Overwrite if they already exist (update in place).
    - Create `~/.agents/skills/` if it doesn't exist.
 
@@ -45,6 +47,8 @@ Setup for Cortex Forge. Run from inside a vault directory (one containing `wiki/
      - `~/.claude/skills/cortex-crystallize` → `~/.agents/skills/cortex-crystallize`
      - `~/.claude/skills/cortex-forge-setup` → `~/.agents/skills/cortex-forge-setup`
      - `~/.claude/skills/cortex-recall` → `~/.agents/skills/cortex-recall`
+     - `~/.claude/skills/cortex-assimilate` → `~/.agents/skills/cortex-assimilate`
+     - `~/.claude/skills/cortex-imprint` → `~/.agents/skills/cortex-imprint`
    - If a symlink already exists and points to the right target, skip silently.
    - If a symlink exists but points elsewhere, overwrite it.
 
@@ -80,7 +84,7 @@ Setup for Cortex Forge. Run from inside a vault directory (one containing `wiki/
 
 8. **Confirm result**:
    - Registered vaults: list all entries in `vaults:` with their paths, marking the default
-   - Skills installed: `cortex-crystallize`, `cortex-forge-setup`, `cortex-recall`
+   - Skills installed: `cortex-crystallize`, `cortex-forge-setup`, `cortex-recall`, `cortex-assimilate`, `cortex-imprint`
    - Claude Code symlinks: created / up to date / skipped
    - Hooks: configured / skipped / manual instructions shown
    - Next step: invoke `/cortex-crystallize` at the end of any project session

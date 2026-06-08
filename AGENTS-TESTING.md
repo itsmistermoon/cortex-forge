@@ -552,3 +552,46 @@ chmod +x ~/.claude/hooks/{load-hot-cache,update-hot-cache}.sh
 #### Fragile context
 - La síntesis generada por `agy -p` en la prueba fue genérica ("web search for 'example'") — el modelo sintetizó sin contexto real de sesión porque el payload era mock. En sesión real el output debería ser más descriptivo.
 - La validación fue con payload simulado, no con un cierre real de sesión nativo. El flujo completo (sesión productiva → `fullyIdle==true` automático → snapshot) sigue pendiente de verificación en uso orgánico.
+
+### 2026-06-08 — Claude Code (diagnóstico de hooks de Codex)
+
+#### What was done
+- Se diagnosticó el comportamiento visible del `SessionStart` de Codex: el hook sí carga el hot cache, pero la UI muestra `hook context:` en la conversación.
+- Se identificó un acoplamiento incorrecto de rutas: `~/.codex/hooks.json` apunta a scripts alojados en `~/.claude/hooks/`, lo que mezcla configuraciones de agentes distintos.
+- Se confirmó que el payload actual inyecta el archivo completo `.hot/{project}.md`, lo que aumenta el ruido visual y el costo de contexto.
+
+#### Discarded
+- Asumir que el problema principal era el `Stop` hook — el ruido aparece en el primer turno, así que el foco real es el arranque (`SessionStart`) o una capa previa.
+- Asumir que `suppressOutput` resuelve el problema — no está disponible como solución efectiva hoy para ocultar `additionalContext`.
+
+#### Fragile context
+- En Codex, la visibilidad del `hook context:` parece ser una propiedad de la UI, no un fallo de parsing del hook.
+- Los scripts deberían vivir en una ruta neutral de Cortex Forge o en una carpeta propia de Codex; depender de `~/.claude/hooks/` es frágil y confunde el diagnóstico.
+- Si se quiere reducir el impacto, el siguiente refactor debe limitar `SessionStart` a la zona mínima necesaria de `.hot/`, no al archivo entero.
+
+#### Proposals for next iteration
+1. **Mover scripts fuera de `~/.claude/hooks/`**
+   - Objetivo: que Codex no dependa de rutas de Claude Code.
+   - Cambio propuesto: usar una ruta neutral del vault, por ejemplo `~/proyectos/cortex-forge/bin/hooks/` o `~/.cortex-forge/hooks/`, y actualizar `~/.codex/hooks.json` para apuntar ahí.
+   - Resultado esperado: configuración más clara y menos acoplamiento entre agentes.
+
+2. **Reducir el payload de `SessionStart`**
+   - Objetivo: minimizar el ruido visual y el costo de contexto.
+   - Cambio propuesto: inyectar solo la zona relevante de `.hot/{project}.md` en vez del archivo completo.
+   - Criterio mínimo: `### Pending` y `### Active decisions`; opcionalmente un encabezado corto del proyecto.
+   - Resultado esperado: menos texto visible en el chat y menos tokens consumidos al arrancar.
+
+3. **Aclarar la limitación de UI en Codex**
+   - Objetivo: distinguir bug real de comportamiento esperado.
+   - Cambio propuesto: documentar que `hook context:` es visible por diseño en Codex cuando se usa `additionalContext`.
+   - Resultado esperado: evitar perseguir como bug algo que hoy es una limitación de plataforma.
+
+4. **Separar validación de arranque y de cierre**
+   - Objetivo: hacer más preciso el diagnóstico en la próxima prueba.
+   - Cambio propuesto: probar `SessionStart` por separado del `Stop`, y verificar si el ruido aparece antes de cualquier respuesta del modelo.
+   - Resultado esperado: si el ruido sigue, el problema queda confirmado como de arranque; si no, hay una capa intermedia que inspeccionar.
+
+5. **Dejar un criterio de aceptación para el siguiente test**
+   - Objetivo: que la siguiente sesión tenga un resultado verificable.
+   - Criterio esperado: Codex lee el hot cache al iniciar, pero la inyección se mantiene acotada y las rutas ya no apuntan a `~/.claude/`.
+   - Criterio de rechazo: si sigue apareciendo el archivo completo en `hook context:`, el refactor no está listo.

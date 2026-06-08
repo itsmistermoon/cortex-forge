@@ -21,13 +21,14 @@ Objetivo: que el Hot Cache Protocol funcione en todos los agentes soportados.
   - [ ] Ingestar una fuente con `cortex-assimilate`
   - [ ] Consultar conocimiento con `cortex-recall`
 - [ ] CommandCode — parcial; Capa 1 confirmada, hooks de cierre pendientes
-  - [ ] Correr `/cortex-forge-setup` desde CommandCode — muestra el bloque JSON a agregar
+  - [x] Correr `/cortex-forge-setup` desde CommandCode — re-ejecutado; skills y symlinks actualizados
   - [ ] Pegar bloque de Stop hook en el archivo de hooks de CommandCode
   - [x] Verificar modo degradado sesión 1: agente lee `.hot/` vía `AGENTS.md` (Capa 1 confirmada — lectura en primer turno, contexto de proyecto inmediato)
   - [x] Verificar ciclo completo sesión 2: `.hot/` escrito en sesión 1 es leído correctamente en sesión 2
   - [x] Ejecutar `cortex-crystallize` y confirmar snapshot guardado
   - [x] Ingestar una fuente con `cortex-assimilate`
   - [ ] Consultar conocimiento con `cortex-recall` — falló proactivamente (usó `grep`); funciona bajo instrucción explícita
+  - [x] Instalar TASTE rule (`## Cortex Forge Skills`) en `taste.md` per-project (second-brain) y global (`~/.commandcode/taste/`) — paso 7 de setup ejecutado por Claude Code; CommandCode no puede editar `taste/` por system policy
 
 ## Fase 2 — Hardening del protocolo
 

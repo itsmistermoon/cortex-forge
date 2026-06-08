@@ -83,8 +83,8 @@ Setup for Cortex Forge. Run from inside a vault directory (one containing `wiki/
      - **Per-project** (`.commandcode/taste/` inside this vault) — applies only when working in this vault directory.
      - **Global** (`~/.commandcode/taste/`) — applies in every project on this machine.
    - Create or append to the target file:
-     - Per-project → `.commandcode/taste/cortex-forge.md`
-     - Global → `~/.commandcode/taste/cortex-forge.md`
+     - Per-project → `.commandcode/taste/taste.md`
+     - Global → `~/.commandcode/taste/taste.md`
    - **Per-project content** (includes `cortex-prune`, which is vault-local):
      ```markdown
      ## Cortex Forge Skills

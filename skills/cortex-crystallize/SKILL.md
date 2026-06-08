@@ -67,11 +67,9 @@ updated: {YYYY-MM-DD}
 ## Current state
 ### Pending
 - [ ] {concise description with enough context to resume} — {file or path if applicable}
-_(none)_ if empty
 
 ### Active decisions
 - {decision and rationale — to avoid re-litigating it}
-_(none)_ if empty
 ```
 
 `agent:` identifies who last wrote Current state — the mutable zone. When multiple agents operate the same vault across sessions, this field makes it immediately clear whose snapshot is active without reading git history. Update it on every `/cortex-crystallize` invocation.
@@ -83,14 +81,14 @@ Append at the end, never modify previous entries.
 ```markdown
 ## History
 
-### {YYYY-MM-DD HH:MM TZ} — {Agent} ({Trigger})
+### {YYYY-MM-DD HH:MM UTC±N} — {Agent} ({Trigger})
+<!-- Timestamp exacto con offset local. Ejemplo: 2026-06-08 14:30 -04. Nunca omitir hora ni offset. -->
 
 #### What was done
 - {bullet per significant change — file or decision, not narrative}
 
 #### Discarded
 - {options evaluated and rejected, with brief reason}
-- _(none)_ if empty
 
 #### Fragile context
 - {exact numbers, commands, paths, URLs, conventions a new agent can't infer from code}
@@ -99,7 +97,7 @@ Append at the end, never modify previous entries.
 ## Rules
 
 - Language: match the vault's language (check `AGENTS.md`).
-- Empty sections: write `_(none)_`, never omit.
+- Empty sections: omit entirely — never write `_(none)_` or other placeholders.
 - Pending items live in **Current state**, not in the snapshot — so they don't get buried.
 - The history snapshot **has no pending section** — that's Current state's responsibility.
 - Don't duplicate content already in ADRs, PRDs, issues, or commits — reference by path.

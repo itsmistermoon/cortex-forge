@@ -8,7 +8,7 @@ Example: "I'm a backend engineer working on distributed systems. Active projects
 
 ## Crystallize protocol — MANDATORY
 
-`.hot/{project}.md` exists in this vault. It contains `## Pending` tasks and `## Fragile context` that must inform every session.
+`.hot/{project}.md` exists in this vault. It has two zones: a mutable `Current state` (`### Pending` items and `### Active decisions`) and an append-only `History` of session snapshots. Both must inform every session.
 
 **Before your first response to the user, in any session that starts in this vault, you MUST:**
 

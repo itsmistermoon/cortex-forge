@@ -23,7 +23,7 @@ Objetivo: que el Hot Cache Protocol funcione en todos los agentes soportados.
   - [ ] Consultar conocimiento con `cortex-recall`
 - [ ] CommandCode — parcial; Capa 1 confirmada, hooks de cierre pendientes
   - [x] Correr `/cortex-forge-setup` desde CommandCode — re-ejecutado; skills y symlinks actualizados
-  - [ ] Pegar bloque de Stop hook en el archivo de hooks de CommandCode
+  - [x] Pegar bloque de Stop hook en el archivo de hooks de CommandCode — copiado a `second-brain/.commandcode/settings.local.json` con wire format anidado
   - [x] Verificar modo degradado sesión 1: agente lee `.hot/` vía `AGENTS.md` (Capa 1 confirmada — lectura en primer turno, contexto de proyecto inmediato)
   - [x] Verificar ciclo completo sesión 2: `.hot/` escrito en sesión 1 es leído correctamente en sesión 2
   - [x] Ejecutar `cortex-crystallize` y confirmar snapshot guardado
@@ -34,6 +34,7 @@ Objetivo: que el Hot Cache Protocol funcione en todos los agentes soportados.
 ## Fase 2 — Hardening del protocolo
 
 - [x] **Multi-vault**: `~/.cortex-forge/config.yml` con `vaults: {name: path}` + `default:`; vault resuelto por CWD primero, luego default; `cortex-forge-setup` registra/deregistra el vault actual (toggle por CWD); legacy `vault:` soportado en `cortex-crystallize`
+- [ ] Guardrails de compliance para skills — contratos verificables en `AGENTS.md` (criterio de cumplimiento por protocolo) + output format obligatorio en `cortex-recall`, `cortex-assimilate`, `cortex-crystallize`; siguiente nivel: hook `PostToolUse` que detecte SPA o búsqueda manual sin pasar por skill
 - [ ] Versionado de schema en `AGENTS.md` y templates (`schema_version:`)
 - [ ] `cortex-prune` automático vía hook periódico
 - [ ] Detección de hot cache stale (sin actualizar en N días)

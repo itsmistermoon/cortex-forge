@@ -14,6 +14,12 @@ Operations: `ingest`, `imprint`, `prune`, `query`
 
 <!-- entries below -->
 
+## [2026-06-08] ingest | CommandCode TASTE — 4 fuentes oficiales
+
+Sources: `.raw/commandcode-taste-blog.md`, `.raw/commandcode-taste-docs.md`, `.raw/commandcode-taste-manage.md`, `.raw/commandcode-taste-commands.md`
+Pages created: `wiki/sources/commandcode-taste-{blog,docs,manage,commands}.md`, `wiki/concepts/commandcode-taste.md`
+Key finding: TASTE tiene dos ámbitos con paths concretos — per-project en `.commandcode/taste/` y global en `~/.commandcode/taste/` (flag `-g`). Resuelve el pendiente de scope para TASTE rule de `cortex-recall`.
+
 ## [2026-06-08] ingest | Gemini CLI Hooks & Skills (youtube.com/watch?v=ZXYuiEMm21s)
 
 Source: `.raw/gemini-cli-hooks-video.md` (transcript limpio via yt-dlp)

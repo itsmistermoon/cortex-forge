@@ -6,6 +6,7 @@
 - [[wiki/pages/cortex-forge]] — Vault con protocolo de hot cache multi-agente (Claude Code, Codex, Antigravity, CommandCode)
 
 ## Concepts
+- [[wiki/concepts/commandcode-taste]] — Sistema de personalización continua de CommandCode: paths per-project (.commandcode/taste/) y global (~/.commandcode/taste/), bucle de aprendizaje implícito, CLI push/pull
 - [[wiki/concepts/agent-hook-compatibility]] — Matriz de lifecycle hooks por agente (Claude Code, Codex, Antigravity, CommandCode)
 - [[wiki/concepts/antigravity-hooks]] — Configuración y ejecución de hooks en Google Antigravity / Gemini CLI
 - [[wiki/concepts/progressive-disclosure-hooks]] — Patrón de carga just-in-time de contexto vía hooks y skills; evita token bloat al inicio de sesión

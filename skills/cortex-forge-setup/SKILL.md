@@ -73,7 +73,12 @@ Setup for Cortex Forge. Run from inside a vault directory (one containing `wiki/
        Stop → bash {vault}/bin/hooks/update-hot-cache.sh
      ```
 
-7. **Confirm result**:
+7. **Set default vault** — if more than one vault is registered:
+   - Ask: "Which vault should be the default? ({list of registered names})"
+   - Update `default:` in the config with the chosen name.
+   - If only one vault is registered, set it as default automatically without asking.
+
+8. **Confirm result**:
    - Registered vaults: list all entries in `vaults:` with their paths, marking the default
    - Skills installed: `cortex-crystallize`, `cortex-forge-setup`, `cortex-recall`
    - Claude Code symlinks: created / up to date / skipped
@@ -95,4 +100,4 @@ The hook writes a minimal snapshot (files touched, external actions). For a full
 - Preserve all existing vault entries when writing config
 - Symlinks in `~/.claude/skills/`, not copies — updates propagate automatically
 - When merging into `settings.json`, preserve all existing hooks
-- Never set a new vault as default if a default already exists
+- Always ask for default when there are multiple vaults — never assume

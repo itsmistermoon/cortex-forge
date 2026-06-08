@@ -72,22 +72,25 @@ Always end with the relevant subset of step 9 (confirmation).
      - Read `~/.claude/settings.json` (or create it if missing).
      - Add the following hooks if not already present:
        ```json
-       "SessionStart": [{ "type": "command", "command": "~/.claude/hooks/load-hot-cache.sh" }]
-       "PreCompact":   [{ "type": "command", "command": "~/.claude/hooks/update-hot-cache.sh" }]
+       "SessionStart": [{ "type": "command", "command": "~/.claude/hooks/cortex-reactivate.sh" }]
+       "PreCompact":   [{ "type": "command", "command": "~/.claude/hooks/cortex-crystallize.sh" }]
+       "SessionEnd":   [{ "type": "command", "command": "~/.claude/hooks/cortex-crystallize.sh", "timeout": 60 }]
        ```
      - Merge carefully — do not overwrite existing hooks, only append to the arrays.
    - **Other agents** — display manual instructions:
      ```
      Codex (~/.codex/hooks.json):
-       SessionStart → bash {vault}/bin/hooks/load-hot-cache.sh
-       Stop         → bash {vault}/bin/hooks/update-hot-cache.sh
+       SessionStart → bash ~/.claude/hooks/cortex-reactivate.sh
+       Stop         → bash ~/.claude/hooks/cortex-crystallize.sh
 
      Antigravity (~/.gemini/config/hooks.json):
-       PreInvocation (invocationNum == 0) → bash {vault}/bin/hooks/load-hot-cache.sh
-       Stop (fullyIdle == true)           → bash {vault}/bin/hooks/update-hot-cache.sh
+       PreInvocation (invocationNum == 0) → bash ~/.gemini/config/hooks/cortex-reactivate.sh
+       Stop (fullyIdle == true)           → bash ~/.gemini/config/hooks/cortex-crystallize.sh
+       Note: copy scripts to ~/.gemini/config/hooks/ — Antigravity cannot use ~/.claude/hooks/
 
-     CommandCode ({vault}/.commandcode/settings.json or ~/.commandcode/settings.json):
-       Stop → bash {vault}/bin/hooks/update-hot-cache.sh
+     CommandCode ({vault}/.commandcode/settings.local.json):
+       Stop → bash ~/.claude/hooks/cortex-crystallize.sh
+       Note: scope must be the vault's .commandcode/, not cortex-forge's
      ```
 
 7. **Install TASTE rule for `cortex-recall`** — ask: "Install a TASTE rule so CommandCode invokes `/cortex-recall` automatically? (recommended)"

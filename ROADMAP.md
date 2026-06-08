@@ -34,7 +34,8 @@ Objetivo: que el Hot Cache Protocol funcione en todos los agentes soportados.
 ## Fase 2 — Hardening del protocolo
 
 - [x] **Multi-vault**: `~/.cortex-forge/config.yml` con `vaults: {name: path}` + `default:`; vault resuelto por CWD primero, luego default; `cortex-forge-setup` registra/deregistra el vault actual (toggle por CWD); legacy `vault:` soportado en `cortex-crystallize`
-- [ ] Guardrails de compliance para skills — contratos verificables en `AGENTS.md` (criterio de cumplimiento por protocolo) + output format obligatorio en `cortex-recall`, `cortex-assimilate`, `cortex-crystallize`; siguiente nivel: hook `PostToolUse` que detecte SPA o búsqueda manual sin pasar por skill
+- [x] Guardrails de compliance para skills — contratos verificables en `AGENTS.md` (criterio de cumplimiento por protocolo) + output format obligatorio en `cortex-recall`, `cortex-assimilate`, `cortex-crystallize` — commit `ee7cbe5`
+- [ ] Hook `PostToolUse` como guardrail de plataforma — detectar SPA tras WebFetch e inyectar recordatorio del flujo 3a; detectar `grep`/`find` en contexto de vault sin pasar por `cortex-recall`
 - [ ] Versionado de schema en `AGENTS.md` y templates (`schema_version:`)
 - [ ] `cortex-prune` automático vía hook periódico
 - [ ] Detección de hot cache stale (sin actualizar en N días)

@@ -4,24 +4,87 @@ description: Health check del vault — detecta dead links, páginas huérfanas,
 argument-hint: "No arguments — vault detected from CWD"
 ---
 
-Health check del vault activo. Ejecuta `bin/cortex-prune.sh` y reporta hallazgos por severidad.
+Health check del vault activo en dos capas: estructural (script) y semántica (agentes).
 
 ## Steps
 
 1. **Detect vault** — find nearest `.git` from CWD. Confirm it contains `wiki/` and `bin/cortex-prune.sh`.
-2. **Run** `bash {vault}/bin/cortex-prune.sh {vault}` and capture output.
-3. **Report** findings grouped by severity. For each finding include: path, problem, suggested action.
-4. **Ask** whether to proceed with corrections:
-   - **Auto-correctable** (propose and apply on confirmation):
-     - Add missing `confidence:` to source pages
-     - Add entry to `wiki/index.md` for unindexed pages
-     - Add `wiki/meta/log.md` entry: `## [YYYY-MM-DD] prune | {N} findings`
-   - **Requires discussion** (never auto-apply):
-     - Delete orphan pages
-     - Create missing entity/concept pages (requires knowing the content)
-     - Mark claims as `[!stale]`
 
-## Detection criteria (implemented in bin/cortex-prune.sh)
+2. **Capa 1 — Structural check**: Run `bash {vault}/bin/cortex-prune.sh {vault}` and capture output.
+
+3. **Capa 2 — Semantic analysis**: Run the four semantic checks below. For each check, spawn subagents as described — do not attempt to reason about the wiki pages from memory alone.
+
+4. **Report** all findings (Layer 1 + Layer 2) grouped by severity. For each: path(s), problem, proposed action.
+
+5. **Ask** whether to proceed with corrections per the auto-correct / requires-confirmation rules below.
+
+---
+
+## Capa 2 — Semantic checks
+
+### 2a. Unlinked relationships between entities and concepts
+
+Read `wiki/index.md` to get the full list of entities and concepts. Then:
+
+1. For every pair of pages where EITHER of these is true:
+   - One page's `title`, `aliases`, or `tags` contains a term that appears in the other page's title or aliases
+   - One page's body text mentions the other entity/concept by name without using `[[wikilink]]` syntax
+2. Spawn one subagent per candidate pair with this prompt:
+   > "Read {page_A} and {page_B}. Are these genuinely related (one describes a component, variant, or sub-topic of the other)? Or is the name/tag overlap coincidental? Respond with: RELATED or COINCIDENCE, followed by one sentence of justification. If RELATED, propose the exact wikilink text to add to each page."
+3. Collect verdicts. Report RELATED findings as MEDIUM findings. Discard COINCIDENCE.
+
+### 2b. Body text mentions without wikilinks
+
+For each page in `wiki/concepts/`, `wiki/entities/`, and `wiki/pages/`:
+
+1. Extract all entity and concept titles + aliases from the index.
+2. Scan the page body for plain-text mentions of those names (case-insensitive) that are NOT already wrapped in `[[...]]`.
+3. Report as LOW: "Page X mentions 'Y' without a wikilink — consider `[[wiki/entities/Y]]`."
+
+Do not flag mentions inside code blocks or frontmatter.
+
+### 2c. Sources without a covering concept
+
+For each page in `wiki/sources/`:
+
+1. Check if any page in `wiki/concepts/` or `wiki/entities/` lists this source in its `sources:` frontmatter.
+2. If no covering page exists, spawn one subagent:
+   > "Read {source_page}. Does this source introduce a distinct concept, pattern, or entity that warrants its own wiki page? Or is it adequately covered by existing vault pages (list them if so)? Respond: NEEDS_PAGE, COVERED_BY {page}, or BORDERLINE with one sentence."
+3. Report NEEDS_PAGE as MEDIUM. Report BORDERLINE for user decision. Discard COVERED_BY.
+
+### 2d. Potential page merges (debate pattern)
+
+Trigger only when check 2a finds two pages with significant overlap (not just a component relationship, but potentially duplicate coverage of the same topic).
+
+Spawn two subagents in parallel:
+
+- **Agent FOR merge**: "Read {page_A} and {page_B}. Argue that these pages should be merged. What content would be lost? What would be gained? Max 5 bullet points."
+- **Agent AGAINST merge**: "Read {page_A} and {page_B}. Argue that these pages should remain separate. What distinct value does each provide? Max 5 bullet points."
+
+Then spawn a third subagent:
+- **Synthesizer**: "Given these arguments FOR and AGAINST merging {page_A} and {page_B}: {for_args} / {against_args} — render a verdict: MERGE, KEEP_SEPARATE, or RESTRUCTURE. One paragraph."
+
+Report verdict as MEDIUM. Never auto-apply — always requires user confirmation.
+
+---
+
+## Auto-correctable (propose + apply on confirmation)
+
+- Add missing `confidence:` or `tags:` to source pages
+- Add `[[wikilink]]` to a body mention identified in check 2b
+- Add entry to `wiki/index.md` for unindexed pages
+- Add `wiki/meta/log.md` entry: `## [YYYY-MM-DD] prune | {N} findings`
+
+## Requires confirmation (never auto-apply)
+
+- Add cross-links between entities/concepts (check 2a verdict: RELATED)
+- Create missing concept/entity pages (check 2c verdict: NEEDS_PAGE)
+- Merge pages (check 2d verdict: MERGE or RESTRUCTURE)
+- Delete orphan pages
+
+---
+
+## Detection criteria — Capa 1 (bin/cortex-prune.sh)
 
 | Severity | Check |
 |---|---|
@@ -35,8 +98,10 @@ Health check del vault activo. Ejecuta `bin/cortex-prune.sh` y reporta hallazgos
 
 ## Rules
 
-- Always run the script — never reproduce its logic ad-hoc
+- Always run the script for Layer 1 — never reproduce its logic ad-hoc
+- For Layer 2, always spawn subagents — never reason about page relationships from memory alone
 - `index.md` and `log.md` without frontmatter is expected, not a finding
 - Source pages use `source:` (URL) and `raw:` for provenance — `sources:` (wiki links) is for concepts and entities only
 - Orphan sources are normal if freshly ingested and not yet linked from concepts/entities
-- Never delete pages without explicit confirmation
+- Never delete or merge pages without explicit user confirmation
+- Debate pattern (2d) only triggers on genuine ambiguity — not on clear component relationships

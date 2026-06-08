@@ -23,6 +23,7 @@ Google Antigravity is an agent-first development ecosystem designed to shift tra
 - **Antigravity SDK:** A programmatic Python toolkit to build, run, and steer customized agent configurations.
 
 ## Relationships
+- **Antigravity CLI** (`agy`) is the terminal component of this ecosystem — documented in detail at [[wiki/entities/antigravity-cli]].
 - Uses [[antigravity-hooks]] to enable custom lifecycle scripting (like `SessionStart` actions).
 - Serves as the active environment for executing developer assistants (such as the Antigravity agent).
 

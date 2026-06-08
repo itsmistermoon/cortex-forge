@@ -66,7 +66,7 @@ La carpeta estandarizada agnóstica de proveedor es `.agents/skills/`. Gemini CL
 
 ## Connections
 - Related concepts: [[wiki/concepts/agent-hook-compatibility]], [[wiki/concepts/progressive-disclosure-hooks]]
-- Entities: [[wiki/entities/google-antigravity]]
+- Entities: [[wiki/entities/google-antigravity]], [[wiki/entities/antigravity-cli]]
 
 ---
 

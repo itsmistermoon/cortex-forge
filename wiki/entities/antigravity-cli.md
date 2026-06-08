@@ -113,6 +113,8 @@ Permission actions and their defaults:
 
 ## See also
 
+- [[wiki/entities/google-antigravity]] — the full Antigravity ecosystem of which this CLI is one component
+- [[wiki/concepts/antigravity-hooks]] — hooks system: configuration, events, payload format
 - [Permissions](../sources/antigravity-cli-permissions.md)
 - [Sandbox](../sources/antigravity-cli-sandbox.md)
 - [Settings](../sources/antigravity-cli-settings.md)

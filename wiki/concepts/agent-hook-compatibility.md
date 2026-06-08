@@ -121,7 +121,7 @@ Exit codes: `0` → ejecutar JSON output; `2` → bloquear/reintentar según eve
 - **Plan mode**: hooks están deshabilitados en plan mode — no asumir que corren siempre.
 - **`chmod +x`**: todos los scripts deben ser ejecutables.
 
-> Fuentes: `wiki/sources/commandcode-hooks-configuration`, `commandcode-hooks-reference`, `commandcode-hooks-examples`, `commandcode-hooks-best-practices` (2026-06-08).
+> Fuentes: `wiki/sources/commandcode-hooks-configuration`, `commandcode-hooks-reference`, `commandcode-hooks-examples`, `commandcode-hooks-best-practices` (2026-06-08). Ver [[wiki/entities/commandcode]] para el perfil completo del agente.
 
 ## Patrones de uso comunes (aplicables a todos los agentes)
 

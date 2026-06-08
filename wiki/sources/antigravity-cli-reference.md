@@ -5,6 +5,7 @@ source: https://antigravity.google/docs/cli-reference
 slug: antigravity-cli-reference
 section: Antigravity CLI / Reference
 fetched: 2026-06-08
+tags: [antigravity, cli, reference]
 confidence: high
 raw: .raw/antigravity-cli/cli-reference.md
 ---

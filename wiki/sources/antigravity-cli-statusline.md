@@ -5,6 +5,7 @@ source: https://antigravity.google/docs/cli-statusline
 slug: antigravity-cli-statusline
 section: Antigravity CLI / Customizations
 fetched: 2026-06-08
+tags: [antigravity, cli, statusline, tui]
 confidence: high
 raw: .raw/antigravity-cli/cli-statusline.md
 ---

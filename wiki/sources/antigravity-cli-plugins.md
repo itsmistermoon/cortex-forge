@@ -5,6 +5,7 @@ source: https://antigravity.google/docs/cli-plugins
 slug: antigravity-cli-plugins
 section: Antigravity CLI / Customizations
 fetched: 2026-06-08
+tags: [antigravity, cli, plugins, skills, mcp]
 confidence: high
 raw: .raw/antigravity-cli/cli-plugins.md
 ---

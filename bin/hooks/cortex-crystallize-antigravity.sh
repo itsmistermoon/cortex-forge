@@ -118,7 +118,7 @@ Omit sections with no real content entirely — never use placeholders.
 #### Fragile context
 [only if there are implicit decisions or context that would be lost between sessions — omit if not applicable]"
 
-SUMMARY=$(claude -p "$FULL_PROMPT" 2>/dev/null)
+SUMMARY=$(agy -p "$FULL_PROMPT" 2>/dev/null)
 [ -z "$SUMMARY" ] && echo '{"decision":""}' && exit 0
 
 # ── Write hot file ────────────────────────────────────────────────────────────

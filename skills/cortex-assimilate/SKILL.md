@@ -18,8 +18,20 @@ Ingest a new source and synthesize wiki pages from it.
 2. **Receive input** — URL or `.raw/` file path.
 
 3. **Download or read**:
-   - URL → download content, save to `{vault}/.raw/{slug}.md` (never overwrite if exists).
+   - URL → fetch content. Before saving, run **SPA detection** (step 3a). Then save to `{vault}/.raw/{slug}.md` (never overwrite if exists).
    - `.raw/` file → read directly.
+
+   **3a. SPA detection and static asset fallback**
+
+   After fetching a URL, check if the response is a rendered SPA shell with no real content:
+   - Signals: `<app-root>`, `<div id="root">`, `<div id="__next">`, HTML under ~30 KB with no meaningful body text, or `<title>` identical to the site name across different routes.
+
+   If SPA detected:
+   1. Fetch the main JS bundle URL (typically `main-*.js` or `_app-*.js`, found in `<script src="...">` tags).
+   2. Search the bundle for path template literals — e.g., `` `/assets/docs/${path}/${file}.md` ``, `"/content/"`, `"/static/md/"` — to discover where static markdown is served.
+   3. Reconstruct the asset URL from the slug and try fetching it directly.
+   4. If found: use the static asset content as the source. Note the actual asset URL in the `.raw/` file and wiki page.
+   5. If not found after 2–3 attempts: stop and tell the user that the page is a client-rendered SPA and content couldn't be extracted automatically. Suggest pasting the content directly or providing a static URL.
 
 4. **Synthesize** — determine what to create (see criteria below) and create pages at the correct path inside the resolved vault.
 

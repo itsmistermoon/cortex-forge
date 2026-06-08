@@ -1,10 +1,23 @@
 ---
 name: cortex-forge-setup
 description: Register or deregister the current vault in Cortex Forge, install global skills, and configure lifecycle hooks. Run from inside a vault directory.
-argument-hint: "No arguments needed — vault is detected from CWD"
+argument-hint: "Optional sub-task: hooks | skills | taste | vaults"
 ---
 
 Setup for Cortex Forge. Run from inside a vault directory (one containing `wiki/`, `AGENTS.md`, and `.git/`). Registers the vault in the global config, installs global skills, and optionally configures lifecycle hooks.
+
+## Sub-tasks
+
+When an argument is provided, always run step 1 (vault detection) first, then jump directly to the relevant step(s) — skip everything else:
+
+| Argument | Runs |
+|---|---|
+| `hooks` | Step 6 — reinstall hook scripts + update settings.json |
+| `skills` | Steps 4–5 — install skills + create symlinks |
+| `taste` | Step 7 — install TASTE rule |
+| `vaults` | Steps 2–3 — register/update vault in config |
+
+Always end with the relevant subset of step 9 (confirmation).
 
 ## Steps
 

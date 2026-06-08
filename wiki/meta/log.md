@@ -131,3 +131,38 @@ No new concepts/entities. Los patrones de ejemplos (block dangerous commands, wa
 Project linking: `wiki/pages/cortex-forge.md` vinculado en todas las sources (dominio: hooks, cortex-forge).
 
 Agent: Claude Code (claude-sonnet-4-6)
+
+---
+
+## 2026-06-08 — Agent (assimilate 9x Antigravity CLI docs)
+
+**Operation**: bulk assimilation of 9 CLI documentation pages from `https://antigravity.google/docs/cli-*` into vault.
+
+**Sources**:
+- `.raw/antigravity-cli/cli-permissions.md` (3.0 KB)
+- `.raw/antigravity-cli/cli-sandbox.md` (1.4 KB)
+- `.raw/antigravity-cli/cli-settings.md` (2.5 KB)
+- `.raw/antigravity-cli/cli-plugins.md` (2.7 KB)
+- `.raw/antigravity-cli/cli-statusline.md` (2.5 KB)
+- `.raw/antigravity-cli/cli-title.md` (1.3 KB)
+- `.raw/antigravity-cli/cli-best-practices.md` (2.7 KB)
+- `.raw/antigravity-cli/cli-troubleshooting.md` (2.9 KB)
+- `.raw/antigravity-cli/cli-reference.md` (4.3 KB)
+
+**Key technical finding**: the docs site is a **pure Angular SPA** — all `/docs/*` URLs serve the same 22.7 KB shell HTML (identical MD5 across all 9 pages). The `<title>` says only "Google Antigravity" and the body is `<app-root></app-root>`. The real content is fetched as **static markdown** from `/assets/docs/cli/<slug>.md` (revealed by grepping the bundle's template literal `` `/assets/docs/${t.path}/${e}.md` ``). This explains why Claude's WebFetch only returns the title — it has no JS execution and no knowledge of the assets path.
+
+**Created**:
+- `wiki/sources/antigravity-cli-permissions.md`
+- `wiki/sources/antigravity-cli-sandbox.md`
+- `wiki/sources/antigravity-cli-settings.md`
+- `wiki/sources/antigravity-cli-plugins.md`
+- `wiki/sources/antigravity-cli-statusline.md`
+- `wiki/sources/antigravity-cli-title.md`
+- `wiki/sources/antigravity-cli-best-practices.md`
+- `wiki/sources/antigravity-cli-troubleshooting.md`
+- `wiki/sources/antigravity-cli-reference.md`
+- `wiki/entities/antigravity-cli.md` — consolidated entry: identity, config root, two-layer security model, customization layers, TUI rendering, statusline/title shared schema, subagent model
+
+**No new concepts**: the pages describe a single product (Antigravity CLI). Knowledge is granular enough to live as 9 sources + 1 entity.
+
+**Reusable asset** for future doc scrapes: pattern to detect static `.md` content behind a SPA shell is to grep the main JS bundle for `/assets/docs/` or similar template literals, then probe with `curl -I` until 200.

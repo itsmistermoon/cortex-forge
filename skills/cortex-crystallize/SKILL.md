@@ -56,6 +56,13 @@ Update on every `/cortex-crystallize`. Hard limits: **max 5 pending items, max 3
 
 When adding a new item, evaluate whether an existing one has become obsolete and remove it. The size constraint is what makes this zone reliable — if it grows unbounded, it degrades.
 
+**What goes in Current state vs. History:**
+
+- **Current state** — work that requires action in a future session: tasks to resume, decisions to revisit, things left incomplete. If the next agent needs to act on it, it goes here.
+- **History** — work that is complete and closed within this session. If nothing is left to do, it belongs only in History.
+
+When in doubt: ask "does the next session need to act on this?" If no → History only. If yes → add to `### Pending` in Current state.
+
 ```markdown
 ---
 agent: {agent-id}

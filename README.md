@@ -1,6 +1,6 @@
 # cortex-forge
 
-A protocol for agent-operated knowledge vaults — five skills, one session layer, any LLM.
+A protocol for agent-operated knowledge vaults — six skills, one session layer, any LLM.
 
 ## What it is
 
@@ -10,19 +10,22 @@ The architecture works with any LLM agent — Claude Code, Codex, Antigravity, C
 
 ## Architecture
 
-Five layers, each with a distinct role:
+Six layers, each with a distinct role:
 
 | Layer | Path | Purpose | Rule |
 |-------|------|---------|------|
-| **Raw** | `.raw/` | Immutable original sources | Never modify |
-| **Wiki** | `wiki/` | Synthesized knowledge | Agent writes and maintains |
+| **Raw** | `.raw/` | Primary sources — immutable originals | Never modify |
+| **Wiki** | `wiki/` | Secondary sources — synthesized knowledge | Agent writes and maintains |
 | **Hot** | `.hot/` | Per-project session cache | Read on session start |
+| **Codex** | `CODEX.md` | Vault identity: mission, owner, domains, vocabulary | Read on session start |
 | **Meta** | `wiki/meta/` | Vault metadata and guides | Agent maintains |
 | **Skills** | `skills/` | Invocable agent skills | Extend, don't modify |
 
+`.raw/` is authoritative. `wiki/` is a derived view — cheaper to load, but lossy by construction. When they conflict, `.raw/` wins.
+
 ## Skills
 
-Five skills that map to how knowledge actually moves through a system. All are globally invocable via `/skill-name` once installed.
+Six skills that map to how knowledge actually moves through a system. All are globally invocable via `/skill-name` once installed.
 
 ### `/cortex-assimilate` — Ingest
 
@@ -30,7 +33,9 @@ Sources land in `.raw/`: articles, PDFs, transcripts, URLs. The agent processes 
 
 ### `/cortex-crystallize` — Session context
 
-Working memory lasts seconds. `.hot/MEMORY.md` extends it indefinitely: current state, active decisions, open threads. The agent reads it on session start; you invoke it at the end. Without it, every conversation starts from zero. Works from any repo, not just the vault.
+Working memory lasts seconds. `.hot/MEMORY.md` extends it indefinitely: current state, active decisions, open threads. The agent reads it on session start; you invoke it at milestones. Without it, every conversation starts from zero. Works from any repo, not just the vault.
+
+The file has two zones: a mutable `Current state` (max 5 pending items, max 3 active decisions) and an append-only `History`. Two triggers are supported — `PreCompact` (mid-session checkpoint, session continues) and `SessionEnd` (true handoff, no return path) — each producing an appropriately scoped summary via `claude -p`.
 
 ### `/cortex-imprint` — Permanent archive
 
@@ -40,9 +45,13 @@ What was worth keeping from the session becomes a stable wiki page. A memory tra
 
 The agent searches the vault, retrieves relevant pages, and synthesizes a response with citations. It can only return what was imprinted — if it's not in the vault, it doesn't exist for the system.
 
-### `cortex-prune` — Vault hygiene
+### `/cortex-prune` — Vault hygiene
 
 Detects orphan pages, dead links, contradictory claims, stale information. Forgetting in the brain isn't a failure — it's maintenance. Prune does this deliberately: removes what weakens the network so what remains is more reliable.
+
+### `/cortex-forge-setup` — Setup and configuration
+
+Registers the vault, installs global skills, and configures lifecycle hooks. Run from inside a vault directory. Run again from the same vault to deregister.
 
 ## Wiki Taxonomy
 
@@ -51,7 +60,10 @@ Detects orphan pages, dead links, contradictory claims, stale information. Forge
 | Concept | `wiki/concepts/` | Ideas, patterns, frameworks |
 | Entity | `wiki/entities/` | People, tools, services |
 | Source | `wiki/sources/` | Articles, docs, external references |
-| Page | `wiki/pages/` | Active projects and decisions (ADRs) |
+| Page | `wiki/pages/` | Active projects and decisions |
+| Reference | `wiki/reference/` | Lookup tables, wire formats, cheat sheets |
+
+**Concept vs Reference:** use Reference when the content is a table or code block you scan to find a specific value. Use Concept when understanding the idea requires reading prose.
 
 Each page follows: YAML frontmatter + compiled truth + chronological changelog.
 
@@ -59,13 +71,11 @@ Each page follows: YAML frontmatter + compiled truth + chronological changelog.
 
 Three behaviors are mandatory for any agent operating the vault, defined in `AGENTS.md`:
 
-**Crystallize** — before responding to the user, read `.hot/MEMORY.md`. After milestones, invoke `/cortex-crystallize` to snapshot progress.
+**Crystallize** — before responding to the user, read `.hot/MEMORY.md` and `CODEX.md`. After milestones, invoke `/cortex-crystallize` to snapshot current state and append a history entry. Three automation levels: manual invocation, `AGENTS.md` instructions, or lifecycle hooks configured via `/cortex-forge-setup`.
 
 **Assimilate** — when the user provides a URL, file, or uses words like "ingest" or "process", invoke `/cortex-assimilate` as the first action, no confirmation needed.
 
-**Recall** — when the user asks about any topic that may exist in the vault, invoke `/cortex-recall` as the first action. Do not answer from active context or use `grep` as a substitute — the skill returns synthesized knowledge with citations.
-
-**Crystallize** — before responding in any session, read `.hot/MEMORY.md` to resume with full context. After milestones, invoke `/cortex-crystallize` to snapshot current state and append a history entry. The file has two zones: a mutable `Current state` (max 5 pending items, max 3 active decisions) and an append-only `History`. Works from any repo — when invoked outside the vault, it snapshots that project and optionally updates the linked vault page. Three automation levels are available: manual invocation, `AGENTS.md` instructions, or lifecycle hooks configured via `/cortex-forge-setup`.
+**Recall** — when the user asks about any topic that may exist in the vault, invoke `/cortex-recall` as the first action. Do not answer from active context or use `grep` as a substitute — the skill returns synthesized knowledge with citations. Agent training knowledge is disqualified for vault topics.
 
 ## Agent compatibility
 
@@ -73,7 +83,7 @@ Tested agents and their hook support:
 
 | Agent | Session start | Session end | Status |
 |-------|--------------|-------------|--------|
-| Claude Code | `SessionStart` hook | `SessionEnd` (synthesized via `claude -p`) + `PreCompact` (mechanical) | ✅ automatic |
+| Claude Code | `SessionStart` hook | `SessionEnd` + `PreCompact` (both synthesized via `claude -p`) | ✅ automatic |
 | Codex | `SessionStart` hook | `Stop` hook | ✅ automatic |
 | Antigravity CLI | `PreInvocation` (first only) | `Stop` (fullyIdle) | documented, untested |
 | CommandCode | none — via `AGENTS.md` | `Stop` hook | partial (close only) |
@@ -91,7 +101,7 @@ vaults:
 default: personal
 ```
 
-Skills resolve the vault automatically: CWD inside a registered vault → that vault; otherwise → `default`. Register a vault by running `/cortex-forge-setup` from inside it. Run it again from the same vault to deregister.
+Skills resolve the vault automatically: CWD inside a registered vault → that vault; otherwise → `default`. Register a vault by running `/cortex-forge-setup` from inside it.
 
 ## Setup
 
@@ -107,16 +117,16 @@ cd ~/my-vault
 The skill will:
 1. Validate the vault structure
 2. Register it in `~/.cortex-forge/config.yml`
-3. Install all five skills globally (`~/.agents/skills/` + `~/.claude/skills/` symlinks for Claude Code)
+3. Install all six skills globally (`~/.agents/skills/` + `~/.claude/skills/` symlinks for Claude Code)
 4. Optionally configure lifecycle hooks for automatic session memory
 5. Ask which vault to set as default if more than one is registered
 
-After setup, all skills are available as `/cortex-assimilate`, `/cortex-crystallize`, `/cortex-imprint`, `/cortex-recall`, and `/cortex-forge-setup`.
+After setup, all skills are available as `/cortex-assimilate`, `/cortex-crystallize`, `/cortex-imprint`, `/cortex-recall`, `/cortex-prune`, and `/cortex-forge-setup`.
 
 ## Usage
 
 Fork this repo and adapt it to your knowledge domain. The `skills/`, `templates/`, and `wiki/` structure is designed to be domain-agnostic — swap out the content, keep the architecture.
 
-Fill in the `## About this vault` section in `AGENTS.md` with 2–3 lines describing your domain and active projects. Agents use this to make better decisions about relevance and taxonomy.
+Fill in `CODEX.md` with your vault's mission, domains, vocabulary, and out-of-scope rules. Agents read this at session start to ground relevance and taxonomy decisions.
 
 See `AGENTS.md` for the full operating protocol.

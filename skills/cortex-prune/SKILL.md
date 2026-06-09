@@ -12,6 +12,8 @@ Health check del vault activo en dos capas: estructural (script) y semántica (a
 
 1. **Detect vault** — find nearest `.git` from CWD. Confirm it contains `wiki/` and `bin/cortex-prune.sh`.
 
+   If `CODEX.md` exists at the vault root, read **Domains** and **Out of scope** — use them to flag pages whose topics fall outside the vault's defined scope.
+
 2. **Capa 1 — Structural check**: Run `bash {vault}/bin/cortex-prune.sh {vault}` and capture output.
 
 3. **Capa 2 — Semantic analysis**: Run the four semantic checks below. For each check, spawn subagents as described — do not attempt to reason about the wiki pages from memory alone.

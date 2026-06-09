@@ -19,13 +19,15 @@ Answer a question using the vault's wiki content as the source.
    - If no default and multiple vaults are registered → ask the user to pick one.
    - If no vaults registered → stop and prompt to run `/cortex-forge-setup`.
 
-2. Read `{vault}/wiki/index.md` to identify relevant pages.
+2. If `{vault}/CODEX.md` exists, read **Vocabulary** and **Domains** — use them to interpret the query correctly and scope the search.
 
-3. Read the relevant pages.
+3. Read `{vault}/wiki/index.md` to identify relevant pages.
 
-4. Synthesize a response with citations to specific pages.
+4. Read the relevant pages.
 
-5. If information is missing, suggest sources to ingest with `/cortex-assimilate`.
+5. Synthesize a response with citations to specific pages.
+
+6. If information is missing, suggest sources to ingest with `/cortex-assimilate`.
 
 ## Output format
 

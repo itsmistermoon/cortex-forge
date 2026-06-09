@@ -2,9 +2,7 @@
 
 ## About this vault
 
-Replace this section with 2–3 lines describing your vault: who you are, what domain this vault covers, and what active projects matter. Agents use this to make better decisions about relevance, taxonomy, and what's worth persisting.
-
-Example: "I'm a backend engineer working on distributed systems. Active projects: payments-api, infra-migration. Knowledge domains: Go, Kafka, PostgreSQL."
+See `CODEX.md` for vault context: mission, owner, domains, vocabulary, and out-of-scope rules.
 
 ## Crystallize protocol — MANDATORY
 
@@ -14,8 +12,9 @@ Example: "I'm a backend engineer working on distributed systems. Active projects
 
 1. Detect the project name = `basename` of your current working directory.
 2. Read `.hot/{project}.md` in full.
-3. Treat the loaded content as required context — not optional background.
-4. If the file contains `### Pending` items, acknowledge them in your first message or surface them before starting new work.
+3. If `CODEX.md` exists at the vault root, read it — it provides context that grounds relevance, vocabulary, and tone decisions throughout the session.
+4. Treat the loaded content as required context — not optional background.
+5. If the file contains `### Pending` items, acknowledge them in your first message or surface them before starting new work.
 
 **Failure to load hot cache before first response is a protocol violation**, equivalent to ignoring `CLAUDE.md` in Claude Code.
 
@@ -79,6 +78,7 @@ Five layers, each with a distinct role:
 | **Raw** | `.raw/` | Immutable original sources | Never modify |
 | **Wiki** | `wiki/` | Synthesized knowledge | Agent writes and maintains |
 | **Hot** | `.hot/` | Per-project session cache | Read on session start, write via /cortex-crystallize |
+| **Codex** | `CODEX.md` | Vault context: mission, owner, domains, vocabulary | Read on session start after `.hot/` |
 | **Meta** | `wiki/meta/` | Vault metadata and guides | Agent maintains |
 | **Skills** | `skills/` | Invocable agent skills | Extend, don't modify |
 

@@ -17,9 +17,11 @@ Archive a valuable session synthesis as a permanent wiki page.
    - If no default and multiple vaults → ask the user to pick one.
    - If no vaults registered → stop and prompt to run `/cortex-forge-setup`.
 
-2. Review the current conversation and identify the main synthesis produced.
+2. If `{vault}/CODEX.md` exists, read **Mission**, **Domains**, and **Vocabulary** — use them to validate whether the synthesis is worth persisting and to name the page consistently with the vault's terminology.
 
-3. Propose: page type, suggested title, proposed path inside the resolved vault.
+3. Review the current conversation and identify the main synthesis produced.
+
+4. Propose: page type, suggested title, proposed path inside the resolved vault.
 
 4. Wait for confirmation or adjustment.
 

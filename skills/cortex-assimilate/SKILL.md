@@ -19,9 +19,14 @@ Ingest a new source and synthesize wiki pages from it.
    - If no default and multiple vaults → ask the user to pick one.
    - If no vaults registered → stop and prompt to run `/cortex-forge-setup`.
 
-2. **Receive input** — URL or `.raw/` file path.
+2. If `{vault}/CODEX.md` exists, read **Domains**, **Out of scope**, **Mission**, and **Vocabulary**:
+   - If the source falls under **Out of scope**, stop and tell the user — do not ingest.
+   - If the source domain is not in **Domains**, flag it before proceeding.
+   - Use **Vocabulary** when naming pages and writing content.
 
-3. **Download or read**:
+3. **Receive input** — URL or `.raw/` file path.
+
+4. **Download or read**:
    - URL → fetch content. Before saving, run **SPA detection** (step 3a). Then save to `{vault}/.raw/{slug}.md` (never overwrite if exists).
    - `.raw/` file → read directly.
 
@@ -41,11 +46,11 @@ Ingest a new source and synthesize wiki pages from it.
    Saving an HTML shell with no body text to `.raw/` is a protocol violation.
    If in doubt whether content is readable: paste the first 200 characters and ask yourself "would a reader understand anything from this?" — if no, run SPA detection.
 
-4. **Synthesize** — determine what to create (see criteria below) and create pages at the correct path inside the resolved vault.
+5. **Synthesize** — determine what to create (see criteria below) and create pages at the correct path inside the resolved vault.
 
-5. Update `{vault}/wiki/index.md` with new pages.
+6. Update `{vault}/wiki/index.md` with new pages.
 
-6. **Project linking** — check `{vault}/wiki/pages/` for active projects whose `domains:` match the source; propose the update before writing.
+7. **Project linking** — check `{vault}/wiki/pages/` for active projects whose `domains:` match the source; propose the update before writing.
 
 ## When to invoke
 

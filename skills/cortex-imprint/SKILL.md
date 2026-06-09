@@ -5,6 +5,8 @@ description: Archive a valuable session synthesis as a permanent wiki page in th
 
 # cortex-imprint
 
+Begin your response by outputting exactly: `Imprinting reference...`
+
 Archive a valuable session synthesis as a permanent wiki page.
 
 ## Steps

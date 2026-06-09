@@ -4,6 +4,8 @@ description: Snapshot session context into .hot/{project}.md. Works from any rep
 argument-hint: "[vault-name] [project-name]"
 ---
 
+Begin your response by outputting exactly: `Crystallizing memory...`
+
 Save a session snapshot to `.hot/{project}.md` in the active repo (the nearest `.git`), so any agent can resume without losing context.
 
 ## Modes

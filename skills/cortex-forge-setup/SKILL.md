@@ -80,8 +80,10 @@ Always end with the relevant subset of step 9 (confirmation).
    - **Other agents** — display manual instructions:
      ```
      Codex (~/.codex/hooks.json):
-       SessionStart → bash ~/.claude/hooks/cortex-reactivate.sh
-       Stop         → bash ~/.claude/hooks/cortex-crystallize.sh
+       SessionStart → ~/.codex/hooks/cortex-reactivate.sh
+       Stop         → ~/.codex/hooks/cortex-crystallize.sh
+
+       Note: keep Codex hooks in a stable global folder and make the scripts vault-aware at runtime; do not point Codex directly at a specific vault path.
 
      Antigravity (~/.gemini/config/hooks.json):
        PreInvocation (invocationNum == 0) → bash ~/.gemini/config/hooks/cortex-reactivate.sh
@@ -141,10 +143,14 @@ Always end with the relevant subset of step 9 (confirmation).
 ## Hook behavior
 
 The hooks provide automatic (no-invoke) session memory:
-- **SessionStart** (`load-hot-cache.sh`) — reads `.hot/{project}.md` and injects it as context
-- **PreCompact / Stop** (`update-hot-cache.sh`) — appends a snapshot to `.hot/{project}.md`
+- **SessionStart** (`cortex-reactivate.sh`) — reads `.hot/{project}.md` and injects it as context
+- **PreCompact / Stop** (`cortex-crystallize.sh`) — appends a snapshot to `.hot/{project}.md`
 
 The hook writes a minimal snapshot (files touched, external actions). For a full snapshot with Current state updated, invoke `/cortex-crystallize` manually — hooks and manual invocation are compatible and complementary.
+
+## Codex placement
+
+Codex should use a stable global hook directory such as `~/.codex/hooks/`, not a vault-local path. The hook scripts themselves must resolve the active vault at runtime so the same Codex setup works across multiple vaults and from non-vault projects.
 
 ## Rules
 

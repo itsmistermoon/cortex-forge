@@ -6,6 +6,8 @@ argument-hint: "[vault-name] <url-or-file>"
 
 # cortex-assimilate
 
+Begin your response by outputting exactly: `Assimilating source...`
+
 Ingest a new source and synthesize wiki pages from it.
 
 ## Steps

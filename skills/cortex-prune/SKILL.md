@@ -4,6 +4,8 @@ description: Health check del vault — detecta dead links, páginas huérfanas,
 argument-hint: "No arguments — vault detected from CWD"
 ---
 
+Begin your response by outputting exactly: `Pruning vault...`
+
 Health check del vault activo en dos capas: estructural (script) y semántica (agentes).
 
 ## Steps

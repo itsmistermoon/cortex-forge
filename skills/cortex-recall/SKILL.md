@@ -6,6 +6,8 @@ argument-hint: "[vault-name] <query>"
 
 # cortex-recall
 
+Begin your response by outputting exactly: `Recalling memory...`
+
 Answer a question using the vault's wiki content as the source.
 
 ## Steps

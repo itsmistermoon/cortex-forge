@@ -1,7 +1,8 @@
 #!/bin/bash
-# SessionEnd + PreCompact hook: snapshots de sesión en .hot/{project}.md
-# SessionEnd  → síntesis con claude -p (bullets descriptivos)
-# PreCompact  → mecánico (lista de archivos modificados)
+# SessionEnd + PreCompact hook: snapshots de sesión en .hot/MEMORY.md
+# Ambos triggers usan claude -p para generar bullets descriptivos.
+# SessionEnd  → handoff definitivo (no return path)
+# PreCompact  → compactación mid-session (la sesión continúa)
 
 set -uo pipefail
 
@@ -60,23 +61,29 @@ else
   PREV_HISTORY=""
 fi
 
-if [ "$TRIGGER" = "SessionEnd" ]; then
-  TOOL_CALL_COUNT=$(jq -r 'select(.type=="assistant") | .message.content[]? | select(.type=="tool_use") | .name' "$TRANSCRIPT_PATH" 2>/dev/null | wc -l | tr -d ' ')
-  [ "$TOOL_CALL_COUNT" -eq 0 ] && exit 0
+TOOL_CALL_COUNT=$(jq -r 'select(.type=="assistant") | .message.content[]? | select(.type=="tool_use") | .name' "$TRANSCRIPT_PATH" 2>/dev/null | wc -l | tr -d ' ')
+[ "$TOOL_CALL_COUNT" -eq 0 ] && exit 0
 
-  USER_MSGS=$(jq -r 'select(.type=="user") | .message.content[]? | select(.type=="text") | .text' "$TRANSCRIPT_PATH" 2>/dev/null \
-    | grep -v '^<' | grep -v '^$' | head -40)
+USER_MSGS=$(jq -r 'select(.type=="user") | .message.content[]? | select(.type=="text") | .text' "$TRANSCRIPT_PATH" 2>/dev/null \
+  | grep -v '^<' | grep -v '^$' | head -40)
 
-  TOOL_CALLS=$(jq -r '
-    select(.type=="assistant")
-    | .message.content[]?
-    | select(.type=="tool_use")
-    | "- " + .name + ": " + ((.input.file_path // .input.command // (.input | tostring)) | .[0:120])
-  ' "$TRANSCRIPT_PATH" 2>/dev/null | head -50)
+TOOL_CALLS=$(jq -r '
+  select(.type=="assistant")
+  | .message.content[]?
+  | select(.type=="tool_use")
+  | "- " + .name + ": " + ((.input.file_path // .input.command // (.input | tostring)) | .[0:120])
+' "$TRANSCRIPT_PATH" 2>/dev/null | head -50)
 
-  LAST_REPLY=$(jq -r 'select(.type=="assistant") | .message.content[]? | select(.type=="text") | .text' "$TRANSCRIPT_PATH" 2>/dev/null | tail -3)
+LAST_REPLY=$(jq -r 'select(.type=="assistant") | .message.content[]? | select(.type=="text") | .text' "$TRANSCRIPT_PATH" 2>/dev/null | tail -3)
 
-  FULL_PROMPT="Analiza esta sesión de Claude Code y genera un resumen estructurado en español chileno.
+if [ "$TRIGGER" = "PreCompact" ]; then
+  MODE_NOTE="NOTA: Snapshot de compactación mid-session (la sesión continúa después). Registra lo hecho hasta ahora, no lo que queda pendiente."
+else
+  MODE_NOTE="NOTA: Snapshot de fin de sesión — handoff definitivo (no return path). La sesión termina después de esto."
+fi
+
+FULL_PROMPT="Analiza esta sesión de Claude Code y genera un resumen estructurado en español chileno.
+$MODE_NOTE
 
 == PETICIONES DEL USUARIO ==
 $USER_MSGS
@@ -99,40 +106,8 @@ Omite completamente las secciones que no tengan contenido real — no uses _(non
 #### Fragile context
 [solo si hay decisiones implícitas o contexto que se perdería entre sesiones — omitir si no aplica]"
 
-  SUMMARY=$(claude -p "$FULL_PROMPT" 2>/dev/null)
-  [ -z "$SUMMARY" ] && exit 0
-
-else
-  FILES_TOUCHED=$(jq -r '
-    select(.type == "assistant")
-    | .message.content[]?
-    | select(.type == "tool_use" and (.name == "Edit" or .name == "Write" or .name == "NotebookEdit"))
-    | .input.file_path // empty
-  ' "$TRANSCRIPT_PATH" 2>/dev/null | sort -u | grep -v '^$' || true)
-
-  EXTERNAL_ACTIONS=$(jq -r '
-    select(.type == "assistant")
-    | .message.content[]?
-    | select(.type == "tool_use" and .name == "Bash")
-    | .input.command
-    | select(test("git (commit|push|tag)|gh (issue|pr) (create|edit|close)|sam deploy"; "i"))
-    | split("\n")[0]
-  ' "$TRANSCRIPT_PATH" 2>/dev/null | tail -n 10)
-
-  [ -z "$FILES_TOUCHED" ] && [ -z "$EXTERNAL_ACTIONS" ] && exit 0
-
-  SUMMARY="#### What was done
-$(printf '%s\n' "$FILES_TOUCHED" | sed 's|^|- |')"
-
-  if [ -n "$EXTERNAL_ACTIONS" ]; then
-    SUMMARY="$SUMMARY
-
-#### External actions
-\`\`\`bash
-$EXTERNAL_ACTIONS
-\`\`\`"
-  fi
-fi
+SUMMARY=$(claude -p "$FULL_PROMPT" 2>/dev/null)
+[ -z "$SUMMARY" ] && exit 0
 
 {
   printf '%s\n' "$CURRENT_STATE"

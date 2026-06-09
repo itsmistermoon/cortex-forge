@@ -1,7 +1,7 @@
 ---
 name: cortex-crystallize
 description: Snapshot session context into .hot/MEMORY.md. Works from any repo — inside the vault or from a linked project.
-argument-hint: "[vault-name] [project-name]"
+argument-hint: "[vault-name] [project-name] [next: <focus>]"
 ---
 
 Begin your response by outputting exactly: `Crystallizing memory...`
@@ -32,6 +32,7 @@ Behavior depends on where the skill is invoked:
 4. Create `.hot/` if it doesn't exist. Add `.hot/` to `.gitignore` if not already there.
 5. Read `.hot/MEMORY.md` in full if it exists.
 6. **Update current state** (see limits below). Update `agent:` and `updated:` in the file frontmatter to reflect the current agent and date.
+   - If an argument with `next: <focus>` was provided (e.g., `/cortex-crystallize next: PostToolUse hook`), add a `### Suggested skills` entry and tailor `### Pending` toward the declared next focus.
 7. **Append snapshot to history** using the format in `MEMORY-FORMAT.md` (co-located with this skill).
 8. If cross-vault mode: **run cross-vault update** (see section below).
 

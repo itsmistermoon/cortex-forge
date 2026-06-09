@@ -76,12 +76,14 @@ Five layers, each with a distinct role:
 
 | Layer | Path | Purpose | Rule |
 |-------|------|---------|------|
-| **Raw** | `.raw/` | Immutable original sources | Never modify |
-| **Wiki** | `wiki/` | Synthesized knowledge | Agent writes and maintains |
+| **Raw** | `.raw/` | Primary sources — immutable originals (articles, docs, transcripts) | Never modify |
+| **Wiki** | `wiki/` | Secondary sources — synthesized knowledge; one step removed from primaries | Agent writes and maintains |
 | **Hot** | `.hot/` | Per-project session cache | Read on session start, write via /cortex-crystallize |
 | **Codex** | `CODEX.md` | Vault context: mission, owner, domains, vocabulary | Read on session start after `.hot/` |
 | **Meta** | `wiki/meta/` | Vault metadata and guides | Agent maintains |
 | **Skills** | `skills/` | Invocable agent skills | Extend, don't modify |
+
+`.raw/` is the authoritative record. `wiki/` is always a derived view — cheaper to load, but lossy by construction. When they conflict, `.raw/` wins.
 
 ## Wiki taxonomy
 

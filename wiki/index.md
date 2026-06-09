@@ -6,6 +6,11 @@
 - [[wiki/pages/cortex-forge]] — Vault with multi-agent hot cache protocol (Claude Code, Codex, Antigravity, CommandCode)
 
 ## Concepts
+- [[wiki/concepts/parametric-knowledge]] — What the model knows from training; frozen, unverifiable, disqualified as a source for vault topics
+- [[wiki/concepts/contextual-knowledge]] — Facts the agent reads directly from context; the verifiable counterpart to parametric knowledge
+- [[wiki/concepts/memory-system]] — System that makes an agent stateful across sessions; Cortex Forge is one implementation
+- [[wiki/concepts/handoff-artifact]] — Document written by one session to be read by another; .hot/MEMORY.md is an instance
+- [[wiki/concepts/smart-zone]] — Session degradation pattern: agents drift from sharp (smart zone) to sloppy (dumb zone) as context fills
 - [[wiki/concepts/commandcode-taste]] — CommandCode continuous personalization system: per-project paths (.commandcode/taste/) and global (~/.commandcode/taste/), implicit learning loop, CLI push/pull
 - [[wiki/concepts/agent-hook-compatibility]] — Lifecycle hook matrix per agent (Claude Code, Codex, Antigravity, CommandCode)
 - [[wiki/concepts/antigravity-hooks]] — Hook configuration and execution in Google Antigravity / Gemini CLI
@@ -46,6 +51,7 @@
 - [[wiki/sources/commandcode-taste-docs]] — Official TASTE documentation: taste.md format, scopes, management
 - [[wiki/sources/commandcode-taste-manage]] — TASTE profile management: push/pull, Studio, lint, scopes
 - [[wiki/sources/commandcode-taste-commands]] — `npx taste` / `cmd taste` command reference
+- [[wiki/sources/ai-coding-dictionary]] — 68-entry plain-English vocabulary of AI coding by Matt Pocock (AI Hero)
 
 ## Meta
 - [[wiki/meta/log]] — Append-only vault operation log

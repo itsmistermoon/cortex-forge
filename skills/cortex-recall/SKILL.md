@@ -37,8 +37,9 @@ Every response must include:
 
 ## Rules
 
-- Cite wiki pages, not training knowledge
+- **Parametric knowledge is disqualified** for any topic this vault may cover. What you know from training is unverified — the vault is the source of truth.
+- Cite wiki pages, not parametric knowledge
 - If there are contradictions between pages, flag them
-- If the topic is not in the wiki, say so explicitly — do not answer from training knowledge as a fallback
-- **Never answer from active session context alone** — if you believe you already know the answer, stop and run the steps anyway; the vault may have synthesized additional detail not in your context
+- If the topic is not in the wiki, say so explicitly — only then may you supplement with parametric knowledge, clearly labeled as such
+- **Never answer from active session context alone** — if you believe you already know the answer, that belief is parametric. Stop and run the steps anyway.
 - Using `grep`, `find`, or direct file reads instead of these steps is a protocol violation

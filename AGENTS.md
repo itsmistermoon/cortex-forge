@@ -35,12 +35,14 @@ See full creation/omission criteria in `skills/cortex-assimilate.md`.
 
 ## Recall protocol — MANDATORY
 
+**Parametric knowledge** is what you know from training. It is unverified, unversioned, and may contradict what this vault has synthesized. For any topic this vault may cover, parametric knowledge is not a valid source — the vault is.
+
 **When the user asks about any topic that may exist in the vault — concepts, sources, agents, tools, past analysis, or anything previously ingested — you MUST invoke `cortex-recall` as your first action.**
 
 This applies even if:
 - The content was ingested earlier in this same session (do not answer from active context).
 - You could find the answer with `grep` or `find` (manual search is a protocol violation).
-- You believe you already know the answer (the vault may have synthesized additional detail).
+- You believe you already know the answer — that belief is parametric knowledge, which is disqualified.
 
 Trigger phrases include: "what does the vault say about", "recall", "what do we know about", "is this documented", "what was ingested about", or any question about a topic covered in `wiki/`.
 

@@ -62,6 +62,18 @@ Invoke automatically when the user provides new content in any of these forms:
 | **Concept** | `wiki/concepts/` | `templates/concept.md` |
 | **Entity** | `wiki/entities/` | `templates/entity.md` |
 | **Project** | `wiki/pages/` | `templates/project.md` |
+| **Reference** | `wiki/reference/` | `templates/reference.md` |
+
+## Reference criteria
+
+**Create** if:
+- The content is primarily a table, wire format, code block, or checklist
+- The user will scan it to find a specific value, not read it to understand an idea
+- Examples: hook wire formats per agent, detection signals, syntax cheat sheets, configuration schemas
+
+**Skip** if:
+- The topic needs prose explanation to be useful → create a Concept instead
+- It's a one-off lookup that won't be consulted again
 
 ## Concept criteria
 

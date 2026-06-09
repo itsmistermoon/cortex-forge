@@ -90,6 +90,9 @@ Five layers, each with a distinct role:
 | **Entity** | `wiki/entities/` | People, tools, services | `templates/entity.md` |
 | **Source** | `wiki/sources/` | Articles, docs, external references | `templates/source.md` |
 | **Page** | `wiki/pages/` | Active projects with repo and status | `templates/project.md` |
+| **Reference** | `wiki/reference/` | Lookup tables, wire formats, cheat sheets | `templates/reference.md` |
+
+**Reference vs Concept:** use Reference when the content is a table, code block, or checklist you scan in seconds to find a specific value. Use Concept when understanding the idea requires reading prose. If in doubt: does it need explanation to be useful? → Concept. Can it be expressed as a table or code block alone? → Reference.
 
 Each page follows: YAML frontmatter + compiled truth + chronological changelog. **All wiki content must be written in English** — this is a public repo.
 

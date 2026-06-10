@@ -10,13 +10,19 @@
 
 This document was reviewed by a second agent on 2026-06-10 acting as a **critical senior reviewer**. The role was to evaluate each item from a skeptical, maintenance-cost-aware perspective, push back on weak proposals, and surface hidden coupling between items. The reviewer did **not** rewrite the proposals — verdicts and critique points were appended to each item as a dedicated subsection, leaving the original proposal intact for a third agent to do a final pass.
 
-**Co-firmado por:**
-- Agente externo (autor original) — análisis comparativo con Graphify, propuestas de cambio
-- Command Code v0.33.1 (modelo minimax-m3) — revisión crítica con veredictos, vea `### Verdict (critical senior reviewer)` al final de cada item
+**Co-signed by:**
+- Claude.ai (model claude-sonnet-4-6) — comparative analysis with Graphify, change propposals
+- Command Code v0.33.1 (model minimax-m3) — critical review with verdicts, see `### Verdict (Command Code, critical senior reviewer)` at the end of every item
+- Codex (model GPT-5) — second-pass protocol-minimal review; cross-checked for duplicate sources of truth, stubbed artifacts, and unnecessary schema expansion
+- Antigravity (model Claude Sonnet 4.6 Thinking) — final evaluation from a skeptical end-user perspective; assessed real implementation cost vs. stated value, surfaced risks the previous reviewers softened, and produced actionable per-item verdicts for the applying agent
 
 **Reviewer scope:** read original items 1–6, read `AGENTS.md`, `CODEX.md`, `.hot/MEMORY.md`, and verified the codebase state (v0.2.0 published, `.hot/MEMORY.md` as fixed filename, type `Reference` in wiki taxonomy, six skills registered). The reviewer did not modify any of the proposed file changes — only appended verdicts.
 
 **Reviewer stance:** the original analysis is strong on diagnosis (the "Corrections" table proves the author read the code) but uneven on implementation. The strongest items are those that touch contracts and documentation only (1, 5, 6). The weakest is Item 3, which proposes a documented stub as if it were a feature — that is debt, not infrastructure. The hidden coupling the reviewer surfaced: Item 2's `protocol_version` field and Item 6's `CHANGELOG.md` must agree on a single source of truth, and Item 3's `bin/standalone/` directory becomes a second source of truth for Layer 1 spec that already lives in `cortex-prune/SKILL.md`.
+
+**Codex review summary:** I re-evaluated the backlog with a minimal-protocol lens. My pass focused on whether each change has a concrete consumer, whether it introduces a second source of truth, and whether it adds operational surface area without delivering runtime value. I preserved the original proposals and appended final verdicts for a third agent to arbitrate.
+
+**Antigravity review summary:** I evaluated the backlog after the two prior review passes — my role was to ask the question the previous reviewers did not ask with enough force: *does this item earn its place given the current state of the repo?* The prior reviews are good at catching implementation problems but consistently soft on scope. Three items are clear wins (1, 5, 6). Two need tighter constraints before touching code (2, 4). One should be partially rejected outright (3). I also surfaced cross-cutting issues: `CODEX.md` is entirely unfilled (all sections are comment templates), which undermines Items 2 and 6; and the proposed CHANGELOG has both a wrong version baseline and a wrong year. Per-item verdicts follow.
 
 ---
 
@@ -75,7 +81,7 @@ The templates are already correct. `cortex-prune` already enforces presence of t
 - `AGENTS.md` compliance criterion for Recall references confidence surfacing.
 - No changes to templates (they're already correct).
 
-### Verdict (critical senior reviewer)
+### Verdict (Command Code, critical senior reviewer)
 
 **Verdict: ACCEPT — accept as proposed, with one clarification.**
 
@@ -86,6 +92,26 @@ The templates are already correct. `cortex-prune` already enforces presence of t
 **Minor nit:** I would put the confidence marker *before* the path, not after, so a reader scanning multiple citations sees confidence first. This is bikeshedding; the proposed order is fine.
 
 **For the third agent:** confirm that `cortex-prune` Layer 1 (which already flags missing `confidence:` as MEDIUM) and the new recall output contract stay in sync. If a page is flagged by prune as missing confidence, a recall that cites it will also surface the same issue via `[confidence: unset]` — the two signals must agree on what counts as a finding.
+
+### Verdict (Codex, protocol-minimal review)
+
+**Verdict: ACCEPT.**
+
+**Why accept:** this is a narrow, coherent change. It exposes an already-existing field at the point of consumption, which improves trust without adding storage, new files, or a parallel contract.
+
+**Constraint:** preserve the distinction between missing and low-confidence content. `unset` is the only error state here; `medium` and `low` remain valid and should be shown as-is.
+
+**For the third agent:** keep this item if the implementation only appends the confidence value and does not widen the citation format beyond that.
+
+### Verdict (Antigravity, final user-skeptic review)
+
+**Verdict: ACCEPT — with one gap to close in the output contract.**
+
+**Why accept:** three reviewers are aligned and the case is sound. The change is two lines of text in two files. It exposes a field that already exists, already has write-time enforcement, and adds zero maintenance surface.
+
+**Gap not addressed by previous reviewers:** when the agent reads a page's frontmatter and the YAML is malformed (syntax error, encoding issue), the current proposal would emit `[confidence: unset]` — the same signal as a valid page with a missing field. These are different conditions. The SKILL.md edit should distinguish them: `[confidence: unset]` for a valid page missing the field; `[confidence: read-error]` for a file the agent could not parse. The `read-error` case is also a prune finding, but a different one from missing-provenance.
+
+**For the applying agent:** implement exactly as proposed. Add the `read-error` case to the output spec alongside `unset`. No other changes.
 
 ---
 
@@ -212,7 +238,7 @@ In the Crystallize protocol `## Before your first response` sequence, add step 3
 - `AGENTS.md` session startup reads `vault-report.json` as step 3 and surfaces HIGH findings.
 - `vault-report.json` is not in `.gitignore`.
 
-### Verdict (critical senior reviewer)
+### Verdict (Command Code, critical senior reviewer)
 
 **Verdict: ACCEPT — accept the JSON artifact, but the schema must be trimmed and two fields removed before implementation.**
 
@@ -229,6 +255,43 @@ In the Crystallize protocol `## Before your first response` sequence, add step 3
 4. **Commit vs gitignore is debatable, not a blocker.** "Vault state, not local artifact" is reasonable, but the file changes on *every* prune. If the team wants diff-reviewable health, commit it. If the team wants a clean history, gitignore it. Do not impose one answer — this is a team-preference decision, and the proposal should say so.
 
 **For the third agent:** confirm that the trimmed schema still answers the original motivation (session-startup health signal). If trimming kills a field that AGENTS.md actually needs, keep it. The principle is: every field must have a consumer. Fields with no consumer are dead weight.
+
+### Verdict (Codex, protocol-minimal review)
+
+**Verdict: REJECT AS WRITTEN; ACCEPT ONLY AFTER TRIMMING.**
+
+**Why reject as written:** the proposed JSON schema is overgrown for the stated use. It bundles speculative fields, a version authority that will drift, and history-like counters that already belong elsewhere. That is not minimal protocol; that is future maintenance cost.
+
+**Minimum acceptable revision:** keep only fields with a live consumer in `AGENTS.md` or `cortex-prune`, remove or defer the rest, and choose one version source of truth. If the artifact cannot be reduced without losing actual utility, do not add it.
+
+**For the third agent:** approve only the trimmed form, not the full schema. If the schema still feels large after trimming, the item should be rejected outright.
+
+### Verdict (Antigravity, final user-skeptic review)
+
+**Verdict: ACCEPT ONLY THE MINIMUM VIABLE SCHEMA — reject everything else in the proposal.**
+
+**Why the full schema fails:** the two previous reviewers correctly flag it as oversized, but neither provides the minimum viable schema. Here it is:
+
+```json
+{
+  "generated": "YYYY-MM-DD",
+  "health": {
+    "dead_links": [],
+    "raw_without_source_page": [],
+    "missing_confidence": []
+  }
+}
+```
+
+These are the only three fields that `AGENTS.md` step 3 (session startup) will actually read and surface to the user. Every other field in the original proposal — `stats`, `knowledge_map`, `suggested_questions`, `last_findings`, `protocol_version` — has no concrete consumer in the session startup flow. Drop them from this item; they can be added later when a real consumer exists.
+
+**On `protocol_version`:** reject it from this schema. `CHANGELOG.md` (Item 6) is the authoritative version record. Do not create a second source of truth.
+
+**On commit vs. gitignore:** gitignore it. This is a single-owner personal repo. Committing a file that changes on every prune run creates noise in git history with no benefit.
+
+**On `CODEX.md`:** this repo's `CODEX.md` is entirely unfilled — all sections are comment templates. The `suggested_questions` and `vault_topics` fields (proposed or suggested as alternatives) depend on `CODEX.md` being populated. Neither field is viable until `CODEX.md` has real content. This is not the applying agent's problem to solve, but it should be noted as a blocker for any `knowledge_map` expansion.
+
+**For the applying agent:** implement only the three-field schema above. Add step 3 to `AGENTS.md` startup sequence reading only `health.dead_links` and `health.raw_without_source_page` (surface these if non-empty). Add `wiki/meta/vault-report.json` to `.gitignore`.
 
 ---
 
@@ -389,7 +452,7 @@ Add a row:
 - `README.md` mentions Obsidian with a link to the doc.
 - `AGENTS.md` vault architecture table includes `bin/standalone/` row.
 
-### Verdict (critical senior reviewer)
+### Verdict (Command Code, critical senior reviewer)
 
 **Verdict: SPLIT — accept the Obsidian documentation half, reject the `bin/standalone/` stub half.**
 
@@ -406,6 +469,30 @@ Add a row:
 **Alternative I recommend:** implement `bin/cortex-prune.sh` completely in one pass (that is Item 4, already in this backlog). If headless mode is needed later, add a `--headless` flag to the same script. One script, two modes. No new directory, no second source of truth.
 
 **For the third agent:** if the team genuinely wants `bin/standalone/` as a separate concern (e.g., for distribution to non-Cortex-Forge users), then the script must be implemented end-to-end before it lands. Half-measures here are not acceptable.
+
+### Verdict (Codex, protocol-minimal review)
+
+**Verdict: REJECT AS WRITTEN — preserve the Obsidian docs idea, but do not add a stubbed standalone script or a second Layer 1 spec.**
+
+**Why reject:** the documentation half is legitimate, but the `bin/standalone/` package creates maintenance debt immediately because the script is explicitly a TODO stub. A script that exits successfully while doing nothing is worse than no script. The proposal also duplicates Layer 1 semantics already owned by `skills/cortex-prune/SKILL.md`, which violates the minimal-protocol principle: one contract, one canonical implementation.
+
+**Keep:** `docs/obsidian-visualization.md` and the README mention, provided they remain documentation-only and do not assert unsupported behavior.
+
+**Drop or rewrite:** `bin/standalone/README.md`, `bin/standalone/prune.sh`, and the new `AGENTS.md` architecture row unless the standalone path is implemented end-to-end and has a clear consumer outside the existing agent workflow.
+
+**For the third agent:** decide whether the value of a headless path justifies a new directory and maintenance surface. If yes, require a complete implementation first. If no, collapse the idea back into the existing `bin/cortex-prune.sh` flow and avoid a parallel contract.
+
+### Verdict (Antigravity, final user-skeptic review)
+
+**Verdict: SPLIT — Obsidian docs ACCEPT; `bin/standalone/` REJECT with no path to revival in this backlog.**
+
+**On the Obsidian docs:** accept. Create `docs/obsidian-visualization.md` and add the README `## Visualization` paragraph. The comparison table is accurate. The "open `wiki/` only, not the vault root" instruction is the single most useful sentence in the entire item — it prevents Obsidian from indexing `.raw/`, `.hot/`, and `skills/` as graph nodes. Do not remove that instruction.
+
+**On `bin/standalone/`:** reject with stronger rationale than the prior reviewers gave. In an agent-managed project the specific danger is not that the CI step lies — it is that **a future agent reading `bin/standalone/prune.sh` will treat the `echo "TODO"` lines as documentation of existing behavior, not as a placeholder**. Agent consumers of this codebase use the file tree as a source of truth. A script that exists and is executable is indistinguishable from a script that works. This is a category error, not just technical debt.
+
+**On the `AGENTS.md` architecture row for `bin/standalone/`:** reject. Adding a row for a directory that contains only a TODO script implies the layer exists and operates. It does not.
+
+**For the applying agent:** create `docs/obsidian-visualization.md` and add the README `## Visualization` paragraph exactly as proposed. Do not create `bin/standalone/`. Do not add a `bin/standalone/` row to the `AGENTS.md` architecture table. If headless mode is ever needed, add a `--headless` flag to `bin/cortex-prune.sh` — one script, one spec, no parallel contract.
 
 ---
 
@@ -496,7 +583,7 @@ Also add a note after the table:
 - `cortex-prune SKILL.md` detection table includes the link-count scan row.
 - Output is written to `vault-report.json → knowledge_map.most_referenced` in Item 2's schema format.
 
-### Verdict (critical senior reviewer)
+### Verdict (Command Code, critical senior reviewer)
 
 **Verdict: ACCEPT — accept the algorithm, with two technical fixes required before implementation.**
 
@@ -511,6 +598,34 @@ Also add a note after the table:
 **Caveat I want to keep in the record:** the proposal says the scan approximates Graphify's Leiden algorithm at "80% fidelity." That number is made up — Leiden is a community-detection algorithm, this is a popularity ranking. They answer different questions. Drop the percentage or rephrase as "answers a related but different question."
 
 **For the third agent:** confirm that the scan runs *after* Layer 1 has detected `orphan_pages` (a page with 0 incoming links cannot be in `most_referenced` by definition, so the two outputs are correlated). The script should exclude any page flagged as orphan from the ranking, or document that an orphan can still appear if other pages link to it. Pick one interpretation and make it explicit.
+
+### Verdict (Codex, protocol-minimal review)
+
+**Verdict: ACCEPT THE SIGNAL, REJECT THE CURRENT HANDOFF MECHANISM.**
+
+**Why accept the signal:** a most-referenced ranking is useful and cheap to compute. It helps identify core pages without semantic inference, so the underlying idea earns its place.
+
+**Why reject the implementation shape:** the proposal currently uses stdout as an intermediate contract and then asks `cortex-prune` to re-parse or reassemble that output into JSON. That is avoidable complexity. The script should either write structured output directly or return a format with a single, explicit parser. Also, basename matching needs a stronger namespace boundary to avoid collisions between pages with the same filename in different folders.
+
+**Minimum bar for approval:** one writer, one artifact, no stubbed shell, no ambiguous matching, and no dependence on a human remembering how to parse console text.
+
+**For the third agent:** if you keep this item, tighten the path-matching algorithm and define the JSON emission boundary precisely. If you cannot do that cleanly, drop the item and keep the vault simpler.
+
+### Verdict (Antigravity, final user-skeptic review)
+
+**Verdict: DEFER — do not implement until Item 2's trimmed schema is stable.**
+
+**Why defer:** this item writes to `vault-report.json → knowledge_map.most_referenced`. My verdict on Item 2 removes `knowledge_map` entirely from the minimum viable schema. Implementing a scan that writes to a field no consumer reads is wasted effort. This item becomes viable only if a future session adds `knowledge_map` back with a real consumer.
+
+**Two technical problems that must be resolved before any implementation:**
+
+1. **Basename collision is a design defect, not a theoretical risk.** The wikilink convention in this vault is `[[page-slug]]`, not `[[type/page-slug]]`. Matching `[[synthesis` will collide if both `wiki/concepts/synthesis.md` and `wiki/sources/synthesis.md` exist. The proposed "fix" — match by full path-derived slug — breaks compatibility with every existing wikilink in the vault. There is no clean solution within the current wikilink convention. Accept the limitation explicitly or change the wikilink convention first; do not paper over it.
+
+2. **The "80% fidelity" claim is fabricated.** Leiden algorithm detects community structure; this scan counts popularity. They answer different questions. The applying agent must remove this comparison from any documentation generated by this item.
+
+**On stdout-to-JSON:** both prior reviewers correctly flag this. The script must write JSON directly — no intermediate stdout parsing.
+
+**For the applying agent:** do not implement this item in the current backlog pass. Add it to `ROADMAP.md` as a post-v0.3.0 item, contingent on `knowledge_map` being added to `vault-report.json` with a verified consumer.
 
 ---
 
@@ -559,7 +674,7 @@ Run `/cortex-forge-setup skills` to reinstall skills only.
 - Table accurately reflects what `cortex-forge-setup` already does (symlinks for Claude Code, manual instructions for Codex and Antigravity).
 - The sub-commands `hooks` and `skills` are mentioned as shortcuts.
 
-### Verdict (critical senior reviewer)
+### Verdict (Command Code, critical senior reviewer)
 
 **Verdict: ACCEPT — with one factual verification before landing.**
 
@@ -570,6 +685,28 @@ Run `/cortex-forge-setup skills` to reinstall skills only.
 **One factual correction:** the Cursor row says "Not supported" for hooks. That is stronger than what I can verify. Cursor's skill resolution is typically `.cursor/rules/` or project-local, not `~/.agents/skills/`. Saying "Not tested" is more honest than "Not supported" — the difference matters for users evaluating whether to adopt.
 
 **For the third agent:** confirm the sub-command existence and the Cursor row's accuracy. If both check out, accept as-is. If either is wrong, the proposal needs a small edit before merging.
+
+### Verdict (Codex, protocol-minimal review)
+
+**Verdict: ACCEPT WITH MINOR VERIFICATION, BUT DO NOT EXPAND THE CONTRACT BEYOND WHAT THE READER NEEDS.**
+
+**Why accept:** this is pure documentation and it answers a real discoverability gap. The platform table is low-risk, high-signal, and does not add runtime surface area.
+
+**Conditions:** only document commands that exist today, and avoid claiming stronger support than has been verified. The table should describe current behavior, not promise broader compatibility than the repo implements.
+
+**For the third agent:** verify the exact setup subcommands before landing the README text. If the commands do not exist, remove them from the documentation rather than normalizing aspirational CLI syntax.
+
+### Verdict (Antigravity, final user-skeptic review)
+
+**Verdict: ACCEPT — with two factual corrections required before landing.**
+
+**Why accept:** highest value-to-effort ratio in the backlog. Pure documentation, zero runtime risk, and it answers a question a new user will hit in the first five minutes.
+
+**Required correction 1 — Cursor row:** the proposal says "Not supported" for Cursor hooks. That is an overclaim in the wrong direction. Cursor uses `.cursor/rules/` (project-local) as its primary instruction surface, not `~/.agents/skills/`. The row should read: Skills path: `.cursor/rules/` (project-local, not `~/.agents/skills/`); Hook support: Not tested; Notes: Copy `AGENTS.md` content to `.cursor/rules/cortex-forge.mdc`. "Not supported" implies a test was run and failed; "Not tested" is honest about the unknown.
+
+**Required correction 2 — subcommands:** `/cortex-forge-setup hooks` and `/cortex-forge-setup skills` must be verified against the actual skill file before the README documents them. If they do not exist as discrete invocations, remove those two lines. Documenting commands that do not exist is the same error as the `bin/standalone/prune.sh` stub — it tells the reader something works when it does not.
+
+**For the applying agent:** verify both corrections, then implement exactly as proposed. No other changes.
 
 ---
 
@@ -672,7 +809,7 @@ before a recent protocol change, check the changelog to identify missing fields 
 - `README.md` documents the five commit prefixes and specifies which require a CHANGELOG entry.
 - `AGENTS.md` references `CHANGELOG.md` in the architecture section.
 
-### Verdict (critical senior reviewer)
+### Verdict (Command Code, critical senior reviewer)
 
 **Verdict: ACCEPT — with three corrections required and one coordination point with Item 2.**
 
@@ -689,6 +826,36 @@ before a recent protocol change, check the changelog to identify missing fields 
 **Coordination with Item 2 (vault-report.json):** the JSON's `protocol_version` field and `CHANGELOG.md` must agree. Pick one as source of truth — my recommendation: `CHANGELOG.md` is authoritative for the version string, and `vault-report.json` reads it (or is regenerated on each `protocol:` commit). Two sources of truth will drift within a month.
 
 **For the third agent:** confirm that the corrected changelog (option b above) and the trimmed vault-report.json from Item 2's verdict can coexist. The schema's `protocol_version` should match the latest entry in CHANGELOG.md at all times. Add this as an explicit invariant in `cortex-prune` Step 4a, or in a test, or in AGENTS.md as a design constraint.
+
+### Verdict (Codex, protocol-minimal review)
+
+**Verdict: ACCEPT THE IDEA, REJECT THE CURRENT SHAPE WITHOUT REVISION.**
+
+**Why accept the idea:** a changelog is the right place to record protocol-significant changes, and the vault already has enough moving parts that version history matters.
+
+**Why reject the current shape:** the proposal is internally inconsistent with the repo state by using `0.1.0` as the baseline instead of matching the current `0.2.0` state. It also defines commit categories and enforcement expectations without a mechanism to enforce them. A convention without enforcement is documentation, not protocol.
+
+**Minimum revision required:** align the initial version to the actual current state, decide whether the commit taxonomy is full Conventional Commits or a smaller custom set, and pair any “must update changelog” rule with an enforcement hook or check.
+
+**For the third agent:** confirm that `CHANGELOG.md` and any version-bearing JSON field stay synchronized through one authoritative source, not two parallel claims.
+
+### Verdict (Antigravity, final user-skeptic review)
+
+**Verdict: ACCEPT — with three mandatory corrections before the file is created.**
+
+**Why accept:** a protocol that evolves without a version record is a protocol that cannot be debugged. This repo already has meaningful version history (v0.1.0 → v0.2.0) and the items in this backlog will constitute v0.3.0-level changes. The CHANGELOG is the right artifact.
+
+**Mandatory correction 1 — wrong year:** the proposal writes `[0.1.0] — 2025-06-09`. The actual date visible in `.hot/MEMORY.md` is June 2026, not 2025. Use `2026-06-08` for v0.1.0 and `2026-06-09` for v0.2.0.
+
+**Mandatory correction 2 — wrong baseline version:** the repo is at v0.2.0. The CHANGELOG must include both a `[0.1.0]` retroactive entry and a `[0.2.0]` entry covering: CODEX.md added, type `Reference` in taxonomy, `.hot/MEMORY.md` fixed filename, parametric knowledge disqualification in Recall, PreCompact fix in crystallize, six-layer architecture. The `[0.2.0]` content is fully documented in `.hot/MEMORY.md` History — the applying agent should use that as the authoritative source.
+
+**Mandatory correction 3 — commit convention:** adopt [Conventional Commits](https://www.conventionalcommits.org/) in full, or define a custom set completely. The proposed five-prefix subset silently omits `chore:` and `refactor:`, which creates invisible gaps. Half-conventional is worse than no convention. For a solo project, a complete custom set of 5–7 prefixes is fine — but define it without holes.
+
+**On enforcement:** a pre-commit hook that checks changelog entries is overkill for a solo project and will be disabled the first time it blocks a typo fix. Document the convention and move on. Discipline is the enforcement mechanism here.
+
+**On the architecture description in the `[0.1.0]` entry:** the proposal describes "Five-layer vault" but the current architecture has six layers (Raw, Wiki, Hot, Codex, Meta, Skills — per `AGENTS.md`). Correct this or the entry becomes a false historical record.
+
+**For the applying agent:** create `CHANGELOG.md` with `[0.2.0]` as the topmost released entry (sourced from `.hot/MEMORY.md` History section), `[0.1.0]` retroactive below it with the corrected year and six-layer architecture description, and `[Unreleased]` as a placeholder above both. Use the corrected commit convention. Add `CHANGELOG.md` reference to `AGENTS.md` architecture section as proposed.
 
 ---
 

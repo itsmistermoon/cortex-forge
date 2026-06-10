@@ -311,3 +311,60 @@ fallos: no invocar `cortex-recall` proactivamente, y no seguir el flujo de
 
 **Aplicado:** contratos verificables y hardening implementados en `AGENTS.md` y
 skills `cortex-recall`, `cortex-assimilate`, `cortex-crystallize` — commit `ee7cbe5`.
+
+---
+
+## 2026-06-09 — Claude Code (claude-sonnet-4-6) — v0.2.0 + sincronización second-brain
+
+**Qué ocurrió:** sesión de cierre post-v0.2.0. Dos bloques de trabajo: (1) aplicar
+mejoras derivadas del análisis del handoff skill de Matt Pocock al protocolo; (2)
+replicar todos los cambios de v0.2.0 al vault personal `second-brain`.
+
+**Qué falló:**
+- El PreCompact anterior (00:20 -04) registró solo rutas de archivo en lugar de bullets
+  descriptivos — la rama mecánica del script seguía activa. Fix aplicado en esta sesión.
+- Los dos PreCompact previos a la sesión guardaron listas de rutas sin narrativa, lo que
+  hace esas entradas inútiles como handoff. Entradas conservadas tal cual (append-only).
+
+**Qué funcionó:**
+- Fix de `cortex-crystallize.sh`: rama PreCompact mecánica eliminada; ambos triggers
+  usan `claude -p` con `MODE_NOTE` contextual. Código unificado, sin duplicación.
+- 4 mejoras del análisis handoff aplicadas: tabla PreCompact/SessionEnd en MEMORY-FORMAT,
+  `### Suggested skills` en Zone 1, argumento `next: <focus>` en SKILL.md,
+  primary/secondary source en AGENTS.md.
+- `wiki/concepts/handoff-artifact.md`: decisiones de diseño documentadas — `.hot/` vs
+  `/tmp`, nombre fijo MEMORY.md, dos zonas, PreCompact vs SessionEnd.
+- `second-brain` sincronizado a v0.2.0 sin fricción: AGENTS.md (6 capas, MEMORY.md fijo,
+  Reference taxonomy, parametric knowledge, compliance criteria), CODEX.md creado,
+  template reference copiado, `.hot/second-brain.md` renombrado a `.hot/MEMORY.md`.
+- Release v0.2.0 publicado en GitHub.
+
+**Observaciones / sugerencias:**
+- La sincronización manual de second-brain es el proceso doloroso esperado al tener dos
+  repos. El costo fue bajo esta vez (AGENTS.md + CODEX.md + un template), pero crecerá
+  con cada iteración del protocolo.
+- Considerar en el futuro: `/cortex-forge-setup` podría detectar si hay vaults registrados
+  con AGENTS.md desactualizado y proponer un diff aplicable. No urgente — el proceso
+  manual fue rápido y controlado.
+
+---
+
+## 2026-06-10 — CommandCode (MiniMax-M3)
+
+**Qué ocurrió:** implementación final del backlog de mejoras derivado del análisis comparativo. Se aplicaron los ítems con unanimidad de los revisores y se diferó el escaneo de enlaces (Item 4) a `ROADMAP.md`.
+
+**Qué falló:**
+- Mención innecesaria a "Graphify" en la documentación de Obsidian (era análisis interno, no un reemplazo declarativo del proyecto). Corregido.
+- El `CHANGELOG.md` generado inicialmente duplicaba información que ya existe en las releases de GitHub. Ajustado para ser un resumen conciso con enlaces a las releases oficiales.
+
+**Qué funcionó:**
+- **Item 1:** Citas de confianza en `cortex-recall` (maneja `unset`, `read-error` y valida `medium`/`low`).
+- **Item 2:** Esquema mínimo viable de `vault-report.json` (solo `generated` y `health` con 3 campos), actualizado en `cortex-prune`, `AGENTS.md` y `.gitignore`.
+- **Item 3:** Documentación de visualización con Obsidian (`docs/obsidian-visualization.md` y sección en `README.md`). Se omitió `bin/standalone/` por rechazo unánime.
+- **Item 5:** Tabla de compatibilidad de plataformas en `README.md` (con corrección de Cursor a "Not tested" y mención de sub-comandos).
+- **Item 6:** `CHANGELOG.md` ajustado para apuntar a las releases de GitHub, y convención de commits agregada a `README.md` y referenciada en `AGENTS.md`.
+- **Item 4:** Diferido a `ROADMAP.md` como pendiente para post-v0.3.0 debido a colisiones de basename y falta de consumidor real.
+
+**Observaciones / sugerencias:**
+- Mantener el `CHANGELOG.md` local como un resumen de alto nivel con enlaces a las releases de GitHub evita la duplicación y el desfasaje entre el repo y el tracker de releases.
+- La omisión de referencias a herramientas de análisis interno en la documentación pública mantiene el foco en el valor propio del proyecto.

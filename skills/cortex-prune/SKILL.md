@@ -78,6 +78,7 @@ Report verdict as MEDIUM. Never auto-apply — always requires user confirmation
 - Add `[[wikilink]]` to a body mention identified in check 2b
 - Add entry to `wiki/index.md` for unindexed pages
 - Add `wiki/meta/log.md` entry: `## [YYYY-MM-DD] prune | {N} findings`
+- Write `wiki/meta/vault-report.json` (always — no confirmation needed)
 
 ## Requires confirmation (never auto-apply)
 

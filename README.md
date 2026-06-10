@@ -125,6 +125,25 @@ The skill will:
 
 After setup, all skills are available as `/cortex-assimilate`, `/cortex-crystallize`, `/cortex-imprint`, `/cortex-recall`, `/cortex-prune`, and `/cortex-forge-setup`.
 
+## Platform compatibility
+
+`/cortex-forge-setup` installs skills to `~/.agents/skills/` — the cross-platform convention adopted by most AI coding agents — and creates agent-specific symlinks where detected.
+
+| Agent | Skills path (global) | Hook support | Notes |
+|---|---|---|---|
+| Claude Code | `~/.agents/skills/` + `~/.claude/skills/` (symlinks) | Auto (SessionStart, PreCompact, SessionEnd) | Full support |
+| Codex | `~/.agents/skills/` | Manual — see setup step 6 | Hooks in `~/.codex/hooks.json` |
+| Antigravity (Gemini CLI) | `~/.agents/skills/` | Manual — see setup step 6 | Hooks in `~/.gemini/config/hooks.json` |
+| CommandCode | `~/.agents/skills/` | Manual (Stop hook) | TASTE rule available via setup step 7 |
+| Cursor | `.cursor/rules/` (project-local) | Not tested | Copy `AGENTS.md` content to `.cursor/rules/cortex-forge.mdc` |
+| Other agents | `~/.agents/skills/` | Varies | Check agent docs for skill resolution path |
+
+**If your agent does not read `~/.agents/skills/` automatically:**
+Copy `skills/cortex-*.md` (or the full skill folder, if your agent requires it) to your agent's configured skills path. `AGENTS.md` must always be present at the vault root regardless of agent.
+
+Run `/cortex-forge-setup hooks` to reinstall hooks only.
+Run `/cortex-forge-setup skills` to reinstall skills only.
+
 ## Usage
 
 Fork this repo and adapt it to your knowledge domain. The `skills/`, `templates/`, and `wiki/` structure is designed to be domain-agnostic — swap out the content, keep the architecture.
@@ -132,3 +151,19 @@ Fork this repo and adapt it to your knowledge domain. The `skills/`, `templates/
 Fill in `CODEX.md` with your vault's mission, domains, vocabulary, and out-of-scope rules. Agents read this at session start to ground relevance and taxonomy decisions.
 
 See `AGENTS.md` for the full operating protocol.
+
+## Commit convention
+
+```
+protocol:  changes to AGENTS.md, skill steps, or compliance criteria
+schema:    changes to template frontmatter or vault-report.json schema
+feat:      new skill, new script, new document
+fix:       incorrect instruction in a skill or broken script
+docs:      README, prose, non-protocol documentation
+chore:     dependency updates, tooling changes
+refactor:  reorganization without contract change
+```
+
+`protocol:`, `schema:`, and `feat:` commits require a `CHANGELOG.md` entry.
+`fix:` requires an entry only if it corrects a behavior agents were relying on.
+`docs:`, `chore:`, and `refactor:` never require an entry.

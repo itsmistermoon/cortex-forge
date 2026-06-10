@@ -32,7 +32,11 @@ Answer a question using the vault's wiki content as the source.
 ## Output format
 
 Every response must include:
-- At least one citation in the form `Source: wiki/{type}/{slug}.md`
+- At least one citation in the form `Source: wiki/{type}/{slug}.md [confidence: {value}]`
+  where `{value}` is read directly from the page's YAML frontmatter `confidence:` field.
+- If a cited page has no `confidence:` field, append `[confidence: unset]` and flag it as a finding.
+- If the page cannot be parsed due to malformed YAML, append `[confidence: read-error]` and flag it.
+- If `confidence: medium` or `low`, append the value and do not flag — these are valid states.
 - If no relevant pages exist: state "Not in vault" explicitly — do not fall back to training knowledge
 
 ## Rules

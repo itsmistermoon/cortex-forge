@@ -85,6 +85,8 @@ Five layers, each with a distinct role:
 
 `.raw/` is the authoritative record. `wiki/` is always a derived view — cheaper to load, but lossy by construction. When they conflict, `.raw/` wins.
 
+See `CHANGELOG.md` for protocol version history. When operating in a vault that may have been created before a recent protocol change, check the changelog to identify missing fields or behaviors.
+
 ## Wiki taxonomy
 
 | Type | Path | Purpose | Template |
@@ -102,3 +104,4 @@ Each page follows: YAML frontmatter + compiled truth + chronological changelog. 
 ## On session close
 
 Before `/cortex-crystallize`, evaluate whether the session produced analysis, design decisions, or synthesis worth persisting. If so, suggest `/cortex-imprint` — never archive without explicit confirmation. Add an entry to `wiki/meta/log.md` for each significant operation.
+it confirmation. Add an entry to `wiki/meta/log.md` for each significant operation.

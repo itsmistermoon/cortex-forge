@@ -12,8 +12,9 @@ See `CODEX.md` for vault context: mission, owner, domains, vocabulary, and out-o
 
 1. Read `.hot/MEMORY.md` in full.
 2. If `CODEX.md` exists at the vault root, read it — it provides context that grounds relevance, vocabulary, and tone decisions throughout the session.
-3. Treat both as required context — not optional background.
-4. If `MEMORY.md` contains `### Pending` items, acknowledge them in your first message or surface them before starting new work.
+3. If `wiki/meta/vault-report.json` exists, read it. If `health.dead_links` or `health.raw_without_source_page` is non-empty, surface these to the user in your first message as actionable issues — not background noise.
+4. Treat all of the above as required context — not optional background.
+5. If `MEMORY.md` contains `### Pending` items, acknowledge them in your first message or surface them before starting new work.
 
 **Failure to load hot cache before first response is a protocol violation**, equivalent to ignoring `CLAUDE.md` in Claude Code.
 
@@ -48,7 +49,7 @@ Trigger phrases include: "what does the vault say about", "recall", "what do we 
 
 **Do not use `grep`, `find`, or direct file reads as a substitute for `cortex-recall`.** Those tools return raw memory; the skill returns synthesized knowledge with citations.
 
-**Compliance criterion:** every response that draws on vault knowledge must include at least one citation to a `wiki/` page. If `cortex-recall` is unavailable in this session, declare it explicitly before answering — do not answer as if recall occurred.
+**Compliance criterion:** every response that draws on vault knowledge must include at least one citation to a `wiki/` page with its `confidence:` value appended. If `cortex-recall` is unavailable in this session, declare it explicitly before answering — do not answer as if recall occurred.
 
 ## Agent rules
 
@@ -72,7 +73,7 @@ Trigger phrases include: "what does the vault say about", "recall", "what do we 
 
 ## Vault architecture
 
-Five layers, each with a distinct role:
+Six layers, each with a distinct role:
 
 | Layer | Path | Purpose | Rule |
 |-------|------|---------|------|
@@ -104,4 +105,3 @@ Each page follows: YAML frontmatter + compiled truth + chronological changelog. 
 ## On session close
 
 Before `/cortex-crystallize`, evaluate whether the session produced analysis, design decisions, or synthesis worth persisting. If so, suggest `/cortex-imprint` — never archive without explicit confirmation. Add an entry to `wiki/meta/log.md` for each significant operation.
-it confirmation. Add an entry to `wiki/meta/log.md` for each significant operation.

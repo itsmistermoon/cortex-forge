@@ -12,7 +12,7 @@ cortex-forge's `wiki/` is a native Obsidian vault. No configuration required.
 - **Nodes** — every page in `wiki/` (concepts, entities, sources, pages, reference).
 - **Edges** — every `[[wikilink]]` between pages.
 - **Clusters** — Obsidian renders densely-linked groups visually, emerging naturally from the `[[wikilinks]]` that already exist.
-- **Orphans** — isolated nodes with no connections are visually obvious — the same set that `cortex-prune` detects programmatically and writes to `vault-report.json`.
+- **Orphans** — isolated nodes with no connections are visually obvious — the same set that `cortex-prune` detects programmatically in its Layer 1 structural check.
 
 ## Relationship with cortex-prune
 
@@ -20,9 +20,9 @@ cortex-forge's `wiki/` is a native Obsidian vault. No configuration required.
 
 | | cortex-prune | Obsidian |
 |---|---|---|
-| Orphan detection | Programmatic, written to vault-report.json | Visual |
-| Dead links | Programmatic | Not shown |
-| Cluster detection | Link-count approximation (most_referenced) | Native graph layout |
+| Orphan detection | Programmatic (Layer 1) | Visual |
+| Dead links | Programmatic (Layer 1, written to vault-report.json) | Not shown |
+| Cluster detection | Not implemented (link-count scan deferred — see `ROADMAP.md`) | Native graph layout |
 | Contradiction detection | Semantic (subagent) | Not shown |
 
 ## Status

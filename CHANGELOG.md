@@ -18,6 +18,12 @@ Format: `[semver] — YYYY-MM-DD`
 
 ## [Unreleased]
 
+- `protocol:` `cortex-recall` output contract appends `[confidence: {value}]` to every citation — `unset` and `read-error` are flagged as findings; `medium`/`low` are valid states. `AGENTS.md` Recall compliance criterion updated to match.
+- `schema:` `wiki/meta/vault-report.json` canonical minimal schema defined in `cortex-prune` step 4a (`generated` + `health.dead_links` / `health.raw_without_source_page` / `health.missing_confidence`). Written on every prune run, read at session start per `AGENTS.md` startup step 3, gitignored.
+- `protocol:` `AGENTS.md` session startup sequence gains step 3: read `vault-report.json` and surface non-empty `dead_links` / `raw_without_source_page`.
+- `feat:` `docs/obsidian-visualization.md` — `wiki/` documented as a native Obsidian vault; linked from `README.md` § Visualization.
+- `docs:` platform compatibility table and commit convention added to `README.md`.
+
 ## [0.2.0] — 2026-06-09
 
 See full release notes: https://github.com/itsmistermoon/cortex-forge/releases/tag/v0.2.0

@@ -20,6 +20,26 @@ Health check del vault activo en dos capas: estructural (script) y semántica (a
 
 4. **Report** all findings (Layer 1 + Layer 2) grouped by severity. For each: path(s), problem, proposed action.
 
+4a. **Write `wiki/meta/vault-report.json`** — after completing both layers, write or overwrite this file with exactly this structure:
+
+   ```json
+   {
+     "generated": "YYYY-MM-DD",
+     "health": {
+       "dead_links": [],
+       "raw_without_source_page": [],
+       "missing_confidence": []
+     }
+   }
+   ```
+
+   Field definitions:
+   - `health.dead_links` — array of `{"from": "wiki/...", "broken_target": "[[X]]"}` objects, from Layer 1.
+   - `health.raw_without_source_page` — array of `.raw/` file paths with no corresponding `wiki/sources/` page, from Layer 1.
+   - `health.missing_confidence` — array of page paths where `confidence:` is absent from frontmatter, from Layer 1.
+
+   This file is the session-startup health signal read in `AGENTS.md`. It is gitignored — a local artifact, not versioned content. This schema is canonical: do not add fields that have no consumer in `AGENTS.md` or in this skill.
+
 5. **Ask** whether to proceed with corrections per the auto-correct / requires-confirmation rules below.
 
 ---

@@ -25,6 +25,10 @@ Six layers, each with a distinct role:
 
 `.raw/` is authoritative. `wiki/` is a derived view — cheaper to load, but lossy by construction. When they conflict, `.raw/` wins.
 
+## Visualization
+
+Open `wiki/` as an [Obsidian](https://obsidian.md) vault to get a live knowledge graph — nodes are pages, edges are `[[wikilinks]]`, clusters emerge from link density. No configuration needed. See `docs/obsidian-visualization.md`.
+
 ## Skills
 
 Six skills that map to how knowledge actually moves through a system. All are globally invocable via `/skill-name` once installed.

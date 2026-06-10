@@ -11,7 +11,7 @@ Cada entrada es el selfreport de una sesión: qué ocurrió, qué falló, qué f
 y qué observaciones o sugerencias ofrece el agente.
 
 **No es un tracker de tareas.** No hay `Pending`, ni `Active decisions`, ni `Current state`.
-Para eso existe `.hot/{project}.md`.
+Para eso existe `.hot/MEMORY.md`.
 
 ---
 

@@ -127,7 +127,7 @@ Report verdict as MEDIUM. Never auto-apply — always requires user confirmation
 - Always run the script for Layer 1 — never reproduce its logic ad-hoc
 - For Layer 2, always spawn subagents — never reason about page relationships from memory alone
 - `index.md` and `log.md` without frontmatter is expected, not a finding
-- Source pages use `source:` (URL) and `raw:` for provenance — `sources:` (wiki links) is for concepts and entities only
+- Source pages use `source:` (URL) and `raw:` for provenance — `raw:` is the page's context pointer back to its `.raw/` primary. `sources:` (wiki links) is for concepts and entities only
 - Orphan sources are normal if freshly ingested and not yet linked from concepts/entities
 - Never delete or merge pages without explicit user confirmation
 - Debate pattern (2d) only triggers on genuine ambiguity — not on clear component relationships

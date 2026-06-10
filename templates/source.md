@@ -1,14 +1,13 @@
 ---
-title: {{title}}
 type: source
-created: {{date:YYYY-MM-DD}}
-updated: {{date:YYYY-MM-DD}}
+title: "{{title}}"
+source: 
+slug: {{slug}}
+section: 
+fetched: {{date:YYYY-MM-DD}}
 tags: []
-source_url: 
-source_date: 
-source_author: 
-sources: []
 confidence: high
+raw: .raw/{{slug}}.md
 ---
 
 # {{title}}

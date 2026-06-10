@@ -84,7 +84,7 @@ Six layers, each with a distinct role:
 | **Meta** | `wiki/meta/` | Vault metadata and guides | Agent maintains |
 | **Skills** | `skills/` | Invocable agent skills | Extend, don't modify |
 
-`.raw/` is the authoritative record. `wiki/` is always a derived view — cheaper to load, but lossy by construction. When they conflict, `.raw/` wins.
+`.raw/` is the authoritative record. `wiki/` is always a derived view — cheaper to load, but lossy by construction, and subject to drift (the primary changes, the account doesn't follow). When they conflict, `.raw/` wins. Every source page carries a **context pointer** back to its original — the `raw:` frontmatter field; follow it whenever the synthesized account isn't enough.
 
 See `CHANGELOG.md` for protocol version history. When operating in a vault that may have been created before a recent protocol change, check the changelog to identify missing fields or behaviors.
 

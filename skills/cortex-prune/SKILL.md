@@ -20,7 +20,7 @@ Health check del vault activo en dos capas: estructural (script) y semántica (a
 
 4. **Report** all findings (Layer 1 + Layer 2) grouped by severity. For each: path(s), problem, proposed action.
 
-4a. **Write `wiki/meta/vault-report.json`** — after completing both layers, write or overwrite this file with exactly this structure:
+4a. **Verify `wiki/meta/vault-report.json`** — the Layer 1 script (step 2) writes or overwrites this file on every run. Confirm it was refreshed (its `generated` date matches today) and report its path to the user. Do not write it yourself — the script is the single writer. The canonical schema:
 
    ```json
    {
@@ -98,7 +98,8 @@ Report verdict as MEDIUM. Never auto-apply — always requires user confirmation
 - Add `[[wikilink]]` to a body mention identified in check 2b
 - Add entry to `wiki/index.md` for unindexed pages
 - Add `wiki/meta/log.md` entry: `## [YYYY-MM-DD] prune | {N} findings`
-- Write `wiki/meta/vault-report.json` (always — no confirmation needed)
+
+`wiki/meta/vault-report.json` is written automatically by `bin/cortex-prune.sh` on every Layer 1 run — it is not a correction and needs no confirmation.
 
 ## Requires confirmation (never auto-apply)
 

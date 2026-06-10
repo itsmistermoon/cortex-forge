@@ -23,6 +23,7 @@ Format: `[semver] — YYYY-MM-DD`
 - `protocol:` `AGENTS.md` session startup sequence gains step 3: read `vault-report.json` and surface non-empty `dead_links` / `raw_without_source_page`.
 - `feat:` `docs/obsidian-visualization.md` — `wiki/` documented as a native Obsidian vault; linked from `README.md` § Visualization.
 - `docs:` platform compatibility table and commit convention added to `README.md`.
+- `protocol:` `vault-report.json` is now written directly by `bin/cortex-prune.sh` (Layer 1) — single writer, structured output, no stdout parsing. `cortex-prune` step 4a verifies the file instead of writing it.
 
 ## [0.2.0] — 2026-06-09
 

@@ -2,7 +2,7 @@
 title: "AI Coding Dictionary"
 type: source
 created: 2026-06-08
-updated: 2026-06-08
+updated: 2026-06-10
 tags: [ai-agents, vocabulary, reference]
 source_url: https://www.aihero.dev/ai-coding-dictionary
 source_date: 2026
@@ -42,8 +42,10 @@ confidence: high
 
 ## Connections
 
-- Related concepts: [[parametric-knowledge]], [[contextual-knowledge]], [[memory-system]], [[handoff-artifact]], [[smart-zone]], [[progressive-disclosure-hooks]]
+- Related concepts: [[parametric-knowledge]], [[contextual-knowledge]], [[memory-system]], [[handoff-artifact]], [[smart-zone]], [[progressive-disclosure-hooks]], [[primary-source]], [[secondary-source]]
+- Expanded entries (full articles, ingested separately): [[ai-coding-dictionary-primary-source]], [[ai-coding-dictionary-secondary-source]]
 
 ---
 
 - 2026-06-08 [Claude Code]: Page created
+- 2026-06-10 [Claude Code]: Primary source and Secondary source entries expanded with full articles (this page covers only the one-line index definitions)

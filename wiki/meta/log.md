@@ -214,3 +214,10 @@ Agent: Claude Code (claude-sonnet-4-6)
 
 Files translated: `wiki/sources/gemini-cli-hooks-video.md`, `wiki/sources/understand-anything.md`, `wiki/meta/log.md`
 Agent: Claude Code
+
+## [2026-06-10] assimilate | 2 sources + 2 concepts from AI Coding Dictionary full articles
+
+Sources: `wiki/sources/ai-coding-dictionary-primary-source.md`, `wiki/sources/ai-coding-dictionary-secondary-source.md`
+Concepts: `wiki/concepts/primary-source.md`, `wiki/concepts/secondary-source.md`
+Raw: `.raw/ai-coding-dictionary-primary-source.md`, `.raw/ai-coding-dictionary-secondary-source.md`
+Agent: Claude Code

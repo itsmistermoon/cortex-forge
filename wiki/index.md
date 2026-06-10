@@ -18,6 +18,8 @@
 - [[wiki/concepts/karpathy-wiki-pattern]] — Wiki design pattern optimized for LLM consumption (deterministic parser + semantic layer)
 - [[wiki/concepts/treesitter-llm-hybrid-parsing]] — Separation of concerns: deterministic parser for facts, LLM for interpretations
 - [[wiki/concepts/multi-agent-analysis-pipeline]] — Orchestration of N specialized agents with parallel fan-out and per-layer validation
+- [[wiki/concepts/primary-source]] — Source of truth in its original form (the thing, not an account of it); expensive but complete and current — `.raw/` is the vault's instance
+- [[wiki/concepts/secondary-source]] — Account one step removed, lossy by construction; fails by loss or drift, remedied by context pointers — `wiki/` is the vault's instance
 
 ## Entities
 - [[wiki/entities/google-antigravity]] — Agent-first development platform oriented toward autonomous workflows
@@ -52,6 +54,8 @@
 - [[wiki/sources/commandcode-taste-manage]] — TASTE profile management: push/pull, Studio, lint, scopes
 - [[wiki/sources/commandcode-taste-commands]] — `npx taste` / `cmd taste` command reference
 - [[wiki/sources/ai-coding-dictionary]] — 68-entry plain-English vocabulary of AI coding by Matt Pocock (AI Hero)
+- [[wiki/sources/ai-coding-dictionary-primary-source]] — Full article: primary source — cost vs completeness, staleness inheritance (ingested 2026-06-10)
+- [[wiki/sources/ai-coding-dictionary-secondary-source]] — Full article: secondary source — lossy/drift failure modes, context pointers (ingested 2026-06-10)
 
 ## Meta
 - [[wiki/meta/log]] — Append-only vault operation log

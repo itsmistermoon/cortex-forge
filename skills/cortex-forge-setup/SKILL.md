@@ -73,25 +73,25 @@ Always end with the relevant subset of step 9 (confirmation).
      - Add the following hooks if not already present:
        ```json
        "SessionStart": [{ "type": "command", "command": "~/.claude/hooks/cortex-reactivate.sh" }]
-       "PreCompact":   [{ "type": "command", "command": "~/.claude/hooks/cortex-crystallize.sh" }]
-       "SessionEnd":   [{ "type": "command", "command": "~/.claude/hooks/cortex-crystallize.sh", "timeout": 60 }]
+       "PreCompact":   [{ "type": "command", "command": "~/.claude/hooks/cortex-crystallize-claude.sh" }]
+       "SessionEnd":   [{ "type": "command", "command": "~/.claude/hooks/cortex-crystallize-claude.sh", "timeout": 60 }]
        ```
      - Merge carefully — do not overwrite existing hooks, only append to the arrays.
    - **Other agents** — display manual instructions:
      ```
      Codex (~/.codex/hooks.json):
        SessionStart → ~/.codex/hooks/cortex-reactivate.sh
-       Stop         → ~/.codex/hooks/cortex-crystallize.sh
+       Stop         → ~/.codex/hooks/cortex-crystallize-claude.sh
 
        Note: keep Codex hooks in a stable global folder and make the scripts vault-aware at runtime; do not point Codex directly at a specific vault path.
 
      Antigravity (~/.gemini/config/hooks.json):
        PreInvocation (invocationNum == 0) → bash ~/.gemini/config/hooks/cortex-reactivate.sh
-       Stop (fullyIdle == true)           → bash ~/.gemini/config/hooks/cortex-crystallize.sh
+       Stop (fullyIdle == true)           → bash ~/.gemini/config/hooks/cortex-crystallize-claude.sh
        Note: copy scripts to ~/.gemini/config/hooks/ — Antigravity cannot use ~/.claude/hooks/
 
      CommandCode ({vault}/.commandcode/settings.local.json):
-       Stop → bash ~/.claude/hooks/cortex-crystallize.sh
+       Stop → bash ~/.claude/hooks/cortex-crystallize-claude.sh
        Note: scope must be the vault's .commandcode/, not cortex-forge's
      ```
 
@@ -131,7 +131,7 @@ Always end with the relevant subset of step 9 (confirmation).
 
 The hooks provide automatic (no-invoke) session memory:
 - **SessionStart** (`cortex-reactivate.sh`) — reads `.hot/MEMORY.md` and injects it as context
-- **PreCompact / Stop** (`cortex-crystallize.sh`) — appends a snapshot to `.hot/MEMORY.md`
+- **PreCompact / Stop** (`cortex-crystallize-claude.sh`) — appends a snapshot to `.hot/MEMORY.md`
 
 The hook writes a minimal snapshot (files touched, external actions). For a full snapshot with Current state updated, invoke `/cortex-crystallize` manually — hooks and manual invocation are compatible and complementary.
 

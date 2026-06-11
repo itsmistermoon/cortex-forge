@@ -59,7 +59,7 @@ Configure in `~/.codex/hooks.json`:
 ```json
 {
   "SessionStart": [{ "command": "bash ~/.codex/hooks/cortex-reactivate.sh" }],
-  "Stop":         [{ "command": "bash ~/.codex/hooks/cortex-crystallize.sh" }]
+  "Stop":         [{ "command": "bash ~/.codex/hooks/cortex-crystallize-claude.sh" }]
 }
 ```
 
@@ -135,6 +135,26 @@ Patterns extracted from official CommandCode examples; the output mechanism vari
 | **Pure observability** | Pre or PostToolUse | exit `0`, writes to local log | Tool call audit with timestamp and session ID |
 | **Completion gate** | Stop | exit `2` + `systemMessage` | Block close if `DO NOT SHIP` markers exist; up to 3 retries |
 
+## Agent detection signals (for `cortex-crystallize` skill)
+
+When `/cortex-crystallize` is invoked manually, the skill must identify the calling agent to fill `agent:` and `{Agent}` in the history header. Detection is based on environment variables set by each CLI at runtime. Check in order:
+
+| Signal | Value | Agent |
+|--------|-------|-------|
+| `CLAUDECODE` | `1` | Claude Code — also check `AI_AGENT` for model/version |
+| `AI_AGENT` | starts with `claude-code` | Claude Code (fallback if `CLAUDECODE` unset) |
+| `COMMANDCODE` | `1` | CommandCode (⚠ unconfirmed — needs validation in live session) |
+| `AI_AGENT` | starts with `commandcode` | CommandCode (⚠ unconfirmed) |
+| `AGY` | `1` | Antigravity (⚠ unconfirmed) |
+| `AI_AGENT` | starts with `agy` or `antigravity` | Antigravity (⚠ unconfirmed) |
+| `CODEX` | `1` | Codex (⚠ unconfirmed) |
+| `AI_AGENT` | starts with `codex` | Codex (⚠ unconfirmed) |
+| none matched | — | Fall back to self-knowledge |
+
+**Confirmed (Claude Code, 2026-06-11):** `CLAUDECODE=1`, `AI_AGENT=claude-code_{version}_agent`, `CLAUDE_CODE_ENTRYPOINT=cli`, `CLAUDE_CODE_SESSION_ID=…`
+
+**Pending validation:** CommandCode, Antigravity, and Codex signals — update this table when each CLI is tested in a live session with `/cortex-crystallize`.
+
 ## Universal fallback rule
 
 If an agent has no startup hook, `AGENTS.md` acts as a fallback: the explicit instruction to read `.hot/MEMORY.md` is interpreted by any agent that processes the instructions file before operating. It is less reliable than a hook (depends on the agent respecting AGENTS.md), but covers the gap.
@@ -148,3 +168,4 @@ If an agent has no startup hook, `AGENTS.md` acts as a fallback: the explicit in
 - 2026-06-08 [claude-sonnet-4-6]: Added full CommandCode I/O schema (control fields, exit codes), security/performance section (best practices), and table of common usage patterns portable across agents. Sources: commandcode-hooks-reference, commandcode-hooks-examples, commandcode-hooks-best-practices
 - 2026-06-08 [claude-sonnet-4-6]: Claude Code SessionStart — `source` field documented (startup|resume|clear|compact), `asyncRewake` added, `PreCompact` with exit 2 confirmed. CommandCode — plan mode gotcha documented. Source: handoff from second-brain
 - 2026-06-08 [Claude Code]: Translated to English
+- 2026-06-11 [Claude Code]: Agent detection signals section added — confirmed Claude Code env vars; other CLIs marked unconfirmed pending live validation

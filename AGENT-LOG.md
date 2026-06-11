@@ -383,3 +383,24 @@ replicar todos los cambios de v0.2.0 al vault personal `second-brain`.
 **Observaciones / sugerencias:**
 - El script no hace síntesis IA (como sí hace la versión de Claude Code). El snapshot es mínimo — solo marca que la sesión se cerró. La síntesis real la hará el agente CommandCode al leer MEMORY.md en la próxima sesión y reconstruir contexto desde el historial.
 - El pending de Antigravity (`cortex-crystallize-antigravity.sh` en sesión orgánica real) queda como el único bloqueante previo a instalar hooks nuevos del backlog #2.
+
+---
+
+## 2026-06-11 — Claude Code (claude-sonnet-4-6) — fix cortex-crystallize-antigravity.sh
+
+**Qué ocurrió:** diagnóstico y corrección del script Stop hook de Antigravity, que generaba síntesis basura.
+
+**Qué falló:**
+- `cortex-crystallize-antigravity.sh` usaba `jq` para parsear el transcript, pero Antigravity almacena transcripts como SQLite+Protobuf (`.db`), no JSON. `jq` fallaba silenciosamente y retornaba 0 tool calls.
+- Durante la sesión de test, Antigravity creó un dummy transcript en formato JSON-Claude-Code. El script lo parseó con éxito, llamó `agy -p` sobre ese dummy, y escribió una síntesis genérica/incorrecta en `.hot/MEMORY.md` (entrada "No files were created..." del 20:31). Cuando el hook real se disparó al cerrar la sesión real, el `.db` no fue parseado y la entrada basura quedó intacta.
+- La entrada del 20:31 fue eliminada de MEMORY.md (era artefacto del test, no contexto real de sesión).
+
+**Qué funcionó:**
+- Nuevo approach para parsear transcripts de Antigravity: (1) `strings $TRANSCRIPT | grep -oE '"toolSummary":"[^"]*"'` extrae summaries de herramientas desde los blobs protobuf; (2) `grep -F $CONV_ID ~/.gemini/antigravity-cli/history.jsonl | grep -oE '"display":"[^"]*"'` extrae mensajes del usuario, donde `CONV_ID` se deriva del basename del `.db`.
+- El script probado con el db real de la sesión bb3be9d0 generó síntesis correcta y descriptiva.
+- Fix de portabilidad: `grep -P` → `grep -E` (BSD grep en macOS no tiene PCRE).
+
+**Observaciones / sugerencias:**
+- El guard `[ -z "$TOOL_SUMMARIES" ] && exit 0` protege contra sesiones de solo lectura sin herramientas.
+- Queda pendiente la validación en sesión orgánica real (el script se probó con transcript de sesión anterior, no con trigger real del hook Stop).
+- Si Antigravity cambia el schema del SQLite o el campo `toolSummary` en el wire format, la extracción falla silenciosamente — documentar como fragile point.

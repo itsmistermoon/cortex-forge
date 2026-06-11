@@ -18,6 +18,13 @@ Behavior depends on where the skill is invoked:
 ## Steps
 
 1. Detect active repo: find nearest `.git` from CWD. If none, ask.
+1a. **Detect invoking agent** — run `env` and check these signals in order:
+   - `CLAUDECODE=1` → **Claude Code**; append model from `AI_AGENT` if set (e.g. `claude-code_2-1-172_agent` → `Claude Code (claude-sonnet-4-6)`)
+   - `COMMANDCODE=1` or `AI_AGENT` starts with `commandcode` → **CommandCode**
+   - `AGY=1` or `AI_AGENT` starts with `agy` or `antigravity` → **Antigravity**
+   - `CODEX=1` or `AI_AGENT` starts with `codex` → **Codex**
+   - None matched → use self-knowledge (you know what CLI you are)
+   Use the detected identity as `{Agent}` in the history header and in the `agent:` frontmatter field.
 2. **Resolve vault** from `~/.cortex-forge/config.yml`. If missing, prompt to run `/cortex-forge-setup` first.
    - Config supports two formats — handle both:
      - New: `vaults: {name: path, ...}` + `default: name`

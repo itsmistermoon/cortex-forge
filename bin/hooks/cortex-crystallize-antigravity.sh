@@ -1,6 +1,8 @@
 #!/bin/bash
-# Stop hook for Antigravity — snapshots session into .hot/{project}.md.
+# Stop hook for Antigravity — snapshots session into .hot/MEMORY.md.
 # Only fires when fullyIdle==true and terminationReason=="model_stop".
+# Antigravity stores transcripts as SQLite+Protobuf .db files — cannot parse
+# with jq. Instead: user messages from history.jsonl, tool summaries via strings.
 
 set -uo pipefail
 
@@ -26,8 +28,6 @@ find_git_root_dir() {
 
 GIT_ROOT=$(find_git_root_dir)
 
-[ -z "$TRANSCRIPT" ] || [ ! -f "$TRANSCRIPT" ] && echo '{"decision":""}' && exit 0
-
 mkdir -p "$GIT_ROOT/.hot" 2>/dev/null || { echo '{"decision":""}'; exit 0; }
 
 if ! grep -qF '.hot/' "$GIT_ROOT/.gitignore" 2>/dev/null; then
@@ -49,7 +49,6 @@ if [ -f "$HOT_FILE" ]; then
   ' "$HOT_FILE")
   PREV_HISTORY=$(awk '/^## History$/{found=1; next} found{print}' "$HOT_FILE")
 
-  # Guard against duplicate Current state blocks
   DASH_COUNT=$(printf '%s\n' "$CURRENT_STATE" | grep -c '^---$' 2>/dev/null || echo 0)
   if [ "$DASH_COUNT" -gt 2 ]; then
     CURRENT_STATE=$(printf '%s\n' "$CURRENT_STATE" | awk '/^---$/{n++; if(n==3) exit} {print}')
@@ -59,51 +58,43 @@ else
   PREV_HISTORY=""
 fi
 
+# ── Extract session context from Antigravity's SQLite .db transcript ─────────
+# Antigravity uses SQLite+Protobuf — jq cannot parse it.
+# Strategy: tool summaries via `strings`, user messages via history.jsonl.
+
+TOOL_SUMMARIES=""
+USER_MSGS=""
+
+if [ -n "$TRANSCRIPT" ] && [ -f "$TRANSCRIPT" ]; then
+  # Extract tool summaries embedded as JSON fragments in protobuf blobs
+  TOOL_SUMMARIES=$(strings "$TRANSCRIPT" 2>/dev/null \
+    | grep -oE '"toolSummary":"[^"]*"' \
+    | sed 's/"toolSummary":"//;s/"$//' \
+    | sort -u \
+    | head -30)
+
+  # Derive conversationId from db filename, then fetch user messages
+  CONV_ID=$(basename "$TRANSCRIPT" .db)
+  HISTORY_FILE="$HOME/.gemini/antigravity-cli/history.jsonl"
+  if [ -f "$HISTORY_FILE" ] && [ -n "$CONV_ID" ]; then
+    USER_MSGS=$(grep -F "$CONV_ID" "$HISTORY_FILE" \
+      | grep -oE '"display":"[^"]*"' \
+      | sed 's/"display":"//;s/"$//' \
+      | head -20)
+  fi
+fi
+
+# If no tool summaries found, the session had no real work — skip
+[ -z "$TOOL_SUMMARIES" ] && echo '{"decision":""}' && exit 0
+
 # ── Build synthesis prompt ───────────────────────────────────────────────────
-# Antigravity tool names differ from Claude Code
-TOOL_CALL_COUNT=$(jq -r '
-  select(.type=="assistant")
-  | .message.content[]?
-  | select(.type=="tool_use")
-  | .name
-' "$TRANSCRIPT" 2>/dev/null | wc -l | tr -d ' ')
-
-[ "$TOOL_CALL_COUNT" -eq 0 ] && echo '{"decision":""}' && exit 0
-
-USER_MSGS=$(jq -r '
-  select(.type=="user")
-  | .message.content[]?
-  | select(.type=="text")
-  | .text
-' "$TRANSCRIPT" 2>/dev/null | grep -v '^<' | grep -v '^$' | head -40)
-
-TOOL_CALLS=$(jq -r '
-  select(.type=="assistant")
-  | .message.content[]?
-  | select(.type=="tool_use")
-  | "- " + .name + ": " + (
-      (.input.TargetFile // .input.command // (.input | tostring))
-      | .[0:120]
-    )
-' "$TRANSCRIPT" 2>/dev/null | head -50)
-
-LAST_REPLY=$(jq -r '
-  select(.type=="assistant")
-  | .message.content[]?
-  | select(.type=="text")
-  | .text
-' "$TRANSCRIPT" 2>/dev/null | tail -3)
-
 FULL_PROMPT="Analyze this Antigravity CLI session and generate a structured summary in English.
 
 == USER REQUESTS ==
 $USER_MSGS
 
-== TOOLS USED ==
-$TOOL_CALLS
-
-== LAST ASSISTANT MESSAGE ==
-$LAST_REPLY
+== TOOLS USED (summaries) ==
+$TOOL_SUMMARIES
 
 Generate EXACTLY this markdown block (no extra text before or after).
 Omit sections with no real content entirely — never use placeholders.

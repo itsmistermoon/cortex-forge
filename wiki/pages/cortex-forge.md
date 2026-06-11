@@ -50,9 +50,12 @@ Vault with a hot cache protocol that synchronizes context across multiple agents
 ## Next steps
 
 - [ ] Validar `cortex-crystallize-antigravity.sh` en sesión real (flujo orgánico completo, no mock)
-- [ ] Verificar hook Stop de CommandCode en `second-brain/` — script puede degradar silenciosamente con el wire format de CommandCode
 - [ ] Implementar PostToolUse como guardrail de plataforma (detección SPA + intercepción grep/find) — Roadmap Fase 2
 - [ ] MOCs por área temática (Fase 3)
+
+## Resolved
+
+- [x] Verificar hook Stop de CommandCode en `second-brain/` — script degradaba silenciosamente con el wire format de CommandCode. Fix: `bin/hooks/cortex-crystallize-commandcode.sh` creado (no depende de transcript, no usa `claude -p`). Hook instalado en `second-brain/.commandcode/settings.local.json` (scope correcto) y corregido también en `cortex-forge/.commandcode/settings.local.json`. (2026-06-10, CommandCode)
 
 ## Knowledge applied
 
@@ -73,6 +76,7 @@ Vault with a hot cache protocol that synchronizes context across multiple agents
 - `cortex-recall` compliance gap — agents fall back to manual search or parametric knowledge despite `MANDATORY` in `AGENTS.md`. Compliance criteria added to the protocol (2026-06-08) but root cause unresolved. May require PostToolUse guardrail to enforce.
 - Codex hooks need a stable global path (e.g., `~/.codex/hooks/`) with runtime vault resolution. Vault-local paths break multi-vault and off-vault setups.
 - Antigravity `cortex-crystallize-antigravity.sh` installed but not verified in a real organic session.
+- CommandCode Stop hook: requiere `cortex-crystallize-commandcode.sh` (script dedicado, no comparte con Claude Code). Resuelto: script creado, hook instalado en second-brain y cortex-forge.
 
 ## Sources
 

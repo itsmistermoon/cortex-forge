@@ -368,3 +368,18 @@ replicar todos los cambios de v0.2.0 al vault personal `second-brain`.
 **Observaciones / sugerencias:**
 - Mantener el `CHANGELOG.md` local como un resumen de alto nivel con enlaces a las releases de GitHub evita la duplicación y el desfasaje entre el repo y el tracker de releases.
 - La omisión de referencias a herramientas de análisis interno en la documentación pública mantiene el foco en el valor propio del proyecto.
+
+---
+
+## 2026-06-10 17:45 -04 — CommandCode (Stop hook fix)
+
+**Qué ocurrió:** se resolvió el pending de CommandCode en el vault: el hook Stop apuntaba a `cortex-crystallize.sh` (diseñado para Claude Code, incompatible con el wire format de CommandCode — esperaba `transcript_path`, `hook_event_name`, `cwd` y usaba `claude -p`). Se creó `bin/hooks/cortex-crystallize-commandcode.sh` que no depende de transcript, no usa síntesis IA, y escribe el snapshot directamente. Se instaló en `second-brain/.commandcode/settings.local.json` (scope correcto). Se corrigió también `cortex-forge/.commandcode/settings.local.json` para que apunte al script CommandCode-native.
+
+**Qué funcionó:**
+- `cortex-crystallize-commandcode.sh` creado como script mínimo y robusto: parsea stdin con jq, encuentra git root, preserva Zone 1 + Zone 2 de MEMORY.md, escribe entrada en History con etiqueta `CommandCode (Stop)`.
+- Hook instalado donde corresponde: `second-brain/.commandcode/settings.local.json` (el vault activo del usuario).
+- Hook de cortex-forge corregido también para que use el script CommandCode-native.
+
+**Observaciones / sugerencias:**
+- El script no hace síntesis IA (como sí hace la versión de Claude Code). El snapshot es mínimo — solo marca que la sesión se cerró. La síntesis real la hará el agente CommandCode al leer MEMORY.md en la próxima sesión y reconstruir contexto desde el historial.
+- El pending de Antigravity (`cortex-crystallize-antigravity.sh` en sesión orgánica real) queda como el único bloqueante previo a instalar hooks nuevos del backlog #2.

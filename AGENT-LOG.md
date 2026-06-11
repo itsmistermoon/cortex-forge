@@ -404,3 +404,19 @@ replicar todos los cambios de v0.2.0 al vault personal `second-brain`.
 - El guard `[ -z "$TOOL_SUMMARIES" ] && exit 0` protege contra sesiones de solo lectura sin herramientas.
 - Queda pendiente la validación en sesión orgánica real (el script se probó con transcript de sesión anterior, no con trigger real del hook Stop).
 - Si Antigravity cambia el schema del SQLite o el campo `toolSummary` en el wire format, la extracción falla silenciosamente — documentar como fragile point.
+
+---
+
+## 2026-06-11 — Claude Code (claude-sonnet-4-6) — rename -claude suffix + agent detection en skill
+
+**Qué ocurrió:** rename de `cortex-crystallize.sh` a `cortex-crystallize-claude.sh` para alinear la convención de nombres con los demás scripts. Adicionalmente, se implementó detección de agente invocador en la skill `cortex-crystallize`.
+
+**Qué funcionó:**
+- Rename aplicado en todas las referencias activas: `bin/hooks/`, `~/.claude/hooks/`, `~/.claude/settings.json`, `skills/cortex-forge-setup/SKILL.md`, `wiki/concepts/agent-hook-compatibility.md`. Las referencias históricas en AGENT-LOG y MEMORY.md se dejaron intactas (append-only).
+- Detección de agente: inspeccionando el entorno real de Claude Code se confirmaron las señales disponibles — `CLAUDECODE=1`, `AI_AGENT=claude-code_{version}_agent`, `CLAUDE_CODE_ENTRYPOINT`, `CLAUDE_CODE_SESSION_ID`. Estas variables son suficientes para identificar Claude Code sin depender del auto-reporte del modelo.
+- Paso `1a` agregado a `cortex-crystallize/SKILL.md`: el agente corre `env` y matchea las señales en orden de prioridad para identificarse antes de escribir el snapshot.
+- Tabla de señales agregada a `agent-hook-compatibility.md` con estado de validación por CLI.
+
+**Observaciones / sugerencias:**
+- Las señales de CommandCode, Antigravity y Codex son hipótesis (marcadas `⚠ unconfirmed`). Necesitan validarse en sesión real con cada CLI: correr `env | grep -iE "commandcode|agy|codex|ai_agent"` al inicio de sesión y reportar el resultado.
+- `AI_AGENT` parece ser la variable más prometedora como estándar cross-CLI — si los demás agentes la adoptan con su propio prefijo, sería el único campo a verificar.

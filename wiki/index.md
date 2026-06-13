@@ -64,6 +64,7 @@
 - [[wiki/sources/claude-code-shorthand-guide]] — @affaan's power-user Claude Code setup: tool-context budget, codemap skill, enforcement hooks (ingested 2026-06-12)
 - [[wiki/sources/claude-code-longform-guide]] — @affaan's advanced techniques: memory persistence hook chain, continuous learning, iterative retrieval, evals (ingested 2026-06-12)
 - [[wiki/sources/agentic-security-shorthand-guide]] — @affaan's agent security guide: memory poisoning, lethal trifecta, skills as supply chain, least agency (ingested 2026-06-12)
+- [[wiki/sources/graphify]] — Knowledge graph skill for AI coding assistants; 66.3k stars, YC S26, 20+ platforms, multi-agent install patterns (ingested 2026-06-12)
 - [[wiki/sources/commandcode-headless]] — Headless mode: session persistence, resume, exit codes, permissions (ingested 2026-06-12)
 
 ## Meta

@@ -108,6 +108,9 @@ Append at the end, never modify previous entries.
 #### Discarded
 - {options evaluated and rejected, with brief reason}
 
+#### Attempted and failed
+- {approach tried, why it failed, evidence — prevents retrying the same dead end}
+
 #### Fragile context
 - {exact numbers, commands, paths, URLs, conventions a new agent can't infer from code}
 ```
@@ -122,7 +125,7 @@ After completing the snapshot, confirm:
 ## Rules
 
 - Language: match the vault's language (check `AGENTS.md`).
-- Empty sections: omit entirely — never write `_(none)_` or other placeholders.
+- Empty sections: omit entirely — never write `_(none)_` or other placeholders. This applies to `#### Attempted and failed` and `#### Discarded` and `#### Fragile context` equally.
 - Pending items live in **Current state**, not in the snapshot — so they don't get buried.
 - The history snapshot **has no pending section** — that's Current state's responsibility.
 - Don't duplicate content already in ADRs, PRDs, issues, or commits — reference by path.

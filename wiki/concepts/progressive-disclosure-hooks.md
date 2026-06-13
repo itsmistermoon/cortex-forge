@@ -7,6 +7,7 @@ tags: [hooks, skills, context-management, token-efficiency]
 aliases: [just-in-time context, lazy context loading]
 sources:
   - wiki/sources/gemini-cli-hooks-video.md
+  - wiki/sources/obsidian-mind.md
 confidence: medium
 ---
 
@@ -34,6 +35,19 @@ The separation between hot cache and wiki is an instance of this pattern:
 - The content of `wiki/` is loaded on demand via `cortex-recall` when the user queries a topic
 - The History section of the hot cache is **not** injected (this was the 2026-06-08 fix to `load-hot-cache.sh`)
 
+## Explicit tier model (Obsidian Mind)
+
+Obsidian Mind makes the same pattern explicit with a per-tier token budget:
+
+| Tier | What | Cost |
+|------|------|------|
+| Always | Operating manual + SessionStart excerpts (goals, git summary, file listing) | ~2K tokens |
+| On-demand | Semantic search results when the agent needs specific context | Targeted |
+| Triggered | Classification hints (per message) and write validation (per `.md` write) | ~100–200 tokens |
+| Rare | Full file reads, only when explicitly needed | Variable |
+
+The useful addition is the *budget*: each tier has a known cost ceiling, so the loading strategy can be reasoned about quantitatively instead of just "load less upfront."
+
 ## Tension with visibility
 
 In Codex, context injected by hooks is visible in the chat (`hook context:`). The progressive disclosure pattern reduces the impact of this visibility by minimizing the injected volume — less visible noise, fewer tokens consumed.
@@ -45,3 +59,4 @@ In Codex, context injected by hooks is visible in the chat (`hook context:`). Th
 
 - 2026-06-08 [Claude Code]: Page created — concept extracted from the Gemini CLI hooks video; instantiated in the hot cache History fix
 - 2026-06-08 [Claude Code]: Translated to English
+- 2026-06-12 [Claude Code]: Added explicit tier model from Obsidian Mind ingestion

@@ -420,3 +420,97 @@ replicar todos los cambios de v0.2.0 al vault personal `second-brain`.
 **Observaciones / sugerencias:**
 - Las señales de CommandCode, Antigravity y Codex son hipótesis (marcadas `⚠ unconfirmed`). Necesitan validarse en sesión real con cada CLI: correr `env | grep -iE "commandcode|agy|codex|ai_agent"` al inicio de sesión y reportar el resultado.
 - `AI_AGENT` parece ser la variable más prometedora como estándar cross-CLI — si los demás agentes la adoptan con su propio prefijo, sería el único campo a verificar.
+
+---
+
+## 2026-06-11 21:03 -04 — CommandCode (deepseek/deepseek-v4-flash) — validación señales de entorno y detección de agente
+
+**Qué ocurrió:** validación en sesión real de las señales de entorno de CommandCode. Se ejecutó `env | grep -iE "commandcode|agy|codex|ai_agent|claude"` al inicio de sesión, más un dump completo de variables (35 total), inspección del árbol de procesos, y análisis del binario.
+
+**Qué falló:**
+- `COMMANDCODE=1` **no existe.** La tabla de señales en `agent-hook-compatibility.md` estaba incorrecta para CommandCode. Ninguna de las 35 variables de entorno identifica al CLI.
+- `AI_AGENT` tampoco existe en CommandCode. No es un estándar cross-CLI — es específico de Claude Code.
+- Tampoco hay `COMMANDCODE_SESSION_ID`, ni ninguna variable tipo `_AGENT`, `_PLATFORM` o similar.
+- El paso `1a` de `cortex-crystallize/SKILL.md` (correr `env` y matchear señales) es insuficiente para CommandCode — `env` en CommandCode solo tiene el entorno de shell, sin inyección del CLI.
+
+**Qué funcionó:**
+- Se identificaron **2 métodos detectables** alternativos a las variables de entorno:
+  1. **Árbol de procesos:** el proceso padre de la sesión es `node /opt/homebrew/bin/cmd` (el symlink de CommandCode). Caminando el árbol hacia arriba desde `$PPID` se llega a `node /opt/homebrew/bin/cmd` → Ghostty. Confiable porque el path del binario identifica unívocamente al CLI.
+  2. **Ruta del binario:** `commandcode` está en `$PATH` como `/opt/homebrew/bin/commandcode`, y `which commandcode` funciona. No es suficiente por sí solo (el agente no sabe si el shell nativo lo ejecutó), pero como test complementario es rápido.
+- Config de CommandCode en `~/.commandcode/config.json`: `"provider": "command-code"`, `"model": "deepseek/deepseek-v4-flash"`.
+- `commandcode --version` → `0.35.0`. El binario es `node /opt/homebrew/bin/commandcode -> ../lib/node_modules/command-code/dist/index.mjs`.
+
+**Observaciones / sugerencias:**
+- CommandCode **no inyecta** señales de entorno auto-identificadoras. La detección vía `env` es un falso positivo en la tabla actual.
+- Método propuesto para detección en `cortex-crystallize`: (1) probar `env` match (funciona para Claude Code); (2) si no hay match, caminar árbol de procesos desde `$PPID` buscando binario conocido (`commandcode`, `claude`, `codex`, `agy`); (3) último recurso: `which commandcode | agy | codex`.
+- Ventaja del árbol de procesos: funciona aunque el CLI no exporte vars. Aplica a cualquier agente que no inyecte señales (CommandCode, probablemente Antigravity y Codex también).
+- Hipótesis a validar en Antigravity y Codex: ¿también carecen de vars de entorno? Si el patrón se repite, el árbol de procesos es el método universal.
+- **Recomendación:** cambiar la lógica de detección en la skill de "match env vars" a "match env vars OR walk process tree OR check common binary paths", en ese orden. El árbol de procesos es el mecanismo más robusto porque no depende del CLI implementando nada.
+
+---
+
+## 2026-06-10 21:57 -04 — Codex / Claude Code (hook test)
+
+**Qué ocurrió:** se creó `bin/hooks/cortex-crystallize-codex.sh` como wrapper explícito para los hooks de Codex y se generalizó `bin/hooks/cortex-crystallize-claude.sh` para aceptar un `AGENT_LABEL` y múltiples rutas de fallback de transcripts. Se probaron ambos scripts con un repo temporal, un transcript JSONL mínimo y un stub local de `claude`.
+
+**Qué falló:**
+- El guard de conteo de `tool_use` y la normalización de `DASH_COUNT` eran frágiles en shells POSIX: `wc -l` y `grep -c || echo 0` podían producir valores con saltos de línea dobles o concatenados. Eso se corrigió al pasar ambos conteos a `awk`.
+- La primera pasada del test mostró que el wrapper de Codex sí delegaba correctamente, pero el hot cache temporal quedó con zona `Current state` duplicada porque el fixture de prueba no tenía frontmatter real. No afectó al flujo de ejecución, pero deja claro que el test fixture debe parecerse más a un vault real.
+
+**Qué funcionó:** el wrapper de Codex escribió una entrada de historia con `Codex (PreCompact)`, el script compartido siguió funcionando para Claude Code, y el setup/documentación ya no apuntan a `cortex-crystallize-claude.sh` para Codex.
+
+**Observaciones / sugerencias:** si se quiere seguir endureciendo esta ruta, el siguiente paso es extraer el conteo y la selección de current-state a funciones compartidas para evitar que las tres variantes de hook diverjan otra vez.
+
+---
+
+## 2026-06-11 21:40 -04 — Codex / Stop hook hardening
+
+**Qué ocurrió:** se investigaron dos registros casi vacíos vistos en `.hot/MEMORY.md` bajo `Stop`. El archivo no tenía un segundo hot cache escondido: las entradas eran historia heredada de CommandCode dentro del mismo `MEMORY.md`.
+
+**Qué falló:**
+- `~/.codex/hooks.json` ya apuntaba a `cortex-crystallize-codex.sh`, pero el wrapper no existía en `~/.codex/hooks/`, así que el `Stop` de Codex no tenía un destino ejecutable real.
+- El hook compartido podía dejar pasar snapshots demasiado pobres si `claude -p` devolvía una plantilla vacía o casi vacía.
+
+**Qué funcionó:**
+- Se creó `~/.codex/hooks/cortex-crystallize-codex.sh` como wrapper estable para Codex, delegando al script compartido del repo con `AGENT_LABEL=Codex` y fallback de transcripts para Codex/Claude.
+- Se endureció `bin/hooks/cortex-crystallize-claude.sh` para normalizar `Current state` aunque `.hot/MEMORY.md` venga vacío o malformado, y para salir sin escribir si la síntesis no contiene un bloque real con contenido.
+
+**Observaciones / sugerencias:**
+- La verificación final todavía depende de una sesión real de Codex para confirmar el flujo end-to-end `SessionStart` + `Stop`.
+- `.hot/MEMORY.md` es un archivo único por repo, así que al auditar “registros de Codex” conviene distinguir historia heredada de snapshots nuevos.
+
+---
+
+## 2026-06-11 22:15 -04 — CommandCode (deepseek/deepseek-v4-flash) — diagnóstico de entradas Stop vacías
+
+**Qué ocurrió:** se investigaron dos registros prácticamente vacíos en `.hot/MEMORY.md` con etiqueta `CommandCode (Stop)`. Se analizaron los 3 scripts hook (`cortex-crystallize-commandcode.sh`, `cortex-crystallize-claude.sh`, `cortex-crystallize-codex.sh`) para determinar si el frontmatter se preserva/actualiza correctamente y si las entradas vacías son esperables.
+
+**Qué falló:** nada. Las entradas vacías son intencionales por diseño del `cortex-crystallize-commandcode.sh` (documentado en sesión 2026-06-10 17:45). El script no tiene acceso al transcript de sesión, a diferencia del script de Claude Code/Codex que usa `claude -p` para sintetizar.
+
+**Qué funcionó:**
+- Se identificó que `cortex-crystallize-commandcode.sh` preserva el frontmatter intacto pero no lo actualiza — comportamiento idéntico al de `cortex-crystallize-claude.sh` (que descarta el frontmatter vía `extract_current_state()`). Ambos scripts hook aplican el mismo principio: el Stop hook no modifica Current state, solo agrega una entrada en History.
+- `agent:` y `updated:` deben ser actualizados solo por `/cortex-crystallize`, no por el hook Stop — confirmado contra `MEMORY-FORMAT.md`.
+- `cortex-crystallize-codex.sh` es un wrapper de 12 líneas que delega completamente en `cortex-crystallize-claude.sh` con `AGENT_LABEL=Codex`.
+
+**Observaciones / sugerencias:**
+- La diferencia fundamental entre CommandCode y Claude Code/Codex no es el manejo de frontmatter (idéntico), sino la capacidad de síntesis: Claude Code puede invocar `claude -p` desde el hook, CommandCode no tiene un equivalente.
+- Si en el futuro CommandCode ofrece un subcomando tipo `cmd -p` para síntesis no-interactiva, se podría agregar síntesis IA al script hook. Hasta entonces, el diseño minimalista es correcto y está documentado.
+
+---
+
+## 2026-06-12 19:33 -04 — Claude Code (Fable 5) — backlog #2 aplicado para Claude Code
+
+**Qué ocurrió:** se contrastó `cortex-forge-improvements-2.md` (ambos ítems en ACCEPT WITH CHANGES, sin implementar) contra los hallazgos del batch 2026-06-12 (obsidian-mind + guías de @affaan). Veredicto: ningún ítem queda obsoleto ni solapado — el Item 1 sale *reforzado* (el nudge PreToolUse es la misma familia de "routing hints" del concepto `prompt-classification-hook`, y su costo encaja en el tier Triggered ~100-200 tokens del modelo de progressive disclosure; la guía de seguridad valida instalar en `settings.local.json`, nunca en config versionada de un template público). Se implementó v1 para Claude Code según la convergencia de los reviewers.
+
+**Qué funcionó:**
+- `bin/hooks/cortex-recall-nudge.sh` creado: Bash-matcher only (Read|Glob descartado por unanimidad), throttle once-per-session por `session_id`, scope a comandos que mencionan `wiki/`/`.raw/`, gate de inercia vía `~/.cortex-forge/config.yml` + `wiki/index.md`, fail-open en cada rama, jq con guard (bin/hooks documentado como exento del no-jq de cortex-prune.sh). 6/6 pruebas de criterios de aceptación pasaron, incluyendo payload malformado, comando reescrito por rtk, e inercia fuera de vault.
+- `.git/hooks/post-commit` escrito con bloque marcado: prune en background (criterio de latencia), resumen a `.git/cortex-prune.log` (no-silente, lección "exit 0 oculta todo"), `[ -f bin/cortex-prune.sh ] || skip` sin path horneado, `core.hooksPath` verificado (no seteado en este repo).
+- `cortex-forge-setup` SKILL.md: pasos 6a (nudge, Claude Code only) y 6b (post-commit, pregunta separada, opt-in) con uninstall no-clobber. CHANGELOG y ROADMAP actualizados (línea PostToolUse de grep interception superseded).
+
+**Qué falló:**
+- El classifier de permisos bloqueó dos pasos de instalación local: escribir `.claude/settings.local.json` (auto-modificación) y `chmod +x .git/hooks/post-commit` (persistencia). Ambos quedan para ejecución manual del usuario — el post-commit existe pero está inerte sin bit de ejecución.
+
+**Observaciones / sugerencias:**
+- Experimento pendiente (es el entregable real, no el mecanismo): baseline de pregunta de contenido sin/con nudge, medir invocación de `cortex-recall`. Kill criterion: 5 sesiones sin cambio de comportamiento o fatiga → desinstalar y registrar aquí.
+- Scope note vigente: el bypass paramétrico sin tool calls (Codex respondió desde contexto activo) queda cubierto solo por los criterios de AGENTS.md.
+- Ports a otros agentes: bloqueados hasta resultado del experimento (acuerdo con el usuario: los retrasos de otros agentes quedan como pendientes; se sigue solo con Claude).

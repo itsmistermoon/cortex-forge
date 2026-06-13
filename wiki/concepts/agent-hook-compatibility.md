@@ -2,7 +2,7 @@
 title: agent-hook-compatibility
 type: concept
 created: 2026-06-07
-updated: 2026-06-08
+updated: 2026-06-10
 tags: [multi-agent, hooks, cortex-forge, compatibility]
 aliases: [hook matrix, agent lifecycle]
 sources:
@@ -59,17 +59,22 @@ Configure in `~/.codex/hooks.json`:
 ```json
 {
   "SessionStart": [{ "command": "bash ~/.codex/hooks/cortex-reactivate.sh" }],
-  "Stop":         [{ "command": "bash ~/.codex/hooks/cortex-crystallize-claude.sh" }]
+  "Stop":         [{ "command": "bash ~/.codex/hooks/cortex-crystallize-codex.sh" }]
 }
 ```
 
 **Findings validated in session (2026-06-08):**
 - Use a stable global hook directory (`~/.codex/hooks/`) rather than a vault-local path. The scripts must be vault-aware at runtime so the same Codex setup works across multiple vaults and from non-vault projects.
 - Wire format identical to Claude Code — the `cortex-reactivate.sh` script is compatible without modifications.
-- `SessionStart` may fire more than once per session: it has a `source` field with values `startup`, `resume`, `clear`. Filter by `source` in the matcher if you want to limit to the real start.
+- `SessionStart` may fire more than once per session: it has a `source` field with values `startup`, `resume`, `clear`, `compact`. Filter by `source` in the matcher if you want to limit to the real start.
+- Codex hooks are enabled by default. Multiple matching hooks from multiple files all run.
+- The CLI exposes `/hooks` for reviewing, trusting, and disabling non-managed hooks.
 - The `hook context:` is visible in chat by design in the Codex UI. There is no mechanism to suppress it today (`suppressOutput` is reserved for future use). The context reaches the model correctly — the noise is visual only.
 - **Context cost**: `additionalContext` consumes tokens from the session context window like any message. For a hot cache of a few KB it is negligible with 200k+ token windows, but it is a real cost shared with Claude Code and every Layer 2 implementation.
 - First run requires manual hook approval (`Trust: New hook - review required`).
+- `Stop` does not use `matcher`; it expects JSON output on stdout when exiting `0`, or exit code `2` with the continuation reason on stderr.
+- `transcript_path` is a convenience field, but transcript format is not a stable hook interface. Treat it as best-effort input for snapshotting, not as a contract.
+- Stop hooks should call `cortex-crystallize-codex.sh`, which wraps the shared Claude-compatible implementation with Codex-specific labels and transcript fallback paths.
 
 ### CommandCode
 Has no SessionStart hook. Context is injected via `AGENTS.md`: the global rule to read `.hot/MEMORY.md` on startup is fulfilled by the agent if it reads the instructions file. Closing is automatic via the `Stop` hook.
@@ -139,17 +144,19 @@ Patterns extracted from official CommandCode examples; the output mechanism vari
 
 When `/cortex-crystallize` is invoked manually, the skill must identify the calling agent to fill `agent:` and `{Agent}` in the history header. Detection is based on environment variables set by each CLI at runtime. Check in order:
 
-| Signal | Value | Agent |
-|--------|-------|-------|
-| `CLAUDECODE` | `1` | Claude Code — also check `AI_AGENT` for model/version |
-| `AI_AGENT` | starts with `claude-code` | Claude Code (fallback if `CLAUDECODE` unset) |
-| `COMMANDCODE` | `1` | CommandCode (⚠ unconfirmed — needs validation in live session) |
-| `AI_AGENT` | starts with `commandcode` | CommandCode (⚠ unconfirmed) |
-| `AGY` | `1` | Antigravity (⚠ unconfirmed) |
-| `AI_AGENT` | starts with `agy` or `antigravity` | Antigravity (⚠ unconfirmed) |
-| `CODEX` | `1` | Codex (⚠ unconfirmed) |
-| `AI_AGENT` | starts with `codex` | Codex (⚠ unconfirmed) |
-| none matched | — | Fall back to self-knowledge |
+| Method | Signal | Agent | Reliability |
+|--------|--------|-------|-------------|
+| env var | `CLAUDECODE=1` | Claude Code | ✅ confirmed (2026-06-11) |
+| env var | `AI_AGENT` starts with `claude-code` | Claude Code (fallback) | ✅ confirmed |
+| process tree | `node .../commandcode` in `$PPID` ancestry | CommandCode | ✅ confirmed (2026-06-11) |
+| which | `which commandcode` yields path | CommandCode | ⚠ partial (shell-level, not session-level) |
+| env var | `AGY=1` | Antigravity | ❌ unconfirmed |
+| process tree | `node .../agy` in `$PPID` ancestry | Antigravity | ❌ unconfirmed |
+| env var | `CODEX=1` | Codex | ❌ unconfirmed |
+| process tree | `codex` in `$PPID` ancestry | Codex | ❌ unconfirmed |
+| none matched | — | Fall back to self-knowledge | — |
+
+**Key finding (2026-06-11):** CommandCode 0.35.0 does **not** export any self-identifying environment variables (`COMMANDCODE`, `AI_AGENT`, or others). The `COMMANDCODE=1` signal was a false hypothesis. Detection must fall back to walking the process tree from `$PPID` upward, looking for known binary paths. This is the recommended universal fallback for any CLI that doesn't inject env vars.
 
 **Confirmed (Claude Code, 2026-06-11):** `CLAUDECODE=1`, `AI_AGENT=claude-code_{version}_agent`, `CLAUDE_CODE_ENTRYPOINT=cli`, `CLAUDE_CODE_SESSION_ID=…`
 

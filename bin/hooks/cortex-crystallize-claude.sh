@@ -10,6 +10,8 @@ PAYLOAD=$(cat 2>/dev/null || echo "{}")
 TRANSCRIPT_PATH=$(printf '%s' "$PAYLOAD" | jq -r '.transcript_path // empty' 2>/dev/null)
 TRIGGER=$(printf '%s' "$PAYLOAD" | jq -r '.hook_event_name // "PreCompact"' 2>/dev/null)
 CWD=$(printf '%s' "$PAYLOAD" | jq -r '.cwd // empty' 2>/dev/null)
+AGENT_LABEL=${AGENT_LABEL:-Claude Code}
+TRANSCRIPT_FALLBACK_DIRS=${TRANSCRIPT_FALLBACK_DIRS:-"$HOME/.claude/projects"}
 
 find_git_root_dir() {
   local dir="${CWD:-$PWD}"
@@ -20,10 +22,70 @@ find_git_root_dir() {
   echo "${CWD:-$PWD}"
 }
 
+extract_current_state() {
+  local file="$1"
+  if [ ! -f "$file" ]; then
+    printf '%s\n' "## Current state"
+    return 0
+  fi
+
+  awk '
+    BEGIN {
+      in_state = 0
+      saw_state = 0
+      printed_any = 0
+    }
+    /^## History$/ { exit }
+    /^## Current state$/ {
+      saw_state = 1
+      if (!printed_any) {
+        print
+        printed_any = 1
+      }
+      in_state = 1
+      next
+    }
+    /^## / {
+      if (!saw_state) {
+        print "## Current state"
+        printed_any = 1
+        saw_state = 1
+      }
+      in_state = 1
+      next
+    }
+    {
+      if (!saw_state) {
+        print "## Current state"
+        printed_any = 1
+        saw_state = 1
+      }
+      if (length($0) > 0) {
+        print
+        printed_any = 1
+      }
+    }
+    END {
+      if (!printed_any) print "## Current state"
+    }
+  ' "$file"
+}
+
+extract_previous_history() {
+  local file="$1"
+  [ -f "$file" ] || return 0
+  awk '/^## History$/{found=1; next} found{print}' "$file"
+}
+
 GIT_ROOT=$(find_git_root_dir)
 
 if [ -z "$TRANSCRIPT_PATH" ] || [ ! -f "$TRANSCRIPT_PATH" ]; then
-  TRANSCRIPT_PATH=$(ls -t "$HOME/.claude/projects/"*/*.jsonl 2>/dev/null | head -1)
+  IFS=':' read -r -a FALLBACK_DIRS <<< "$TRANSCRIPT_FALLBACK_DIRS"
+  for dir in "${FALLBACK_DIRS[@]}"; do
+    [ -d "$dir" ] || continue
+    TRANSCRIPT_PATH=$(find "$dir" -type f -name '*.jsonl' -print 2>/dev/null | sort -r | head -1)
+    [ -n "$TRANSCRIPT_PATH" ] && break
+  done
 fi
 [ -z "$TRANSCRIPT_PATH" ] && exit 0
 [ ! -f "$TRANSCRIPT_PATH" ] && exit 0
@@ -39,29 +101,10 @@ HOT_FILE="$GIT_ROOT/.hot/MEMORY.md"
 TMP=$(mktemp -t hot-cache.XXXXXX) || exit 0
 trap 'rm -f "$TMP"' EXIT
 
-if [ -f "$HOT_FILE" ]; then
-  # Cortar en el --- que precede a ## History, no en el primero que aparece.
-  # Esto preserva el frontmatter YAML cuando la skill escribe el archivo.
-  CURRENT_STATE=$(awk '
-    /^---$/ { buf = buf "---\n"; next }
-    /^## History$/ { gsub(/---\n[[:space:]]*$/, "", buf); printf "%s", buf; exit }
-    { buf = buf $0 "\n" }
-    END { printf "%s", buf }
-  ' "$HOT_FILE")
-  PREV_HISTORY=$(awk '/^## History$/{found=1; next} found{print}' "$HOT_FILE")
+CURRENT_STATE=$(extract_current_state "$HOT_FILE")
+PREV_HISTORY=$(extract_previous_history "$HOT_FILE")
 
-  # Guard: si hay más de 2 líneas "---" en CURRENT_STATE, hay bloques duplicados.
-  # Conservar solo el primer bloque (frontmatter + current state).
-  DASH_COUNT=$(printf '%s\n' "$CURRENT_STATE" | grep -c '^---$' 2>/dev/null || echo 0)
-  if [ "$DASH_COUNT" -gt 2 ]; then
-    CURRENT_STATE=$(printf '%s\n' "$CURRENT_STATE" | awk '/^---$/{n++; if(n==3) exit} {print}')
-  fi
-else
-  CURRENT_STATE="## Current state"
-  PREV_HISTORY=""
-fi
-
-TOOL_CALL_COUNT=$(jq -r 'select(.type=="assistant") | .message.content[]? | select(.type=="tool_use") | .name' "$TRANSCRIPT_PATH" 2>/dev/null | wc -l | tr -d ' ')
+TOOL_CALL_COUNT=$(jq -r 'select(.type=="assistant") | .message.content[]? | select(.type=="tool_use") | .name' "$TRANSCRIPT_PATH" 2>/dev/null | awk 'END { print NR + 0 }')
 [ "$TOOL_CALL_COUNT" -eq 0 ] && exit 0
 
 USER_MSGS=$(jq -r 'select(.type=="user") | .message.content[]? | select(.type=="text") | .text' "$TRANSCRIPT_PATH" 2>/dev/null \
@@ -107,7 +150,14 @@ Omite completamente las secciones que no tengan contenido real — no uses _(non
 [solo si hay decisiones implícitas o contexto que se perdería entre sesiones — omitir si no aplica]"
 
 SUMMARY=$(claude -p "$FULL_PROMPT" 2>/dev/null)
-[ -z "$SUMMARY" ] && exit 0
+case "$SUMMARY" in
+  *"#### What was done"*) ;;
+  *) exit 0 ;;
+esac
+
+if ! printf '%s\n' "$SUMMARY" | grep -qE '^- '; then
+  exit 0
+fi
 
 {
   printf '%s\n' "$CURRENT_STATE"
@@ -116,7 +166,7 @@ SUMMARY=$(claude -p "$FULL_PROMPT" 2>/dev/null)
   echo ""
   echo "## History"
   echo ""
-  echo "### $NOW — Claude Code ($TRIGGER)"
+  echo "### $NOW — $AGENT_LABEL ($TRIGGER)"
   echo ""
   printf '%s\n' "$SUMMARY"
   if [ -n "$PREV_HISTORY" ]; then

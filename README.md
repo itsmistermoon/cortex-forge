@@ -83,6 +83,18 @@ Three behaviors are mandatory for any agent operating the vault, defined in `AGE
 
 **Recall** — when the user asks about any topic that may exist in the vault, invoke `/cortex-recall` as the first action. Do not answer from active context or use `grep` as a substitute — the skill returns synthesized knowledge with citations. Agent training knowledge is disqualified for vault topics.
 
+## Design rationale
+
+Most agent-memory systems fail in the same places. These are the failure modes we found studying comparable projects, and the design decisions that answer them.
+
+**There is only one reliable consumption channel.** Instructions in `AGENTS.md`, skill descriptions, and "the agent will remember to check" are all best-effort: agents ignore them often enough that anything critical cannot depend on them. The only channel an agent cannot ignore is unconditional injection at session start — and it's expensive in tokens, so it only scales for small content. Cortex Forge is built around this asymmetry: anything that must survive is distilled into the injected hot cache (`.hot/MEMORY.md`, hard size caps); everything else — wiki, skills — is consultable best-effort backup. The guarantee comes from the channel, not from the wording.
+
+**State and lessons are different artifacts.** Session-end snapshots capture *state* (pending work, decisions, fragile context). Lessons — the workaround you'd otherwise re-explain next week — get lost because nobody archives them at the moment of fatigue. Cortex Forge splits the work across the session boundary *(landing in v0.4)*: at session end, crystallize (which already runs enforced, with full context) only *flags* imprint candidates with a pointer to the transcript. At the next session start, a cheap background subagent triages the flags with fresh eyes and proposes the archive. Detection happens where context is richest; the decision happens where judgment is freshest. No flags, zero overhead.
+
+**Memory is attack surface.** A vault that auto-loads files nobody re-reads is exactly where injection payloads persist (see Microsoft's AI Recommendation Poisoning report, Feb 2026). Cortex Forge treats this structurally: `.raw/` is immutable so provenance is always auditable; ingestion scans foreign content for hidden Unicode, embedded payloads, and egress commands before it enters the vault *(sanitization landing in v0.4)*; and automated archiving defaults to *suggest* *(imprint pipeline landing in v0.4)* — a human approves before anything becomes ground truth. Convenience never outruns the isolation layer.
+
+**Failed attempts are knowledge.** Session memory that only records what worked condemns the next session to retry what didn't. The hot cache contract records attempted-and-failed approaches, with evidence, as a first-class section *(landing in v0.4)*.
+
 ## Agent compatibility
 
 Tested agents and their hook support:

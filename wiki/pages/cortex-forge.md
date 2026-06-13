@@ -2,7 +2,7 @@
 title: cortex-forge
 type: project
 created: 2026-06-08
-updated: 2026-06-10
+updated: 2026-06-13
 tags: [vault, multi-agent, hot-cache, hooks, knowledge-management]
 status: active
 repo: /Users/itsmistermoon/proyectos/cortex-forge
@@ -12,6 +12,7 @@ sources:
   - wiki/sources/codex-hooks.md
   - wiki/sources/antigravity-hooks.md
   - wiki/sources/ai-coding-dictionary.md
+  - wiki/sources/obsidian-mind.md
 confidence: high
 ---
 
@@ -46,6 +47,7 @@ Vault with a hot cache protocol that synchronizes context across multiple agents
 - **Reference taxonomy:** fifth wiki type for lookup tables, wire formats, cheat sheets — use when the content can be expressed as a table/code block without prose. Complements Concept (which requires explanation).
 - **CommandCode wire format is nested** (`hooks: [{ matcher, hooks: [{ type, command, timeout? }] }]`), unlike the flat format of Claude Code/Codex. Hook scripts are not drop-in across agents.
 - **Project pages only for user's own projects** — third-party entities go in `wiki/entities/`, not `wiki/pages/`.
+- **[[wiki/sources/obsidian-mind]] is the closest comparable project** — both target agent-operated knowledge vaults; obsidian-mind focuses on Obsidian-native graph exploration with MCP, while cortex-forge generalizes to any agent via hot cache protocol. Key difference: obsidian-mind requires Obsidian; cortex-forge is agent-agnostic.
 
 ## Next steps
 

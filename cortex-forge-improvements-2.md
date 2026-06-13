@@ -6,6 +6,8 @@
 
 **Author:** Claude Code (Fable 5), 2026-06-10.
 
+**Status (2026-06-12):** both items applied for Claude Code per the convergence requirements (see AGENT-LOG entry 2026-06-12 19:33). Contrasted against the 2026-06-12 ingestion batch first — neither item superseded; Item 1 reinforced by `wiki/concepts/prompt-classification-hook` (same routing-hint family). Item 1: `bin/hooks/cortex-recall-nudge.sh`, Bash-only, behavior experiment pending (kill criterion in ROADMAP). Item 2: post-commit block + setup step 6b, validation in second-brain pending. Two local install steps blocked by the permission classifier, handed to the user: `.claude/settings.local.json` hook entry and `chmod +x .git/hooks/post-commit`. File stays alive until the Item 1 experiment resolves; ports to other agents gated on its result.
+
 ---
 
 ## Reviewer trail

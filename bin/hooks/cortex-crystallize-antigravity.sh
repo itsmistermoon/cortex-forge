@@ -49,7 +49,7 @@ if [ -f "$HOT_FILE" ]; then
   ' "$HOT_FILE")
   PREV_HISTORY=$(awk '/^## History$/{found=1; next} found{print}' "$HOT_FILE")
 
-  DASH_COUNT=$(printf '%s\n' "$CURRENT_STATE" | grep -c '^---$' 2>/dev/null || echo 0)
+  DASH_COUNT=$(printf '%s\n' "$CURRENT_STATE" | awk '/^---$/{n++} END { print n + 0 }')
   if [ "$DASH_COUNT" -gt 2 ]; then
     CURRENT_STATE=$(printf '%s\n' "$CURRENT_STATE" | awk '/^---$/{n++; if(n==3) exit} {print}')
   fi

@@ -66,8 +66,11 @@ Never modify previous entries. Append at the end.
 #### Discarded
 - {options evaluated and rejected, with brief reason}
 
+#### Attempted and failed
+- {approach tried, why it failed, evidence — prevents retrying the same dead end}
+
 #### Fragile context
 - {exact numbers, commands, paths, URLs, conventions a new agent can't infer from code}
 ```
 
-Empty sections (Discarded, Fragile context): omit entirely — never write `_(none)_`.
+Empty sections (Discarded, Attempted and failed, Fragile context): omit entirely — never write `_(none)_`.

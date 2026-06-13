@@ -14,6 +14,28 @@ Operations: `ingest`, `imprint`, `prune`, `query`
 
 <!-- entries below -->
 
+## [2026-06-10] ingest | Codex hooks docs refresh
+
+Checked `https://developers.openai.com/codex/hooks` against the existing vault source before rewriting anything. The source was already present as `.raw/codex-hooks.md` and `wiki/sources/codex-hooks.md`, so no new raw capture was needed.
+
+Updated:
+- `wiki/sources/codex-hooks.md` — refreshed summary with current docs details: hooks are enabled by default, multiple matches all run, `/hooks` is the review path, `Stop` ignores `matcher`, and `transcript_path` is only a convenience field
+
+Updated by request to keep the synthesized source aligned with the current official docs while respecting the "do not ingest if already consumed" constraint.
+
+Agent: Codex
+
+## [2026-06-10] query | Agent hook compatibility refreshed with current Codex docs
+
+Updated `wiki/concepts/agent-hook-compatibility.md` to reflect the current Codex hook behavior documented on `https://developers.openai.com/codex/hooks`:
+- hooks are enabled by default
+- multiple matching hooks across files all run
+- `/hooks` is the review/trust/disable surface for non-managed hooks
+- `Stop` ignores `matcher`
+- `transcript_path` is convenience input, not a stable contract
+
+Agent: Codex
+
 ## [2026-06-08] ingest | Antigravity CLI docs: full re-assimilation
 
 Rebuilt the Antigravity CLI tutorial, plugins, statusline, using, and features pages from the official documentation routes using the SPA fallback flow required by `cortex-assimilate`.

@@ -19,6 +19,10 @@
 - [[wiki/concepts/treesitter-llm-hybrid-parsing]] — Separation of concerns: deterministic parser for facts, LLM for interpretations
 - [[wiki/concepts/multi-agent-analysis-pipeline]] — Orchestration of N specialized agents with parallel fan-out and per-layer validation
 - [[wiki/concepts/primary-source]] — Source of truth in its original form (the thing, not an account of it); expensive but complete and current — `.raw/` is the vault's instance
+- [[wiki/concepts/prompt-classification-hook]] — UserPromptSubmit hook that classifies each message and injects routing hints for mid-session capture
+- [[wiki/concepts/continuous-learning-loop]] — Stop-hook evaluation of sessions to extract non-trivial patterns as reusable skills; counterpart to crystallize (lessons, not state)
+- [[wiki/concepts/iterative-retrieval]] — Orchestrator treats subagent summaries as drafts: evaluate, follow up, loop (bounded); pass objective, not just query
+- [[wiki/concepts/memory-as-attack-surface]] — Persistent memory lets injection payloads plant fragments and assemble later; auto-loaded files are rarely re-audited
 - [[wiki/concepts/secondary-source]] — Account one step removed, lossy by construction; fails by loss or drift, remedied by context pointers — `wiki/` is the vault's instance
 
 ## Entities
@@ -56,6 +60,10 @@
 - [[wiki/sources/ai-coding-dictionary]] — 68-entry plain-English vocabulary of AI coding by Matt Pocock (AI Hero)
 - [[wiki/sources/ai-coding-dictionary-primary-source]] — Full article: primary source — cost vs completeness, staleness inheritance (ingested 2026-06-10)
 - [[wiki/sources/ai-coding-dictionary-secondary-source]] — Full article: secondary source — lossy/drift failure modes, context pointers (ingested 2026-06-10)
+- [[wiki/sources/obsidian-mind]] — README from github.com/breferrari/obsidian-mind: comparable memory vault with classification/validation hooks (ingested 2026-06-12)
+- [[wiki/sources/claude-code-shorthand-guide]] — @affaan's power-user Claude Code setup: tool-context budget, codemap skill, enforcement hooks (ingested 2026-06-12)
+- [[wiki/sources/claude-code-longform-guide]] — @affaan's advanced techniques: memory persistence hook chain, continuous learning, iterative retrieval, evals (ingested 2026-06-12)
+- [[wiki/sources/agentic-security-shorthand-guide]] — @affaan's agent security guide: memory poisoning, lethal trifecta, skills as supply chain, least agency (ingested 2026-06-12)
 
 ## Meta
 - [[wiki/meta/log]] — Append-only vault operation log

@@ -81,7 +81,7 @@ Always end with the relevant subset of step 9 (confirmation).
      ```
      Codex (~/.codex/hooks.json):
        SessionStart → ~/.codex/hooks/cortex-reactivate.sh
-       Stop         → ~/.codex/hooks/cortex-crystallize-claude.sh
+       Stop         → ~/.codex/hooks/cortex-crystallize-codex.sh
 
        Note: keep Codex hooks in a stable global folder and make the scripts vault-aware at runtime; do not point Codex directly at a specific vault path.
 
@@ -94,6 +94,38 @@ Always end with the relevant subset of step 9 (confirmation).
        Stop → bash ~/.claude/hooks/cortex-crystallize-claude.sh
        Note: scope must be the vault's .commandcode/, not cortex-forge's
      ```
+
+6a. **Recall enforcement nudge (Claude Code only, v1)** — ask: "Install the cortex-recall nudge hook? It reminds the agent to use /cortex-recall when it greps vault content directly. (experimental)"
+   If yes, ask scope (never the versioned `settings.json` of a template repo):
+   - **Global (recommended)** — the script self-gates (inert outside registered vaults, once per session), so user scope covers every vault without per-vault config. Copy `bin/hooks/cortex-recall-nudge.sh` to `~/.claude/hooks/` (chmod +x), then add to `~/.claude/settings.local.json`:
+     ```json
+     "PreToolUse": [{ "matcher": "Bash", "hooks": [{ "type": "command", "command": "bash ~/.claude/hooks/cortex-recall-nudge.sh" }] }]
+     ```
+   - **Vault-local** — add to the vault's `.claude/settings.local.json` with `"bash \"$CLAUDE_PROJECT_DIR\"/bin/hooks/cortex-recall-nudge.sh"` instead.
+   - Scope criterion (applies to any future hook): global only if the script self-discards deterministically, cheaply, and silently from environment signals (config, files, CWD); if relevance can't be detected from the environment, install per project.
+   - Merge into existing hooks arrays, never overwrite.
+   - The hook is Bash-matcher only, fires once per session, and is inert outside registered vaults. Do **not** offer this for other agents — ports are gated on the AGENT-LOG behavior experiment showing the nudge changes recall invocation (see `cortex-forge-improvements-2.md` Item 1).
+
+6b. **Post-commit prune (opt-in, separate question)** — ask: "Refresh vault-report.json automatically after each commit? (optional)"
+   If yes:
+   - Check `git config core.hooksPath` first — if set (husky-style), install into that directory instead of `.git/hooks/`, or warn and skip.
+   - Append the marked block to `{vault}/.git/hooks/post-commit` (create with shebang if missing; never clobber existing content — only add/remove the `>>> cortex-forge prune >>>` … `<<< cortex-forge prune <<<` block) and make it executable:
+     ```bash
+     # >>> cortex-forge prune >>>
+     if [ -f bin/cortex-prune.sh ]; then
+       (
+         bash bin/cortex-prune.sh >/dev/null 2>&1 || true
+         R="wiki/meta/vault-report.json"
+         if [ -f "$R" ] && command -v jq >/dev/null 2>&1; then
+           n=$(jq '[.health[] | length] | add' "$R" 2>/dev/null || echo "?")
+           echo "$(date '+%F %T') cortex-prune: report refreshed, findings=$n" >> .git/cortex-prune.log
+         fi
+       ) &
+     fi
+     # <<< cortex-forge prune <<<
+     ```
+   - Backgrounded: never delays the commit. Not silent: summary line in `.git/cortex-prune.log`.
+   - Uninstall (deregister path): remove only the marked block — a diff against the pre-install file must be empty.
 
 7. **Install TASTE rule for `cortex-recall`** — ask: "Install a TASTE rule so CommandCode invokes `/cortex-recall` automatically? (recommended)"
    If yes:

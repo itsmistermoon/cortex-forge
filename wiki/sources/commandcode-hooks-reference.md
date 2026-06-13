@@ -1,11 +1,11 @@
 ---
 title: Hooks Reference - Command Code
 type: source
-created: 2026-06-08
-updated: 2026-06-08
-tags: [commandcode, hooks, reference, wire-format, exit-codes]
+created: 2026-06-12
+updated: 2026-06-12
+tags: [commandcode, hooks, reference, wire-format, transcript-path]
 source_url: https://commandcode.ai/docs/hooks/reference
-source_date:
+source_date: 2026-06-12
 source_author: CommandCode
 sources:
   - .raw/commandcode-hooks-reference.md
@@ -19,22 +19,21 @@ confidence: high
 
 ## Summary
 
-Complete technical reference for the CommandCode hooks system. Defines the HookDefinition/HookEntry data structure, the three event types (PreToolUse, PostToolUse, Stop), the wire format for input/output (JSON on stdin/stdout), the behavioral control fields, and the semantics of exit codes.
+Complete technical reference for the CommandCode hooks system. Covers settings schema, hook input/output wire formats, exit codes, execution semantics, and the permission modes table.
 
-## Key ideas
+## Key findings for cortex-forge
 
-1. Input wire format: JSON on stdin with session context, tool details, and environment info. Output: JSON on stdout with optional fields `continue`, `systemMessage`, `permissionDecision`, `decision`, `additionalContext`.
-2. Exit codes: `0` → execute JSON output; `2` → block (PreToolUse) / retry (PostToolUse/Stop); others → non-blocking error.
-3. Three events: `PreToolUse` (sequential, can block), `PostToolUse` (parallel, can retry), `Stop` (parallel, can retry the response).
-4. `permissionDecision: "deny"` in PreToolUse blocks the tool with feedback to the model. `additionalContext` injects context without blocking.
-5. Each hook receives isolated stdin — hooks cannot communicate with each other within the same event.
+1. **`transcript_path` is a common field** on every hook event — absolute path to the session's JSONL transcript. Available on stdin for any hook to read.
+2. **Transcript format confirmed JSONL** — the hook input explicitly documents `transcript_path` as "Absolute path to this session's transcript JSONL".
+3. **Environment variables**: `COMMANDCODE_PROJECT_DIR`, `COMMANDCODE_SESSION_ID`, `COMMANDCODE_HOOK_EVENT`, `COMMANDCODE_CWD` are injected into every hook process — useful for hook scripts to self-identify without parsing stdin.
+4. **Plan mode disables hooks entirely** — the crystallize Stop hook does not fire when closing a planning session. Confirmed by official docs.
+5. **No additional system fields** beyond what was already documented in `agent-hook-compatibility.md`. The wire format is stable as captured.
 
 ## Connections
-
 - Related concepts: [[wiki/concepts/agent-hook-compatibility]]
 - Projects: [[wiki/pages/cortex-forge]]
+- Sources: [[wiki/sources/commandcode-hooks-configuration]], [[wiki/sources/commandcode-hooks-examples]], [[wiki/sources/commandcode-hooks-best-practices]]
 
 ---
 
-- 2026-06-08 [claude-sonnet-4-6]: Page created
-- 2026-06-08 [Claude Code]: Translated to English
+- 2026-06-12 [CommandCode]: Page created — ingested from official docs to resolve transcript_path field semantics

@@ -103,6 +103,14 @@ Example (project scope) for the hot cache:
 
 **Implication**: in CommandCode the hot cache is write-only in the first session. From the second session onward, the previous context is already in `.hot/` and `AGENTS.md` instructs the agent to read it — the cycle closes via instruction, not via hook.
 
+**Transcript location (for pipeline imprint):** Confirmed 2026-06-12 via filesystem inspection and official docs:
+- **Filesystem path:** `~/.commandcode/projects/{project-slug}/{session-uuid}.jsonl`
+  - Project slug mirrors the filesystem path with `/` replaced by `-` (e.g., `/Users/itsmistermoon/proyectos/cortex-forge` → `users-itsmistermoon-proyectos-cortex-forge`)
+- **Hook input field:** `transcript_path` is a common field on every hook event (PreToolUse, PostToolUse, Stop) — absolute path to the JSONL transcript. Available at runtime without guessing filesystem paths.
+- **Transcript format:** JSONL, one JSON object per line. Each object has `id`, `timestamp`, `sessionId`, `parentId`, `role` (user/assistant), `content` (array of content blocks), `gitBranch`, `metadata`.
+- **Retention:** No documented retention period. Filesystem inspection shows sessions dating back at least 5 days (no pruning observed). Assume indefinite retention or disk-pressure-based cleanup.
+- **Global history:** `~/.commandcode/history.jsonl` exists as a compact history log with `p` (prompt fragment) and `t` (timestamp) fields — not a full transcript, but useful for lightweight session tracing.
+
 **Recall nudge port (experimental, gated):** `bin/hooks/cortex-recall-nudge.sh` is I/O-compatible with CommandCode without any script changes — both use `payload.tool_input.command` on input and `hookSpecificOutput.additionalContext` on output. To install on CommandCode, add to `.commandcode/settings.local.json`:
 ```json
 {

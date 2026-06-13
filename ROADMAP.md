@@ -64,7 +64,7 @@ Decisiones derivadas de la ingesta de obsidian-mind + guías de @affaan (`wiki/s
   - [ ] Toggle por vault en `~/.cortex-forge/config.yml`: `imprint_triage: off | suggest | auto`. Default `suggest` (subagente deja borrador, humano aprueba — mitiga memory poisoning). `auto` escribe directo confiando en git como reversa. Configurable en `cortex-forge-setup` y conmutable después.
   - [ ] Transcript caducado o ilocalizable → degradar a imprint desde el resumen del History, o descartar flag.
   - Nota de diseño: la garantía de consumo viene del **canal inyectado** (hot cache), no de la redacción de skills/AGENTS.md — los flags viajan en la misma inyección que ya es confiable. Lección crítica que deba sobrevivir siempre → destilar a una línea en `Current state`, detalle largo en wiki.
-  - Pendientes por agente: localización de transcripts en Codex (`~/.codex/sessions/`), Antigravity (SQLite+Protobuf — sin path JSONL) y CommandCode (desconocido); subagente en background es capacidad de Claude Code, sin equivalente verificado en los demás.
+  - Pendientes por agente: localización de transcripts en Codex (`~/.codex/sessions/`) y Antigravity (SQLite+Protobuf — sin path JSONL); **CommandCode resuelto** (2026-06-12): `~/.commandcode/projects/{project-slug}/{session-uuid}.jsonl`, también disponible vía `transcript_path` en stdin de hooks. Subagente en background es capacidad de Claude Code, sin equivalente verificado en los demás. Fuentes: `wiki/sources/commandcode-hooks-reference`, `wiki/sources/commandcode-headless`, inspección de filesystem real.
 
 ## Fase 3 — Adoptabilidad
 

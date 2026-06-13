@@ -8,6 +8,12 @@ A protocol for agent-operated knowledge vaults — six skills, one session layer
 
 Cortex Forge is a structured system for turning raw sources into synthesized, queryable knowledge. Agents operate the vault: they ingest, recall, and maintain. You define what matters and when to persist it.
 
+The system separates **two kinds of memory** that most tools conflate:
+- **Operational memory** — what's happening now and what was decided. Lives in `.hot/MEMORY.md` (session cache), injected at every session start. Small, fast, always loaded.
+- **Knowledge base** — what the vault knows about the world. Lives in `wiki/` (synthesized pages). Large, deep, consulted on demand.
+
+Session memory keeps context across conversations. The wiki keeps knowledge across projects. They serve different purposes, use different retrieval patterns, and neither can replace the other.
+
 The architecture works with any LLM agent — Claude Code, Codex, Antigravity, CommandCode — via a shared session file and a set of invocable skills.
 
 ## Architecture

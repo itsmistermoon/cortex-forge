@@ -52,16 +52,16 @@ Health check del vault activo en dos capas: estructural (script) y semántica (a
 
    This file is the session-startup health signal read in `AGENTS.md`. It is gitignored — a local artifact, not versioned content. This schema is canonical: do not add fields that have no consumer in `AGENTS.md` or in this skill.
 
-5. **Consolidate findings** — spawn one subagent with all Layer 1 output + all Layer 2 verdicts collected so far:
+5. **Consolidate findings** — if your environment supports subagent spawning, delegate to a subagent using the lightest capable model available. This task requires only structured formatting of pre-classified findings — prioritize speed. If subagent spawning is not supported, execute inline.
 
-   > "You are synthesizing the results of a vault health check. Here is the Layer 1 structural report: {layer1_json}. Here are the Layer 2 semantic findings: {layer2_findings}. Produce a single grouped report with this structure:
-   > - HIGH findings (list each: path, problem, proposed action)
-   > - MEDIUM findings (same)
-   > - LOW findings (same)
-   > - Summary line: '{N} HIGH / {N} MEDIUM / {N} LOW findings'
-   > Be concise. Do not add explanation beyond what's needed to act on each finding."
+   Prompt: "You are synthesizing the results of a vault health check. Here is the Layer 1 structural report: {layer1_json}. Here are the Layer 2 semantic findings: {layer2_findings}. Produce a single grouped report with this structure:
+   - HIGH findings (list each: path, problem, proposed action)
+   - MEDIUM findings (same)
+   - LOW findings (same)
+   - Summary line: '{N} HIGH / {N} MEDIUM / {N} LOW findings'
+   Be concise. Do not add explanation beyond what's needed to act on each finding."
 
-   The main agent presents this consolidated report verbatim — it does not re-process or summarize the subagent's output.
+   The main agent presents this consolidated report verbatim — it does not re-process or summarize the output.
 
 6. **Ask** whether to proceed with corrections per the auto-correct / requires-confirmation rules below.
 
@@ -76,8 +76,9 @@ Read `wiki/index.md` to get the full list of entities and concepts. Then:
 1. For every pair of pages where EITHER of these is true:
    - One page's `title`, `aliases`, or `tags` contains a term that appears in the other page's title or aliases
    - One page's body text mentions the other entity/concept by name without using `[[wikilink]]` syntax
-2. Spawn one subagent per candidate pair with this prompt:
-   > "Read {page_A} and {page_B}. Are these genuinely related (one describes a component, variant, or sub-topic of the other)? Or is the name/tag overlap coincidental? Respond with: RELATED or COINCIDENCE, followed by one sentence of justification. If RELATED, propose the exact wikilink text to add to each page."
+2. If your environment supports subagent spawning, spawn one subagent per candidate pair using the lightest capable model available. This task requires only binary classification — prioritize speed. If subagent spawning is not supported, evaluate each pair inline.
+
+   Prompt per pair: "Read {page_A} and {page_B}. Are these genuinely related (one describes a component, variant, or sub-topic of the other)? Or is the name/tag overlap coincidental? Respond with: RELATED or COINCIDENCE, followed by one sentence of justification. If RELATED, propose the exact wikilink text to add to each page."
 3. Collect verdicts. Report RELATED findings as MEDIUM findings. Discard COINCIDENCE.
 
 ### 2b. Body text mentions without wikilinks
@@ -95,20 +96,21 @@ Do not flag mentions inside code blocks or frontmatter.
 For each page in `wiki/sources/`:
 
 1. Check if any page in `wiki/concepts/` or `wiki/entities/` lists this source in its `sources:` frontmatter.
-2. If no covering page exists, spawn one subagent:
-   > "Read {source_page}. Does this source introduce a distinct concept, pattern, or entity that warrants its own wiki page? Or is it adequately covered by existing vault pages (list them if so)? Respond: NEEDS_PAGE, COVERED_BY {page}, or BORDERLINE with one sentence."
+2. If no covering page exists: if your environment supports subagent spawning, spawn one subagent per uncovered source using the lightest capable model available. This task requires only a three-way classification — prioritize speed. If subagent spawning is not supported, evaluate inline.
+
+   Prompt: "Read {source_page}. Does this source introduce a distinct concept, pattern, or entity that warrants its own wiki page? Or is it adequately covered by existing vault pages (list them if so)? Respond: NEEDS_PAGE, COVERED_BY {page}, or BORDERLINE with one sentence."
 3. Report NEEDS_PAGE as MEDIUM. Report BORDERLINE for user decision. Discard COVERED_BY.
 
 ### 2d. Potential page merges (debate pattern)
 
 Trigger only when check 2a finds two pages with significant overlap (not just a component relationship, but potentially duplicate coverage of the same topic).
 
-Spawn two subagents in parallel:
+If your environment supports subagent spawning, spawn two subagents in parallel using the lightest capable model available. This task requires structured argumentation, not deep reasoning — prioritize speed. If subagent spawning is not supported, argue both sides inline before rendering a verdict.
 
 - **Agent FOR merge**: "Read {page_A} and {page_B}. Argue that these pages should be merged. What content would be lost? What would be gained? Max 5 bullet points."
 - **Agent AGAINST merge**: "Read {page_A} and {page_B}. Argue that these pages should remain separate. What distinct value does each provide? Max 5 bullet points."
 
-Then spawn a third subagent:
+Then spawn a third subagent (or continue inline):
 - **Synthesizer**: "Given these arguments FOR and AGAINST merging {page_A} and {page_B}: {for_args} / {against_args} — render a verdict: MERGE, KEEP_SEPARATE, or RESTRUCTURE. One paragraph."
 
 Report verdict as MEDIUM. Never auto-apply — always requires user confirmation.

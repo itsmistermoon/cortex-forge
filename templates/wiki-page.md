@@ -4,6 +4,7 @@ type: concept
 created: {{date:YYYY-MM-DD}}
 updated: {{date:YYYY-MM-DD}}
 tags: []
+schema_version: "0.3"
 ---
 
 # {{title}}

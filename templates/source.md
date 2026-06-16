@@ -7,6 +7,7 @@ section:
 fetched: {{date:YYYY-MM-DD}}
 tags: []
 confidence: high
+schema_version: "0.3"
 raw: .raw/{{slug}}.md
 ---
 

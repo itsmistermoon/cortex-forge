@@ -1,3 +1,7 @@
+---
+schema_version: "0.3"
+---
+
 # AGENTS.md — cortex-forge
 
 ## About this vault
@@ -86,7 +90,7 @@ Six layers, each with a distinct role:
 
 `.raw/` is the authoritative record. `wiki/` is always a derived view — cheaper to load, but lossy by construction, and subject to drift (the primary changes, the account doesn't follow). When they conflict, `.raw/` wins. Every source page carries a **context pointer** back to its original — the `raw:` frontmatter field; follow it whenever the synthesized account isn't enough.
 
-See `CHANGELOG.md` for protocol version history. When operating in a vault that may have been created before a recent protocol change, check the changelog to identify missing fields or behaviors.
+See `CHANGELOG.md` for protocol version history (current: **0.3**). When operating in a vault that may have been created before a recent protocol change, check the changelog to identify missing fields or behaviors. Pages with `schema_version` lower than the current protocol version may be missing fields introduced after their creation.
 
 ## Wiki taxonomy
 

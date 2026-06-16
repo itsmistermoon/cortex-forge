@@ -24,12 +24,17 @@
 - [[wiki/concepts/iterative-retrieval]] — Orchestrator treats subagent summaries as drafts: evaluate, follow up, loop (bounded); pass objective, not just query
 - [[wiki/concepts/memory-as-attack-surface]] — Persistent memory lets injection payloads plant fragments and assemble later; auto-loaded files are rarely re-audited
 - [[wiki/concepts/secondary-source]] — Account one step removed, lossy by construction; fails by loss or drift, remedied by context pointers — `wiki/` is the vault's instance
+- [[wiki/concepts/pi-extension-lifecycle]] — Pi's TypeScript-first extension framework: async factory pattern, event taxonomy, ExtensionContext, provider registration, context-overflow recovery
+- [[wiki/concepts/knowledge-graph-code-intelligence]] — Structural approach: codebase parsed into persistent property graph; agents query graph instead of reading files; 99%+ token reduction vs file-by-file
 
 ## Entities
+- [[wiki/entities/openbrain-nate-jones]] — Personal semantic memory system: Postgres + pgvector + MCP server; any agent connects with URL + key
 - [[wiki/entities/google-antigravity]] — Agent-first development platform oriented toward autonomous workflows
 - [[wiki/entities/antigravity-cli]] — Google Antigravity CLI: `agy` binary, two-layer permission model, OS-level sandbox, plugins/skills/hooks
 - [[wiki/entities/commandcode]] — AI coding agent with continuous TASTE personalization; Stop/SessionStart hooks, config in `.commandcode/`
 - [[wiki/entities/understand-anything]] — Lum1104's multi-platform plugin that builds knowledge graphs over codebases and wikis
+- [[wiki/entities/pi-cli]] — Terminal AI coding agent from `earendil-works/pi-mono`: TypeScript extensions, JSONL tree sessions, multi-provider (Anthropic, OpenAI, Google, Ollama, vLLM, custom)
+- [[wiki/entities/codebase-memory-mcp]] — High-performance MCP server: codebase → SQLite knowledge graph; 158 languages, 14 tools, zero dependencies, single static binary; 3,902 stars
 
 ## Sources
 - [[wiki/sources/antigravity-hooks]] — Hook documentation for Google Antigravity (ingested 2026-06-07)
@@ -65,8 +70,35 @@
 - [[wiki/sources/claude-code-longform-guide]] — @affaan's advanced techniques: memory persistence hook chain, continuous learning, iterative retrieval, evals (ingested 2026-06-12)
 - [[wiki/sources/agentic-security-shorthand-guide]] — @affaan's agent security guide: memory poisoning, lethal trifecta, skills as supply chain, least agency (ingested 2026-06-12)
 - [[wiki/sources/yt-claude-code-memory-compared]] — 6 levels of Claude Code memory: native tools, hooks, vectors, conversation recall, wiki knowledge bases, cross-platform brain (ingested 2026-06-12)
-- [[wiki/sources/graphify]] — Knowledge graph skill for AI coding assistants; 66.3k stars, YC S26, 20+ platforms, multi-agent install patterns (ingested 2026-06-12)
+- [[wiki/sources/graphify]] — Knowledge graph skill for AI coding assistants; 66.3k stars, YC S26, 20+ platforms, multi-agent install patterns (combined synthesis, ingested 2026-06-12)
+- [[wiki/sources/graphify-readme]] — graphify README v8: multi-agent install paths, hook mechanisms per platform (ingested 2026-06-12)
+- [[wiki/sources/graphify-agents]] — graphify AGENTS.md: graph-aware agent workflow, read report → navigate wiki → update on change (ingested 2026-06-12)
+- [[wiki/sources/graphify-architecture]] — graphify ARCHITECTURE.md: 7-stage pipeline, 18 modules, extraction schema, confidence labels (ingested 2026-06-12)
+- [[wiki/sources/graphify-how-it-works]] — graphify how-it-works: 3-pass architecture, Leiden algorithm, 71.5x token reduction (ingested 2026-06-12)
 - [[wiki/sources/commandcode-headless]] — Headless mode: session persistence, resume, exit codes, permissions (ingested 2026-06-12)
+- [[wiki/sources/commandcode-security]] — Security model: permission modes, headless permissions, data handling, MCP security (ingested 2026-06-13)
+- [[wiki/sources/openbrain]] — OpenBrain by Nate B. Jones: Postgres+pgvector+MCP personal semantic memory; schema, capture pipeline, privacy model (ingested 2026-06-15)
+- [[wiki/sources/pi-usage]] — Pi CLI usage: TUI areas, slash commands, message queue, sessions, project trust, full CLI surface (ingested 2026-06-16)
+- [[wiki/sources/pi-extensions]] — Pi extension system: TypeScript lifecycle, event taxonomy, ExtensionContext, ExtensionAPI, custom tools/UI (ingested 2026-06-16)
+- [[wiki/sources/pi-packages]] — Pi packages: npm/git distribution, `pi` manifest, conventions, peer vs bundled deps, filtering (ingested 2026-06-16)
+- [[wiki/sources/pi-models]] — Pi `models.json`: custom provider schema, value resolution, `compat` flags, `thinkingLevelMap`, per-model overrides (ingested 2026-06-16)
+- [[wiki/sources/pi-custom-provider]] — Pi custom providers: `pi.registerProvider()`, OAuth/SSO, `streamSimple` event protocol, context-overflow recovery (ingested 2026-06-16)
+- [[wiki/sources/pi-session-format]] — Pi session JSONL tree format: versions, AgentMessage union, entry types, SessionManager API (ingested 2026-06-16)
+- [[wiki/sources/pi-terminal-setup]] — Pi terminal compatibility matrix and per-emulator config (Kitty protocol, Ghostty, WezTerm, Alacritty, VS Code, Windows Terminal) (ingested 2026-06-16)
+- [[wiki/sources/codebase-memory-mcp]] — codebase-memory-mcp GitHub README: knowledge graph indexer, 14 MCP tools, Hybrid LSP, team-shared artifact (ingested 2026-06-16)
+
+## Reference
+- [[wiki/reference/workflow-architecture]] — Three-phase session flow: hooks, skills, scripts, degraded modes, config files per agent
+- [[wiki/reference/commandcode-models]] — Model ids for `cmd -m` / `cmd --model`, grouped by provider
+- [[wiki/reference/pi-cli-flags]] — Every `pi` CLI flag by category: modes, model/session/tool/resource/other options, env vars (PI_CODING_AGENT_DIR, PI_OFFLINE, etc.)
+- [[wiki/reference/pi-slash-commands]] — All built-in Pi slash commands with one-line descriptions
+- [[wiki/reference/pi-session-file-format]] — Pi JSONL session entry types, message content blocks, AgentMessage union, tree structure
+- [[wiki/reference/pi-terminal-compat]] — Pi terminal compatibility matrix and config snippets for Ghostty/WezTerm/Alacritty/VS Code/Windows Terminal
+- [[wiki/reference/pi-models-json]] — `~/.pi/agent/models.json` full schema: provider/model fields, value resolution, compat flags
+- [[wiki/reference/pi-provider-api-types]] — Pi supported streaming APIs: anthropic-messages, openai-completions, mistral-conversations, etc., with compat flag matrix
+- [[wiki/reference/pi-event-types]] — Pi extension event taxonomy (startup/session/agent/tool/user_bash/input) and ExtensionContext properties
+- [[wiki/reference/pi-extension-api]] — All `pi.*` ExtensionAPI methods (registerTool, registerCommand, registerProvider, etc.)
+- [[wiki/reference/codebase-memory-mcp-tools]] — All 14 MCP tools, node labels, edge types, Cypher read subset, CLI mode, env vars, troubleshooting
 
 ## Meta
 - [[wiki/meta/log]] — Append-only vault operation log

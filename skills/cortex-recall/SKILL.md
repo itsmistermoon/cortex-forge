@@ -13,6 +13,8 @@ Answer a question using the vault's wiki content as the source.
 ## Steps
 
 1. **Resolve vault** — read `~/.cortex-forge/config.yml`:
+   Also read `locale:` from the vault's entry — use it for all agent-generated content. Fallback if absent: `.hot/MEMORY.md` title line (`— locale: {lang}`) → `CODEX.md` Vocabulary (`**locale**:`) → default `en`.
+
    - If the first argument matches a registered vault name (e.g., `/cortex-recall second-brain <query>`) → use that vault; treat the remaining text as the query.
    - Otherwise: check if CWD is inside any registered vault (CWD starts with a `vaults:` path) → use that vault.
    - If not, use the `default` vault.

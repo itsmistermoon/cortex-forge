@@ -5,7 +5,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash /Users/itsmistermoon/proyectos/cortex-forge/bin/hooks/cortex-crystallize-commandcode.sh"
+            "command": "bash /Users/itsmistermoon/proyectos/cortex-forge/bin/hooks/cortex-crystallize-commandcode.sh",
+            "timeout": 60
           }
         ]
       }

@@ -1,7 +1,7 @@
 ---
 type: codex
-created: {{date:YYYY-MM-DD}}
-updated: {{date:YYYY-MM-DD}}
+created: 2026-06-13
+updated: 2026-06-13
 ---
 
 # CODEX
@@ -37,11 +37,9 @@ Partially filled is fine — empty sections are ignored.
 
 ## Vocabulary
 
-<!-- Terms with specific meaning in this vault.
-     Prevents agents from using generic definitions when this vault has its own.
-     Example:
-       - **hot cache**: session memory per project (.hot/), not persistent knowledge
-       - **vault**: a knowledge base managed by Cortex Forge, not a password manager -->
+- **locale**: en — locale for agent-generated content (hot cache entries, skill acknowledgments).
+- **hot cache**: session memory per project (.hot/), not persistent knowledge
+- **vault**: a knowledge base managed by Cortex Forge, not a password manager
 
 ## Out of scope
 

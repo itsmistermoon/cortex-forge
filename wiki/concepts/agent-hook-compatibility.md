@@ -2,7 +2,7 @@
 title: agent-hook-compatibility
 type: concept
 created: 2026-06-07
-updated: 2026-06-10
+updated: 2026-06-13
 tags: [multi-agent, hooks, cortex-forge, compatibility]
 aliases: [hook matrix, agent lifecycle]
 sources:
@@ -24,7 +24,7 @@ Cortex Forge's Hot Cache Protocol requires two lifecycle events per agent: one a
 | Claude Code | `SessionStart` | `SessionEnd` + `PreCompact` | ✅ full — automatic via hooks |
 | Antigravity CLI | `PreInvocation (invocationNum==0)` | `Stop (fullyIdle==true)` | documented, untested |
 | Codex | `SessionStart` | `Stop` | ✅ full — automatic via hooks; hook context visible in UI |
-| CommandCode | **does not exist** | `Stop` | partial — close only, automatic |
+| CommandCode | **does not exist** | `Stop` | partial — close only, automatic; IA synthesis via `cmd -p` |
 
 ## Degraded mode per agent
 
@@ -101,7 +101,9 @@ Example (project scope) for the hot cache:
 
 **⚠ Plan mode**: CommandCode disables hooks entirely in plan mode — the `Stop` hook does not run when closing a planning session. Keep this in mind when operating the crystallize protocol.
 
-**Implication**: in CommandCode the hot cache is write-only in the first session. From the second session onward, the previous context is already in `.hot/` and `AGENTS.md` instructs the agent to read it — the cycle closes via instruction, not via hook.
+**Synthesis upgrade (2026-06-13):** `cortex-crystallize-commandcode.sh` ahora usa `cmd -p` para sintetizar resúmenes IA, igual que la versión de Claude Code. Extrae user messages, tool calls y última respuesta del transcript JSONL via jq, construye un prompt estructurado, y escribe en `.hot/MEMORY.md` con formato `#### What was done / Discarded / Fragile context`. Esto reemplaza la entrada mínima "Session closed via Stop hook." que producía antes.
+
+**Implication**: in CommandCode the hot cache is write-only in the first session (no SessionStart hook to load it). From the second session onward, the previous context is already in `.hot/` and `AGENTS.md` instructs the agent to read it — the cycle closes via instruction, not via hook. The Stop crystallize now produces rich IA entries that make the handoff more informative.
 
 **Transcript location (for pipeline imprint):** Confirmed 2026-06-12 via filesystem inspection and official docs:
 - **Filesystem path:** `~/.commandcode/projects/{project-slug}/{session-uuid}.jsonl`
@@ -204,3 +206,4 @@ If an agent has no startup hook, `AGENTS.md` acts as a fallback: the explicit in
 - 2026-06-08 [claude-sonnet-4-6]: Claude Code SessionStart — `source` field documented (startup|resume|clear|compact), `asyncRewake` added, `PreCompact` with exit 2 confirmed. CommandCode — plan mode gotcha documented. Source: handoff from second-brain
 - 2026-06-08 [Claude Code]: Translated to English
 - 2026-06-11 [Claude Code]: Agent detection signals section added — confirmed Claude Code env vars; other CLIs marked unconfirmed pending live validation
+- 2026-06-13 [CommandCode]: CommandCode crystallize upgraded with `cmd -p` IA synthesis — now produces structured `#### What was done / Discarded / Fragile context` entries instead of minimal "Session closed via Stop hook."

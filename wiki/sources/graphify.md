@@ -8,10 +8,10 @@ source_url: https://github.com/safishamsi/graphify
 source_date: 2026-06-12
 source_author: Safi Shamsi / Graphify Labs
 sources:
-  - .raw/graphify-readme.md
-  - .raw/graphify-agents.md
-  - .raw/graphify-architecture.md
-  - .raw/graphify-how-it-works.md
+  - wiki/sources/graphify-readme.md
+  - wiki/sources/graphify-agents.md
+  - wiki/sources/graphify-architecture.md
+  - wiki/sources/graphify-how-it-works.md
 confidence: high
 ---
 

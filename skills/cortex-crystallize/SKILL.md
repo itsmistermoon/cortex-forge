@@ -26,6 +26,7 @@ Behavior depends on where the skill is invoked:
    - None matched → use self-knowledge (you know what CLI you are)
    Use the detected identity as `{Agent}` in the history header and in the `agent:` frontmatter field.
 2. **Resolve vault** from `~/.cortex-forge/config.yml`. If missing, prompt to run `/cortex-forge-setup` first.
+   Also read `locale:` from the vault's entry — use it for all agent-generated content. Fallback if absent: `.hot/MEMORY.md` title line (`— locale: {lang}`) → `CODEX.md` Vocabulary (`**locale**:`) → default `en`.
    - Config supports two formats — handle both:
      - New: `vaults: {name: path, ...}` + `default: name`
      - Legacy: `vault: path` (treat as single vault named after its `basename`)
@@ -113,7 +114,12 @@ Append at the end, never modify previous entries.
 
 #### Fragile context
 - {exact numbers, commands, paths, URLs, conventions a new agent can't infer from code}
+
+#### Imprint candidate
+- {only if the session produced a durable insight, design decision, or analysis worth a permanent wiki page. One line: what to imprint and suggested type. Omit if nothing qualifies.}
 ```
+
+`#### Imprint candidate` is detected by the SessionStart hook on the next session and surfaced as a nudge to run `/cortex-imprint`. Disable globally by setting `imprint_triage: false` in `~/.cortex-forge/config.yml`.
 
 ## Output format
 
@@ -124,7 +130,7 @@ After completing the snapshot, confirm:
 
 ## Rules
 
-- Language: match the vault's language (check `AGENTS.md`).
+- Language: use the locale resolved in step 2b — do not default to your training language.
 - Empty sections: omit entirely — never write `_(none)_` or other placeholders. This applies to `#### Attempted and failed` and `#### Discarded` and `#### Fragile context` equally.
 - Pending items live in **Current state**, not in the snapshot — so they don't get buried.
 - The history snapshot **has no pending section** — that's Current state's responsibility.

@@ -154,7 +154,16 @@ Concepts skipped (considered but discarded due to lack of transferable proper na
 
 Cross-references: [[wiki/concepts/agent-hook-compatibility]] (hooks matrix overlaps with source's multi-platform matrix — both platform × event).
 
-Agent: CommandCode (MiniMax-M3)
+Agent: CommandCode
+
+## [2026-06-13] ingest | CommandCode Models reference
+
+Source: `https://commandcode.ai/docs/reference/cli/models`
+Raw: `.raw/commandcode-models-reference.md`
+Pages created: `wiki/reference/commandcode-models.md`
+Updated: `wiki/index.md`
+Key finding: `google/gemini-3.1-flash-lite` es el modelo id para Gemini 3.1 Flash Lite. Matching acepta short form (`gemini-3.1-flash-lite`) sin el prefijo `google/`. Default actual de CommandCode: `moonshotai/Kimi-K2.5`.
+SPA: no aplica (HTML plano). Sanitization: 0 findings. (MiniMax-M3)
 
 ## [2026-06-08] ingest | CommandCode Hooks Configuration (commandcode.ai/docs/hooks/configuration)
 
@@ -243,3 +252,55 @@ Sources: `wiki/sources/ai-coding-dictionary-primary-source.md`, `wiki/sources/ai
 Concepts: `wiki/concepts/primary-source.md`, `wiki/concepts/secondary-source.md`
 Raw: `.raw/ai-coding-dictionary-primary-source.md`, `.raw/ai-coding-dictionary-secondary-source.md`
 Agent: Claude Code
+
+## [2026-06-13] fix | CommandCode Stop hook timeout
+
+Stop hook estaba fallando con timeout de 30s default — la síntesis IA via `cmd -p` requiere llamada API que toma 20-60s. Agregado `"timeout": 120` al hook en `.commandcode/settings.local.json`. Testeado con transcript real de 297 líneas y 156 tool calls: completado en 22s, produjo `#### What was done / Discarded / Fragile context` correctos.
+Updated: `skills/cortex-forge-setup/SKILL.md` (CommandCode hook example corregido), `wiki/reference/workflow-architecture.md` (nota de timeout)
+
+## [2026-06-13] create | Workflow architecture reference
+
+Pages created: `wiki/reference/workflow-architecture.md`
+Updated: `wiki/index.md` (Reference section), `docs/hot-cache-protocol.md` (outdated notice redirecting to new doc)
+Cobertura: 3 fases de sesión, tabla de skills por evento, 7 hook scripts catalogados con su propósito y agente target, triggers adicionales (compact/clear/resume/fullyIdle), modos degradados por plataforma, config files por agente. El doc viejo `hot-cache-protocol.md` mencionaba scripts `load-hot-cache.sh`/`update-hot-cache.sh` que ya no existen — actualizado con redirect.
+
+## [2026-06-13] upgrade | CommandCode crystallize — IA synthesis via `cmd -p`
+
+`bin/hooks/cortex-crystallize-commandcode.sh` reescrito para usar `cmd -p` headless mode para síntesis IA, replicando el patrón de `cortex-crystallize-claude.sh`. Extrae user messages, tool calls y última respuesta del transcript JSONL via jq, construye prompt estructurado, y escribe en `.hot/MEMORY.md` con formato `#### What was done / Discarded / Fragile context`. Reemplaza la entrada mínima "Session closed via Stop hook."
+
+Dependencias: `cmd` en PATH (encontrado en `/opt/homebrew/bin/cmd` v0.37.1). Fallback: si `cmd` no está disponible o la síntesis falla, el script sale silenciosamente (exit 0). El transcript se resuelve desde el campo `transcript_path` del hook payload, con fallback de slug derivado de CWD y búsqueda global en `~/.commandcode/projects/`.
+
+Updated: `wiki/concepts/agent-hook-compatibility.md` (matrix + síntesis upgrade section)
+
+## [2026-06-13] ingest | CommandCode Security & Privacy docs
+
+Sources: `.raw/commandcode-security.md`
+Pages created: `wiki/sources/commandcode-security.md`
+Updated: `wiki/sources/commandcode-headless.md` (cross-reference to security), `wiki/index.md`, `wiki/pages/cortex-forge.md`
+Key finding: `cmd -p --yolo` is the headless equivalent of `claude -p` for synthesis in hooks, but requires explicit `--yolo` to enable writes. Crystallize hooks currently do not use this — they just append minimal "Session closed via Stop hook." entries.
+
+## [2026-06-13] fix | `cortex-prune.sh` — multi-source page detection
+
+`raw_without_source_page` estaba generando falsos positivos para raws referenciados via el campo `sources:` (lista YAML multi-source), porque el script solo revisaba `raw:` (single-source) y matches de filename. Ejemplo: `.raw/graphify-agents.md` referenciado en `wiki/sources/graphify.md` via `sources:` era reportado como huérfano.
+
+Fix: agregado un tercer chequeo intermedio — `grep -rl "^  - ${rel}$"` sobre `wiki/sources/` — entre el check de `raw:` y el fallback de filename. Vault-report ahora registra 0 findings.
+
+Agent: CommandCode
+
+## [2026-06-16] ingest | Pi CLI documentation (7 pages)
+
+Sources: `.raw/pi-usage.md`, `.raw/pi-extensions.md`, `.raw/pi-packages.md`, `.raw/pi-models.md`, `.raw/pi-custom-provider.md`, `.raw/pi-session-format.md`, `.raw/pi-terminal-setup.md`
+Pages created: 7 in `wiki/sources/pi-*.md`, 1 entity `wiki/entities/pi-cli.md`, 1 concept `wiki/concepts/pi-extension-lifecycle.md`, 8 references in `wiki/reference/pi-*.md` (cli-flags, slash-commands, session-file-format, terminal-compat, models-json, provider-api-types, event-types, extension-api)
+Updated: `wiki/index.md`
+Key findings:
+- Pi is `earendil-works/pi-mono` (NOT `badlogic` — `badlogic/pi-share-hf` is a separate companion project for HF dataset publishing)
+- Design philosophy: small core, opt-in everything else (no built-in MCP, sub-agents, permission popups, plan mode, to-dos, or background bash)
+- Extension system: TypeScript async factory pattern, lifecycle events (startup/session/agent/tool/user_bash/input), two-state model (CustomEntry vs CustomMessageEntry)
+- Sessions: JSONL with id/parentId tree structure (v1→v2→v3), enabling in-place fork/clone
+- Multi-provider: declarative `~/.pi/agent/models.json` (static) or programmatic `pi.registerProvider()` (dynamic, async factory)
+- OAuth/SSO integrated into `/login` via provider's `oauth` block
+- Custom streaming APIs via `streamSimple` event protocol on `createAssistantMessageEventStream`
+- 9 supported API types: anthropic-messages, openai-completions, openai-responses, azure-openai-responses, openai-codex-responses, mistral-conversations, google-generative-ai, google-vertex, bedrock-converse-stream
+- Sub-agent B (references) wrote 8 files directly; sub-agent A (sources/entity/concept) had no write tool, content was written by main agent from the returned payload.
+
+Agent: CommandCode (MiniMax M3)

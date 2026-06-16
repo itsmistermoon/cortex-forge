@@ -1,7 +1,7 @@
 ---
 title: "AGENT-LOG — bitácora de sesiones multi-agente"
 created: 2026-06-08
-updated: 2026-06-08
+updated: 2026-06-16
 ---
 
 # AGENT-LOG
@@ -514,3 +514,181 @@ replicar todos los cambios de v0.2.0 al vault personal `second-brain`.
 - Experimento pendiente (es el entregable real, no el mecanismo): baseline de pregunta de contenido sin/con nudge, medir invocación de `cortex-recall`. Kill criterion: 5 sesiones sin cambio de comportamiento o fatiga → desinstalar y registrar aquí.
 - Scope note vigente: el bypass paramétrico sin tool calls (Codex respondió desde contexto activo) queda cubierto solo por los criterios de AGENTS.md.
 - Ports a otros agentes: bloqueados hasta resultado del experimento (acuerdo con el usuario: los retrasos de otros agentes quedan como pendientes; se sigue solo con Claude).
+
+---
+
+## 2026-06-13 — cortex-forge (CommandCode v0.37.1) — crystallize IA, timeout fix, workflow reference
+
+**Agente:** CommandCode (DeepSeek V4 Flash)
+**Propósito:** Upgrade del crystallize de CommandCode para usar síntesis IA via `cmd -p`, fix de timeout en Stop hook, creación de workflow reference, discusión de memoria histórica.
+
+**Contexto:**
+Sesión posterior al bug de timeout del Stop hook (30s default). Se diagnosticó que el nuevo script `cortex-crystallize-commandcode.sh` — que ahora llama `cmd -p` para síntesis IA — excedía el timeout por defecto de 30s. También se discutió la arquitectura general del sistema (skills, scripts, hooks, triggers) y la utilidad del historial extenso de MEMORY.md.
+
+**Hallazgos:**
+1. **Timeout de 30s en Stop hook.** El crystallize con `cmd -p` toma 20-60s en promedio. El timeout default de CommandCode para hooks es 30s. La solución fue agregar `"timeout": 120` al hook en `.commandcode/settings.local.json`.
+2. **`cmd -p` funciona para síntesis headless.** Testeado con transcript real de 297 líneas y 156 tool calls: completó en 22s, produjo `#### What was done / Discarded / Fragile context` correctos. Es el equivalente funcional de `claude -p` que usa Claude Code.
+3. **No existe SessionStart hook en CommandCode.** Para cargar contexto al inicio, la única vía es AGENTS.md + TASTE rules. Esto limita la automatización del pipeline imprint en CommandCode — el triage de imprint candidates no puede hacerse en background via hook, solo por decisión del agente al leer MEMORY.md.
+4. **El historial extenso como data cruda.** Se discutió que el historial de MEMORY.md no debería ser eterno, sino archivado a un formato estructurado con tags para minería posterior. 3 meses de datos bien catalogados > 300 entradas planas. Queda registrado en ROADMAP.md Fase 4.
+
+**Logros:**
+- `bin/hooks/cortex-crystallize-commandcode.sh` reescrito con síntesis IA via `cmd -p`
+- `.commandcode/settings.local.json` con `"timeout": 120`
+- `wiki/reference/workflow-architecture.md` creado (3 fases, skills, 7 hook scripts, triggers, config files, modos degradados)
+- `docs/hot-cache-protocol.md` marcado como obsoleto con redirect
+- `wiki/sources/commandcode-security.md` ingerido (permission model, headless permissions)
+- `wiki/concepts/agent-hook-compatibility.md` actualizado (CMD crystallize upgrade)
+- `skills/cortex-forge-setup/SKILL.md` actualizado (CommandCode hook example corregido)
+- 16 entradas vacías ("Session closed via Stop hook.") eliminadas de `.hot/MEMORY.md`
+- ROADMAP.md: nuevo ítem de archivo estructurado de historial en Fase 4
+
+**Observaciones / sugerencias:**
+- El pipeline imprint (Fase 2.5 Item 3) ahora tiene el mecanismo base funcionando: crystallize con IA + transcript path resuelto. Falta el flag `imprint-candidate` en el prompt de síntesis y el triage al SessionStart.
+- El recall nudge experiment sigue corriendo solo para Claude Code. Esta sesión no califica para el experimento (CommandCode, no Claude Code).
+- El archive estructurado de historial es un proyecto interesante pero no urgente — el historial actual (459 líneas) cabe sin problema en contexto. La prioridad sigue siendo Fase 2.5 (pipeline imprint).
+
+---
+
+## 2026-06-13 — cortex-forge (CommandCode / MiMo V2.5) — Stop hook payload analysis
+
+**Agente:** CommandCode → MiMo V2.5
+**Propósito:** Investigar si el payload del Stop hook permite distinguir idle timeout de cierre real (/exit).
+
+**Hallazgos:**
+
+1. **Stop hook se dispara múltiples veces por sesión.** El hooks-audit de la sesión `8cd8559c` registró 4 disparos: 3 durante la sesión (presumiblemente idle timeout) y 1 al hacer `/exit`. Los intervalos entre los primeros dos fueron de ~54s, sugiriendo que CommandCode dispara el Stop hook como heartbeat de inactividad cada ~60s.
+
+2. **Payload no discrimina.** El payload tiene 6 campos fijos (session_id, transcript_path, cwd, hook_event_name, permission_mode, stop_hook_active) y stop_hook_active=false tanto para idle como para /exit. No hay campo `reason` ni distinción en los valores existentes.
+
+3. **Hook audit es la fuente real de diagnóstico.** Cada disparo queda registrado en hooks-audit-{session}.jsonl con timestamp, duración y exit code. Esa es la metadata que permite diferenciar idle timeouts de cierre real, no el payload del hook en sí.
+
+4. **Timeout de 60s alcanza.** Las duraciones registradas fueron 15.7s, 33.9s, 18.0s y 29.9s — ninguna llegó al límite.
+
+5. **Problema real:** El Stop hook se ejecuta cada ~60s de inactividad, corre `cmd -p` para síntesis, y eso genera latencia + posibles artefactos (mensajes encolados, texto basura) si la sesión se reanuda antes de que termine.
+
+**Qué no se hizo (por overengineering):**
+- No se implementó un log acumulativo de payloads (stop-hook-payloads.log). La info necesaria ya está en hooks-audit.
+
+**Observaciones / sugerencias:**
+- Si el problema de interrupción persiste, la solución no es modificar el script sino evitar que el Stop hook se dispare por idle. CommandCode no expone configuración de idle timeout en config.json, pero podría investigarse si hay un setting no documentado o si el hook puede llevar un `matcher` condicional.
+- Alternativa más simple: que el script detecte si es idle timeout vs real exit y en idle timeout solo registre timestamp sin ejecutar `cmd -p`. Eso eliminaría la latencia y los artefactos.
+
+---
+
+## 2026-06-13 — cortex-forge (CommandCode / MiMo V2.5) — locale system, Codex hook compat, Stop hook payload capture, models ref ingest
+
+**Agente:** CommandCode → MiMo V2.5 (cambiado durante la sesión)
+**Propósito:** Investigación de hooks de Codex, diseño del sistema de locale multinivel, fix de timeout y modelo del Stop hook, ingesta de models reference.
+
+**Hallazgos:**
+
+1. **Codex hooks:** Codex (OpenAI) soporta `SessionStart` y `Stop`. No tiene `PreCompact`. El `Stop` no usa `matcher` y espera JSON en stdout. El wire format es idéntico al de Claude Code — el wrapper `cortex-crystallize-codex.sh` de 12 líneas delega sin modificaciones. `SessionStart` puede dispararse múltiples veces (source: `startup|resume|clear|compact`). No hay hook pre-/clear — el snapshot solo ocurre al cerrar sesión. Fuente: `wiki/sources/codex-hooks.md` (confidence: high), `wiki/concepts/agent-hook-compatibility.md`, `wiki/reference/workflow-architecture.md`.
+
+2. **Sistema de locale multinivel:** Se diseñó una cadena de resolución de locale para contenido generado por el agente:
+   - `~/.cortex-forge/config.yml` (autoritativo, existe antes que el vault tenga contenido)
+   - `.hot/MEMORY.md` título (reflejo runtime, preservado por crystallize)
+   - CODEX.md Vocabulary (documentación del vault)
+   - Default: `en`
+   Se aplicó a cortex-forge con `locale: en` y second-brain con `locale: es`. Queda pendiente ajustar las skills para que *escriban* respetando el locale — sin eso, es metadata ignorable.
+
+3. **Stop hook timeout (120s → 60s):** El `cortex-crystallize-commandcode.sh` llama a `cmd -p` para síntesis IA, pero el timeout de 120s generaba errores "timed out after 120000ms". Reducido a 60s. Además se agregó captura del payload del hook en `.hot/stop-hook-payload.json` para debuggear si CommandCode dispara Stop por idle timeout vs cierre real (Option B pendiente).
+
+4. **Modelo para síntesis:** Se cambió de default (Kimi K2.5) a `gemini-3.1-flash-lite` y luego a `mimo-v2.5` (MiMo V2.5) por consistencia de identidad entre CLIs: Claude Code usa Sonnet/Haiku, CommandCode usa MiMo, Antigravity usa Gemini.
+
+5. **Ingesta:** `wiki/reference/commandcode-models.md` creado desde `https://commandcode.ai/docs/reference/cli/models`. Todos los modelos documentados con sus ids, grouped by provider. Sanitization 0 findings.
+
+6. **Alucinación china:** El modelo generó "回合" (chino para "round/turn") en lugar de "tema" en español. Error del modelo, no del sistema. Queda registrado como dato.
+
+**Qué falló:**
+- El Stop hook parece dispararse en momentos inesperados (posible idle timeout de sesión), interfiriendo con el flujo de conversación y dejando mensajes en cola sin procesar. Pendiente de diagnosticar con el payload capturado en `.hot/stop-hook-payload.json`.
+- Alucinación con caracteres chinos en output. Documentado, sin fix posible desde la configuración.
+
+**Observaciones / sugerencias:**
+- El locale system necesita que las skills (crystallize, recall, assimilate, imprint) lean y apliquen el locale para que no sea metadata muerta. Eso implica cambiar instrucciones en los SKILL.md y posiblemente pasar el locale como parámetro a los scripts hook.
+- La Option B (detectar si Stop es idle timeout vs cierre real) requiere inspeccionar el payload del hook. El archivo `.hot/stop-hook-payload.json` se genera automáticamente ahora.
+- Para el problema de cola de mensajes: si el idle timeout de CommandCode es configurable, subirlo podría mitigar las interrupciones. Si no, reducir el timeout del hook a 60s ya ayuda (se hizo).
+
+---
+
+## 2026-06-15 — Claude Code (Sonnet 4.6) — experimento recall nudge: primera observación
+
+**Agente:** Claude Code (claude-sonnet-4-6)
+**Propósito:** Verificación de estado del backlog #2 + primera observación del experimento del recall nudge.
+
+**Hallazgos:**
+
+1. **Backlog #2 completamente implementado:** Item 1 (`bin/hooks/cortex-recall-nudge.sh`, PreToolUse, Bash-only, once-per-session, fail-open) e Item 2 (post-commit hook en `.git/hooks/post-commit`, backgrounded, logfile en `.git/cortex-prune.log`). Archivo `cortex-forge-improvements-2.md` eliminado al finalizar la sesión.
+
+2. **Obsidian Mind no tiene mecanismo equivalente al recall nudge:** Sus hooks son UserPromptSubmit (clasificación de mensajes) y PostToolUse (validación de schema). El único mecanismo de búsqueda orientada es QMD semantic search vía MCP, opt-in, sin intercepción PreToolUse.
+
+3. **Primera observación del experimento — no cuenta como dato válido:** En esta sesión el agente invocó `cortex-recall` proactivamente (sin grep previo) ante la pregunta sobre Obsidian Mind. El nudge **no disparó** porque no hubo Bash search interceptable. El mecanismo que operó fue declarativo: skill visible en el system-reminder + regla explícita en la definición de la skill ("Never answer from active session context alone"). Esto confirma el bypass documentado por el user-skeptic: PreToolUse nunca dispara cuando la acción competidora es no usar ningún tool.
+
+4. **Criterio del experimento corregido en ROADMAP:** El criterio anterior ("5 sesiones sin nudge vs con nudge") era inmedible. Criterio actualizado: contar solo sesiones donde el hook **efectivamente disparó**; éxito = el agente cambió su siguiente acción a `cortex-recall` en vez de continuar el grep. Kill criterion: 0/5 cambios en sesiones donde el hook disparó → desinstalar.
+
+**Qué falta para que el experimento sea medible:**
+- Una sesión donde el agente intente `grep wiki/` o `find .raw/` como primera acción ante una pregunta de contenido — ahí el hook dispara y se puede observar si cambia el comportamiento.
+
+---
+
+## 2026-06-16 01:50 -04 — CommandCode (mimo-v2.5) — diagnóstico Stop hook post-cortex-forge update
+
+**Qué ocurrió:** Sesión abierta en second-brain tras update de cortex-forge a la versión con el fix de backgrounding del Stop hook (commit previo a esta sesión). Usuario reporta "el Stop hook no funcionó tras actualizar cortex-forge". Diagnóstico + limpieza + dry-runs.
+
+**Qué funcionó:**
+- El fix de backgrounding **sí está operativo**. Evidencia en `~/.commandcode/projects/users-itsmistermoon-proyectos-second-brain/hooks-audit-3d5b9e18-1134-4f1e-b109-f695edace57c.jsonl`:
+  - 4 invocaciones reales (05:14, 05:19, 05:23, 05:35 UTC) con duración 100-130ms y exit 0
+  - Sesiones anteriores (04:06-04:27) agotaban el timeout de 30s → confirma que el fix resolvió el bug original
+- El script `cortex-crystallize-commandcode.sh` está bien estructurado: padre escribe placeholder con SENTINEL de forma síncrona, helper sintetiza vía `nohup &; disown`, retorna exit 0 en <200ms.
+- Protocolo Crystallize funcionó: el agente leyó `.hot/MEMORY.md` y reconoció los 8 placeholders huérfanos como contexto de la sesión anterior, en vez de tratarlos como estado actual.
+
+**Qué falló:**
+- 8 placeholders `__PENDING_SYNTHESIS_*__` huérfanos en `.hot/MEMORY.md` (sesiones 0037-0135) — confusión inicial del usuario, parecían evidencia de fallo actual cuando en realidad eran artefactos de la ventana de iteración previa al fix.
+- 1 helper huérfano `.hot/.synthesize-2026-06-16-0105.sh` y 1 `.hot/stop-hook-payload.json` obsoleto acumulado de la fase de pruebas.
+
+**Hallazgos técnicos:**
+
+1. **Ruta hardcoded de `cmd`:** El script llama a `$(command -v cmd 2>/dev/null) && break` en la sección de descubrimiento de binario, pero el `SUMMARY=$("$CMD_BIN" -m "mimo-v2.5" -p "$FULL_PROMPT" 2>/dev/null)` usa la variable correctamente — sin embargo, en la práctica `/opt/homebrew/bin/cmd` es symlink a `index.mjs` (Node.js CLI), no un binario. Implicación: shims de `PATH` para dry-runs **no funcionan** porque el helper no exporta `PATH` ni cambia al directorio; ejecuta la ruta absoluta. Para tests futuros con shim, sería necesario (a) que el padre modifique temporalmente la ruta o (b) agregar un wrapper en `bin/hooks/` que el hook invoque y que sí respete `PATH`.
+
+2. **Trap de `mktemp` puede comerse el helper:** El trap `trap 'rm -f "$TMP"' EXIT` solo limpia `$TMP`, no `$HELPER`. Pero si en el futuro se agrega cleanup del helper, hay que considerar que el helper se ejecuta después del exit del padre — el archivo se deslinka pero el subproceso sigue (Linux permite ejecutar archivos deslinkados). Implicación: el cleanup del helper debe ser *dentro* del propio helper (`rm -f "$HELPER"` al final, que ya está implementado), no en el padre.
+
+3. **Sustitución de SENTINEL por AWK:** El `awk -v sentinel=...` funciona correctamente en dry-runs manuales cuando el helper se ejecuta sin interferencia. El problema en mis pruebas fue timing (yo maté el helper antes de que escribiera). No es bug del script.
+
+**Acciones de limpieza ejecutadas:**
+- Eliminados: `.hot/.synthesize-2026-06-16-0105.sh`, `.hot/stop-hook-payload.json`
+- Consolidación en `.hot/MEMORY.md`: 8 placeholders huérfanos → 1 entrada explicativa; 4 placeholders de dry-runs → 1 entrada similar
+- Actualizado frontmatter de MEMORY.md: `agent: CommandCode (mimo-v2.5)`, `updated: 2026-06-16-0150`
+- Agregada entrada en `wiki/meta/log.md` con causa raíz, acciones y lecciones
+- Agregado pending opcional: "Reemplazar `/opt/homebrew/bin/cmd` hardcoded en `cortex-crystallize-commandcode.sh` por `command -v cmd` para habilitar shims de test"
+
+**Observaciones / sugerencias:**
+
+- El fix de backgrounding está validado por evidencia empírica (`hooks-audit` con duraciones sub-200ms) — no requiere acción adicional.
+- El patrón "escribir placeholder + helper backgrounded" es replicable para cualquier hook con trabajo costoso en CommandCode/Antigravity. Documentar como patrón en `docs/hooks/` sería valioso.
+- Considerar agregar un paso de self-check al script: si el helper no logra sustituir el SENTINEL después de N segundos (e.g., 90s), disparar alerta. Esto habría evitado los 8 placeholders huérfanos de las sesiones 0037-0135.
+- La acumulación de artefactos en `.hot/` durante iteración es un patrón conocido. Considerar un `git clean` selectivo post-crystallize (preservar `MEMORY.md`, eliminar `.synthesize-*.sh` y `stop-hook-payload.json` con más de 24h de antigüedad).
+
+
+---
+
+## 2026-06-16 — Claude Code (claude-sonnet-4-6) — Planificación Fase 3.6
+
+**Qué ocurrió:** sesión de planificación y documentación. No hubo pruebas de protocolo con agentes.
+
+**Qué se incorporó:**
+
+- **Fase 3.6 — Retrieval semántico** añadida al ROADMAP.md con dos etapas:
+  - Etapa 1: índice vectorial local con sqlite-vec + backend de embeddings seleccionado por plataforma
+  - Etapa 2: MCP server con FastMCP (gateada: Etapa 1 validada + vault usado desde >1 cliente)
+- **Backend de embeddings definido como decisión de plataforma**, no de usuario:
+  - Apple Silicon (`Darwin` + `arm64`): `mlx-embeddings` vía Neural Engine; fallback automático a `sentence-transformers` si mlx no está instalado
+  - Linux / Windows / Intel Mac: `sentence-transformers` con `nomic-ai/nomic-embed-text-v1.5`, `normalize_embeddings=True`
+  - Lógica encapsulada en `.cortex/embeddings.py`; ningún otro módulo duplica detección de plataforma
+- **Decisiones de diseño documentadas** en `wiki/pages/cortex-forge.md` → sección `Key decisions`: por qué sqlite-vec, por qué se descarta Ollama, por qué el backend es por plataforma, por qué producto punto, por qué MCP es Etapa 2, por qué no Graphify+Leiden.
+- **`CORTEX_FORGE_PLAN.md` eliminado** tras incorporar su contenido al ROADMAP y la documentación oficial.
+- **`skill-setup-update.md` eliminado** tras incorporar su contenido al ROADMAP.
+
+**Qué no se implementó:** ningún código — esta sesión fue exclusivamente de planificación y documentación.
+
+**Observaciones:**
+- El plan original (CORTEX_FORGE_PLAN.md) tenía inconsistencias internas tras el cambio de Ollama a `sentence-transformers`: la tabla Stack, los snippets de código y dos decisiones de diseño seguían referenciando Ollama. No se corrigieron en el plan fuente (documento desechable); las decisiones incorporadas al ROADMAP y wiki ya reflejan el estado correcto.
+- La selección de backend por plataforma es la solución correcta para un proyecto público: no sacrifica rendimiento en Apple Silicon ni rompe compatibilidad en Linux/Windows.

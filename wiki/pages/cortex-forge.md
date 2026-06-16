@@ -2,13 +2,15 @@
 title: cortex-forge
 type: project
 created: 2026-06-08
-updated: 2026-06-13
+updated: 2026-06-16
 tags: [vault, multi-agent, hot-cache, hooks, knowledge-management]
 status: active
 repo: /Users/itsmistermoon/proyectos/cortex-forge
 domains: [agent-orchestration, knowledge-management, multi-agent-protocols]
 sources:
   - wiki/sources/commandcode-hooks-configuration.md
+  - wiki/sources/commandcode-headless.md
+  - wiki/sources/commandcode-security.md
   - wiki/sources/codex-hooks.md
   - wiki/sources/antigravity-hooks.md
   - wiki/sources/ai-coding-dictionary.md
@@ -48,6 +50,14 @@ Vault with a hot cache protocol that synchronizes context across multiple agents
 - **CommandCode wire format is nested** (`hooks: [{ matcher, hooks: [{ type, command, timeout? }] }]`), unlike the flat format of Claude Code/Codex. Hook scripts are not drop-in across agents.
 - **Project pages only for user's own projects** — third-party entities go in `wiki/entities/`, not `wiki/pages/`.
 - **[[wiki/sources/obsidian-mind]] is the closest comparable project** — both target agent-operated knowledge vaults; obsidian-mind focuses on Obsidian-native graph exploration with MCP, while cortex-forge generalizes to any agent via hot cache protocol. Key difference: obsidian-mind requires Obsidian; cortex-forge is agent-agnostic.
+
+- **Vector retrieval over grep for `cortex-recall`** — at ~50+ wiki pages the grep-based recall degrades: the agent decides what to read rather than what exists. The fix is a pre-built vector index; `cortex-recall` queries the index and receives a bounded top-k set of paths instead of choosing files itself. The index runs as a Python script invoked via bash — the agent remains the runtime, the index is a lookup layer.
+- **sqlite-vec over ChromaDB (or any other vector store)** — ChromaDB requires a client-server model and non-trivial dependencies. sqlite-vec is a SQLite extension: one `.db` file, no background process, zero server. Cortex Forge is deliberately zero-dependency; sqlite-vec maintains that principle. Any other embeddable vector library (LanceDB, Faiss) would have worked architecturally, but sqlite-vec keeps the stack the simplest.
+- **Platform-aware embedding backend, not a single choice** — the embedding backend is selected at runtime by `.cortex/embeddings.py` based on OS and architecture. On Apple Silicon (`Darwin` + `arm64`), `mlx-embeddings` with `mlx-community/nomic-embed-text-v1.5` is preferred — it uses the Neural Engine and is faster than `sentence-transformers` on M-series. On Linux, Windows, and Intel Mac, `sentence-transformers` with `nomic-ai/nomic-embed-text-v1.5` is used — runs in-process, downloads weights on first use (~270 MB), falls back to CPU universally. If mlx is not installed on Apple Silicon, the code falls back to `sentence-transformers` automatically. All platform detection and fallback logic lives in `.cortex/embeddings.py`; nothing else in the stack duplicates it. `normalize_embeddings=True` is mandatory for the `sentence-transformers` path — without it, dot product and cosine are not equivalent.
+- **Ollama discarded for embeddings** — requires a running server at `localhost:11434`. Breaks in post-commit hooks, CI environments, and any user who hasn't installed it. Not viable for a public project with no infrastructure prerequisites.
+- **Dot product over cosine similarity** — `nomic-embed-text-v1.5` with `normalize_embeddings=True` produces unit-norm vectors. For unit-norm vectors, dot product and cosine are mathematically equivalent. sqlite-vec exposes `vec_distance_dot`, which is computationally cheaper than explicit cosine. No precision is lost.
+- **MCP server deferred to Etapa 2** — sqlite-vec solves retrieval; MCP solves multi-client dispatch. These are separate problems. Implementing both simultaneously creates two simultaneous diagnostic surfaces if something fails. Gate: Etapa 1 validated in an organic session AND the vault is accessed from more than one client. `AGENTS.md` remains the design contract regardless — an agent without MCP can still operate the vault by reading `AGENTS.md` directly.
+- **Graphify + Leiden discarded for retrieval** — Leiden is community detection over graphs inferred from code ASTs (via tree-sitter). Cortex Forge's vault contains synthesized prose knowledge in Markdown, not source code. Relationships between pages are captured by the vault taxonomy (`wiki/concepts/`, `wiki/entities/`, etc.) and don't need to be inferred from syntax. Embeddings + semantic similarity solve the actual problem with lower complexity.
 
 ## Next steps
 
@@ -94,3 +104,4 @@ Vault with a hot cache protocol that synchronizes context across multiple agents
 - 2026-06-08 [Claude Code]: Translated to English
 - 2026-06-08 [Claude Code]: Updated to reflect v0.1.0 state — CODEX.md layer, fixed MEMORY.md name, 5 wiki types, PreCompact/SessionEnd distinction, parametric knowledge decision, primary/secondary source taxonomy, co-located templates, updated next steps and recurring issues
 - 2026-06-10 [Claude Code]: Linked primary-source/secondary-source concepts (full-article ingestion); adopted "context pointer" and "drift" vocabulary in the `.raw/` key decision
+- 2026-06-16 [Claude Code]: Added design decisions for Fase 3.6 (vector retrieval stack): sqlite-vec rationale, sentence-transformers over Ollama/mlx, dot product metric, MCP deferral gate, Graphify+Leiden discard

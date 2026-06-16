@@ -56,10 +56,13 @@ if [ -d "$RAW" ]; then
   find "$RAW" -name "*.md" | while read -r raw; do
     rel="${raw#$VAULT/}"
     slug=$(basename "$raw" .md)
-    if ! grep -rl "^raw: ${rel}$" "$WIKI/sources/" 2>/dev/null | grep -q .; then
-      if ! ls "$WIKI/sources/"*"${slug}"*.md 2>/dev/null | grep -q .; then
-        f HIGH "No source page for: $rel"
-        echo "$rel" >> "$RAW_NOSRC"
+    # Check across all wiki directories: raw: (single-source), sources: (multi-source list), then filename match
+    if ! grep -rl "^raw: ${rel}$" "$WIKI" 2>/dev/null | grep -q .; then
+      if ! grep -rl "^  - ${rel}$" "$WIKI" 2>/dev/null | grep -q .; then
+        if ! find "$WIKI" -name "*${slug}*.md" 2>/dev/null | grep -q .; then
+          f HIGH "No source page for: $rel"
+          echo "$rel" >> "$RAW_NOSRC"
+        fi
       fi
     fi
   done

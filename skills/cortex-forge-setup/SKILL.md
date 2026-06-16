@@ -22,6 +22,8 @@ Always end with the relevant subset of step 9 (confirmation).
 ## Steps
 
 1. **Detect vault from CWD** — validate that the current directory is a valid vault:
+   If `~/.cortex-forge/config.yml` already has an entry for this vault, also read its `locale:` — use it for all agent-generated content. Fallback if absent: `.hot/MEMORY.md` title line (`— locale: {lang}`) → `CODEX.md` Vocabulary (`**locale**:`) → default `en`.
+
    - Required: `.git/`, `wiki/`, `AGENTS.md`, `skills/`
    - If validation fails, report what's missing and stop.
    - Derive vault name from `basename` of CWD (e.g., `/Users/jp/second-brain` → `second-brain`).
@@ -91,8 +93,9 @@ Always end with the relevant subset of step 9 (confirmation).
        Note: copy scripts to ~/.gemini/config/hooks/ — Antigravity cannot use ~/.claude/hooks/
 
      CommandCode ({vault}/.commandcode/settings.local.json):
-       Stop → bash ~/.claude/hooks/cortex-crystallize-claude.sh
-       Note: scope must be the vault's .commandcode/, not cortex-forge's
+       Stop → bash {vault}/bin/hooks/cortex-crystallize-commandcode.sh, timeout: 120
+       Note: scope must be the vault's .commandcode/, not cortex-forge's. Timeout de 120s porque la síntesis IA via `cmd -p` requiere llamada API.
+       El script usa `cmd` en el PATH de CommandCode (headless mode).
      ```
 
 6a. **Recall enforcement nudge (Claude Code only, v1)** — ask: "Install the cortex-recall nudge hook? It reminds the agent to use /cortex-recall when it greps vault content directly. (experimental)"

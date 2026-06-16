@@ -13,6 +13,8 @@ Ingest a new source and synthesize wiki pages from it.
 ## Steps
 
 1. **Resolve vault** — read `~/.cortex-forge/config.yml`:
+   Also read `locale:` from the vault's entry — use it for all agent-generated content. Fallback if absent: `.hot/MEMORY.md` title line (`— locale: {lang}`) → `CODEX.md` Vocabulary (`**locale**:`) → default `en`.
+
    - If the first argument matches a registered vault name (e.g., `/cortex-assimilate second-brain <url>`) → use that vault; treat the remaining argument as the URL or file path.
    - Otherwise: check if CWD is inside any registered vault → use that vault.
    - If not, use the `default` vault.

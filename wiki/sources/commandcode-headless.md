@@ -32,8 +32,9 @@ Official documentation for CommandCode's headless mode (`-p`/`--print`). Covers 
 ## Connections
 - Related concepts: [[wiki/concepts/agent-hook-compatibility]]
 - Projects: [[wiki/pages/cortex-forge]]
-- Sources: [[wiki/sources/commandcode-hooks-configuration]], [[wiki/sources/commandcode-hooks-reference]]
+- Sources: [[wiki/sources/commandcode-hooks-configuration]], [[wiki/sources/commandcode-hooks-reference]], [[wiki/sources/commandcode-security]]
 
 ---
 
 - 2026-06-12 [CommandCode]: Page created — ingested to resolve CommandCode transcript location for pipeline imprint design
+- 2026-06-13 [CommandCode]: Updated cross-reference to security source

@@ -13,6 +13,7 @@ Health check del vault activo en dos capas: estructural (script) y semántica (a
 1. **Detect vault** — find nearest `.git` from CWD. Confirm it contains `wiki/` and `bin/cortex-prune.sh`.
 
    If `CODEX.md` exists at the vault root, read **Domains** and **Out of scope** — use them to flag pages whose topics fall outside the vault's defined scope.
+   Also read `locale:` from `~/.cortex-forge/config.yml` (match vault by path) — use it for all agent-generated content. Fallback if absent: `.hot/MEMORY.md` title line (`— locale: {lang}`) → `CODEX.md` Vocabulary (`**locale**:`) → default `en`.
 
 2. **Capa 1 — Structural check**: Run `bash {vault}/bin/cortex-prune.sh {vault}` and capture output.
 

@@ -1,6 +1,7 @@
 ---
 name: cortex-imprint
 description: Archive a valuable session synthesis as a permanent wiki page in the vault.
+argument-hint: "[vault-name]"
 ---
 
 # cortex-imprint
@@ -16,7 +17,8 @@ Archive a valuable session synthesis as a permanent wiki page.
 1. **Resolve vault** — read `~/.cortex-forge/config.yml`:
    Also read `locale:` from the vault's entry — use it for all agent-generated content. Fallback if absent: `.hot/MEMORY.md` title line (`— locale: {lang}`) → `CODEX.md` Vocabulary (`**locale**:`) → default `en`.
 
-   - Check if CWD is inside any registered vault → use that vault.
+   - If the first argument matches a registered vault name (e.g., `/cortex-imprint personal`) → use that vault.
+   - Otherwise: check if CWD is inside any registered vault → use that vault.
    - If not, use the `default` vault.
    - If no default and multiple vaults → ask the user to pick one.
    - If no vaults registered → stop and prompt to run `/cortex-forge-setup`.

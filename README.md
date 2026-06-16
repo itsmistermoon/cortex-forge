@@ -140,8 +140,8 @@ Some skills also accept an explicit vault name as the first argument, letting yo
 | `/cortex-assimilate` | ✅ `/cortex-assimilate <vault-name> <url-or-file>` |
 | `/cortex-recall` | ✅ `/cortex-recall <vault-name> <query>` |
 | `/cortex-crystallize` | ✅ `/cortex-crystallize <vault-name> [project-name] [next: <focus>]` |
-| `/cortex-imprint` | — (uses CWD resolution) |
-| `/cortex-prune` | — (uses CWD resolution) |
+| `/cortex-imprint` | ✅ `/cortex-imprint <vault-name>` |
+| `/cortex-prune` | ✅ `/cortex-prune <vault-name>` — asks for confirmation before proceeding |
 
 ## Setup
 

@@ -1,7 +1,7 @@
 ---
 name: cortex-prune
-description: Health check del vault — detecta dead links, páginas huérfanas, provenance faltante y fuentes no procesadas. Vault-local.
-argument-hint: "No arguments — vault detected from CWD"
+description: Health check del vault — detecta dead links, páginas huérfanas, provenance faltante y fuentes no procesadas.
+argument-hint: "[vault-name]"
 ---
 
 Begin your response by outputting exactly: `Pruning vault...`
@@ -10,7 +10,18 @@ Health check del vault activo en dos capas: estructural (script) y semántica (a
 
 ## Steps
 
-1. **Detect vault** — find nearest `.git` from CWD. Confirm it contains `wiki/` and `bin/cortex-prune.sh`.
+1. **Resolve vault** — read `~/.cortex-forge/config.yml`:
+   Also read `locale:` from the vault's entry — use it for all agent-generated content. Fallback if absent: `.hot/MEMORY.md` title line (`— locale: {lang}`) → `CODEX.md` Vocabulary (`**locale**:`) → default `en`.
+
+   - If the first argument matches a registered vault name (e.g., `/cortex-prune personal`) → use that vault.
+   - Otherwise: check if CWD is inside any registered vault → use that vault.
+   - If not, use the `default` vault.
+   - If no default and multiple vaults → ask the user to pick one.
+   - If no vaults registered → stop and prompt to run `/cortex-forge-setup`.
+
+   **Confirmation gate:** if the vault was resolved from an explicit argument (not from CWD), confirm with the user before proceeding: "About to prune `{vault-name}` at `{path}`. Continue?" — do not proceed until confirmed.
+
+   Confirm vault is a Cortex Forge vault: path contains `wiki/` and `bin/cortex-prune.sh`.
 
    If `CODEX.md` exists at the vault root, read **Domains** and **Out of scope** — use them to flag pages whose topics fall outside the vault's defined scope.
    Also read `locale:` from `~/.cortex-forge/config.yml` (match vault by path) — use it for all agent-generated content. Fallback if absent: `.hot/MEMORY.md` title line (`— locale: {lang}`) → `CODEX.md` Vocabulary (`**locale**:`) → default `en`.

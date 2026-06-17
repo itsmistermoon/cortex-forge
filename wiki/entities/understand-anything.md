@@ -22,6 +22,10 @@ Tool/plugin maintained by **Lum1104** that builds navigable knowledge graphs ove
 **Stack:** tree-sitter (deterministic parsing) + LLM (semantic summaries) + multi-agent pipeline (5-7 agents).
 **Typical install:** `curl … install.sh | bash -s <platform>` or native marketplace depending on platform.
 
+## Relationships
+
+- [[wiki/entities/graphify]] — alternativa YC S26 con soporte PDF, video y 20+ plataformas
+
 ## Role in the vault
 
 Reference entity. Cited in [[wiki/sources/understand-anything]] and origin of the concepts:

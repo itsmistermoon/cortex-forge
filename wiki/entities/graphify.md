@@ -35,12 +35,12 @@ Three cost tiers: free (AST only), local (whisper), API (Claude subagents). User
 | Platform | Mechanism |
 |----------|-----------|
 | Claude Code | `~/.claude/skills/` + PreToolUse hooks (`.claude/settings.local.json`) |
-| Codex | `AGENTS.md` + PreToolUse hooks (`.codex/hooks.json`) |
+| [[wiki/entities/codex|Codex]] | `AGENTS.md` + PreToolUse hooks (`.codex/hooks.json`) |
 | Gemini CLI / Antigravity | `GEMINI.md` + BeforeTool hook |
 | Cursor | `.cursor/rules/graphify.mdc` (`alwaysApply: true`) |
 | Kilo Code | Native skill + `tool.execute.before` plugin |
 | Aider, OpenClaw, Trae | `AGENTS.md` fallback |
-| **CommandCode** | **Not supported** — gap cortex-forge fills |
+| **[[wiki/entities/commandcode\|CommandCode]]** | **Not supported** — gap cortex-forge fills |
 
 Platform pattern mirrors cortex-forge: PreToolUse hooks where available, AGENTS.md as universal fallback.
 
@@ -59,6 +59,7 @@ Platform pattern mirrors cortex-forge: PreToolUse hooks where available, AGENTS.
 | Semantic layer | Leiden clustering | Hybrid LSP + nomic embeddings |
 
 ## Relationships
+- Comparable: [[wiki/entities/understand-anything]] (alternativa MIT, misma arquitectura tree-sitter + LLM pipeline)
 - Comparable: [[wiki/entities/codebase-memory-mcp]] (MCP-native alternative)
 - Concept: [[wiki/concepts/knowledge-graph-code-intelligence]]
 - Concept: [[wiki/concepts/treesitter-llm-hybrid-parsing]] (shared parsing layer)

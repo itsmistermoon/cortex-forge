@@ -7,6 +7,7 @@ tags: [memory, session-management, architecture]
 aliases: [agent memory, persistent memory]
 sources:
   - wiki/sources/ai-coding-dictionary.md
+  - wiki/sources/yt-claude-code-memory-compared.md
 confidence: high
 schema_version: "0.3"
 ---

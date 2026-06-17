@@ -56,6 +56,7 @@ Hooks that call an agent in headless mode must:
 ## Relationships
 - Sources: [[wiki/sources/commandcode-headless]], [[wiki/sources/commandcode-security]]
 - Concepts: [[wiki/concepts/agent-hook-compatibility]]
+- Entities: [[wiki/entities/antigravity-cli]], [[wiki/entities/codex]], [[wiki/entities/pi-cli]], [[wiki/entities/commandcode]]
 - Project: [[wiki/pages/cortex-forge]]
 
 ---

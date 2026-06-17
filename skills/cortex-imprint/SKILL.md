@@ -60,7 +60,7 @@ Typical cases:
 
 ## Provenance
 
-Always populate in the created page:
+Create the page using the corresponding template (step 5) — all frontmatter fields come from the template. Then populate these provenance fields:
 
 ```yaml
 sources:

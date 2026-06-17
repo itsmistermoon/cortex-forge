@@ -1,9 +1,8 @@
 ---
 type: source
 title: "graphify — docs/how-it-works.md (v8)"
-source: https://github.com/safishamsi/graphify/blob/v8/docs/how-it-works.md
-slug: graphify-how-it-works
-fetched: 2026-06-12
+resource: https://github.com/safishamsi/graphify/blob/v8/docs/how-it-works.md
+created: 2026-06-12
 tags: [graphify, internals, pipeline, algorithm]
 confidence: high
 raw: .raw/graphify-how-it-works.md

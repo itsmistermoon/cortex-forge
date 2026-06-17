@@ -4,6 +4,7 @@ type: entity
 created: 2026-06-08
 updated: 2026-06-08
 tags: [commandcode, agente, cli, coding-agent]
+aliases: [cmd]
 sources:
   - wiki/sources/commandcode-taste-blog.md
   - wiki/sources/commandcode-taste-docs.md

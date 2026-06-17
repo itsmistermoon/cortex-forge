@@ -1,10 +1,9 @@
 ---
 type: source
 title: "Pi Packages"
-source: https://pi.dev/docs/latest/packages
-slug: pi-packages
+resource: https://pi.dev/docs/latest/packages
 section: packages
-fetched: 2026-06-16
+created: 2026-06-16
 tags: [pi, packages, npm, git, distribution, security]
 confidence: high
 schema_version: "0.3"

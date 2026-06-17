@@ -112,6 +112,10 @@ find "$WIKI/sources" -name "*.md" | grep -v '_index' | while read -r p; do
   { [ -z "$val" ] || [ "$val" = "tags: []" ]; } && f LOW "No tags: ${p#$VAULT/}"
 done
 
+# ── Schema validation (delegated) ────────────────────────────────────────────
+VALIDATE_SCRIPT="$(dirname "$0")/cortex-validate-schema.sh"
+[ -x "$VALIDATE_SCRIPT" ] && "$VALIDATE_SCRIPT" "$VAULT" "$FINDINGS"
+
 # ── Output ────────────────────────────────────────────────────────────────────
 HIGH=$(grep -c '^\[HIGH\]'   "$FINDINGS" 2>/dev/null || true)
 MED=$(grep  -c '^\[MEDIUM\]' "$FINDINGS" 2>/dev/null || true)

@@ -1,10 +1,9 @@
 ---
 type: source
 title: "Antigravity CLI — Terminal Title Customization"
-source: https://antigravity.google/docs/cli-title
-slug: antigravity-cli-title
+resource: https://antigravity.google/docs/cli-title
 section: Antigravity CLI / Customizations
-fetched: 2026-06-08
+created: 2026-06-08
 tags: [antigravity, cli, title, tui]
 confidence: high
 raw: .raw/antigravity-cli/cli-title.md

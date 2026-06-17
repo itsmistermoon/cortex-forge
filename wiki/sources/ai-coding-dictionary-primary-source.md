@@ -1,10 +1,9 @@
 ---
 type: source
 title: "AI Coding Dictionary — Primary source (full article)"
-source: https://www.aihero.dev/ai-coding-dictionary/primary-source
-slug: ai-coding-dictionary-primary-source
+resource: https://www.aihero.dev/ai-coding-dictionary/primary-source
 section: AI Coding Dictionary
-fetched: 2026-06-10
+created: 2026-06-10
 tags: [epistemology, context-engineering, provenance]
 confidence: high
 raw: .raw/ai-coding-dictionary-primary-source.md

@@ -107,6 +107,22 @@ See `CHANGELOG.md` for protocol version history (current: **0.3**). When operati
 
 Each page follows: YAML frontmatter + compiled truth + chronological changelog. **All wiki content must be written in English** — this is a public repo.
 
+### Source frontmatter fields
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `type` | yes | Always `source` |
+| `title` | yes | Display name of the source |
+| `resource` | yes | Canonical URI of the original resource (OKF-aligned; replaces former `source:`) |
+| `fetched` | yes | Date this source was ingested into the vault (`YYYY-MM-DD`) |
+| `timestamp` | recommended | Publication or last-known-accurate date of the resource (OKF-aligned) |
+| `source_author` | recommended | Author(s) of the original resource |
+| `tags` | recommended | Cross-cutting categorization strings |
+| `confidence` | yes | `high` (primary source) · `medium` (blog, video) · `low` (inference) |
+| `schema_version` | yes | Protocol version this page was written against |
+| `raw` | yes | Path to the immutable primary source in `.raw/` |
+| `section` | optional | Grouping label for multi-part sources from the same origin (e.g. `Antigravity CLI`) |
+
 ## On session close
 
 Before `/cortex-crystallize`, evaluate whether the session produced analysis, design decisions, or synthesis worth persisting. If so, suggest `/cortex-imprint` — never archive without explicit confirmation. Add an entry to `wiki/meta/log.md` for each significant operation.

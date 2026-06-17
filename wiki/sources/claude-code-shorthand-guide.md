@@ -1,10 +1,9 @@
 ---
 type: source
 title: "The Shorthand Guide to Everything Claude Code"
-source: https://x.com/affaan
-slug: claude-code-shorthand-guide
+resource: https://x.com/affaan
 section: full thread
-fetched: 2026-06-12
+created: 2026-06-12
 tags: [claude-code, hooks, skills, subagents, mcp, token-efficiency, workflow]
 confidence: medium
 raw: .raw/claude-code-shorthand-guide.md

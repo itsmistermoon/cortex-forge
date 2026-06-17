@@ -1,10 +1,9 @@
 ---
 type: source
 title: "Antigravity CLI — Plugins & Skills"
-source: https://antigravity.google/docs/cli-plugins
-slug: antigravity-cli-plugins
+resource: https://antigravity.google/docs/cli-plugins
 section: Antigravity CLI / Customizations
-fetched: 2026-06-08
+created: 2026-06-08
 tags: [antigravity, cli, plugins, skills, mcp]
 confidence: high
 raw: .raw/antigravity-cli/cli-plugins.md

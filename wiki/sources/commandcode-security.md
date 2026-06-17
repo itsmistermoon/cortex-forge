@@ -1,10 +1,9 @@
 ---
 type: source
 title: "Security & Privacy — Command Code"
-source: https://commandcode.ai/docs/resources/security
-slug: commandcode-security
+resource: https://commandcode.ai/docs/resources/security
 section: 
-fetched: 2026-06-13
+created: 2026-06-13
 tags: [commandcode, security, permissions, headless, privacy]
 confidence: high
 raw: .raw/commandcode-security.md

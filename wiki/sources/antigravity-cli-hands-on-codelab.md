@@ -1,10 +1,9 @@
 ---
 type: source
 title: "Antigravity CLI — Hands-on Codelab (Step 5)"
-source: https://codelabs.developers.google.com/antigravity-cli-hands-on#5
-slug: antigravity-cli-hands-on-codelab
+resource: https://codelabs.developers.google.com/antigravity-cli-hands-on#5
 section: Antigravity CLI / Getting Started
-fetched: 2026-06-08
+created: 2026-06-08
 tags: [antigravity, cli, installation, flags, configuration, models]
 raw: .raw/antigravity-cli-hands-on-codelab.md
 confidence: high

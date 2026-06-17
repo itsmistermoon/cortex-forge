@@ -4,9 +4,7 @@ type: entity
 created: 2026-06-16
 updated: 2026-06-16
 tags: [pi, coding-agent, cli, tui, typescript, extensions, jsonl, providers]
-aliases: [pi, pi-coding-agent, @earendil-works/pi-coding-agent, earendil-works/pi-mono, badlogic/pi-share-hf]
-role: AI coding CLI agent (terminal-based)
-context: TypeScript extension API, JSONL sessions with tree structure, multi-provider (Anthropic, OpenAI, Google, Ollama, vLLM, LM Studio, custom)
+aliases: [pi, pi-coding-agent]
 sources:
   - wiki/sources/pi-usage.md
   - wiki/sources/pi-extensions.md
@@ -20,9 +18,6 @@ schema_version: "0.3"
 ---
 
 # Pi (CLI)
-
-**Role:** AI coding CLI agent (terminal-based)
-**Context:** TypeScript extension API, JSONL sessions with tree structure, multi-provider (Anthropic, OpenAI, Google, Ollama, vLLM, LM Studio, custom)
 
 Pi is a terminal-based AI coding agent (CLI + TUI) from the `earendil-works/pi-mono` monorepo. It ships with a small core and pushes workflow-specific behavior — MCP, sub-agents, permission popups, plan mode, to-dos, background bash — into TypeScript extensions, skills, prompt templates, and npm/git packages. The interface is a four-area TUI (startup header, messages, editor, footer) with a Kitty-keyboard-protocol-driven editor and a message queue (steering vs follow-up).
 

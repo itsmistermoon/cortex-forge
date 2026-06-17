@@ -1,10 +1,9 @@
 ---
 type: source
 title: "The Shorthand Guide to Everything Agentic Security"
-source: https://x.com/affaan
-slug: agentic-security-shorthand-guide
+resource: https://x.com/affaan
 section: full thread
-fetched: 2026-06-12
+created: 2026-06-12
 tags: [security, prompt-injection, memory, hooks, mcp, supply-chain, sandboxing]
 confidence: medium
 raw: .raw/agentic-security-shorthand-guide.md

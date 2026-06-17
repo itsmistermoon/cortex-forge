@@ -1,10 +1,9 @@
 ---
 type: source
 title: "Using Pi"
-source: https://pi.dev/docs/latest/usage
-slug: pi-usage
+resource: https://pi.dev/docs/latest/usage
 section: usage
-fetched: 2026-06-16
+created: 2026-06-16
 tags: [pi, coding-agent, cli, tui, sessions, slash-commands, modes]
 confidence: high
 schema_version: "0.3"

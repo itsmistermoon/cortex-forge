@@ -1,10 +1,12 @@
 ---
-type: source
 title: "{{title}}"
-source: 
-slug: {{slug}}
+type: source
+resource: 
 section: 
-fetched: {{date:YYYY-MM-DD}}
+created: {{date:YYYY-MM-DD}}
+updated: {{date:YYYY-MM-DD}}
+timestamp: 
+source_author: 
 tags: []
 confidence: high
 schema_version: "0.3"

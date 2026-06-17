@@ -1,9 +1,8 @@
 ---
 type: source
 title: "graphify — ARCHITECTURE.md (v8)"
-source: https://github.com/safishamsi/graphify/blob/v8/ARCHITECTURE.md
-slug: graphify-architecture
-fetched: 2026-06-12
+resource: https://github.com/safishamsi/graphify/blob/v8/ARCHITECTURE.md
+created: 2026-06-12
 tags: [graphify, architecture, pipeline]
 confidence: high
 raw: .raw/graphify-architecture.md

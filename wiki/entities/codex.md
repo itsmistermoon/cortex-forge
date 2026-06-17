@@ -5,8 +5,6 @@ created: 2026-06-16
 updated: 2026-06-16
 tags: [codex, openai, agent, hooks, cli]
 aliases: [Codex, OpenAI Codex CLI]
-role: AI coding agent CLI by OpenAI
-context: One of the four primary agents supported by Cortex Forge's hook protocol
 sources:
   - wiki/sources/codex-hooks.md
 confidence: high
@@ -15,10 +13,7 @@ schema_version: "0.3"
 
 # Codex CLI
 
-**Role:** AI coding agent CLI by OpenAI
-**Context:** Terminal-first coding agent; one of four agents with full Cortex Forge hook support alongside Claude Code, Antigravity CLI, and CommandCode
-
-Codex CLI is OpenAI's terminal AI coding agent. It supports a lifecycle hook system with matcher-based routing, structured JSON outputs, and explicit trust review for non-managed hooks.
+Codex CLI is OpenAI's terminal-first AI coding agent and one of the four agents with full Cortex Forge hook support alongside Claude Code, Antigravity CLI, and CommandCode. It supports a lifecycle hook system with matcher-based routing, structured JSON outputs, and explicit trust review for non-managed hooks.
 
 ## Hook system
 

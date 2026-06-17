@@ -1,8 +1,10 @@
 ---
-type: entity
 title: "Antigravity CLI"
-slug: antigravity-cli
-fetched: 2026-06-08
+type: entity
+created: 2026-06-08
+updated: 2026-06-08
+tags: []
+aliases: [agy]
 sources:
   - wiki/sources/antigravity-cli-permissions.md
   - wiki/sources/antigravity-cli-sandbox.md
@@ -18,6 +20,7 @@ sources:
   - wiki/sources/antigravity-cli-troubleshooting.md
   - wiki/sources/antigravity-cli-reference.md
 confidence: high
+schema_version: "0.3"
 ---
 
 # Antigravity CLI

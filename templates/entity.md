@@ -5,8 +5,6 @@ created: {{date:YYYY-MM-DD}}
 updated: {{date:YYYY-MM-DD}}
 tags: []
 aliases: []
-role: 
-context: 
 sources: []
 confidence: high
 schema_version: "0.3"
@@ -14,10 +12,7 @@ schema_version: "0.3"
 
 # {{title}}
 
-**Role:** 
-**Context:** 
-
-[Description of the entity — person, organization, tool, or service]
+[One paragraph describing what this entity is and its role in this context.]
 
 ## Relationships
 - 

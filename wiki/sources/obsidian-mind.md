@@ -1,10 +1,9 @@
 ---
 type: source
 title: "Obsidian Mind — persistent memory vault for coding agents"
-source: https://github.com/breferrari/obsidian-mind
-slug: obsidian-mind
+resource: https://github.com/breferrari/obsidian-mind
 section: README
-fetched: 2026-06-12
+created: 2026-06-12
 tags: [memory, hooks, obsidian, multi-agent, token-efficiency]
 confidence: high
 raw: .raw/obsidian-mind.md

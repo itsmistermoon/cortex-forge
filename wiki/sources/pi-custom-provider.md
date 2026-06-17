@@ -1,10 +1,9 @@
 ---
 type: source
 title: "Pi Custom Providers"
-source: https://pi.dev/docs/latest/custom-provider
-slug: pi-custom-provider
+resource: https://pi.dev/docs/latest/custom-provider
 section: custom-provider
-fetched: 2026-06-16
+created: 2026-06-16
 tags: [pi, providers, oauth, streaming, streamSimple, registerProvider]
 confidence: high
 schema_version: "0.3"

@@ -6,6 +6,7 @@ updated: 2026-06-15
 tags: [memory-systems, mcp, pgvector, semantic-search, tool]
 sources:
   - wiki/sources/openbrain.md
+aliases: []
 confidence: high
 ---
 

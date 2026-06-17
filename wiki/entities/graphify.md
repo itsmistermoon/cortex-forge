@@ -4,9 +4,7 @@ type: entity
 created: 2026-06-16
 updated: 2026-06-16
 tags: [graphify, knowledge-graph, multi-agent, yc-s26, code-intelligence]
-aliases: [graphify]
-role: AI coding assistant skill that turns any folder into a queryable knowledge graph
-context: Direct comparable to codebase-memory-mcp and cortex-forge; 66.3k stars, YC S26
+aliases: []
 sources:
   - wiki/sources/graphify.md
   - wiki/sources/graphify-readme.md
@@ -19,10 +17,7 @@ schema_version: "0.3"
 
 # Graphify
 
-**Role:** AI coding assistant skill — turns any folder into a queryable knowledge graph
-**Context:** 66.3k stars, YC S26, Graphify Labs (Safi Shamsi); 734 commits, 134 releases, MIT
-
-Graphify is a multi-agent skill that indexes codebases, docs, PDFs, images, and video into a knowledge graph (`graph.html` + `GRAPH_REPORT.md` + `graph.json`). Invoked with `/graphify .`. Supports 20+ agent platforms with per-platform install commands (`graphify install --platform <name>`).
+Graphify is a multi-agent skill by Graphify Labs (Safi Shamsi, YC S26) that indexes codebases, docs, PDFs, images, and video into a knowledge graph (`graph.html` + `GRAPH_REPORT.md` + `graph.json`). Invoked with `/graphify .`. Supports 20+ agent platforms with per-platform install commands (`graphify install --platform <name>`).
 
 ## Architecture
 

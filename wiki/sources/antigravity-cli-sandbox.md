@@ -1,10 +1,9 @@
 ---
 type: source
 title: "Antigravity CLI — Sandbox"
-source: https://antigravity.google/docs/cli-sandbox
-slug: antigravity-cli-sandbox
+resource: https://antigravity.google/docs/cli-sandbox
 section: Antigravity CLI / Agent Capabilities
-fetched: 2026-06-08
+created: 2026-06-08
 tags: [antigravity, cli, sandbox, security]
 confidence: high
 raw: .raw/antigravity-cli/cli-sandbox.md

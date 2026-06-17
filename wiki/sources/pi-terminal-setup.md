@@ -1,10 +1,9 @@
 ---
 type: source
 title: "Pi Terminal Setup"
-source: https://pi.dev/docs/latest/terminal-setup
-slug: pi-terminal-setup
+resource: https://pi.dev/docs/latest/terminal-setup
 section: terminal-setup
-fetched: 2026-06-16
+created: 2026-06-16
 tags: [pi, terminal, kitty-keyboard-protocol, keybindings, ghostty, wezterm, alacritty, vscode, windows-terminal]
 confidence: high
 schema_version: "0.3"

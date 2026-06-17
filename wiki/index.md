@@ -108,6 +108,6 @@
 ## Meta
 - [[wiki/meta/log]] — Append-only vault operation log
 - [[wiki/meta/_index|Vault meta]]
-- `templates/` — 5 page templates (concept, entity, source, project, wiki-page)
+- `templates/` — 5 page templates (concept, entity, source, project, reference)
 - `bin/setup-vault.sh` — setup script
 - `skills/` — agent skills (cortex-assimilate, cortex-recall, cortex-prune, cortex-imprint, cortex-crystallize, cortex-forge-setup)

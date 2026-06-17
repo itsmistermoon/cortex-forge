@@ -1,9 +1,8 @@
 ---
 type: source
 title: "graphify — README (v8)"
-source: https://github.com/safishamsi/graphify
-slug: graphify-readme
-fetched: 2026-06-12
+resource: https://github.com/safishamsi/graphify
+created: 2026-06-12
 tags: [graphify, knowledge-graph, multi-agent, yc-s26]
 confidence: high
 raw: .raw/graphify-readme.md

@@ -5,8 +5,6 @@ created: 2026-06-16
 updated: 2026-06-16
 tags: [mcp, code-intelligence, knowledge-graph, tree-sitter, ai-agents, tool]
 aliases: [cbm, codebase-memory]
-role: MCP server for code intelligence
-context: Tool relevant to AI coding agent workflows; direct competitor/complement to file-by-file exploration
 sources:
   - wiki/sources/codebase-memory-mcp.md
 confidence: high
@@ -15,10 +13,7 @@ schema_version: "0.3"
 
 # codebase-memory-mcp
 
-**Role:** MCP server for persistent code intelligence via knowledge graphs
-**Context:** Built by DeusData; 3,902 stars (2026-06-16); pure C, zero dependencies, single static binary
-
-A high-performance MCP server that indexes codebases into a persistent SQLite-backed knowledge graph using tree-sitter AST parsing across 158 languages. Designed to be the structural backend for AI coding agents — the agent (Claude Code, Codex, Gemini CLI, etc.) is the intelligence layer; this tool answers structural graph queries.
+A high-performance MCP server for persistent code intelligence via knowledge graphs, built by DeusData. Indexes codebases into a persistent SQLite-backed knowledge graph using tree-sitter AST parsing across 158 languages. Designed to be the structural backend for AI coding agents — the agent (Claude Code, Codex, Gemini CLI, etc.) is the intelligence layer; this tool answers structural graph queries.
 
 ## Core capabilities
 

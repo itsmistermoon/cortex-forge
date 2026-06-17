@@ -1,10 +1,9 @@
 ---
 type: source
 title: "Pi Custom Models"
-source: https://pi.dev/docs/latest/models
-slug: pi-models
+resource: https://pi.dev/docs/latest/models
 section: models
-fetched: 2026-06-16
+created: 2026-06-16
 tags: [pi, models, providers, ollama, vllm, lm-studio, openai, anthropic, google, compat]
 confidence: high
 schema_version: "0.3"

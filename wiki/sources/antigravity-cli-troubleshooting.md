@@ -1,10 +1,9 @@
 ---
 type: source
 title: "Antigravity CLI — Troubleshooting"
-source: https://antigravity.google/docs/cli-troubleshooting
-slug: antigravity-cli-troubleshooting
+resource: https://antigravity.google/docs/cli-troubleshooting
 section: Antigravity CLI
-fetched: 2026-06-08
+created: 2026-06-08
 tags: [antigravity, cli, troubleshooting]
 confidence: high
 raw: .raw/antigravity-cli/cli-troubleshooting.md

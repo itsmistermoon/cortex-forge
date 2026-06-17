@@ -1,10 +1,9 @@
 ---
 type: source
 title: "Pi Session File Format"
-source: https://pi.dev/docs/latest/session-format
-slug: pi-session-format
+resource: https://pi.dev/docs/latest/session-format
 section: session-format
-fetched: 2026-06-16
+created: 2026-06-16
 tags: [pi, sessions, jsonl, tree, message-types, sessionmanager, versioning]
 confidence: high
 schema_version: "0.3"

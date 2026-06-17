@@ -8,6 +8,7 @@ aliases: [hybrid parsing, deterministic + semantic parsing]
 sources:
   - wiki/sources/understand-anything.md
 confidence: high
+schema_version: "0.3"
 ---
 
 # Tree-sitter + LLM hybrid parsing

@@ -4,8 +4,10 @@ title: "Antigravity CLI — Settings, Rendering & Keybindings"
 resource: https://antigravity.google/docs/cli-settings
 section: Antigravity CLI / Settings
 created: 2026-06-08
+updated: 2026-06-08
 tags: [antigravity, cli, settings, configuration]
 confidence: high
+schema_version: "0.3"
 raw: .raw/antigravity-cli/cli-settings.md
 ---
 

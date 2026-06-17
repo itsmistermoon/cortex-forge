@@ -8,6 +8,7 @@ aliases: [classification routing, UserPromptSubmit classifier]
 sources:
   - wiki/sources/obsidian-mind.md
 confidence: high
+schema_version: "0.3"
 ---
 
 # Prompt Classification Hook

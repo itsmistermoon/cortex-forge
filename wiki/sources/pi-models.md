@@ -4,6 +4,7 @@ title: "Pi Custom Models"
 resource: https://pi.dev/docs/latest/models
 section: models
 created: 2026-06-16
+updated: 2026-06-16
 tags: [pi, models, providers, ollama, vllm, lm-studio, openai, anthropic, google, compat]
 confidence: high
 schema_version: "0.3"

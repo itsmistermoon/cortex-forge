@@ -8,6 +8,7 @@ aliases: [source of truth, original source]
 sources:
   - wiki/sources/ai-coding-dictionary-primary-source.md
 confidence: high
+schema_version: "0.3"
 ---
 
 # Primary Source

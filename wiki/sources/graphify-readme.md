@@ -3,8 +3,10 @@ type: source
 title: "graphify — README (v8)"
 resource: https://github.com/safishamsi/graphify
 created: 2026-06-12
+updated: 2026-06-12
 tags: [graphify, knowledge-graph, multi-agent, yc-s26]
 confidence: high
+schema_version: "0.3"
 raw: .raw/graphify-readme.md
 ---
 

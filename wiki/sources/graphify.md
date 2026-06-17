@@ -1,6 +1,7 @@
 ---
 title: Graphify
 type: source
+resource: 
 created: 2026-06-12
 updated: 2026-06-12
 tags: [graphify, knowledge-graph, multi-agent, yc-s26, comparable]
@@ -13,6 +14,8 @@ sources:
   - wiki/sources/graphify-architecture.md
   - wiki/sources/graphify-how-it-works.md
 confidence: high
+schema_version: "0.3"
+raw: 
 ---
 
 # Graphify

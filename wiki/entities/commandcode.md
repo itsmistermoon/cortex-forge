@@ -11,6 +11,7 @@ sources:
   - wiki/sources/commandcode-hooks-configuration.md
   - wiki/sources/commandcode-hooks-reference.md
 confidence: high
+schema_version: "0.3"
 ---
 
 # CommandCode

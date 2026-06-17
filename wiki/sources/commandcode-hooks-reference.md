@@ -1,6 +1,7 @@
 ---
 title: Hooks Reference - Command Code
 type: source
+resource: 
 created: 2026-06-12
 updated: 2026-06-12
 tags: [commandcode, hooks, reference, wire-format, transcript-path]
@@ -10,6 +11,8 @@ source_author: CommandCode
 sources:
   - .raw/commandcode-hooks-reference.md
 confidence: high
+schema_version: "0.3"
+raw: 
 ---
 
 # Hooks Reference - Command Code

@@ -1,6 +1,7 @@
 ---
 title: Hooks Examples - Command Code
 type: source
+resource: 
 created: 2026-06-08
 updated: 2026-06-08
 tags: [commandcode, hooks, examples, enforcement, quality-gate]
@@ -10,6 +11,8 @@ source_author: CommandCode
 sources:
   - .raw/commandcode-hooks-examples.md
 confidence: high
+schema_version: "0.3"
+raw: 
 ---
 
 # Hooks Examples - Command Code

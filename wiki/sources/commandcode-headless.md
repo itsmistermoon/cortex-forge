@@ -1,6 +1,7 @@
 ---
 title: Headless Mode - Command Code
 type: source
+resource: 
 created: 2026-06-12
 updated: 2026-06-12
 tags: [commandcode, headless, sessions, transcripts, resume]
@@ -10,6 +11,8 @@ source_author: CommandCode
 sources:
   - .raw/commandcode-headless.md
 confidence: high
+schema_version: "0.3"
+raw: 
 ---
 
 # Headless Mode - Command Code

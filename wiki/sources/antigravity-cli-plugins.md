@@ -4,8 +4,10 @@ title: "Antigravity CLI — Plugins & Skills"
 resource: https://antigravity.google/docs/cli-plugins
 section: Antigravity CLI / Customizations
 created: 2026-06-08
+updated: 2026-06-08
 tags: [antigravity, cli, plugins, skills, mcp]
 confidence: high
+schema_version: "0.3"
 raw: .raw/antigravity-cli/cli-plugins.md
 ---
 

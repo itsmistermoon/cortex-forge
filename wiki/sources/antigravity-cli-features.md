@@ -1,6 +1,7 @@
 ---
 title: Antigravity CLI - Features
 type: source
+resource: 
 created: 2026-06-08
 updated: 2026-06-08
 tags: [antigravity, cli, features, plugins, sandbox, subagents]
@@ -10,6 +11,8 @@ source_author: Google Antigravity Team
 sources:
   - wiki/sources/antigravity-cli-features.md
 confidence: high
+schema_version: "0.3"
+raw: 
 ---
 
 # Antigravity CLI - Features

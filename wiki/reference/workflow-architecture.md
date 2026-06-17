@@ -10,6 +10,7 @@ sources:
   - wiki/sources/commandcode-headless.md
   - wiki/sources/commandcode-security.md
 confidence: high
+schema_version: "0.3"
 ---
 
 # Workflow Architecture

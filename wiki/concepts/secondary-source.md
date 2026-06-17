@@ -8,6 +8,7 @@ aliases: [account, derived source]
 sources:
   - wiki/sources/ai-coding-dictionary-secondary-source.md
 confidence: high
+schema_version: "0.3"
 ---
 
 # Secondary Source

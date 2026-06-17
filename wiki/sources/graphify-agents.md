@@ -3,8 +3,10 @@ type: source
 title: "graphify — AGENTS.md (v8)"
 resource: https://github.com/safishamsi/graphify/blob/v8/AGENTS.md
 created: 2026-06-12
+updated: 2026-06-12
 tags: [graphify, agents, knowledge-graph]
 confidence: high
+schema_version: "0.3"
 raw: .raw/graphify-agents.md
 ---
 

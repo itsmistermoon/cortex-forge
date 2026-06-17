@@ -4,6 +4,7 @@ title: "Using Pi"
 resource: https://pi.dev/docs/latest/usage
 section: usage
 created: 2026-06-16
+updated: 2026-06-16
 tags: [pi, coding-agent, cli, tui, sessions, slash-commands, modes]
 confidence: high
 schema_version: "0.3"

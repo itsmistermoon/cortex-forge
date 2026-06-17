@@ -1,6 +1,7 @@
 ---
 title: "Gemini CLI Hooks & Skills — Google Cloud Live"
 type: source
+resource: 
 created: 2026-06-08
 updated: 2026-06-08
 tags: [gemini-cli, hooks, skills, lifecycle, configuration]
@@ -10,6 +11,8 @@ source_author: Google Cloud Live — Jack Weatherspoon (Gemini CLI team)
 sources:
   - .raw/gemini-cli-hooks-video.md
 confidence: medium
+schema_version: "0.3"
+raw: 
 ---
 
 # Gemini CLI Hooks & Skills — Google Cloud Live

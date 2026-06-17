@@ -4,8 +4,10 @@ title: "Antigravity CLI — Terminal Title Customization"
 resource: https://antigravity.google/docs/cli-title
 section: Antigravity CLI / Customizations
 created: 2026-06-08
+updated: 2026-06-08
 tags: [antigravity, cli, title, tui]
 confidence: high
+schema_version: "0.3"
 raw: .raw/antigravity-cli/cli-title.md
 ---
 

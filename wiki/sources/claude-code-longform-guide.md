@@ -4,8 +4,10 @@ title: "The Longform Guide to Everything Claude Code"
 resource: https://x.com/affaan
 section: full thread
 created: 2026-06-12
+updated: 2026-06-12
 tags: [claude-code, memory, hooks, evals, subagents, token-efficiency, parallelization]
 confidence: medium
+schema_version: "0.3"
 raw: .raw/claude-code-longform-guide.md
 ---
 

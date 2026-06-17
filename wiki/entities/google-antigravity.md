@@ -8,6 +8,7 @@ aliases: [Antigravity, Antigravity CLI]
 sources:
   - wiki/sources/antigravity-hooks.md
 confidence: high
+schema_version: "0.3"
 ---
 
 # Google Antigravity

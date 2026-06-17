@@ -8,6 +8,7 @@ aliases: [dumb zone, session degradation, attention degradation]
 sources:
   - wiki/sources/ai-coding-dictionary.md
 confidence: high
+schema_version: "0.3"
 ---
 
 # Smart Zone / Dumb Zone

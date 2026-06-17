@@ -8,6 +8,7 @@ aliases: [sub-agent context negotiation, follow-up retrieval loop]
 sources:
   - wiki/sources/claude-code-longform-guide.md
 confidence: medium
+schema_version: "0.3"
 ---
 
 # Iterative Retrieval

@@ -16,6 +16,7 @@ sources:
   - wiki/sources/ai-coding-dictionary.md
   - wiki/sources/obsidian-mind.md
 confidence: high
+schema_version: "0.3"
 ---
 
 # cortex-forge

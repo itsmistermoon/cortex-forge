@@ -9,6 +9,7 @@ sources:
   - wiki/sources/antigravity-hooks.md
   - wiki/sources/gemini-cli-hooks-video.md
 confidence: medium
+schema_version: "0.3"
 ---
 
 # Antigravity Hooks

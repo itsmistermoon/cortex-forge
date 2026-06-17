@@ -4,8 +4,10 @@ title: "The Shorthand Guide to Everything Claude Code"
 resource: https://x.com/affaan
 section: full thread
 created: 2026-06-12
+updated: 2026-06-12
 tags: [claude-code, hooks, skills, subagents, mcp, token-efficiency, workflow]
 confidence: medium
+schema_version: "0.3"
 raw: .raw/claude-code-shorthand-guide.md
 ---
 

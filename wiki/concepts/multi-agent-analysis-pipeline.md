@@ -8,6 +8,7 @@ aliases: [analysis pipeline, agent orchestration]
 sources:
   - wiki/sources/understand-anything.md
 confidence: high
+schema_version: "0.3"
 ---
 
 # Multi-agent analysis pipeline

@@ -1,6 +1,7 @@
 ---
 title: "AI Coding Dictionary"
 type: source
+resource: 
 created: 2026-06-08
 updated: 2026-06-10
 tags: [ai-agents, vocabulary, reference]
@@ -9,6 +10,8 @@ source_date: 2026
 source_author: Matt Pocock
 sources: []
 confidence: high
+schema_version: "0.3"
+raw: 
 ---
 
 # AI Coding Dictionary

@@ -1,6 +1,7 @@
 ---
 title: Hooks Configuration - Command Code
 type: source
+resource: 
 created: 2026-06-08
 updated: 2026-06-08
 tags: [commandcode, hooks, configuration, settings.json]
@@ -10,6 +11,8 @@ source_author: CommandCode
 sources:
   - .raw/commandcode-hooks-configuration.md
 confidence: high
+schema_version: "0.3"
+raw: 
 ---
 
 # Hooks Configuration - Command Code

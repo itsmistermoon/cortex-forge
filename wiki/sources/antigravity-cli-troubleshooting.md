@@ -4,8 +4,10 @@ title: "Antigravity CLI — Troubleshooting"
 resource: https://antigravity.google/docs/cli-troubleshooting
 section: Antigravity CLI
 created: 2026-06-08
+updated: 2026-06-08
 tags: [antigravity, cli, troubleshooting]
 confidence: high
+schema_version: "0.3"
 raw: .raw/antigravity-cli/cli-troubleshooting.md
 ---
 

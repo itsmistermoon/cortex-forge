@@ -8,6 +8,7 @@ aliases: [memory poisoning, AI recommendation poisoning]
 sources:
   - wiki/sources/agentic-security-shorthand-guide.md
 confidence: medium
+schema_version: "0.3"
 ---
 
 # Memory as Attack Surface

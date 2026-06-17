@@ -1,6 +1,7 @@
 ---
 title: "OpenBrain — Personal Semantic Memory with MCP"
 type: source
+resource: 
 created: 2026-06-15
 updated: 2026-06-15
 tags: [memory-systems, mcp, pgvector, embeddings, semantic-search, supabase]
@@ -9,6 +10,8 @@ source_author: Nate B. Jones (original); RadixSeven (fork with privacy improveme
 sources:
   - .raw/openbrain-guide.md
 confidence: high
+schema_version: "0.3"
+raw: 
 ---
 
 # OpenBrain — Personal Semantic Memory with MCP

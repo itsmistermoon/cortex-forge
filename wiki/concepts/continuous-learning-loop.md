@@ -8,6 +8,7 @@ aliases: [session-to-skill extraction, learned skills]
 sources:
   - wiki/sources/claude-code-longform-guide.md
 confidence: medium
+schema_version: "0.3"
 ---
 
 # Continuous Learning Loop

@@ -8,6 +8,7 @@ aliases: [Karpathy wiki, LLM-readable wiki, vault-as-llm-context]
 sources:
   - wiki/sources/understand-anything.md
 confidence: high
+schema_version: "0.3"
 ---
 
 # Karpathy-pattern LLM wiki

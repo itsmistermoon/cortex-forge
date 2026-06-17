@@ -8,6 +8,7 @@ aliases: [training knowledge, model knowledge]
 sources:
   - wiki/sources/ai-coding-dictionary.md
 confidence: high
+schema_version: "0.3"
 ---
 
 # Parametric Knowledge

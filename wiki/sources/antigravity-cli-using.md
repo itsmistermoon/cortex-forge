@@ -1,6 +1,7 @@
 ---
 title: Antigravity CLI - Using AGY CLI
 type: source
+resource: 
 created: 2026-06-08
 updated: 2026-06-08
 tags: [antigravity, cli, settings, keybindings, usage]
@@ -10,6 +11,8 @@ source_author: Google Antigravity Team
 sources:
   - wiki/sources/antigravity-cli-using.md
 confidence: high
+schema_version: "0.3"
+raw: 
 ---
 
 # Antigravity CLI - Using AGY CLI

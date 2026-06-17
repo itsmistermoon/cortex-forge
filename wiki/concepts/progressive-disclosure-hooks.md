@@ -9,6 +9,7 @@ sources:
   - wiki/sources/gemini-cli-hooks-video.md
   - wiki/sources/obsidian-mind.md
 confidence: medium
+schema_version: "0.3"
 ---
 
 # Progressive Disclosure via Hooks

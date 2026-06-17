@@ -1,6 +1,7 @@
 ---
 title: "Every Claude Code Memory System Compared"
 type: source
+resource: 
 created: 2026-06-12
 updated: 2026-06-12
 tags: [youtube, memory-systems, claude-code, hooks, knowledge-base, cross-platform, review]
@@ -10,6 +11,8 @@ source_author: Simon Scrapes
 sources:
   - .raw/yt-claude-code-memory-compared.txt
 confidence: medium
+schema_version: "0.3"
+raw: 
 ---
 
 # Every Claude Code Memory System Compared (So You Don't Have To)

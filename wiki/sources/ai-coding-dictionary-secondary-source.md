@@ -4,8 +4,10 @@ title: "AI Coding Dictionary — Secondary source (full article)"
 resource: https://www.aihero.dev/ai-coding-dictionary/secondary-source
 section: AI Coding Dictionary
 created: 2026-06-10
+updated: 2026-06-10
 tags: [epistemology, context-engineering, provenance]
 confidence: high
+schema_version: "0.3"
 raw: .raw/ai-coding-dictionary-secondary-source.md
 ---
 

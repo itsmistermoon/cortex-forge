@@ -7,6 +7,7 @@ tags: [commandcode, models, cli, reference]
 sources:
   - .raw/commandcode-models-reference.md
 confidence: high
+schema_version: "0.3"
 ---
 
 # CommandCode Models

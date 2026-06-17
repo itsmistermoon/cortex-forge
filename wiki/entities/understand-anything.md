@@ -8,6 +8,7 @@ aliases: [UA, Lum1104/Understand-Anything]
 sources:
   - wiki/sources/understand-anything.md
 confidence: high
+schema_version: "0.3"
 ---
 
 # Understand Anything (entity)

@@ -4,8 +4,10 @@ title: "Security & Privacy — Command Code"
 resource: https://commandcode.ai/docs/resources/security
 section: 
 created: 2026-06-13
+updated: 2026-06-13
 tags: [commandcode, security, permissions, headless, privacy]
 confidence: high
+schema_version: "0.3"
 raw: .raw/commandcode-security.md
 ---
 

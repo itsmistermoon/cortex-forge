@@ -8,6 +8,7 @@ sources:
   - wiki/sources/openbrain.md
 aliases: []
 confidence: high
+schema_version: "0.3"
 ---
 
 # OpenBrain (Nate B. Jones)

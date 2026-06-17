@@ -8,6 +8,7 @@ aliases: [carry artifact, session artifact]
 sources:
   - wiki/sources/ai-coding-dictionary.md
 confidence: high
+schema_version: "0.3"
 ---
 
 # Handoff Artifact

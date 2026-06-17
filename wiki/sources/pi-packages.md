@@ -4,6 +4,7 @@ title: "Pi Packages"
 resource: https://pi.dev/docs/latest/packages
 section: packages
 created: 2026-06-16
+updated: 2026-06-16
 tags: [pi, packages, npm, git, distribution, security]
 confidence: high
 schema_version: "0.3"

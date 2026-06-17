@@ -11,6 +11,7 @@ sources:
   - wiki/sources/commandcode-hooks-examples.md
   - wiki/sources/commandcode-hooks-best-practices.md
 confidence: high
+schema_version: "0.3"
 ---
 
 # Agent Hook Compatibility

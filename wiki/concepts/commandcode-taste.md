@@ -11,6 +11,7 @@ sources:
   - wiki/sources/commandcode-taste-manage.md
   - wiki/sources/commandcode-taste-commands.md
 confidence: high
+schema_version: "0.3"
 ---
 
 # CommandCode TASTE

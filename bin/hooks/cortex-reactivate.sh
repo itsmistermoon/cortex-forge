@@ -40,6 +40,14 @@ ENTRY_DATE=$(awk '
   in_hist && /^### [0-9]{4}-[0-9]{2}-[0-9]{2}/ { print $2; exit }
 ' "$HOT" 2>/dev/null)
 
+# Fallback to CONSOLIDATED.md if History in MEMORY.md is empty (all entries archived)
+if [ -z "$ENTRY_DATE" ] && [ -f "$GIT_ROOT/.hot/CONSOLIDATED.md" ]; then
+  ENTRY_DATE=$(awk '
+    /^### [0-9]{4}-[0-9]{2}-[0-9]{2}/ { last_date = $2 }
+    END { print last_date }
+  ' "$GIT_ROOT/.hot/CONSOLIDATED.md" 2>/dev/null)
+fi
+
 DIFF_DAYS=0
 if [ -n "$ENTRY_DATE" ]; then
   ENTRY_TS=$(date -j -f "%Y-%m-%d" "$ENTRY_DATE" "+%s" 2>/dev/null || date -d "$ENTRY_DATE" "+%s" 2>/dev/null || echo 0)

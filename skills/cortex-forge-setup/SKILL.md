@@ -126,6 +126,18 @@ Always end with the relevant subset of step 9 (confirmation).
    - If a symlink already exists and points to the right target, skip silently.
    - If a symlink exists but points elsewhere, overwrite it.
 
+5a. **Antigravity symlinks** — if `~/.gemini/config/` exists:
+    - Create `~/.gemini/config/skills/` if it doesn't exist.
+    - Create symlinks pointing to the installed skills:
+      - `~/.gemini/config/skills/cortex-crystallize` → `~/.agents/skills/cortex-crystallize`
+      - `~/.gemini/config/skills/cortex-forge-setup` → `~/.agents/skills/cortex-forge-setup`
+      - `~/.gemini/config/skills/cortex-recall` → `~/.agents/skills/cortex-recall`
+      - `~/.gemini/config/skills/cortex-assimilate` → `~/.agents/skills/cortex-assimilate`
+      - `~/.gemini/config/skills/cortex-imprint` → `~/.agents/skills/cortex-imprint`
+      - `~/.gemini/config/skills/cortex-prune` → `~/.agents/skills/cortex-prune`
+    - If a symlink already exists and points to the right target, skip silently.
+    - If a symlink exists but points elsewhere, overwrite it.
+
 6. **Configure lifecycle hooks** — ask: "Set up automatic session memory hooks? (recommended)"
    If yes:
    - **Claude Code** (`~/.claude/` exists):

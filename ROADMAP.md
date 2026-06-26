@@ -6,15 +6,15 @@ Objetivo: que el Hot Cache Protocol funcione en todos los agentes soportados.
 
 - [x] Claude Code — configurado vía `cortex-forge-setup`
 - [x] Matriz de compatibilidad → `wiki/concepts/agent-hook-compatibility.md`
-- [ ] Antigravity CLI — parcial
-  - [ ] Correr `/cortex-forge-setup` desde Antigravity — muestra el bloque JSON a agregar
+- [x] Antigravity CLI — completo
+  - [x] Correr `/cortex-forge-setup` desde Antigravity — muestra el bloque JSON a agregar
   - [x] Configurar hooks en `~/.gemini/config/hooks.json` (PreInvocation + Stop) — migrado a `cortex-reactivate-antigravity.sh` + `cortex-crystallize-antigravity.sh`; symlink a `~/.gemini/antigravity-cli/hooks.json` por bug agy-cli #49
   - [x] **PROBAR**: `cortex-reactivate-antigravity.sh` inyecta Zone 1 de `.hot/` al inicio — sin payload devuelve `{"injectSteps":[]}` (correcto); con `invocationNum=0` + workspace inyecta Zone 1 correctamente
   - [x] **REESCRIBIR**: `cortex-crystallize-antigravity.sh` — script original usaba `jq` sobre el transcript; Antigravity guarda transcripts como SQLite+Protobuf (`.db`), no JSON. Script reescrito para extraer via `strings $TRANSCRIPT | grep -oE '"toolSummary":"[^"]*"'` y mensajes de usuario desde `history.jsonl`. Fix de portabilidad: `grep -P` → `grep -E` (BSD grep en macOS). Guard `[ -z "$TOOL_SUMMARIES" ] && exit 0` protege sesiones de solo lectura.
-  - [ ] **VALIDAR** en sesión orgánica real: `fullyIdle==true` dispara hook → `agy -p` sobre transcript real → síntesis descriptiva escrita en `.hot/MEMORY.md` — script probado con transcript histórico (bb3be9d0) ✅; trigger real pendiente ❌
+  - [x] **VALIDAR** en sesión orgánica real: `fullyIdle==true` dispara hook → `agy -p` sobre transcript real → síntesis descriptiva escrita en `.hot/MEMORY.md` — trigger real validado en sesión orgánica (692b01be) ✅
   - [x] **VERIFICAR**: contradicción en path de `settings.json` — no existe `~/.gemini/config/settings.json`; el archivo real es `~/.gemini/antigravity-cli/settings.json`
   - [x] Ingestar una fuente con `cortex-assimilate`
-  - [ ] Consultar conocimiento con `cortex-recall` — falló, usó búsqueda manual
+  - [x] Consultar conocimiento con `cortex-recall` — validado con citations y confidence level ✅
 - [ ] Codex — parcial
   - [ ] Correr `/cortex-forge-setup` desde Codex — verificar que detecta config existente y ofrece "Update"
   - [x] Pegar bloque en `~/.codex/hooks.json` (SessionStart + Stop)

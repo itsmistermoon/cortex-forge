@@ -39,32 +39,45 @@ case "$IMPRINT_TRIAGE" in
   "")    IMPRINT_TRIAGE="suggest" ;;
 esac
 
+ENTRY_DATE=$(awk '
+  /^## History$/ { in_hist=1; next }
+  in_hist && /^### [0-9]{4}-[0-9]{2}-[0-9]{2}/ { print $2; exit }
+' "$HOT" 2>/dev/null)
+
+DIFF_DAYS=0
+if [ -n "$ENTRY_DATE" ]; then
+  ENTRY_TS=$(date -j -f "%Y-%m-%d" "$ENTRY_DATE" "+%s" 2>/dev/null || date -d "$ENTRY_DATE" "+%s" 2>/dev/null || echo 0)
+  NOW_TS=$(date "+%s")
+  DIFF_DAYS=$(( (NOW_TS - ENTRY_TS) / 86400 ))
+fi
+
+# Resolve hot cache stale threshold
+STALE_DAYS_LIMIT=$(awk -v root="$GIT_ROOT" '
+  /^    path:/ { p = $2 }
+  /^    hot_cache_stale_days:/ && p == root { print $2; exit }
+' "$CONFIG" 2>/dev/null)
+STALE_DAYS_LIMIT="${STALE_DAYS_LIMIT:-$(grep -m1 '^hot_cache_stale_days:' "$CONFIG" 2>/dev/null | awk '{print $2}')}"
+STALE_DAYS_LIMIT="${STALE_DAYS_LIMIT:-7}"
+
+STALE_WARNING=""
+if [ -n "$ENTRY_DATE" ] && [ "$DIFF_DAYS" -gt "$STALE_DAYS_LIMIT" ]; then
+  STALE_WARNING="⚠ WARNING: The hot cache session memory has not been updated in $DIFF_DAYS days (threshold is $STALE_DAYS_LIMIT days). The project state might be stale or out of sync. Please verify current status with the user.
+
+---
+
+"
+fi
+
 NUDGE=""
-if [ "$IMPRINT_TRIAGE" != "off" ]; then
-  # Extract date header and candidate from the most recent history entry only
-  ENTRY_DATE=$(awk '
+if [ "$IMPRINT_TRIAGE" != "off" ] && [ -n "$ENTRY_DATE" ] && [ "$DIFF_DAYS" -le 30 ]; then
+  # Extract candidate line from the most recent history entry
+  CANDIDATE=$(awk '
     /^## History$/ { in_hist=1; next }
-    in_hist && /^### [0-9]{4}-[0-9]{2}-[0-9]{2}/ { print $2; exit }
+    in_hist && /^### / { if (++entry_count == 2) exit; next }
+    in_hist && entry_count == 1 && /^#### Imprint candidate$/ { found=1; next }
+    found && /^- / { print; exit }
+    found && /^####/ { exit }
   ' "$HOT" 2>/dev/null)
-
-  CANDIDATE=""
-  if [ -n "$ENTRY_DATE" ]; then
-    # Check 30-day expiry
-    ENTRY_TS=$(date -j -f "%Y-%m-%d" "$ENTRY_DATE" "+%s" 2>/dev/null || date -d "$ENTRY_DATE" "+%s" 2>/dev/null || echo 0)
-    NOW_TS=$(date "+%s")
-    DIFF_DAYS=$(( (NOW_TS - ENTRY_TS) / 86400 ))
-
-    if [ "$DIFF_DAYS" -le 30 ]; then
-      # Extract candidate line from the most recent history entry
-      CANDIDATE=$(awk '
-        /^## History$/ { in_hist=1; next }
-        in_hist && /^### / { if (++entry_count == 2) exit; next }
-        in_hist && entry_count == 1 && /^#### Imprint candidate$/ { found=1; next }
-        found && /^- / { print; exit }
-        found && /^####/ { exit }
-      ' "$HOT" 2>/dev/null)
-    fi
-  fi
 
   if [ -n "$CANDIDATE" ]; then
     # Extract transcript path and clean description
@@ -110,6 +123,6 @@ HOT_ZONE_1=$(awk '
 
 [ -z "$HOT_ZONE_1" ] && echo '{"injectSteps":[]}' && exit 0
 
-CONTENT=$(printf '%s\n%s' "$NUDGE" "$HOT_ZONE_1")
+CONTENT=$(printf '%s%s\n%s' "$STALE_WARNING" "$NUDGE" "$HOT_ZONE_1")
 ESCAPED=$(printf '%s' "$CONTENT" | jq -Rs .)
 printf '{"injectSteps":[{"ephemeralMessage":%s}]}\n' "$ESCAPED"

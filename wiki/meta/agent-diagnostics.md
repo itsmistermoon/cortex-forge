@@ -660,11 +660,12 @@ Sesión posterior al bug de timeout del Stop hook (30s default). Se diagnosticó
 
 ## 2026-06-26 — Antigravity (Gemini 3.5 Flash) — alineación de hooks y robustez de agy
 
-**Qué ocurrió:** Alineación completa de los hooks de reactivación y cristalización para Antigravity con los de Claude Code. Implementación del stale check con fallback y corrección de la ruta de ejecución del ejecutable `agy` en el Stop hook.
+**Qué ocurrió:** Alineación completa de los hooks de reactivación y cristalización para Antigravity con los de Claude Code. Implementación del stale check con fallback y corrección de la ruta de ejecución del ejecutable `agy` en el Stop hook. Además, se identificó y corrigió la falta de alineación de la rotación de historial en el hook de CommandCode.
 
 **Qué falló:**
 - Al simular el Stop hook de Antigravity, la llamada a `agy -p` falló indicando `Unknown option: -p`. Se descubrió que en la ruta de ejecución de hooks se resolvía una versión incorrecta del binario `agy` (como shims locales o módulos no actualizados).
 - Los scripts hook globales en `~/.gemini/config/hooks/` estaban severamente desfasados de las últimas mejoras del repositorio (no tenían traducción de locale, CONSOLIDATED.md, ni lógica de imprint candidate).
+- El hook de cierre de CommandCode (`cortex-crystallize-commandcode.sh`) no implementaba la rotación histórica de 30 días a `CONSOLIDATED.md`, dejando el archivo `.hot/MEMORY.md` vulnerable a un crecimiento indefinido al usar CommandCode.
 
 **Qué funcionó:**
 - **Alineación de hooks**: Se reescribieron los scripts `cortex-reactivate-antigravity.sh` y `cortex-crystallize-antigravity.sh` en `bin/hooks/` y se instalaron en la ruta global de configuración de Antigravity. Soportan traducción de locale, creación automática de drafts en `.hot/imprint-draft.md`, y alertas de la base de datos.
@@ -674,6 +675,8 @@ Sesión posterior al bug de timeout del Stop hook (30s default). Se diagnosticó
   1. sqlite-vec no soporta filtros inline de `distance` dentro de la cláusula `WHERE` junto con `MATCH`; requiere subconsulta (subquery).
   2. Cosine distance en sqlite-vec usa $1 - \cos(\theta)$, requiriendo calibrar el umbral (ej. < 0.5 para similitud > 0.5).
   3. Chunking de markdown debe incluir intro pre-heading y solapamiento deslizante para conservar contexto.
+- **Corrección de CommandCode**: Se integró el bloque de rotación e incorporación a `CONSOLIDATED.md` en `cortex-crystallize-commandcode.sh` de forma idéntica a Claude y Antigravity, logrando simetría en el comportamiento del hot cache.
 
 **Observaciones / sugerencias:**
 - El fallback a `CONSOLIDATED.md` es fundamental: sin él, cualquier vault pausado por más de un mes no disparaba la alerta de staleness.
+- Aunque CommandCode carezca de hook de inicio de sesión (`SessionStart`) debido a limitaciones de plataforma, alinear su hook de `Stop` asegura que el archivo local de memoria permanezca consistente y saludable para otros agentes que sí lo inyectan al arrancar.

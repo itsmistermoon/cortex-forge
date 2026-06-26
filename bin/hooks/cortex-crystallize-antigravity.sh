@@ -28,6 +28,25 @@ find_git_root_dir() {
 
 GIT_ROOT=$(find_git_root_dir)
 
+resolve_locale() {
+  local git_root="$1"
+  local config="$HOME/.cortex-forge/config.yml"
+  local locale=""
+  if [ -f "$config" ]; then
+    locale=$(awk -v root="$git_root" '
+      /^    path:/ { p = $2 }
+      /^    locale:/ && p == root { print $2; exit }
+    ' "$config" 2>/dev/null)
+  fi
+  if [ -z "$locale" ] && [ -f "$git_root/.hot/MEMORY.md" ]; then
+    locale=$(grep -m1 '— locale:' "$git_root/.hot/MEMORY.md" | sed 's/.*locale: *//' | tr -d ' \r\n' 2>/dev/null)
+  fi
+  if [ -z "$locale" ] && [ -f "$git_root/CODEX.md" ]; then
+    locale=$(grep -m1 '\*\*locale\*\*:' "$git_root/CODEX.md" | awk '{print $2}' 2>/dev/null)
+  fi
+  echo "${locale:-en}"
+}
+
 mkdir -p "$GIT_ROOT/.hot" 2>/dev/null || { echo '{"decision":""}'; exit 0; }
 
 if ! grep -qF '.hot/' "$GIT_ROOT/.gitignore" 2>/dev/null; then
@@ -87,8 +106,16 @@ fi
 # If no tool summaries found, the session had no real work — skip
 [ -z "$TOOL_SUMMARIES" ] && echo '{"decision":""}' && exit 0
 
+LOCALE=$(resolve_locale "$GIT_ROOT")
+case "$LOCALE" in
+  es) LANG_LABEL="Spanish (Chilean)" ;;
+  fr) LANG_LABEL="French" ;;
+  *)  LANG_LABEL="English" ;;
+esac
+
 # ── Build synthesis prompt ───────────────────────────────────────────────────
-FULL_PROMPT="Analyze this Antigravity CLI session and generate a structured summary in English.
+FULL_PROMPT="Analyze this Antigravity CLI session and generate a structured summary in $LANG_LABEL.
+NOTE: End-of-session snapshot — definitive handoff (no return path). The session ends after this.
 
 == USER REQUESTS ==
 $USER_MSGS
@@ -106,10 +133,76 @@ Omit sections with no real content entirely — never use placeholders.
 [only if something was explicitly discarded — omit if not applicable]
 
 #### Fragile context
-[only if there are implicit decisions or context that would be lost between sessions — omit if not applicable]"
+[only if there are implicit decisions or context that would be lost between sessions — omit if not applicable]
 
-SUMMARY=$(agy -p "$FULL_PROMPT" 2>/dev/null)
+#### Attempted and failed
+[only if an approach was tried and failed — omit if not applicable]
+
+#### Imprint candidate
+[only if the session produced a durable insight, design decision, or analysis worth a permanent wiki page — omit if not applicable. One line: what to imprint and suggested type (concept/entity/reference/page)]"
+
+AGY="agy"
+if [ -x "/opt/homebrew/bin/agy" ]; then
+  AGY="/opt/homebrew/bin/agy"
+fi
+SUMMARY=$("$AGY" -p "$FULL_PROMPT" 2>/dev/null)
 [ -z "$SUMMARY" ] && echo '{"decision":""}' && exit 0
+
+case "$SUMMARY" in
+  *"#### What was done"*) ;;
+  *) echo '{"decision":""}'; exit 0 ;;
+esac
+
+if ! printf '%s\n' "$SUMMARY" | grep -qE '^- '; then
+  echo '{"decision":""}'; exit 0
+fi
+
+# Append transcript path to the imprint candidate bullet so SessionStart can locate it
+if printf '%s\n' "$SUMMARY" | grep -q "^#### Imprint candidate$" && [ -n "$TRANSCRIPT" ]; then
+  SUMMARY=$(printf '%s\n' "$SUMMARY" | awk -v tp="$TRANSCRIPT" '
+    /^#### Imprint candidate$/ { print; in_candidate=1; next }
+    in_candidate && /^- / { print $0 " — transcript: " tp; in_candidate=0; next }
+    in_candidate && /^####/ { in_candidate=0 }
+    { print }
+  ')
+fi
+
+# Archive history entries older than 30 days to CONSOLIDATED.md
+CONSOLIDATED="$GIT_ROOT/.hot/CONSOLIDATED.md"
+CUTOFF=$(date -v-30d '+%Y-%m-%d' 2>/dev/null || date -d '30 days ago' '+%Y-%m-%d' 2>/dev/null || echo "")
+
+RECENT_HISTORY="$PREV_HISTORY"
+if [ -n "$PREV_HISTORY" ] && [ -n "$CUTOFF" ]; then
+  RECENT_TMP=$(mktemp -t cortex-recent.XXXXXX)
+  ARCHIVE_TMP=$(mktemp -t cortex-archive.XXXXXX)
+  trap 'rm -f "$TMP" "$RECENT_TMP" "$ARCHIVE_TMP"' EXIT
+
+  printf '%s\n' "$PREV_HISTORY" | awk -v cutoff="$CUTOFF" -v recent="$RECENT_TMP" -v archive="$ARCHIVE_TMP" '
+    /^### [0-9]{4}-[0-9]{2}-[0-9]{2}/ {
+      if (buf != "") {
+        dest = (entry_date < cutoff) ? archive : recent
+        printf "%s", buf > dest
+      }
+      entry_date = $2
+      buf = $0 "\n"
+      next
+    }
+    { buf = buf $0 "\n" }
+    END {
+      if (buf != "") {
+        dest = (entry_date < cutoff) ? archive : recent
+        printf "%s", buf > dest
+      }
+    }
+  '
+
+  RECENT_HISTORY=$(cat "$RECENT_TMP" 2>/dev/null || true)
+  ARCHIVED=$(cat "$ARCHIVE_TMP" 2>/dev/null || true)
+
+  if [ -n "$ARCHIVED" ]; then
+    printf '%s\n' "$ARCHIVED" >> "$CONSOLIDATED"
+  fi
+fi
 
 # ── Write hot file ────────────────────────────────────────────────────────────
 {
@@ -122,9 +215,9 @@ SUMMARY=$(agy -p "$FULL_PROMPT" 2>/dev/null)
   echo "### $NOW — Antigravity (Stop)"
   echo ""
   printf '%s\n' "$SUMMARY"
-  if [ -n "$PREV_HISTORY" ]; then
+  if [ -n "$RECENT_HISTORY" ]; then
     echo ""
-    printf '%s\n' "$PREV_HISTORY"
+    printf '%s\n' "$RECENT_HISTORY"
   fi
 } > "$TMP"
 

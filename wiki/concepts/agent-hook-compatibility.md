@@ -48,8 +48,8 @@ ln -s ~/.gemini/config/hooks.json ~/.gemini/antigravity-cli/hooks.json
 Configure in `~/.gemini/config/hooks.json`:
 ```json
 {
-  "PreInvocation": [{ "condition": "invocationNum == 0", "command": "bash ~/.gemini/config/hooks/load-hot-cache-antigravity.sh" }],
-  "Stop":          [{ "condition": "fullyIdle == true",  "command": "bash ~/.gemini/config/hooks/update-hot-cache-antigravity.sh" }]
+  "PreInvocation": { "condition": "invocationNum == 0", "command": "bash ~/.gemini/config/hooks/load-hot-cache-antigravity.sh" },
+  "Stop":          { "condition": "fullyIdle == true",  "command": "bash ~/.gemini/config/hooks/update-hot-cache-antigravity.sh" }
 }
 ```
 

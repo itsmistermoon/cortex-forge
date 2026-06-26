@@ -169,6 +169,43 @@ done
 # nohup, retornando exit 0 en <100ms. El hijo reemplaza el placeholder con
 # el resumen sintetizado al terminar (puede tardar 30-60s, no bloquea cierre).
 
+# Archive history entries older than 30 days to CONSOLIDATED.md
+CONSOLIDATED="$GIT_ROOT/.hot/CONSOLIDATED.md"
+CUTOFF=$(date -v-30d '+%Y-%m-%d' 2>/dev/null || date -d '30 days ago' '+%Y-%m-%d' 2>/dev/null || echo "")
+
+RECENT_HISTORY="$PREV_HISTORY"
+if [ -n "$PREV_HISTORY" ] && [ -n "$CUTOFF" ]; then
+  RECENT_TMP=$(mktemp -t cortex-recent.XXXXXX)
+  ARCHIVE_TMP=$(mktemp -t cortex-archive.XXXXXX)
+  trap 'rm -f "$TMP" "$RECENT_TMP" "$ARCHIVE_TMP"' EXIT
+
+  printf '%s\n' "$PREV_HISTORY" | awk -v cutoff="$CUTOFF" -v recent="$RECENT_TMP" -v archive="$ARCHIVE_TMP" '
+    /^### [0-9]{4}-[0-9]{2}-[0-9]{2}/ {
+      if (buf != "") {
+        dest = (entry_date < cutoff) ? archive : recent
+        printf "%s", buf > dest
+      }
+      entry_date = $2
+      buf = $0 "\n"
+      next
+    }
+    { buf = buf $0 "\n" }
+    END {
+      if (buf != "") {
+        dest = (entry_date < cutoff) ? archive : recent
+        printf "%s", buf > dest
+      }
+    }
+  '
+
+  RECENT_HISTORY=$(cat "$RECENT_TMP" 2>/dev/null || true)
+  ARCHIVED=$(cat "$ARCHIVE_TMP" 2>/dev/null || true)
+
+  if [ -n "$ARCHIVED" ]; then
+    printf '%s\n' "$ARCHIVED" >> "$CONSOLIDATED"
+  fi
+fi
+
 SENTINEL="__PENDING_SYNTHESIS_${NOW// /_}__"
 HELPER="$GIT_ROOT/.hot/.synthesize-${NOW// /_/}.sh"
 
@@ -183,9 +220,9 @@ HELPER="$GIT_ROOT/.hot/.synthesize-${NOW// /_/}.sh"
   echo "### $NOW — CommandCode (Stop)"
   echo ""
   echo "$SENTINEL"
-  if [ -n "$PREV_HISTORY" ]; then
+  if [ -n "$RECENT_HISTORY" ]; then
     echo ""
-    printf '%s\n' "$PREV_HISTORY"
+    printf '%s\n' "$RECENT_HISTORY"
   fi
 } > "$TMP"
 

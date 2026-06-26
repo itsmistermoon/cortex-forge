@@ -305,3 +305,11 @@ Key findings:
 
 Agent: CommandCode (MiniMax M3)
 ## [2026-06-24] imprint | No-Op Audit with Adversarial Subagent Debate
+
+## [2026-06-26] session | Register e7c0e19, fix graphify wikilink, validate post-commit prune hook
+- Registered commit `e7c0e19` in `CHANGELOG.md` and pushed.
+- Fixed the escaped wikilink in `wiki/entities/graphify.md`.
+- Pulled `nomic-embed-text` via Ollama.
+- Installed and validated the post-commit prune hook in the personal vault (`moon-multivac`), confirming background execution and logging.
+
+Agent: Antigravity (Gemini 3.5 Flash)

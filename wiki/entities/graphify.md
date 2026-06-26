@@ -40,7 +40,7 @@ Three cost tiers: free (AST only), local (whisper), API (Claude subagents). User
 | Cursor | `.cursor/rules/graphify.mdc` (`alwaysApply: true`) |
 | Kilo Code | Native skill + `tool.execute.before` plugin |
 | Aider, OpenClaw, Trae | `AGENTS.md` fallback |
-| **[[wiki/entities/commandcode\|CommandCode]]** | **Not supported** — gap cortex-forge fills |
+| **[[wiki/entities/commandcode|CommandCode]]** | **Not supported** — gap cortex-forge fills |
 
 Platform pattern mirrors cortex-forge: PreToolUse hooks where available, AGENTS.md as universal fallback.
 

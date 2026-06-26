@@ -6,6 +6,7 @@
 - [[wiki/pages/cortex-forge]] — Vault with multi-agent hot cache protocol (Claude Code, Codex, Antigravity, CommandCode)
 
 ## Concepts
+- [[wiki/concepts/no-op-audit-adversarial-debate]] — Methodology for identifying and rehabilitating no-op skill instructions via adversarial subagent debate (defender / attacker / judge)
 - [[wiki/concepts/parametric-knowledge]] — What the model knows from training; frozen, unverifiable, disqualified as a source for vault topics
 - [[wiki/concepts/contextual-knowledge]] — Facts the agent reads directly from context; the verifiable counterpart to parametric knowledge
 - [[wiki/concepts/memory-system]] — System that makes an agent stateful across sessions; Cortex Forge is one implementation

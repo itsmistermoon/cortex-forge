@@ -18,6 +18,8 @@ Format: `[semver] — YYYY-MM-DD`
 
 ## [Unreleased]
 
+- `refactor:` `e7c0e19` refactor no-op audit in 4 skills (`cortex-assimilate`, `cortex-crystallize`, `cortex-imprint`, `cortex-prune`) replacing vague rules with verifiable, concrete criteria.
+
 ## [0.3.0] — 2026-06-15
 
 - `schema:` `AGENTS.md` gains YAML frontmatter with `schema_version: "0.3"`. All six templates (`concept`, `entity`, `project`, `reference`, `source`, `wiki-page`) gain `schema_version: "0.3"` in their frontmatter. Pages with an older `schema_version` (or none) may be missing fields introduced after their creation — detectable by `cortex-prune`.

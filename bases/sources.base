@@ -1,8 +1,7 @@
 filters:
   and:
     - file.inFolder("wiki/sources")
-    - 'file.name != "_index"'
-
+    - file.name != "_index"
 properties:
   source_author:
     displayName: Autor
@@ -14,7 +13,6 @@ properties:
     displayName: Actualizado
   tags:
     displayName: Tags
-
 views:
   - type: table
     name: Todas
@@ -23,7 +21,6 @@ views:
       - source_author
       - source_date
       - updated
-
   - type: table
     name: Por autor
     groupBy:

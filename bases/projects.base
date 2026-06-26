@@ -16,7 +16,7 @@ views:
     name: Activos
     filters:
       and:
-        - 'status = "active"'
+        - status = "active"
     order:
       - file.name
       - status

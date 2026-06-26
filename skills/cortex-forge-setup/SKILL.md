@@ -1,7 +1,7 @@
 ---
 name: cortex-forge-setup
 description: Register or deregister the current vault in Cortex Forge, install global skills, and configure lifecycle hooks. Run from inside a vault directory.
-argument-hint: "Optional sub-task: hooks | skills | taste | vaults"
+argument-hint: "Optional sub-task: hooks | skills | sync | vaults"
 ---
 
 Setup for Cortex Forge. Run from inside a vault directory (one containing `wiki/`, `AGENTS.md`, and `.git/`). Registers the vault in the global config, installs global skills, and optionally configures lifecycle hooks.
@@ -14,6 +14,7 @@ When an argument is provided, always run step 1 (vault detection) first, then ju
 |---|---|
 | `hooks` | Step 6 — reinstall hook scripts + update settings.json |
 | `skills` | Steps 4–5 — install skills + create symlinks |
+| `sync` | Step 3b — sync infrastructure files from upstream repo |
 | `taste` | Step 7 — install TASTE rule |
 | `vaults` | Steps 2–3 — register/update vault in config |
 
@@ -24,7 +25,7 @@ Always end with the relevant subset of step 9 (confirmation).
 1. **Detect vault from CWD** — validate that the current directory is a valid vault:
    If `~/.cortex-forge/config.yml` already has an entry for this vault, also read its `locale:` — use it for all agent-generated content. Fallback if absent: `.hot/MEMORY.md` title line (`— locale: {lang}`) → `CODEX.md` Vocabulary (`**locale**:`) → default `en`.
 
-   - Required: `.git/`, `wiki/`, `AGENTS.md`, `skills/`
+   - Required: `.git/`, `wiki/`, `AGENTS.md`
    - If validation fails, report what's missing and stop.
    - Derive vault name from `basename` of CWD (e.g., `/Users/jp/second-brain` → `second-brain`).
 
@@ -35,7 +36,63 @@ Always end with the relevant subset of step 9 (confirmation).
      - If no: proceed to step 3 (re-run updates skills and hooks).
    - **If not registered**: proceed to step 3.
 
-3. **Write config** — add or update the vault entry in `~/.cortex-forge/config.yml`:
+3. **Write config** — add or update the vault entry in `~/.cortex-forge/config.yml`.
+   - If the vault was **already registered** (detected in step 2), after confirming "no" to removal, ask: "Sync infrastructure files from upstream? (templates, bin scripts)" — if yes, run step 3b before continuing.
+
+3b. **Sync infrastructure from upstream** — pull infrastructure files from the upstream repo and apply them to the current vault.
+
+   **Resolve upstream:**
+   - Read `upstream:` from `~/.cortex-forge/config.yml`. Default if absent: `itsmistermoon/cortex-forge`.
+   - Format: `{owner}/{repo}` (no protocol, no `.git`).
+   - Branch/ref: `main` unless `upstream_ref:` is set in config.
+
+   **Fetch file tree** — one API call:
+   ```
+   GET https://api.github.com/repos/{upstream}/git/trees/main?recursive=1
+   ```
+   Extract all `blob` entries whose `path` matches the sync scope (see below). This avoids per-file HEAD requests.
+
+   **Sync scope** — files to download and overwrite locally if content differs:
+   - `templates/*.md`
+   - `bin/*.sh`
+   - `bin/hooks/*`
+
+   For each file in scope:
+   1. Fetch raw content: `https://raw.githubusercontent.com/{upstream}/main/{path}`
+   2. Compare with local file (if it exists).
+   3. If different (or missing locally): overwrite. If identical: skip silently.
+
+   **Never touch** (hard exclusions — skip even if present in upstream tree):
+   - `wiki/` — personal knowledge
+   - `.raw/` — primary sources
+   - `.hot/` — session cache
+   - `CODEX.md` — vault identity; compare structure only (see below)
+   - `AGENTS.md` — mixed protocol + personal content; compare structure only (see below)
+
+   **Structure-only divergence checks** — always run for these files even though they're excluded from auto-sync. Fetch each from upstream, then:
+
+   Extract headings from both upstream and local (`##` and `###` lines). Report:
+   - Headings present upstream but missing locally → "sections added upstream — consider adding them"
+   - Headings present locally but absent upstream → "local-only sections — safe to keep"
+   - Never report body content differences, only structural (heading) changes.
+   - Do not overwrite either file under any circumstance.
+
+   Apply this check to:
+   - `AGENTS.md` — protocol sections may be added or renamed as the protocol evolves
+   - `CODEX.md` — template structure may gain new sections (e.g. a new `## Vocabulary` entry or a new top-level section)
+
+   **Deletions** — files that exist locally in sync scope but are absent from the upstream tree:
+   - Report them as "present locally, removed upstream" and ask the user whether to delete each one (or list them all and ask once with yes/no).
+
+   **Rate limits** — the GitHub API allows 60 unauthenticated requests/hour. The tree fetch is 1 call; each file download is 1 raw HTTP request (not API). Raw downloads are not rate-limited by the API quota, but are subject to bandwidth limits. If a `GITHUB_TOKEN` env var is set, include it as `Authorization: Bearer {token}` on API calls only.
+
+   **Config fields summary:**
+   ```yaml
+   upstream: itsmistermoon/cortex-forge   # default; override to point at a fork
+   upstream_ref: main                      # optional; branch or tag to sync from
+   ```
+
+
    ```yaml
    vaults:
      {name}: {absolute-path}
@@ -162,6 +219,7 @@ Always end with the relevant subset of step 9 (confirmation).
    - Hooks: configured / skipped / manual instructions shown
    - TASTE rule: installed per-project / global / skipped — show exact path
    - CODEX.md: created / already existed / skipped
+   - Sync (if run): upstream used, files updated (list), files skipped (count), deletions pending user confirmation, AGENTS.md divergence noted if any
    - Next step: edit `CODEX.md` if just created; invoke `/cortex-crystallize` at the end of any project session
 
 ## Hook behavior

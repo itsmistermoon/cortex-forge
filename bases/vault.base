@@ -5,8 +5,7 @@ filters:
         - file.inFolder("wiki/sources")
         - file.inFolder("wiki/pages")
         - file.inFolder("wiki/entities")
-    - 'file.name != "_index"'
-
+    - file.name != "_index"
 properties:
   type:
     displayName: Tipo
@@ -16,7 +15,6 @@ properties:
     displayName: Tags
   status:
     displayName: Estado
-
 views:
   - type: table
     name: Todo el vault
@@ -24,7 +22,6 @@ views:
       - file.name
       - type
       - updated
-
   - type: table
     name: Por tipo
     groupBy:
@@ -33,10 +30,8 @@ views:
     order:
       - updated
       - file.name
-
   - type: list
     name: Recientes
+    filters: updated >= date("2026-01-01")
     order:
       - updated
-    filters:
-      'updated >= date("2026-01-01")'

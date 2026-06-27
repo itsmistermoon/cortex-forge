@@ -2,7 +2,7 @@
 title: agent-hook-compatibility
 type: concept
 created: 2026-06-07
-updated: 2026-06-26
+updated: 2026-06-27
 tags: [multi-agent, hooks, cortex-forge, compatibility]
 aliases: [hook matrix, agent lifecycle]
 sources:
@@ -24,7 +24,7 @@ Cortex Forge's Hot Cache Protocol requires two lifecycle events per agent: one a
 | Agent | SessionStart equiv. | Stop equiv. | Hot cache status |
 |--------|---------------------|-------------|-----------------|
 | Claude Code | `SessionStart` | `SessionEnd` + `PreCompact` | ✅ full — automatic via hooks |
-| Antigravity CLI | `PreInvocation (invocationNum==0)` | `Stop (fullyIdle==true)` | documented, untested |
+| Antigravity CLI | `PreInvocation (invocationNum==0)` | **no viable** | ⚠️ partial — SessionStart only; Stop hook unusable (see below) |
 | Codex | `SessionStart` | `Stop` | ✅ full — automatic via hooks; hook context visible in UI |
 | CommandCode | **does not exist** | `Stop` | partial — close only, automatic; IA synthesis via `cmd -p` |
 
@@ -74,6 +74,12 @@ Transcript path: `~/.gemini/antigravity/brain/{conversationId}/.system_generated
 **`PostInvocation` guardrail potential:** `terminationBehavior: "force_continue"` or `"terminate"` enables loops and guardrails based on tool results — no equivalent exists in Claude Code or CommandCode hooks today.
 
 **Wire format incompatibility with Claude Code:** `PreToolUse` output in Antigravity uses `decision` (not `permissionDecision`). Hooks are not cross-compatible at the wire level even if the logic is portable.
+
+**⚠️ Stop hook — unusable for crystallize (confirmed 2026-06-27):** Two blocking issues discovered in live testing:
+1. **No `/exit` trigger:** There is no `SessionEnd` or `/exit` hook. When the user closes the CLI, the process is killed abruptly (Language Server shutting down) without giving lifecycle scripts a chance to run.
+2. **Background deadlock:** If the `Stop` hook attempts to invoke `agy -p` in background (e.g. via `nohup agy -p ... &`) for AI synthesis, the execution hangs permanently. Antigravity blocks secondary instances while the primary session is alive — this makes the cortex-forge crystallize pattern (Stop hook → `agy -p` → write `.hot/MEMORY.md`) impossible.
+
+**Consequence for cortex-forge:** `cortex-crystallize-antigravity.sh` is non-functional and has been removed from the protocol. In Antigravity, crystallize must be invoked **manually** via `/cortex-crystallize` — the hook cannot automate it. Source: `wiki/sources/antigravity-hooks.md` in moon-multivac (live testing 2026-06-27).
 
 ### Codex
 Configure in `~/.codex/hooks.json`:
@@ -220,7 +226,7 @@ Ability to run query-aware semantic search and inject context before the model p
 | Agent | Hook | Query available | Inject mechanism | Status |
 |-------|------|-----------------|-----------------|--------|
 | Claude Code | `UserPromptSubmit` | ✅ direct in payload | `additionalContext` | ✅ implementable |
-| Antigravity | `PreInvocation` (invocationNum==0) | ⚠️ via `transcriptPath` (one extra read) | `injectSteps.ephemeralMessage` | ✅ implementable |
+| Antigravity | `PreInvocation` (invocationNum==0) | ⚠️ via `transcriptPath` (one extra read) | `injectSteps.ephemeralMessage` | ✅ SessionStart only — Stop deadlocks |
 | Codex | not documented | ❌ | — | ❌ unknown |
 | CommandCode | no equivalent | ❌ | — | ❌ not feasible |
 
@@ -242,3 +248,4 @@ If an agent has no startup hook, `AGENTS.md` acts as a fallback: the explicit in
 - 2026-06-11 [Claude Code]: Agent detection signals section added — confirmed Claude Code env vars; other CLIs marked unconfirmed pending live validation
 - 2026-06-13 [CommandCode]: CommandCode crystallize upgraded with `cmd -p` IA synthesis
 - 2026-06-26 [Claude Code]: Antigravity section expanded with full hook event table (PreInvocation/PostInvocation confirmed from official docs); SuperContext injection table added; wire format incompatibility with Claude Code documented. Source: wiki/sources/antigravity-hooks-reference.md — now produces structured `#### What was done / Discarded / Fragile context` entries instead of minimal "Session closed via Stop hook."
+- 2026-06-27 [Claude Code]: Antigravity Stop hook marked unusable — no /exit trigger + deadlock when launching agy -p in background confirmed in live testing. cortex-crystallize-antigravity.sh removed from protocol; crystallize is manual-only for Antigravity. Source: moon-multivac/wiki/sources/antigravity-hooks.md

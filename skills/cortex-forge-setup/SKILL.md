@@ -161,13 +161,13 @@ Always end with the relevant subset of step 9 (confirmation).
 
    **Antigravity** (`~/.gemini/config/` exists):
    - Create `~/.gemini/config/hooks/` if it doesn't exist.
-   - Create symlinks `~/.gemini/config/hooks/{script}` → `~/.cortex-forge/bin/hooks/{script}` for each Antigravity hook script (`cortex-reactivate-antigravity.sh`, `cortex-crystallize-antigravity.sh`).
+   - Create symlink `~/.gemini/config/hooks/cortex-reactivate-antigravity.sh` → `~/.cortex-forge/bin/hooks/cortex-reactivate-antigravity.sh`.
    - Display instructions for `~/.gemini/config/hooks.json`:
      ```
      Antigravity (~/.gemini/config/hooks.json):
        PreInvocation (invocationNum == 0) → bash ~/.gemini/config/hooks/cortex-reactivate-antigravity.sh
-       Stop (fullyIdle == true)           → bash ~/.gemini/config/hooks/cortex-crystallize-antigravity.sh
      ```
+   - ⚠️ **No Stop hook for Antigravity.** The CLI kills the process abruptly on `/exit` (no `SessionEnd` event), and any attempt to launch `agy -p` from a Stop hook causes a deadlock — Antigravity blocks secondary instances while the primary session is alive. Crystallize must be run **manually** via `/cortex-crystallize` in Antigravity. See `wiki/concepts/agent-hook-compatibility.md`.
 
    **Codex** (`~/.codex/` exists):
    - Create `~/.codex/hooks/` if it doesn't exist.

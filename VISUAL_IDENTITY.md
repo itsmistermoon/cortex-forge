@@ -8,6 +8,10 @@ The visual identity of Cortex Forge exists to reinforce the project's central me
 
 Artwork should support the product and its communication. It is not intended to build an extensive fictional universe. Every image should communicate one clear product message.
 
+**Canonical tagline:** *Forge Knowledge. Empower Agents.*
+
+Use this tagline when the image requires a supporting line. Do not substitute aspirational or generic alternatives.
+
 ---
 
 ## Reference Image
@@ -34,6 +38,8 @@ The visual embodiment of wisdom and craftsmanship. Inspired by the Celtic goddes
 
 Brigid has a physical, directed relationship with the Forge. She works with it — not against an enemy. Her posture is focused and deliberate, never aggressive or combative. She should feel closer to an architect, researcher or master artisan than a fighter.
 
+Her expression ranges from calm concentration to quiet satisfaction. She never shows tension, urgency or aggression.
+
 Brigid is the face of Cortex Forge, but she does not need to appear in every illustration.
 
 ---
@@ -52,15 +58,17 @@ The Hammer is Brigid's primary tool. It is a precision instrument of transformat
 
 ## What Lies on the Anvil
 
-The object being transformed on the Forge represents raw knowledge becoming structured. In the reference image this takes the form of a luminous brain — an acceptable starting point.
+The object being transformed on the Forge represents raw knowledge becoming structured. In the GitHub Hero this takes the form of a luminous brain — an acceptable starting point for that image only.
 
-For future images, prefer more abstract representations: a condensed constellation, a geometric lattice of light, a node network, or a sphere of sacred geometry. Avoid anatomical or biological forms when possible. Knowledge should feel architectural, not organic.
+For all future images, prefer a **node lattice**: a network of interconnected points with flowing lines of energy between them, rendered in the Three Fires palette. The lattice should feel three-dimensional and branching in multiple directions — a graph, not a tree. This communicates interconnected knowledge more precisely than a vertical or linear structure. Avoid anatomical or biological forms. Knowledge should feel architectural, not organic.
 
 ---
 
 ## The Trisquetra
 
 The primary symbol of Cortex Forge. It represents the continuous refinement cycle of knowledge and the harmony of the Three Fires. It may appear engraved, forged, projected as holograms or constructed from pure energy.
+
+The Trisquetra should feel integrated into the composition — part of the environment, the forge, or the lattice. Avoid floating it in isolation as a logo element; when it appears disconnected from the scene it reads as an afterthought.
 
 ---
 
@@ -193,6 +201,8 @@ Highlight only two or three major changes.
 
 The version number should dominate.
 
+Layout: Brigid occupies the center or one side of the frame; release text and feature callouts occupy the opposite side. The illustration and the text panel are two distinct zones — do not mix them. Feature callouts are minimal: name and one short line each.
+
 ---
 
 ## Feature Spotlight
@@ -200,6 +210,8 @@ The version number should dominate.
 Focus on a single capability.
 
 The feature is the hero.
+
+Do not embed the image type name ("Feature Spotlight") as text inside the image. Type labels are added in context — in a README, a blog post, a release page — never hardcoded into the artwork itself.
 
 ---
 

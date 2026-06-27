@@ -228,6 +228,20 @@ Always end with the relevant subset of step 9 (confirmation).
    - Backgrounded: never delays the commit. Not silent: summary line in `.git/cortex-prune.log`.
    - Uninstall (deregister path): remove only the marked block — a diff against the pre-install file must be empty.
 
+6c. **Post-commit re-index (opt-in, separate question)** — ask: "Re-index vault embeddings automatically after each commit? (recommended if semantic search is enabled)"
+   If yes:
+   - Skip silently if `.cortex/vault.db` does not exist (semantic search not enabled for this vault).
+   - Check `git config core.hooksPath` first — if set (husky-style), install into that directory instead of `.git/hooks/`, or warn and skip.
+   - Copy `bin/hooks/cortex-reindex-post-commit.sh` from the forge to `~/.cortex-forge/bin/hooks/` if not already there.
+   - Append the marked block to `{vault}/.git/hooks/post-commit` (create with shebang if missing; never clobber existing content — only add/remove the `>>> cortex-forge reindex >>>` … `<<< cortex-forge reindex <<<` block) and make it executable:
+     ```bash
+     # >>> cortex-forge reindex >>>
+     bash ~/.cortex-forge/bin/hooks/cortex-reindex-post-commit.sh
+     # <<< cortex-forge reindex <<<
+     ```
+   - The hook self-gates: exits immediately if `.cortex/vault.db` or `.cortex/cortex-index.py` don't exist, and only runs when the commit touched `wiki/` files. Never delays the commit perceptibly for unchanged content.
+   - Uninstall (deregister path): remove only the marked block — a diff against the pre-install file must be empty.
+
 7. **Install TASTE rule for `cortex-recall`** — ask: "Install a TASTE rule so CommandCode invokes `/cortex-recall` automatically? (recommended)"
    If yes:
    - Ask: "Where should the rule live?"

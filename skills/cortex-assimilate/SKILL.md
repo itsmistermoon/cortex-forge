@@ -107,7 +107,13 @@ If the argument starts with `--research`, enter research mode instead of the nor
 
 6. Update `{vault}/wiki/index.md` with new pages.
 
-7. **Project linking** — check `{vault}/wiki/pages/` for active projects whose `domains:` match the source; propose the update before writing.
+7. **Re-index embeddings** — if `{vault}/.cortex/vault.db` exists, run:
+   ```
+   python {vault}/.cortex/cortex-index.py {vault}
+   ```
+   Report the result inline: "Indexed N new chunk(s)." If `.cortex/vault.db` does not exist, skip silently — the vault may not have semantic search enabled.
+
+8. **Project linking** — check `{vault}/wiki/pages/` for active projects whose `domains:` match the source; propose the update before writing.
 
 ## When to invoke
 

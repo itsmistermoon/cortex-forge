@@ -4,6 +4,8 @@
 
 A protocol for agent-operated knowledge vaults — six skills, one session layer, any LLM.
 
+> The vault lives wherever you put it. The skills work from anywhere.
+
 ## What it is
 
 Cortex Forge is a structured system for turning raw sources into synthesized, queryable knowledge. Agents operate the vault: they ingest, recall, and maintain. You define what matters and when to persist it.
@@ -15,6 +17,21 @@ The system separates **two kinds of memory** that most tools conflate:
 Session memory keeps context across conversations. The wiki keeps knowledge across projects. They serve different purposes, use different retrieval patterns, and neither can replace the other.
 
 The architecture works with any LLM agent — Claude Code, Codex, Antigravity, CommandCode — via a shared session file and a set of invocable skills.
+
+**You never have to be inside the vault to use it.** The skills are installed globally. From any project, in any session, you can recall knowledge, ingest sources, or snapshot context into a vault that lives somewhere else entirely:
+
+```
+# Working on a client project, querying your personal vault
+/cortex-recall What are the trade-offs of single-table DynamoDB?
+
+# Ingesting a URL from a work session into the personal vault
+/cortex-assimilate personal https://...
+
+# Crystallizing a session from inside any repo
+/cortex-crystallize personal
+```
+
+The vault is a target, not a working directory.
 
 ## Architecture
 
@@ -116,7 +133,7 @@ See `wiki/concepts/agent-hook-compatibility.md` for wire formats, configuration 
 
 ## Multi-vault
 
-Multiple vaults are supported. The global config at `~/.cortex-forge/config.yml` maps names to paths:
+Skills resolve the target vault from wherever you are — no `cd` required. The global config at `~/.cortex-forge/config.yml` maps names to paths:
 
 ```yaml
 vaults:
@@ -125,9 +142,7 @@ vaults:
 default: personal
 ```
 
-Skills resolve the vault automatically: CWD inside a registered vault → that vault; otherwise → `default`. Register a vault by running `/cortex-forge-setup` from inside it.
-
-Some skills also accept an explicit vault name as the first argument, letting you target a specific vault regardless of CWD:
+Skills resolve the vault automatically: if you're inside a registered vault → that vault; otherwise → `default`. Pass an explicit vault name as the first argument to override from anywhere:
 
 ```
 /cortex-assimilate personal <url>

@@ -680,3 +680,21 @@ Sesión posterior al bug de timeout del Stop hook (30s default). Se diagnosticó
 **Observaciones / sugerencias:**
 - El fallback a `CONSOLIDATED.md` es fundamental: sin él, cualquier vault pausado por más de un mes no disparaba la alerta de staleness.
 - Aunque CommandCode carezca de hook de inicio de sesión (`SessionStart`) debido a limitaciones de plataforma, alinear su hook de `Stop` asegura que el archivo local de memoria permanezca consistente y saludable para otros agentes que sí lo inyectan al arrancar.
+
+---
+
+## 2026-06-28 — Claude Code (Sonnet 4.6) — cierre del experimento recall nudge
+
+**Qué ocurrió:** Cierre formal del experimento de comportamiento del recall nudge. El hook `cortex-recall-nudge.sh` fue desinstalado de `~/.claude/settings.local.json` y `~/.claude/hooks/`; el script retenido como `.retired` en `~/.cortex-forge/bin/hooks/`.
+
+**Por qué se cerró:**
+- El hook nunca implementó logging de activaciones — sin registro no hay forma de medir si disparó ni cuántas veces.
+- El experimento requería observación de 5 sesiones donde el nudge hubiera disparado, pero esa condición nunca fue medida en semanas de uso.
+- Medir el comportamiento en proyectos externos (único escenario donde el nudge agrega valor real, ya que dentro del vault `AGENTS.md` ya cubre el caso) requiere esfuerzo manual que nunca ocurriría orgánicamente.
+- Hipótesis detectada en sesión: el "bypass declarativo" (agente invoca `cortex-recall` directamente por instrucción en `AGENTS.md`, sin pasar por Bash) es más frecuente que el bypass que el nudge cubría (grep a `wiki/` o `.raw/`). El nudge cubre un caso residual de baja frecuencia práctica.
+
+**Conclusión:** Kill criterion de facto aplicado — 0 datos en semanas. Hipótesis sin confirmar ni refutar. El protocolo en `AGENTS.md` y `SKILL.md` cubre el caso con mejor alcance y sin overhead de hook. Si en el futuro se retoma, el prerequisito es agregar logging al hook antes de medir.
+
+**Scope del cierre:**
+- SPA/PostToolUse — descartado en paralelo. El skill `cortex-assimilate` ya declara el caso por protocolo; un hook PostToolUse no puede modificar la respuesta del agente.
+- Ports a Codex/Antigravity/CommandCode — nunca ejecutados (gateados en resultado del experimento).

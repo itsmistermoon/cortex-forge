@@ -10,7 +10,7 @@ sources:
 confidence: high
 schema_version: "0.3"
 ---
-
+	
 # Parametric Knowledge
 
 What the model knows from training, stored in its parameters. Frozen at training time — the model cannot see its own parameters or update them.

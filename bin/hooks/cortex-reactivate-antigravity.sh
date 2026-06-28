@@ -21,7 +21,7 @@ find_git_root_dir() {
 }
 
 GIT_ROOT=$(find_git_root_dir)
-HOT="$GIT_ROOT/.hot/MEMORY.md"
+HOT="$GIT_ROOT/.cortex/MEMORY.md"
 
 [ ! -s "$HOT" ] && echo '{"injectSteps":[]}' && exit 0
 
@@ -45,11 +45,11 @@ ENTRY_DATE=$(awk '
 ' "$HOT" 2>/dev/null)
 
 # Fallback to CONSOLIDATED.md if History in MEMORY.md is empty (all entries archived)
-if [ -z "$ENTRY_DATE" ] && [ -f "$GIT_ROOT/.hot/CONSOLIDATED.md" ]; then
+if [ -z "$ENTRY_DATE" ] && [ -f "$GIT_ROOT/.cortex/CONSOLIDATED.md" ]; then
   ENTRY_DATE=$(awk '
     /^### [0-9]{4}-[0-9]{2}-[0-9]{2}/ { last_date = $2 }
     END { print last_date }
-  ' "$GIT_ROOT/.hot/CONSOLIDATED.md" 2>/dev/null)
+  ' "$GIT_ROOT/.cortex/CONSOLIDATED.md" 2>/dev/null)
 fi
 
 DIFF_DAYS=0
@@ -93,7 +93,7 @@ if [ "$IMPRINT_TRIAGE" != "off" ] && [ -n "$ENTRY_DATE" ] && [ "$DIFF_DAYS" -le 
     CANDIDATE_TEXT=$(printf '%s' "$CANDIDATE" | sed 's/ — transcript:.*$//' | sed 's/^- //')
 
     # Write structured draft file
-    DRAFT="$GIT_ROOT/.hot/imprint-draft.md"
+    DRAFT="$GIT_ROOT/.cortex/imprint-draft.md"
     cat > "$DRAFT" <<DRAFTEOF
 ---
 candidate: $CANDIDATE_TEXT
@@ -105,14 +105,14 @@ DRAFTEOF
 
     if [ "$IMPRINT_TRIAGE" = "auto" ]; then
       NUDGE="⚠ IMPRINT CANDIDATE (auto mode): $CANDIDATE_TEXT
-Draft saved to .hot/imprint-draft.md. Run /cortex-imprint now — do not wait for user instruction. Confirm with the user only if the page type or title is ambiguous.
+Draft saved to .cortex/imprint-draft.md. Run /cortex-imprint now — do not wait for user instruction. Confirm with the user only if the page type or title is ambiguous.
 
 ---
 
 "
     else
       NUDGE="⚠ IMPRINT CANDIDATE from last session: $CANDIDATE_TEXT
-Draft info saved to .hot/imprint-draft.md. Run /cortex-imprint to archive it as a permanent wiki page before it's lost.
+Draft info saved to .cortex/imprint-draft.md. Run /cortex-imprint to archive it as a permanent wiki page before it's lost.
 
 ---
 

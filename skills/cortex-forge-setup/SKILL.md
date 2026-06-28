@@ -24,7 +24,7 @@ Always end with the relevant subset of step 9 (confirmation).
 ## Steps
 
 1. **Detect vault from CWD** — validate that the current directory is a valid vault:
-   If `~/.cortex-forge/config.yml` already has an entry for this vault, also read its `locale:` — use it for all agent-generated content. Fallback if absent: `.hot/MEMORY.md` title line (`— locale: {lang}`) → `CODEX.md` Vocabulary (`**locale**:`) → default `en`.
+   If `~/.cortex-forge/config.yml` already has an entry for this vault, also read its `locale:` — use it for all agent-generated content. Fallback if absent: `.cortex/MEMORY.md` title line (`— locale: {lang}`) → `AGENTS.md` Vault identity (`**locale**:`) → default `en`.
 
    - Required: `.git/`, `wiki/`, `AGENTS.md`
    - If validation fails, report what's missing and stop.
@@ -32,13 +32,39 @@ Always end with the relevant subset of step 9 (confirmation).
 
 2. **Read existing config** — read `~/.cortex-forge/config.yml` if it exists.
    - Check if the current vault path is already registered.
-   - **If already registered**: ask "This vault (`{name}`) is already registered. Remove it?"
-     - If yes: remove it from `vaults:`. If it was the default, set default to the next available vault or remove the key. Save config and stop — skip steps 3–6.
-     - If no: proceed to step 3 (re-run updates skills and hooks).
-   - **If not registered**: proceed to step 3.
+   - **If not registered** → vault is new. Proceed through steps 3–9 in full, asking each optional step interactively.
+   - **If already registered** → vault exists. Skip steps 3–9. Instead show a menu (step 2b) and execute only what the user selects.
 
-3. **Write config** — add or update the vault entry in `~/.cortex-forge/config.yml`.
-   - If the vault was **already registered** (detected in step 2), after confirming "no" to removal, ask: "Sync infrastructure files from upstream? (templates, bin scripts)" — if yes, run step 3b before continuing.
+2b. **Maintenance menu (existing vault only)** — present a numbered list of available operations. The user can select one or more numbers (comma-separated), or "all":
+
+   ```
+   Vault "{name}" is already registered. What would you like to do?
+
+     1. Update skills       — reinstall/update all cortex-forge skills in ~/.agents/skills/
+     2. Update hooks        — reinstall session hooks in ~/.claude/settings.json (SessionStart / PreCompact / SessionEnd)
+     3. Sync from upstream  — pull updated templates and bin scripts from the upstream repo
+     4. Initialize semantic search — build .cortex/vault.db for the first time (asks for backend choice)
+     5. Add post-commit prune    — install the vault-report refresh hook
+     6. Add post-commit reindex  — install the embedding reindex hook (requires semantic search)
+     7. Install TASTE rule  — add cortex-recall auto-invoke rule for CommandCode
+     8. Remove this vault   — deregister from config.yml
+     9. Set as default      — make this vault the default
+   ```
+
+   For each selected operation, run the corresponding step in sequence:
+   - 1 → steps 4–5
+   - 2 → step 6 (session hooks only; skip 6a, 6b, 6c — those have their own entries)
+   - 3 → step 3b
+   - 4 → Initialize: run `python3 {forge}/bin/cortex-index.py {vault}`, report chunks indexed. Skip if `.cortex/vault.db` already exists (ask user if they want to re-index instead).
+   - 5 → step 6b
+   - 6 → step 6c (gate still applies: if vault.db doesn't exist, offer option 4 first)
+   - 7 → step 7
+   - 8 → remove vault from `vaults:`, update default if needed, save config, stop
+   - 9 → step 9
+
+   After all selected operations complete, show confirmation (step 10) for only the operations that ran.
+
+3. **Write config** — add the vault entry in `~/.cortex-forge/config.yml` (new vault only).
 
 3b. **Sync infrastructure from upstream** — pull infrastructure files from the upstream repo and apply them to the current vault.
 
@@ -55,8 +81,6 @@ Always end with the relevant subset of step 9 (confirmation).
 
    **Sync scope** — files to download and overwrite locally if content differs:
    - `templates/*.md`
-   - `bin/*.sh`
-   - `bin/hooks/*`
 
    For each file in scope:
    1. Fetch raw content: `https://raw.githubusercontent.com/{upstream}/main/{path}`
@@ -66,21 +90,16 @@ Always end with the relevant subset of step 9 (confirmation).
    **Never touch** (hard exclusions — skip even if present in upstream tree):
    - `wiki/` — personal knowledge
    - `.raw/` — primary sources
-   - `.hot/` — session cache
-   - `CODEX.md` — vault identity; compare structure only (see below)
+   - `.cortex/` — session cache and semantic search (gitignored; not synced)
    - `AGENTS.md` — mixed protocol + personal content; compare structure only (see below)
 
-   **Structure-only divergence checks** — always run for these files even though they're excluded from auto-sync. Fetch each from upstream, then:
+   **Structure-only divergence check** — always run for `AGENTS.md` even though it's excluded from auto-sync. Fetch from upstream, then:
 
    Extract headings from both upstream and local (`##` and `###` lines). Report:
    - Headings present upstream but missing locally → "sections added upstream — consider adding them"
    - Headings present locally but absent upstream → "local-only sections — safe to keep"
    - Never report body content differences, only structural (heading) changes.
-   - Do not overwrite either file under any circumstance.
-
-   Apply this check to:
-   - `AGENTS.md` — protocol sections may be added or renamed as the protocol evolves
-   - `CODEX.md` — template structure may gain new sections (e.g. a new `## Vocabulary` entry or a new top-level section)
+   - Do not overwrite under any circumstance.
 
    **Deletions** — files that exist locally in sync scope but are absent from the upstream tree:
    - Report them as "present locally, removed upstream" and ask the user whether to delete each one (or list them all and ask once with yes/no).
@@ -230,7 +249,11 @@ Always end with the relevant subset of step 9 (confirmation).
 
 6c. **Post-commit re-index (opt-in, separate question)** — ask: "Re-index vault embeddings automatically after each commit? (recommended if semantic search is enabled)"
    If yes:
-   - Skip silently if `.cortex/vault.db` does not exist (semantic search not enabled for this vault).
+   - Check if `.cortex/vault.db` exists:
+     - **Exists** → proceed normally.
+     - **Does not exist** → do NOT skip silently. Instead ask: "Semantic search index not found. Initialize it now? This runs `bin/cortex-index.py` once to build `.cortex/vault.db` (requires `OPENAI_API_KEY` or local mlx/sentence-transformers). Skip if you want to set it up later."
+       - If user confirms: run `python3 {forge}/bin/cortex-index.py {vault}` and wait for it to complete before installing the hook. Report how many chunks were indexed.
+       - If user skips: skip the hook installation and note in the summary that semantic search was not initialized (user can re-run `/cortex-forge-setup` later to add it).
    - Check `git config core.hooksPath` first — if set (husky-style), install into that directory instead of `.git/hooks/`, or warn and skip.
    - Copy `bin/hooks/cortex-reindex-post-commit.sh` from the forge to `~/.cortex-forge/bin/hooks/` if not already there.
    - Append the marked block to `{vault}/.git/hooks/post-commit` (create with shebang if missing; never clobber existing content — only add/remove the `>>> cortex-forge reindex >>>` … `<<< cortex-forge reindex <<<` block) and make it executable:
@@ -254,11 +277,10 @@ Always end with the relevant subset of step 9 (confirmation).
    - Create the `taste/` directory if it doesn't exist.
    - If the file already contains a `## Cortex Forge Skills` section, skip — do not duplicate.
 
-8. **Create CODEX.md** — ask: "Create CODEX.md to configure vault context? (recommended)"
-   If yes:
-   - Copy `CODEX-FORMAT.md` (co-located with this skill) to `{vault}/CODEX.md`.
-   - Tell the user: "Edit CODEX.md to describe your vault's mission, domains, vocabulary, and out-of-scope rules."
-   - If `CODEX.md` already exists, skip — do not overwrite.
+8. **Update AGENTS.md vault identity** — check if `AGENTS.md` contains a `## Vault identity` section.
+   - If missing: ask "Add vault identity section to AGENTS.md? (recommended — sets locale, vocabulary, and out-of-scope rules)"
+     If yes: append a `## Vault identity` section with the template from `CODEX-FORMAT.md` (locale, vocabulary, domains, out-of-scope).
+   - If present: skip silently.
 
 9. **Set default vault** — if more than one vault is registered:
    - Ask: "Which vault should be the default? ({list of registered names})"
@@ -271,15 +293,15 @@ Always end with the relevant subset of step 9 (confirmation).
    - Claude Code symlinks: created / up to date / skipped
    - Hooks: configured / skipped / manual instructions shown
    - TASTE rule: installed per-project / global / skipped — show exact path
-   - CODEX.md: created / already existed / skipped
+   - AGENTS.md vault identity: added / already present / skipped
    - Sync (if run): upstream used, files updated (list), files skipped (count), deletions pending user confirmation, AGENTS.md divergence noted if any
-   - Next step: edit `CODEX.md` if just created; invoke `/cortex-crystallize` at the end of any project session
+   - Next step: fill out vault identity in `AGENTS.md` if just added; invoke `/cortex-crystallize` at the end of any project session
 
 ## Hook behavior
 
 The hooks provide automatic (no-invoke) session memory:
-- **SessionStart** (`cortex-reactivate.sh`) — reads `.hot/MEMORY.md` and injects it as context
-- **PreCompact / Stop** (`cortex-crystallize-claude.sh`) — appends a snapshot to `.hot/MEMORY.md`
+- **SessionStart** (`cortex-reactivate.sh`) — reads `.cortex/MEMORY.md` and injects it as context
+- **PreCompact / Stop** (`cortex-crystallize-claude.sh`) — appends a snapshot to `.cortex/MEMORY.md`
 
 The hook writes a minimal snapshot (files touched, external actions). For a full snapshot with Current state updated, invoke `/cortex-crystallize` manually — hooks and manual invocation are compatible and complementary.
 

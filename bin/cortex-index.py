@@ -12,25 +12,25 @@ import sys
 from pathlib import Path
 
 
-def _resolve_forge_cortex() -> Path:
-    """Find .cortex/ from cortex-forge via ~/.cortex-forge/config.yml."""
+def _resolve_forge_db() -> Path:
+    """Find .cortex/db/ from cortex-forge via ~/.cortex-forge/config.yml."""
     config = Path.home() / ".cortex-forge" / "config.yml"
     if config.exists():
         for line in config.read_text().splitlines():
             line = line.strip()
             if line.startswith("path:"):
-                candidate = Path(line.split("path:", 1)[1].strip()) / ".cortex"
+                candidate = Path(line.split("path:", 1)[1].strip()) / ".cortex" / "db"
                 if (candidate / "embeddings.py").exists():
                     return candidate
-    # Fallback: this script lives in <forge>/bin/, so .cortex is sibling
-    fallback = Path(__file__).parent.parent / ".cortex"
+    # Fallback: this script lives in <forge>/bin/, so .cortex/db is sibling of parent
+    fallback = Path(__file__).parent.parent / ".cortex" / "db"
     if (fallback / "embeddings.py").exists():
         return fallback
-    print("ERROR: Cannot locate cortex-forge .cortex/. Check ~/.cortex-forge/config.yml.", file=sys.stderr)
+    print("ERROR: Cannot locate cortex-forge .cortex/db/. Check ~/.cortex-forge/config.yml.", file=sys.stderr)
     sys.exit(1)
 
 
-sys.path.insert(0, str(_resolve_forge_cortex()))
+sys.path.insert(0, str(_resolve_forge_db()))
 import embeddings as emb
 
 CHUNK_WORD_LIMIT = 500
@@ -207,7 +207,7 @@ def calibrate(conn: sqlite3.Connection, vault: Path, config_path: Path) -> None:
     """
     Sample intra-file pairs (similar) and inter-file pairs (dissimilar).
     Re-embeds text directly to avoid sqlite-vec blob format issues.
-    Sets threshold at p75 of dissimilar distances, saves to .cortex/config.json.
+    Sets threshold at p75 of dissimilar distances, saves to .cortex/db/config.json.
     """
     import random
 
@@ -275,8 +275,8 @@ def calibrate(conn: sqlite3.Connection, vault: Path, config_path: Path) -> None:
 def main():
     vault = get_vault(sys.argv)
     wiki_dir = vault / "wiki"
-    cortex_dir = vault / ".cortex"
-    cortex_dir.mkdir(exist_ok=True)
+    cortex_dir = vault / ".cortex" / "db"
+    cortex_dir.mkdir(parents=True, exist_ok=True)
     db_path = cortex_dir / "vault.db"
     config_path = cortex_dir / "config.json"
 

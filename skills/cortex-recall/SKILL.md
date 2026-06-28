@@ -13,7 +13,7 @@ Answer a question using the vault's wiki content as the source.
 ## Steps
 
 1. **Resolve vault** — read `~/.cortex-forge/config.yml`:
-   Also read `locale:` from the vault's entry — use it for all agent-generated content. Fallback if absent: `.hot/MEMORY.md` title line (`— locale: {lang}`) → `CODEX.md` Vocabulary (`**locale**:`) → default `en`.
+   Also read `locale:` from the vault's entry — use it for all agent-generated content. Fallback if absent: `.cortex/MEMORY.md` title line (`— locale: {lang}`) → `AGENTS.md` Vault identity (`**locale**:`) → default `en`.
 
    - If the first argument matches a registered vault name (e.g., `/cortex-recall second-brain <query>`) → use that vault; treat the remaining text as the query.
    - Otherwise: check if CWD is inside any registered vault (CWD starts with a `vaults:` path) → use that vault.
@@ -21,10 +21,10 @@ Answer a question using the vault's wiki content as the source.
    - If no default and multiple vaults are registered → ask the user to pick one.
    - If no vaults registered → stop and prompt to run `/cortex-forge-setup`.
 
-2. If `{vault}/CODEX.md` exists, read **Vocabulary** and **Domains** — use them to interpret the query correctly and scope the search.
+2. Read **Vocabulary** and **Domains** from `{vault}/AGENTS.md` (`## Vault identity` section) — use them to interpret the query correctly and scope the search.
 
 3. **Identify relevant pages** — prefer semantic search if the index is available:
-   - If `.cortex/vault.db` exists: run `python {vault}/.cortex/cortex-search.py "{query}" --top-k 8 --json`
+   - If `.cortex/db/vault.db` exists: run `python {vault}/.cortex/db/cortex-search.py "{query}" --top-k 8 --json`
      and use the returned chunks (path + heading + content) as the primary source set.
    - Otherwise: read `{vault}/wiki/index.md` and identify pages manually.
 

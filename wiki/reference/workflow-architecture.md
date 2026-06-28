@@ -2,7 +2,7 @@
 title: Workflow Architecture
 type: reference
 created: 2026-06-13
-updated: 2026-06-13
+updated: 2026-06-27
 tags: [cortex-forge, architecture, workflow, hooks, skills, scripts, agents]
 sources:
   - wiki/sources/commandcode-hooks-configuration.md
@@ -24,8 +24,8 @@ Cómo opera cortex-forge a través de agentes: qué se gatilla en cada fase de u
 Cada sesión de un agente sigue tres fases: **Start**, **During** y **End**. cortex-forge actúa en cada una con un mecanismo distinto — hooks automáticos cuando existen, skills manuales como fallback.
 
 ```
-Start ─────┬─ Hook SessionStart → inyecta .hot/MEMORY.md
-            └─ Sin hook → AGENTS.md instruye leer .hot/MEMORY.md
+Start ─────┬─ Hook SessionStart → inyecta .cortex/MEMORY.md
+            └─ Sin hook → AGENTS.md instruye leer .cortex/MEMORY.md
 
 During ──── Skills invocados por el agente:
               /cortex-assimilate, /cortex-recall, /cortex-prune,
@@ -39,7 +39,7 @@ End ───────┬─ Hook Stop → extrae transcript, sintetiza, escr
 
 ## Fase 1: Session Start — Cargar contexto
 
-El agente necesita saber qué pasó antes. Cortex-forge se lo entrega via `.hot/MEMORY.md`.
+El agente necesita saber qué pasó antes. Cortex-forge se lo entrega via `.cortex/MEMORY.md`.
 
 | Agente | Evento | Script | Mecanismo | Dónde se configura |
 |--------|--------|--------|-----------|-------------------|
@@ -48,7 +48,7 @@ El agente necesita saber qué pasó antes. Cortex-forge se lo entrega via `.hot/
 | Antigravity | `PreInvocation` (invoc. 0) | `cortex-reactivate-antigravity.sh` | Lee MEMORY.md Zone 1, inyecta como `ephemeralMessage` | `~/.gemini/config/hooks.json` (global) |
 | CommandCode | **no existe** | — | Sin SessionStart hook. Reemplazo: AGENTS.md + TASTE rule instruyen leer MEMORY.md al inicio | — |
 
-**Fallo conocido (CommandCode):** no hay hook para inyectar contexto automáticamente. La instrucción en `AGENTS.md` de leer `.hot/MEMORY.md` es la única vía. Funciona si el agente respeta AGENTS.md, pero es menos confiable que un hook.
+**Fallo conocido (CommandCode):** no hay hook para inyectar contexto automáticamente. La instrucción en `AGENTS.md` de leer `.cortex/MEMORY.md` es la única vía. Funciona si el agente respeta AGENTS.md, pero es menos confiable que un hook.
 
 ---
 
@@ -60,7 +60,7 @@ Skills se invocan manualmente durante la sesión. No tienen hooks — el agente 
 |-------|---------------|----------|-----------|
 | `/cortex-recall` | Cuando el usuario pregunta sobre algo que el vault pueda cubrir | Busca en `wiki/` y responde con citas + confidence. **Protocolo obligatorio** — no usar grep/find como reemplazo | `skills/cortex-recall/SKILL.md` |
 | `/cortex-assimilate` | Cuando llega una URL o archivo nuevo para ingerir | Descarga → SPA detection → guarda en `.raw/` → sintetiza páginas wiki → actualiza índice. **Protocolo obligatorio** | `skills/cortex-assimilate/SKILL.md` |
-| `/cortex-crystallize` | Al cerrar un hito, o cuando el usuario pide "guardar contexto" | Snapshot del estado actual de la sesión en `.hot/MEMORY.md` | `skills/cortex-crystallize/SKILL.md` |
+| `/cortex-crystallize` | Al cerrar un hito, o cuando el usuario pide "guardar contexto" | Snapshot del estado actual de la sesión en `.cortex/MEMORY.md` | `skills/cortex-crystallize/SKILL.md` |
 | `/cortex-prune` | Periódicamente, o cuando el vault-report muestra issues | Health check: detecta dead links, raw huerfanos, páginas sin frontmatter, confidence faltante | `skills/cortex-prune/SKILL.md` |
 | `/cortex-imprint` | Cuando la sesión produjo análisis o síntesis que vale la pena persistir | Archiva el hallazgo como página permanente en `wiki/` | `skills/cortex-imprint/SKILL.md` |
 
@@ -74,7 +74,7 @@ Al cerrar la sesión, el agente necesita escribir qué se hizo, qué se descart�
 
 | Agente | Evento | Script | Qué hace | Dónde se configura |
 |--------|--------|--------|----------|-------------------|
-| Claude Code | `SessionEnd` (Stop) | `cortex-crystallize-claude.sh` | Parsea transcript JSONL via jq, extrae tool calls + user messages, llama `claude -p` para síntesis IA, escribe en `.hot/MEMORY.md` | `~/.claude/settings.local.json` (global) |
+| Claude Code | `SessionEnd` (Stop) | `cortex-crystallize-claude.sh` | Parsea transcript JSONL via jq, extrae tool calls + user messages, llama `claude -p` para síntesis IA, escribe en `.cortex/MEMORY.md` | `~/.claude/settings.local.json` (global) |
 | Claude Code | `PreCompact` | `cortex-crystallize-claude.sh` | Mismo script, mismo prompt pero con mode note "mid-session" — se ejecuta ANTES de compactar la ventana | `~/.claude/settings.local.json` (global) |
 | Codex | `Stop` | `cortex-crystallize-codex.sh` | Wrapper de 12 líneas: setea `AGENT_LABEL=Codex`, delega a `cortex-crystallize-claude.sh` | `~/.codex/hooks.json` (global) |
 | CommandCode | `Stop` | `cortex-crystallize-commandcode.sh` | Parsea transcript JSONL (schema CommandCode: `role`-based), extrae tool calls, llama `cmd -p` para síntesis IA. Timeout configurado a 120s (la llamada API puede tomar 20-60s) | `{vault}/.commandcode/settings.local.json` (proyecto) |
@@ -100,25 +100,45 @@ No todos los Stop son iguales. Según el agente, el evento Stop puede tener sub-
 
 ## Scripts: referencia completa
 
-### Hook scripts en `bin/hooks/`
+### Hook scripts en `~/.cortex-forge/bin/hooks/`
+
+Todos los scripts viven en el directorio global de config — **nunca en `bin/` de un vault consumidor**. Los hooks de cada agente apuntan a esta ubicación directamente.
 
 | Script | Para qué agente | Evento | Propósito |
 |--------|----------------|--------|-----------|
-| `cortex-reactivate.sh` | Claude Code, Codex | SessionStart | Inyecta .hot/MEMORY.md como contexto adicional |
-| `cortex-reactivate-antigravity.sh` | Antigravity | PreInvocation (invoc 0) | Inyecta .hot/MEMORY.md Zone 1 como ephemeralMessage |
+| `cortex-reactivate.sh` | Claude Code, Codex | SessionStart | Inyecta .cortex/MEMORY.md como contexto adicional |
+| `cortex-reactivate-antigravity.sh` | Antigravity | PreInvocation (invoc 0) | Inyecta .cortex/MEMORY.md Zone 1 como ephemeralMessage |
 | `cortex-crystallize-claude.sh` | Claude Code, Codex | SessionEnd, PreCompact, Stop | Parsea transcript, sintetiza via `claude -p`, escribe snapshot |
 | `cortex-crystallize-codex.sh` | Codex | Stop | Wrapper: setea Codex labels, delega al script Claude |
 | `cortex-crystallize-commandcode.sh` | CommandCode | Stop | Parsea transcript CommandCode, sintetiza via `cmd -p`, escribe snapshot |
 | `cortex-crystallize-antigravity.sh` | Antigravity | Stop (fullyIdle) | Parsea DB Antigravity, sintetiza via `agy -p`, escribe snapshot |
 | `cortex-recall-nudge.sh` | Claude Code (Bash matcher) | PreToolUse | Nudge a usar `/cortex-recall` cuando grep/rg apunta a wiki/ |
+| `cortex-reindex-post-commit.sh` | Todos (git hook) | post-commit | Re-indexa `.cortex/vault.db` cuando el commit toca archivos `wiki/` |
 
-### Scripts standalone en `bin/`
+### Scripts standalone (solo en el repo fuente)
+
+Estos scripts solo existen en el repo `moon-cortexforge`. Los vaults consumidores no los tienen.
 
 | Script | Propósito | Uso |
 |--------|-----------|-----|
 | `cortex-prune.sh` | Health check estructural del vault | Manual o via post-commit hook |
 | `cortex-sanitize.sh` | Escaneo de seguridad antes de ingerir a .raw/ | Manual, paso intermedio de `/cortex-assimilate` |
 | `setup-vault.sh` | Crear estructura de directorios + config Obsidian | Una vez, al crear el vault |
+
+### Hook scripts en `.git/hooks/`
+
+El post-commit hook del vault (`<vault>/.git/hooks/post-commit`) orquesta triggers automáticos tras cada commit.
+
+| Bloque | Script invocado | Qué hace | Condición |
+|--------|----------------|----------|-----------|
+| `cortex-forge prune` | `~/.cortex-forge/bin/hooks/cortex-prune.sh` | Refresca `wiki/meta/vault-report.json`; log en `.git/cortex-prune.log` | Siempre (backgrounded, fail-open) |
+| `cortex-forge reindex` | `~/.cortex-forge/bin/hooks/cortex-reindex-post-commit.sh` | Re-indexa embeddings cuando el commit tocó archivos `wiki/` | Solo si `.cortex/vault.db` existe Y el commit incluyó cambios en `wiki/` |
+
+**Flujo del reindex:** el script detecta cuántos archivos `wiki/` cambiaron en el commit (`git diff-tree`), y solo entonces invoca `bin/cortex-index.py` sobre la raíz del vault. Si la DB no existe o no hay archivos wiki modificados, sale silenciosamente (`exit 0`). El bloque usa `|| true` para ser fail-open — nunca bloquea un commit.
+
+**Instalación:** el post-commit hook se instala en `<vault>/.git/hooks/post-commit` durante `/cortex-forge-setup`.
+
+**Nota de rendimiento:** el reindex es full (no incremental) — recorre todos los archivos wiki/ en cada commit que los toque. Aceptable con < 200 páginas; en vaults grandes puede requerir estrategia incremental (indexar solo los paths del diff).
 
 ---
 
@@ -131,7 +151,7 @@ No todos los agentes tienen el mismo soporte de hooks. Esta tabla muestra qué f
 | **Claude Code** | ✅ `SessionStart` | ✅ `SessionEnd` | ✅ `PreCompact` | **Completo.** Todos los hooks existen. Ciclo cerrado automático. |
 | **Codex** | ✅ `SessionStart` | ✅ `Stop` | ❌ | **Casi completo.** No hay PreCompact → el snapshot solo ocurre al cerrar sesión. Si la ventana se llena, se pierde contexto medio sin registro. Reemplazo: invocar `/cortex-crystallize` manual antes de que la ventana se llene. |
 | **Antigravity** | ⚠ `PreInvocation` (condicional) | ⚠ `Stop` (condicional) | ❌ | **Parcial.** Start requiere `invocationNum==0`, Stop requiere `fullyIdle==true`. Si el agente se cierra abruptamente, no hay snapshot. Reemplazo: `AGENTS.md` + invocación manual de `/cortex-crystallize`. |
-| **CommandCode** | ❌ No existe | ✅ `Stop` | ❌ | **Mitad.** El Stop funciona y produce snapshots con IA. Pero sin SessionStart, el contexto hay que cargarlo via `AGENTS.md` + TASTE rules. Es menos confiable — el agente puede ignorar la instrucción. Reemplazo: `AGENTS.md` con instrucción explícita de leer `.hot/MEMORY.md`. Plan mode desactiva incluso el Stop. |
+| **CommandCode** | ❌ No existe | ✅ `Stop` | ❌ | **Mitad.** El Stop funciona y produce snapshots con IA. Pero sin SessionStart, el contexto hay que cargarlo via `AGENTS.md` + TASTE rules. Es menos confiable — el agente puede ignorar la instrucción. Reemplazo: `AGENTS.md` con instrucción explícita de leer `.cortex/MEMORY.md`. Plan mode desactiva incluso el Stop. |
 | **Trae, Copilot CLI, Cursor, etc.** | ❌ | ❌ | ❌ | **Solo manual.** Sin hooks disponibles. El protocolo funciona via `AGENTS.md` + skills invocados manualmente. El agente lee las instrucciones, invoca `/cortex-crystallize` cuando corresponde. |
 
 ### Regla general
@@ -142,7 +162,7 @@ No todos los agentes tienen el mismo soporte de hooks. Esta tabla muestra qué f
 ¿Nada?            → Manual (humano instruye al agente paso a paso)
 ```
 
-Los tres niveles producen `.hot/MEMORY.md` en el mismo formato. Cualquier agente leyendo el archivo no puede distinguir si fue escrito por un hook o por un skill manual.
+Los tres niveles producen `.cortex/MEMORY.md` en el mismo formato. Cualquier agente leyendo el archivo no puede distinguir si fue escrito por un hook o por un skill manual.
 
 ---
 
@@ -160,10 +180,12 @@ Los tres niveles producen `.hot/MEMORY.md` en el mismo formato. Cualquier agente
 
 ### Ubicación de scripts
 
-Los hooks invocan scripts que están en `bin/hooks/` del vault. Durante la instalación (`/cortex-forge-setup`), los scripts se copian al directorio global de hooks del agente (`~/.claude/hooks/`, `~/.codex/hooks/`, etc.).
+Los scripts viven en `~/.cortex-forge/bin/hooks/` (global, única copia). Los agentes apuntan directamente a esta ubicación. Los vaults consumidores no tienen `bin/` — solo el repo fuente (`moon-cortexforge`) lo tiene como directorio de desarrollo.
 
-Para CommandCode, los scripts se ejecutan directamente desde `bin/hooks/` del vault (no hay copia global porque CommandCode permite rutas absolutas en `settings.local.json`).
+Para CommandCode, los scripts también se resuelven desde `~/.cortex-forge/bin/hooks/` vía ruta absoluta en `settings.local.json`.
 
 ---
 
 - 2026-06-13 [CommandCode]: Page created — comprehensive workflow architecture reference covering 3-phase flow, hooks per agent, skills, scripts, degraded modes, and config files
+- 2026-06-27 [Claude Code]: Added `.git/hooks/` section — post-commit hook blocks (prune + reindex), reindex trigger conditions, performance note on full vs incremental strategy
+- 2026-06-28 [Claude Code]: Corrected script location throughout — all scripts live in `~/.cortex-forge/bin/hooks/` (global), never in consumer vault `bin/`; added reindex script to hook table; clarified standalone scripts are repo-only

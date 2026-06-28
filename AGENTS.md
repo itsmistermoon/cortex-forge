@@ -4,25 +4,29 @@ schema_version: "0.3"
 
 # AGENTS.md — cortex-forge
 
-## About this vault
+## Vault identity
 
-See `CODEX.md` for vault context: mission, owner, domains, vocabulary, and out-of-scope rules.
+**locale**: en — locale for agent-generated content (hot cache entries, skill acknowledgments).
+
+**Vocabulary:**
+- **hot cache**: session memory per project (`.cortex/`), not persistent knowledge
+- **vault**: a knowledge base managed by Cortex Forge, not a password manager
 
 ## Crystallize protocol — MANDATORY
 
-`.hot/MEMORY.md` exists in this vault. It has two zones: a mutable `Current state` (`### Pending` items and `### Active decisions`) and an append-only `History` of session snapshots. Both must inform every session.
+`.cortex/MEMORY.md` exists in this vault. It has two zones: a mutable `Current state` (`### Pending` items and `### Active decisions`) and an append-only `History` of session snapshots. Both must inform every session.
 
 **Before your first response to the user, in any session that starts in this vault, you MUST:**
 
-1. Read `.hot/MEMORY.md` in full.
-2. If `CODEX.md` exists at the vault root, read it — it provides context that grounds relevance, vocabulary, and tone decisions throughout the session.
+1. Read `.cortex/MEMORY.md` in full.
+2. If `.cortex/PRAXIS.md` exists, read it — it provides accumulated agent context (structural conventions and working context) that grounds decisions for the session.
 3. If `wiki/meta/vault-report.json` exists, read it. If `health.dead_links` or `health.raw_without_source_page` is non-empty, surface these to the user in your first message as actionable issues — not background noise.
 4. Treat all of the above as required context — not optional background.
 5. If `MEMORY.md` contains `### Pending` items, acknowledge them in your first message or surface them before starting new work.
 
 **Failure to load hot cache before first response is a protocol violation**, equivalent to ignoring `CLAUDE.md` in Claude Code.
 
-**After milestones**, invoke `/cortex-crystallize` to snapshot progress back into `.hot/MEMORY.md`. The `.hot/` directory is gitignored — it's a local agent artifact, not versioned content.
+**After milestones**, invoke `/cortex-crystallize` to snapshot progress back into `.cortex/MEMORY.md`. The entire `.cortex/` directory is gitignored — it's a local agent artifact, not versioned content.
 
 **Compliance criterion:** after invoking `/cortex-crystallize`, confirm what changed — state which items moved to Current state and what was appended to History. If the session produced analysis or synthesis worth persisting, propose `/cortex-imprint` before closing.
 
@@ -72,7 +76,7 @@ Trigger phrases include: "what does the vault say about", "recall", "what do we 
 - `cortex-prune` — Health check: detect orphans, dead links, stale claims, missing provenance
 
 **Global** (`skills/{name}/SKILL.md` — installed to `~/.agents/skills/` via `/cortex-forge-setup`):
-- `/cortex-crystallize` — Snapshot session context into `.hot/MEMORY.md`, works from any repo
+- `/cortex-crystallize` — Snapshot session context into `.cortex/MEMORY.md`, works from any repo
 - `/cortex-forge-setup` — Initial setup: configure vault path and install global skills
 
 ## Vault architecture
@@ -83,8 +87,7 @@ Six layers, each with a distinct role:
 |-------|------|---------|------|
 | **Raw** | `.raw/` | Primary sources — immutable originals (articles, docs, transcripts) | Never modify |
 | **Wiki** | `wiki/` | Secondary sources — synthesized knowledge; one step removed from primaries | Agent writes and maintains |
-| **Hot** | `.hot/` | Per-project session cache | Read on session start, write via /cortex-crystallize |
-| **Codex** | `CODEX.md` | Vault context: mission, owner, domains, vocabulary | Read on session start after `.hot/` |
+| **Hot** | `.cortex/` | Per-project session cache (MEMORY.md, PRAXIS.md) and semantic search DB (`db/`) | Read on session start, write via /cortex-crystallize |
 | **Meta** | `wiki/meta/` | Vault metadata and guides | Agent maintains |
 | **Skills** | `skills/` | Invocable agent skills | Extend, don't modify |
 | **Docs** | `docs/` | Design notes, protocol rationale, resilience proposals | Reference before implementing changes |

@@ -9,25 +9,25 @@ Objetivo: que el Hot Cache Protocol funcione en todos los agentes soportados.
 - [x] Antigravity CLI — completo
   - [x] Correr `/cortex-forge-setup` desde Antigravity — muestra el bloque JSON a agregar
   - [x] Configurar hooks en `~/.gemini/config/hooks.json` (PreInvocation + Stop) — migrado a `cortex-reactivate-antigravity.sh` + `cortex-crystallize-antigravity.sh`; symlink a `~/.gemini/antigravity-cli/hooks.json` por bug agy-cli #49
-  - [x] **PROBAR**: `cortex-reactivate-antigravity.sh` inyecta Zone 1 de `.hot/` al inicio — sin payload devuelve `{"injectSteps":[]}` (correcto); con `invocationNum=0` + workspace inyecta Zone 1 correctamente
+  - [x] **PROBAR**: `cortex-reactivate-antigravity.sh` inyecta Zone 1 de `.cortex/` al inicio — sin payload devuelve `{"injectSteps":[]}` (correcto); con `invocationNum=0` + workspace inyecta Zone 1 correctamente
   - [x] **REESCRIBIR**: `cortex-crystallize-antigravity.sh` — script original usaba `jq` sobre el transcript; Antigravity guarda transcripts como SQLite+Protobuf (`.db`), no JSON. Script reescrito para extraer via `strings $TRANSCRIPT | grep -oE '"toolSummary":"[^"]*"'` y mensajes de usuario desde `history.jsonl`. Fix de portabilidad: `grep -P` → `grep -E` (BSD grep en macOS). Guard `[ -z "$TOOL_SUMMARIES" ] && exit 0` protege sesiones de solo lectura.
-  - [x] **VALIDAR** en sesión orgánica real: `fullyIdle==true` dispara hook → `agy -p` sobre transcript real → síntesis descriptiva escrita en `.hot/MEMORY.md` — trigger real validado en sesión orgánica (692b01be) ✅
+  - [x] **VALIDAR** en sesión orgánica real: `fullyIdle==true` dispara hook → `agy -p` sobre transcript real → síntesis descriptiva escrita en `.cortex/MEMORY.md` — trigger real validado en sesión orgánica (692b01be) ✅
   - [x] **VERIFICAR**: contradicción en path de `settings.json` — no existe `~/.gemini/config/settings.json`; el archivo real es `~/.gemini/antigravity-cli/settings.json`
   - [x] Ingestar una fuente con `cortex-assimilate`
   - [x] Consultar conocimiento con `cortex-recall` — validado con citations y confidence level ✅
 - [ ] Codex — parcial
   - [ ] Correr `/cortex-forge-setup` desde Codex — verificar que detecta config existente y ofrece "Update"
   - [x] Pegar bloque en `~/.codex/hooks.json` (SessionStart + Stop)
-  - [x] Verificar que `.hot/` se inyecta en contexto al iniciar sesión — hook nativo confirmado; `hook context:` visible en UI es comportamiento de diseño, no error de parsing
+  - [x] Verificar que `.cortex/` se inyecta en contexto al iniciar sesión — hook nativo confirmado; `hook context:` visible en UI es comportamiento de diseño, no error de parsing
   - [x] Crear `cortex-crystallize-codex.sh` — wrapper de 12 líneas que delega en `cortex-crystallize-claude.sh` con `AGENT_LABEL=Codex`; instalado en `~/.codex/hooks/cortex-crystallize-codex.sh`
-  - [ ] **VALIDAR** flujo end-to-end: SessionStart inyecta `.hot/` → trabajo real → Stop dispara wrapper → síntesis escrita — wrapper creado ✅; validación en sesión orgánica pendiente ❌
+  - [ ] **VALIDAR** flujo end-to-end: SessionStart inyecta `.cortex/` → trabajo real → Stop dispara wrapper → síntesis escrita — wrapper creado ✅; validación en sesión orgánica pendiente ❌
   - [ ] Ingestar una fuente con `cortex-assimilate`
   - [ ] Consultar conocimiento con `cortex-recall`
 - [ ] CommandCode — parcial; Capa 1 confirmada, hooks de cierre pendientes
   - [x] Correr `/cortex-forge-setup` desde CommandCode — re-ejecutado; skills y symlinks actualizados
   - [x] Pegar bloque de Stop hook en el archivo de hooks de CommandCode — copiado a `second-brain/.commandcode/settings.local.json` con wire format anidado
-  - [x] Verificar modo degradado sesión 1: agente lee `.hot/` vía `AGENTS.md` (Capa 1 confirmada — lectura en primer turno, contexto de proyecto inmediato)
-  - [x] Verificar ciclo completo sesión 2: `.hot/` escrito en sesión 1 es leído correctamente en sesión 2
+  - [x] Verificar modo degradado sesión 1: agente lee `.cortex/` vía `AGENTS.md` (Capa 1 confirmada — lectura en primer turno, contexto de proyecto inmediato)
+  - [x] Verificar ciclo completo sesión 2: `.cortex/` escrito en sesión 1 es leído correctamente en sesión 2
   - [x] Ejecutar `cortex-crystallize` y confirmar snapshot guardado
   - [x] Ingestar una fuente con `cortex-assimilate`
   - [ ] Consultar conocimiento con `cortex-recall` — falló proactivamente (usó `grep`); funciona bajo instrucción explícita
@@ -45,9 +45,9 @@ Objetivo: que el Hot Cache Protocol funcione en todos los agentes soportados.
   - [ ] Ports a Codex/Antigravity/CommandCode — bloqueados hasta que el experimento muestre cambio de comportamiento (pendiente por agente)
 - [x] Versionado de schema en `AGENTS.md` y templates (`schema_version: "0.3"`) — 2026-06-15
 - [~] `cortex-prune` automático vía hook periódico — **parcial** 2026-06-12: post-commit hook (backlog #2 Item 2) refresca `vault-report.json` en cada commit (setup paso 6b); post-commit ≠ periódico — detección de staleness en vaults dormidos sigue abierta. Pendiente: validar en second-brain (vault con commits de contenido reales)
-- [ ] Detección de hot cache stale (sin actualizar en N días)
-- [x] Campo `agent:` en frontmatter de snapshots `.hot/` — identifica qué agente escribió cada entrada; necesario para resolver conflictos en vaults multi-agente
-- [ ] Split `Project state` / `Agent context` en `.hot/` — separar estado del proyecto (pendientes, decisiones) del contexto específico del agente (convenciones aprendidas, workarounds); patrón validado por MEMORY.md + USER.md de Hermes
+- [x] Detección de hot cache stale (sin actualizar en N días) — `hot_cache_stale_days:` en `config.yml`; `cortex-reactivate.sh` y `cortex-reactivate-antigravity.sh` inyectan warning al inicio de sesión si supera el umbral
+- [x] Campo `agent:` en frontmatter de snapshots `.cortex/` — identifica qué agente escribió cada entrada; necesario para resolver conflictos en vaults multi-agente
+- [x] Split `Project state` / `Agent context` — `.cortex/MEMORY.md` (estado de sesión) + `.cortex/PRAXIS.md` (contexto acumulado del agente: convenciones permanentes + working context con TTL 30 días). `.hot/` eliminado; todo en `.cortex/`. `CODEX.md` absorbido en `AGENTS.md` (`## Vault identity`). (2026-06-28)
 - [ ] Context fencing en `cortex-imprint` — al escribir páginas wiki, la fuente de verdad es `.raw/`; las páginas wiki existentes son referencia, no fuente; previene contaminación circular donde el agente "recuerda" resúmenes de sus propias memorias
 - [ ] Tags de comportamiento en skills (`behavior:` en frontmatter) — clasificar skills por lo que el agente *hace* (`#synthesize`, `#ingest`, `#recall`, `#prune`) además de su nombre; un skill con múltiples comportamientos es señal de que debe dividirse
 
@@ -59,9 +59,9 @@ Decisiones derivadas de la ingesta de obsidian-mind + guías de @affaan (`wiki/s
 - [x] **Sanitización en `cortex-assimilate`** — `bin/cortex-sanitize.sh` creado y paso 4a agregado al skill. Escanea: Unicode invisible, comentarios HTML, base64 embebido, comandos de egress, `ANTHROPIC_BASE_URL`. Hallazgo → reporta al usuario, no bloquea. (2026-06-12, CommandCode)
 - [x] **Pipeline imprint: detección al Stop + triage al SessionStart** — implementado 2026-06-15:
   - [x] Crystallize (Stop): Haiku detecta síntesis durable → genera `#### Imprint candidate` con bullet + `— transcript: <path>` en la entrada de History.
-  - [x] SessionStart: detecta candidate en la entrada más reciente del History, chequea expiración (>30 días → ignora), escribe `.hot/imprint-draft.md` con candidate + transcript path, inyecta nudge.
+  - [x] SessionStart: detecta candidate en la entrada más reciente del History, chequea expiración (>30 días → ignora), escribe `.cortex/imprint-draft.md` con candidate + transcript path, inyecta nudge.
   - [x] Toggle `imprint_triage: off | suggest | auto` en `~/.cortex-forge/config.yml` (global o por vault). Backwards compat `true`→`suggest`, `false`→`off`. Default `suggest` en config global.
-  - [x] `cortex-imprint/SKILL.md` lee `.hot/imprint-draft.md` si existe (paso 0) y lo elimina tras leerlo.
+  - [x] `cortex-imprint/SKILL.md` lee `.cortex/imprint-draft.md` si existe (paso 0) y lo elimina tras leerlo.
   - [ ] **Pendiente — modo `auto` completo**: hoy `auto` se comporta igual que `suggest` (nudge más fuerte, pero sin subagente autónomo). Implementación completa: el hook lanza `claude -p` (Haiku) bloqueante que lee el transcript + candidate y escribe la página wiki directamente en el vault. Requiere que el hook conozca vault path, taxonomía de tipos y templates — diseñar como script separado `bin/cortex-imprint-auto.sh` invocado desde el hook solo cuando `imprint_triage: auto`.
   - Nota de diseño: la garantía de consumo viene del **canal inyectado** (hot cache), no de la redacción de skills/AGENTS.md — los flags viajan en la misma inyección que ya es confiable. Lección crítica que deba sobrevivir siempre → destilar a una línea en `Current state`, detalle largo en wiki.
   - Pendientes por agente: localización de transcripts en Codex (`~/.codex/sessions/`) y Antigravity (SQLite+Protobuf — sin path JSONL); **CommandCode resuelto** (2026-06-12): `~/.commandcode/projects/{project-slug}/{session-uuid}.jsonl`, también disponible vía `transcript_path` en stdin de hooks. Subagente en background es capacidad de Claude Code, sin equivalente verificado en los demás. Fuentes: `wiki/sources/commandcode-hooks-reference`, `wiki/sources/commandcode-headless`, inspección de filesystem real.
@@ -119,13 +119,13 @@ Diseño completo en `CORTEX_FORGE_PLAN.md`. Esta fase desbloquea Fase 4: sin vec
 
 ### Etapa 1 — Índice vectorial local
 
-- [x] Crear `.cortex/embeddings.py` — módulo compartido; backends Ollama (default), mlx-embeddings (Apple Silicon), sentence-transformers (fallback); prefijos `search_document:`/`search_query:` para nomic-embed-text-v1.5
+- [x] Crear `.cortex/db/embeddings.py` — módulo compartido; backends Ollama (default), mlx-embeddings (Apple Silicon), sentence-transformers (fallback); prefijos `search_document:`/`search_query:` para nomic-embed-text-v1.5
 - [ ] Actualizar `cortex-forge-setup` (skill): detectar OS/arch → instalar dependencias base + opcionales Apple Silicon → descargar pesos (~270 MB) → reportar qué backend quedó activo
 - [x] Crear `bin/cortex-index.py` — indexador completo con chunking por headings + sub-chunking 500 palabras/100 overlap; índice `(path, chunk_index)`; updates atómicos; limpieza de archivos eliminados; calibración automática de threshold (p75 inter-file)
-- [x] Crear `.cortex/cortex-search.py` — KNN two-step (vec_documents → documents JOIN por rowid); flags `--top-k`, `--threshold`, `--json`; threshold leído de `.cortex/config.json`
+- [x] Crear `.cortex/db/cortex-search.py` — KNN two-step (vec_documents → documents JOIN por rowid); flags `--top-k`, `--threshold`, `--json`; threshold leído de `.cortex/db/config.json`
 - [ ] Hook post-commit: re-indexar solo archivos `wiki/` modificados en el commit
 - [x] Modificar `cortex-recall/SKILL.md`: si existe `.cortex/vault.db` → invocar `cortex-search.py`; fallback a lectura manual del índice
-- [x] Agregar `.cortex/vault.db`, `.cortex/__pycache__/` y `.cortex/config.json` a `.gitignore`
+- [x] Agregar `.cortex/` completo a `.gitignore` (todo el directorio, no solo archivos individuales)
 - [ ] Validar en second-brain: indexación inicial + query de prueba + indexación incremental tras `cortex-assimilate`; verificar que el backend reportado coincide con la plataforma
 
 ### Etapa 2 — MCP server (gate: Etapa 1 validada + vault usado desde >1 cliente)
@@ -139,6 +139,6 @@ No implementar antes. Ver diseño completo en `CORTEX_FORGE_PLAN.md` → secció
 ## Fase 4 — Inteligencia acumulada
 
 - [ ] `cortex-recall` con síntesis cross-página y detección de contradicciones
-- [ ] Detección de patrones cross-sesión: temas recurrentes en `.hot/` que nunca llegan a `wiki/` — al crystallizar, revisar historial y proponer candidatos; patrón validado por dialectic reasoning de Honcho
+- [ ] Detección de patrones cross-sesión: temas recurrentes en `.cortex/` que nunca llegan a `wiki/` — al crystallizar, revisar historial y proponer candidatos; patrón validado por dialectic reasoning de Honcho
 - [ ] Carga progresiva en `cortex-recall` — navegar wiki como filesystem según relevancia en lugar de cargar el índice completo al inicio; reduce token bloat sin perder cobertura
-- [~] **Archivo de historial.** Capa simple implementada 2026-06-15: entries >30 días en `MEMORY.md` → `.hot/CONSOLIDATED.md` (mismo formato Markdown, append-only, no se inyecta al inicio de sesión). Capa estructurada pendiente: cuando `CONSOLIDATED.md` supere N entradas, parsear a JSON con tags `{ts, agent, trigger, tags: [], files: [], decisions: [], discarded: [], fragile: []}` extraídos por el crystallize al momento de escribir. JSON no se carga al inicio — consultable vía `/cortex-recall` o skill dedicado.
+- [~] **Archivo de historial.** Capa simple implementada 2026-06-15: entries >30 días en `MEMORY.md` → `.cortex/CONSOLIDATED.md` (mismo formato Markdown, append-only, no se inyecta al inicio de sesión). Capa estructurada pendiente: cuando `CONSOLIDATED.md` supere N entradas, parsear a JSON con tags `{ts, agent, trigger, tags: [], files: [], decisions: [], discarded: [], fragile: []}` extraídos por el crystallize al momento de escribir. JSON no se carga al inicio — consultable vía `/cortex-recall` o skill dedicado.

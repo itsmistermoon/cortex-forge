@@ -1,4 +1,4 @@
-.hot/
+.cortex/
 .DS_Store
 .commandcode/taste/
 .raw/*.vtt
@@ -6,8 +6,4 @@
 .obsidian/
 wiki/meta/vault-report.json
 .serena/
-
-
-.cortex/vault.db
-.cortex/__pycache__/
-.cortex/config.json
+.hot/

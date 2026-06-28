@@ -1,6 +1,6 @@
 # MEMORY.md — format reference
 
-File: `.hot/MEMORY.md` in the active repo root.
+File: `.cortex/MEMORY.md` in the active repo root.
 Gitignored — local agent artifact, not versioned content.
 
 ---

@@ -1,12 +1,12 @@
 ---
 name: cortex-crystallize
-description: Snapshot session context into .hot/MEMORY.md. Works from any repo — inside the vault or from a linked project.
+description: Snapshot session context into .cortex/MEMORY.md. Works from any repo — inside the vault or from a linked project.
 argument-hint: "[vault-name] [project-name] [next: <focus>]"
 ---
 
 Begin your response by outputting exactly: `Crystallizing memory...`
 
-Save a session snapshot to `.hot/MEMORY.md` in the active repo (the nearest `.git`), so any agent can resume without losing context.
+Save a session snapshot to `.cortex/MEMORY.md` in the active repo (the nearest `.git`), so any agent can resume without losing context.
 
 ## Modes
 
@@ -26,7 +26,7 @@ Behavior depends on where the skill is invoked:
    - None matched → use self-knowledge (you know what CLI you are)
    Use the detected identity as `{Agent}` in the history header and in the `agent:` frontmatter field.
 2. **Resolve vault** from `~/.cortex-forge/config.yml`. If missing, prompt to run `/cortex-forge-setup` first.
-   Also read `locale:` from the vault's entry — use it for all agent-generated content. Fallback if absent: `.hot/MEMORY.md` title line (`— locale: {lang}`) → `CODEX.md` Vocabulary (`**locale**:`) → default `en`.
+   Also read `locale:` from the vault's entry — use it for all agent-generated content. Fallback if absent: `.cortex/MEMORY.md` title line (`— locale: {lang}`) → `AGENTS.md` Vault identity (`**locale**:`) → default `en`.
    - Config supports two formats — handle both:
      - New: `vaults: {name: path, ...}` + `default: name`
      - Legacy: `vault: path` (treat as single vault named after its `basename`)
@@ -37,8 +37,9 @@ Behavior depends on where the skill is invoked:
 3. Determine mode:
    - If active repo contains `wiki/`, `AGENTS.md`, and `skills/` → **it IS a vault** → standard mode.
    - Otherwise → cross-vault mode (snapshot project repo + update linked vault page).
-4. Create `.hot/` if it doesn't exist. Add `.hot/` to `.gitignore` if not already there.
-5. Read `.hot/MEMORY.md` in full if it exists.
+4. Create `.cortex/` if it doesn't exist. Add `.cortex/` to `.gitignore` if not already there.
+5. Read `.cortex/MEMORY.md` in full if it exists.
+5b. **Prune PRAXIS.md working context** — if `.cortex/PRAXIS.md` exists, remove any `### Working context` entries older than 30 days (compare entry date against today). Do not touch `## Permanent`. If nothing to prune, skip silently.
 6. **Update current state** (see limits below). Update `agent:` and `updated:` in the file frontmatter to reflect the current agent and date.
    - If an argument with `next: <focus>` was provided (e.g., `/cortex-crystallize next: PostToolUse hook`), add a `### Suggested skills` entry and tailor `### Pending` toward the declared next focus.
 7. **Append snapshot to history** using the format in `MEMORY-FORMAT.md` (co-located with this skill).
@@ -135,4 +136,4 @@ After completing the snapshot, confirm:
 - Pending items live in **Current state**, not in the snapshot — so they don't get buried.
 - The history snapshot **has no pending section** — that's Current state's responsibility.
 - Don't duplicate content already in ADRs, PRDs, issues, or commits — reference by path.
-- `.hot/` must be in `.gitignore` — it's a local agent artifact, not project content.
+- `.cortex/` must be in `.gitignore` — it's a local agent artifact, not project content.

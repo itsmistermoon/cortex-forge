@@ -2,10 +2,10 @@
 title: cortex-forge
 type: project
 created: 2026-06-08
-updated: 2026-06-16
+updated: 2026-06-28
 tags: [vault, multi-agent, hot-cache, hooks, knowledge-management]
 status: active
-repo: /Users/itsmistermoon/proyectos/cortex-forge
+repo: /Users/itsmistermoon/proyectos/moon-cortexforge
 domains: [agent-orchestration, knowledge-management, multi-agent-protocols]
 sources:
   - wiki/sources/commandcode-hooks-configuration.md
@@ -22,7 +22,7 @@ schema_version: "0.3"
 # cortex-forge
 
 **Status:** active
-**Repo:** /Users/itsmistermoon/proyectos/cortex-forge
+**Repo:** /Users/itsmistermoon/proyectos/moon-cortexforge
 
 ## Origin
 
@@ -32,14 +32,15 @@ Born as a public mirror of moon-multivac (JP's private vault), created initially
 
 Be the reference implementation of an LLM-native vault for multi-agent operation: any developer can fork the repo and have a knowledge base that any agent (Claude Code, Codex, Gemini, Cursor) can operate without additional configuration. Unlike tools like Obsidian or Notion, cortex-forge assumes the agent is the primary operator, not the human.
 
-Vault with a hot cache protocol that synchronizes context across multiple agents (Claude Code, Codex, Antigravity, CommandCode) without token bloat at session start. Synthesized knowledge lives in `wiki/` (secondary sources); originals in `.raw/` (primary sources, immutable); ephemeral per-project context in `.hot/MEMORY.md`; vault identity in `CODEX.md`.
+Vault with a hot cache protocol that synchronizes context across multiple agents (Claude Code, Codex, Antigravity, CommandCode) without token bloat at session start. Synthesized knowledge lives in `wiki/` (secondary sources); originals in `.raw/` (primary sources, immutable); ephemeral per-project context in `.cortex/MEMORY.md` and accumulated agent context in `.cortex/PRAXIS.md`; vault identity in `AGENTS.md` (`## Vault identity`).
 
 ## Stack / Technologies
 
-- 6 layers: `.raw/`, `wiki/`, `.hot/`, `CODEX.md`, `wiki/meta/`, `skills/`
+- 5 layers: `.raw/`, `wiki/`, `.cortex/`, `wiki/meta/`, `skills/`
 - 5 wiki page types: concepts, entities, sources, projects, reference
 - 6 vault skills: assimilate, recall, prune, imprint, crystallize, forge-setup
-- Native hooks: PreCompact + SessionEnd (Claude Code), Stop (Antigravity) — bash scripts in `bin/hooks/`
+- Native hooks: PreCompact + SessionEnd (Claude Code), Stop (Antigravity) — bash scripts in `~/.cortex-forge/bin/hooks/` (global runtime; never replicated into consumer vaults)
+- post-commit hook: `cortex-reindex-post-commit.sh` — re-indexa `.cortex/vault.db` automáticamente cuando el commit toca archivos `wiki/`
 - `AGENTS.md` fallback for agents without native session-start hooks (CommandCode, Codex pre-init)
 - Templates co-located with their skills: `MEMORY-FORMAT.md`, `CODEX-FORMAT.md`, `TASTE-FORMAT.md`
 - `AGENT-LOG.md` — append-only session bitácora (self-report per session, not per file)
@@ -47,11 +48,17 @@ Vault with a hot cache protocol that synchronizes context across multiple agents
 ## Key decisions
 
 - **Layer 1 (AGENTS.md) + Layer 2 (native hooks)** are complementary. Layer 1 covers agents without a session-start hook; Layer 2 is more reliable when available.
-- **`.hot/MEMORY.md` — fixed name per repo.** No project-name detection needed; each repo has its own `.hot/` directory (gitignored). Safe across multiple concurrent projects.
+- **`.cortex/MEMORY.md` — fixed name per repo.** No project-name detection needed; each repo has its own `.cortex/` directory (gitignored). Safe across multiple concurrent projects.
 - **Two-zone MEMORY.md:** `## Current state` (mutable, max 5 pending / 3 decisions) + `## History` (append-only). Only Current state is reinjected at session start — History is available but not required.
 - **PreCompact ≠ SessionEnd.** PreCompact is a mid-session compaction checkpoint (session continues); SessionEnd is a true handoff with no return path. Both use `claude -p` synthesis, but the prompt notes the distinction so the agent writes accordingly.
-- **CODEX.md** — vault identity file (Mission, Owner, Domains, Vocabulary, Out of scope), read at session start after `.hot/MEMORY.md`. Empty sections are ignored; partial CODEX.md is valid.
+- **CODEX.md retired.** Vault identity (Mission, Owner, Domains, Vocabulary) moved into `AGENTS.md` under `## Vault identity`. CODEX.md file deleted from vault root. This unifies the two session-start reads — agents now load only `AGENTS.md` for both protocol and identity context.
 - **Parametric knowledge disqualified** for vault topics. Agent training knowledge is unverified and unversioned — `cortex-recall` is mandatory even when the agent "knows" the answer.
+- **Hook scripts live globally, never in consumer vaults.** `~/.cortex-forge/bin/hooks/` is the single runtime for all vaults. Consumer vaults (`moon-multivac`, `moon-academy`, etc.) have no `bin/` directory — they consume hooks from the global config dir. The `sync` step in `cortex-forge-setup` only downloads `templates/*.md`; `bin/` is never synced to vault directories.
+
+- **`cortex-forge-setup` has two modes.** New vault (not in config) → full wizard, all steps in sequence. Existing vault → maintenance menu: numbered list of operations (update skills, update hooks, sync, initialize semantic search, add post-commit hooks, install TASTE rule, remove vault, set default). User selects one or more; only selected steps run.
+
+- **Setup gate for semantic search corrected.** Step 6c used to skip silently if `.cortex/vault.db` was absent — which always happens on a new vault. Corrected: if `vault.db` doesn't exist, the setup asks whether to initialize it now (runs `cortex-index.py` once) or skip with an explicit note in the summary. Silent skip replaced by explicit choice.
+
 - **`.raw/` is immutable primary source.** `wiki/` is always a derived secondary view. When they conflict, `.raw/` wins — the conflict rule is the remedy for **drift** (the primary changes, the account doesn't follow). The `raw:` frontmatter field on source pages is a **context pointer** back to the primary, and `bin/cortex-prune.sh` verifies it — the vault implemented the pattern before the vocabulary existed.
 - **Reference taxonomy:** fifth wiki type for lookup tables, wire formats, cheat sheets — use when the content can be expressed as a table/code block without prose. Complements Concept (which requires explanation).
 - **CommandCode wire format is nested** (`hooks: [{ matcher, hooks: [{ type, command, timeout? }] }]`), unlike the flat format of Claude Code/Codex. Hook scripts are not drop-in across agents.
@@ -65,6 +72,10 @@ Vault with a hot cache protocol that synchronizes context across multiple agents
 - **Dot product over cosine similarity** — `nomic-embed-text-v1.5` with `normalize_embeddings=True` produces unit-norm vectors. For unit-norm vectors, dot product and cosine are mathematically equivalent. sqlite-vec exposes `vec_distance_dot`, which is computationally cheaper than explicit cosine. No precision is lost.
 - **MCP server deferred to Etapa 2** — sqlite-vec solves retrieval; MCP solves multi-client dispatch. These are separate problems. Implementing both simultaneously creates two simultaneous diagnostic surfaces if something fails. Gate: Etapa 1 validated in an organic session AND the vault is accessed from more than one client. `AGENTS.md` remains the design contract regardless — an agent without MCP can still operate the vault by reading `AGENTS.md` directly.
 - **[[wiki/entities/openhuman|OpenHuman]] is the closest full-harness comparable** — both solve the agent cold-start problem via a local Karpathy-style Obsidian vault as the memory layer, and both implement the [[wiki/concepts/super-context|Super Context]] pattern (harness-level deterministic context injection on session start). Key divergences: OpenHuman is a desktop GUI application with 118+ managed OAuth integrations and automatic 20-minute auto-fetch loops that populate the vault without agent involvement; Cortex Forge is a vault protocol that any CLI agent operates via hooks and skills, with knowledge synthesized manually from ingested sources. OpenHuman's SuperContext runs inside the harness (Python/Rust app); Cortex Forge's equivalent is a bash `SessionStart` hook that injects `.hot/MEMORY.md` before the first prompt. OpenHuman is user-facing and batteries-included; Cortex Forge is agent-infrastructure and composable. TokenJuice (OpenHuman's token compression layer — up to 80% reduction via HTML→Markdown, URL shortening, dedup) has no Cortex Forge equivalent; the vault reduces token cost indirectly by replacing file-by-file retrieval with a pre-built semantic index.
+
+- **`.cortex/` consolidates all local agent artifacts.** Previously `.hot/` held session memory and `.cortex/` held semantic search infrastructure. Now everything is under `.cortex/`: `MEMORY.md` (session snapshot), `PRAXIS.md` (accumulated agent context), `CONSOLIDATED.md` (history archive), and `db/` (vault.db, embeddings.py, cortex-search.py, config.json). A single `.cortex/` gitignore entry covers everything.
+
+- **PRAXIS.md — two-zone accumulated agent context.** Persistent knowledge the agent builds across sessions that doesn't fit the session-scoped MEMORY.md or the wiki's synthesized knowledge. Two zones: `## Permanent` (no TTL — structural conventions, workarounds, invariants the agent writes deliberately) and `## Working context` (dated entries auto-pruned by `/cortex-crystallize` after 30 days). Unlike MEMORY.md (rewound per session), PRAXIS.md is the agent's long-term institutional memory within a vault.
 
 - **[[wiki/entities/graphify|Graphify]] + Leiden discarded for retrieval** — Leiden is community detection over graphs inferred from code ASTs (via tree-sitter). Cortex Forge's vault contains synthesized prose knowledge in Markdown, not source code. Relationships between pages are captured by the vault taxonomy (`wiki/concepts/`, `wiki/entities/`, etc.) and don't need to be inferred from syntax. Embeddings + semantic similarity solve the actual problem with lower complexity.
 
@@ -82,7 +93,7 @@ Goal: Hot Cache Protocol working across all supported agents.
 ### Phase 2 — Protocol hardening
 - [ ] Schema versioning in `AGENTS.md` and templates (`schema_version:`)
 - [ ] Automatic `cortex-prune` via periodic hook
-- [ ] Stale hot cache detection (not updated in N days)
+- [x] Stale hot cache detection (not updated in N days) — `hot_cache_stale_days:` en config.yml; `cortex-reactivate.sh` y `cortex-reactivate-antigravity.sh` inyectan warning si supera el umbral
 - [ ] PostToolUse as platform guardrail (SPA detection + grep/find interception)
 
 ### Phase 3 — Adoptability
@@ -140,3 +151,6 @@ Goal: Hot Cache Protocol working across all supported agents.
 - 2026-06-10 [Claude Code]: Linked primary-source/secondary-source concepts (full-article ingestion); adopted "context pointer" and "drift" vocabulary in the `.raw/` key decision
 - 2026-06-16 [Claude Code]: Added design decisions for Fase 3.6 (vector retrieval stack): sqlite-vec rationale, sentence-transformers over Ollama/mlx, dot product metric, MCP deferral gate, Graphify+Leiden discard
 - 2026-06-26 [Claude Code]: Added OpenHuman as closest full-harness comparable; SuperContext pattern comparison; added openhuman sources
+- 2026-06-27 [Claude Code]: Added post-commit reindex hook to stack description; corrected repo path to moon-cortexforge
+- 2026-06-28 [Claude Code]: Added three key decisions — hook scripts global-only (no bin/ in consumer vaults), cortex-forge-setup maintenance menu for existing vaults, semantic search init gate corrected
+- 2026-06-28 [Claude Code]: Major restructure — `.hot/` + `.cortex/` consolidated into single `.cortex/` directory (`db/` for semantic search, `MEMORY.md` + `PRAXIS.md` flat); `CODEX.md` retired and identity absorbed into `AGENTS.md`; PRAXIS.md introduced for two-zone accumulated agent context (permanent + working with 30-day TTL); updated stack layer count from 6 to 5

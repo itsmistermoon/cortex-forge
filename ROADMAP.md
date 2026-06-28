@@ -1,4 +1,4 @@
-# Roadmap
+		# Roadmap
 
 ## Phase 1 — Multi-agent parity
 
@@ -43,7 +43,7 @@ Goal: Hot Cache Protocol working across all supported agents.
   - [x] Grep interception: `cortex-recall-nudge.sh` implemented 2026-06-12 — **uninstalled**. The hook never logged any activations and the experiment was unmeasurable without logging. The declarative bypass (agent invokes `cortex-recall` via `AGENTS.md` instruction) covers the case with better reach and no overhead. De facto kill criterion: 0 data points in weeks. Script retained as `.retired` in `~/.cortex-forge/bin/hooks/`.
   - [-] SPA/PostToolUse — canceled. `cortex-assimilate` already covers the case by protocol; a PostToolUse hook cannot modify the agent's response and the marginal value does not justify the complexity.
 - [x] Schema versioning in `AGENTS.md` and templates (`schema_version: "0.3"`) — 2026-06-15
-- [/] Automatic `cortex-prune` via periodic hook — **partial** 2026-06-12: post-commit hook (backlog #2 item 2) refreshes `vault-report.json` on every commit (setup step 6b); post-commit ≠ periodic — staleness detection in dormant vaults still open. Pending: validate in second-brain (vault with real content commits)
+- [x] Automatic `cortex-prune` via post-commit hook — post-commit hook refreshes `vault-report.json` on every commit (setup step 6b). Periodic hook for dormant vaults descoped: vaults without commits have no active sessions consuming the report, so staleness is not actionable. (2026-06-12)
 - [x] Stale hot cache detection (not updated in N days) — `hot_cache_stale_days:` in `config.yml`; `cortex-reactivate.sh` and `cortex-reactivate-antigravity.sh` inject a warning on session start if threshold is exceeded
 - [x] `agent:` field in `.cortex/` snapshot frontmatter — identifies which agent last wrote the mutable zone; needed to resolve conflicts in multi-agent vaults
 - [x] Split `Project state` / `Agent context` — `.cortex/MEMORY.md` (session state) + `.cortex/PRAXIS.md` (accumulated agent context: permanent conventions + working context with 30-day TTL). `.hot/` removed; everything in `.cortex/`. `CODEX.md` absorbed into `AGENTS.md` (`## Vault identity`). (2026-06-28)

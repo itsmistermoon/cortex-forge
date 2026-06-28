@@ -42,6 +42,10 @@ DEFAULT_THRESHOLD = 0.5
 
 def find_vault(start: Path) -> Path:
     for candidate in [start, *start.parents]:
+        # Canonical path (post-migration): .cortex/db/vault.db
+        if (candidate / ".cortex" / "db" / "vault.db").exists():
+            return candidate
+        # Legacy path (pre-migration): .cortex/vault.db
         if (candidate / ".cortex" / "vault.db").exists():
             return candidate
     print("ERROR: vault.db not found. Run cortex-index first.", file=sys.stderr)
@@ -123,8 +127,9 @@ def main():
 
     vault = Path(args.vault).resolve() if args.vault else find_vault(Path.cwd())
     cortex_dir = vault / ".cortex"
-    db_path = cortex_dir / "vault.db"
-    threshold = args.threshold if args.threshold is not None else load_threshold(cortex_dir)
+    # Canonical path; fall back to legacy .cortex/vault.db for older vaults
+    db_path = (cortex_dir / "db" / "vault.db") if (cortex_dir / "db" / "vault.db").exists() else (cortex_dir / "vault.db")
+    threshold = args.threshold if args.threshold is not None else load_threshold(cortex_dir / "db" if (cortex_dir / "db").exists() else cortex_dir)
 
     emb.load_embedding_model()
     query_vec = emb.embed_query(args.query)

@@ -1,5 +1,5 @@
 #!/bin/bash
-# PreInvocation hook for Antigravity — injects .hot/{project}.md on invocationNum==0.
+# PreInvocation hook for Antigravity — injects .cortex/MEMORY.md on invocationNum==0.
 # Detects the active project from workspace path.
 
 set -uo pipefail

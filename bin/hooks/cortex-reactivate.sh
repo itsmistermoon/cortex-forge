@@ -1,5 +1,5 @@
 #!/bin/bash
-# SessionStart hook: injects .hot/{project}.md as additional context.
+# SessionStart hook: injects .cortex/MEMORY.md as additional context.
 # Detects the active project from CWD and reads from the active repo.
 
 set -euo pipefail

@@ -20,7 +20,7 @@ schema_version: "0.3"
 
 1. Read `.cortex/MEMORY.md` in full.
 2. If `.cortex/PRAXIS.md` exists, read it — it provides accumulated agent context (structural conventions and working context) that grounds decisions for the session.
-3. If `wiki/meta/vault-report.json` exists, read it. If `health.dead_links` or `health.raw_without_source_page` is non-empty, surface these to the user in your first message as actionable issues — not background noise.
+3. If `wiki/meta/vault-report.json` exists, read it. If `health.dead_links`, `health.raw_without_source_page`, or `health.orphan_pages` is non-empty, surface these to the user in your first message as actionable issues — not background noise.
 4. Treat all of the above as required context — not optional background.
 5. If `MEMORY.md` contains `### Pending` items, acknowledge them in your first message or surface them before starting new work.
 

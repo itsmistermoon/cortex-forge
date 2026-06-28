@@ -24,7 +24,7 @@ Health check del vault activo en dos capas: estructural (script) y semántica (a
 
    Confirm vault is a Cortex Forge vault: path contains `wiki/` and `bin/cortex-prune.sh`.
 
-   If `CODEX.md` exists at the vault root, read **Domains** and **Out of scope** — use them to flag pages whose topics fall outside the vault's defined scope.
+   Read **Domains** and **Out of scope** from `AGENTS.md` (`## Vault identity`) — use them to flag pages whose topics fall outside the vault's defined scope.
    Also read `locale:` from `~/.cortex-forge/config.yml` (match vault by path) — use it for all agent-generated content. Fallback if absent: `.cortex/MEMORY.md` title line (`— locale: {lang}`) → `AGENTS.md` Vault identity (`**locale**:`) → default `en`.
 
 2. **Capa 1 — Structural check**: Run `bash {vault}/bin/cortex-prune.sh {vault}` and capture output.
@@ -41,7 +41,8 @@ Health check del vault activo en dos capas: estructural (script) y semántica (a
      "health": {
        "dead_links": [],
        "raw_without_source_page": [],
-       "missing_confidence": []
+       "missing_confidence": [],
+       "orphan_pages": []
      }
    }
    ```
@@ -50,6 +51,7 @@ Health check del vault activo en dos capas: estructural (script) y semántica (a
    - `health.dead_links` — array of `{"from": "wiki/...", "broken_target": "[[X]]"}` objects, from Layer 1.
    - `health.raw_without_source_page` — array of `.raw/` file paths with no corresponding `wiki/sources/` page, from Layer 1.
    - `health.missing_confidence` — array of page paths where `confidence:` is absent from frontmatter, from Layer 1.
+   - `health.orphan_pages` — array of page paths with no incoming `[[wikilinks]]` from any other vault page, from Layer 1. Matched by full vault-relative path (e.g. `wiki/concepts/foo.md`) to avoid basename collisions.
 
    This file is the session-startup health signal read in `AGENTS.md`. It is gitignored — a local artifact, not versioned content. This schema is canonical: do not add fields that have no consumer in `AGENTS.md` or in this skill.
 

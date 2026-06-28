@@ -18,7 +18,8 @@ FINDINGS=$(mktemp)
 DEAD_LINKS=$(mktemp)
 RAW_NOSRC=$(mktemp)
 NO_CONF=$(mktemp)
-trap 'rm -f "$FINDINGS" "$DEAD_LINKS" "$RAW_NOSRC" "$NO_CONF"' EXIT
+ORPHANS=$(mktemp)
+trap 'rm -f "$FINDINGS" "$DEAD_LINKS" "$RAW_NOSRC" "$NO_CONF" "$ORPHANS"' EXIT
 
 f() { echo "[$1] $2" >> "$FINDINGS"; }
 
@@ -79,13 +80,20 @@ find "$WIKI" -name "*.md" \
     done
 
 # ── MEDIUM: Orphan pages ──────────────────────────────────────────────────────
+# Match by full vault-relative path to avoid basename collisions.
+# A page is an orphan if no other wiki page links to it via [[wiki/...]] wikilink.
 find "$WIKI" -name "*.md" \
   | grep -v '_index\|/index\.md\|/log\.md' \
   | while read -r page; do
-      short=$(basename "$page" .md)
-      hits=$(grep -rl "\[\[.*${short}" "$WIKI" 2>/dev/null \
+      rel="${page#$VAULT/}"          # e.g. wiki/concepts/memory-system.md
+      rel_noext="${rel%.md}"         # e.g. wiki/concepts/memory-system
+      # Count pages that contain a wikilink to this exact path (with or without .md)
+      hits=$(grep -rl "\[\[${rel_noext}" "$WIKI" 2>/dev/null \
              | grep -v "^${page}$" | wc -l | tr -d ' ')
-      [ "$hits" -eq 0 ] && f MEDIUM "Orphan: ${page#$VAULT/}"
+      if [ "$hits" -eq 0 ]; then
+        f MEDIUM "Orphan: ${rel}"
+        echo "$rel" >> "$ORPHANS"
+      fi
     done
 
 # ── MEDIUM: Missing provenance — concepts + entities ──────────────────────────
@@ -139,7 +147,8 @@ mkdir -p "$WIKI/meta"
   printf '  "health": {\n'
   printf '    "dead_links": %s,\n' "$(json_dead_links_array "$DEAD_LINKS")"
   printf '    "raw_without_source_page": %s,\n' "$(json_str_array "$RAW_NOSRC")"
-  printf '    "missing_confidence": %s\n' "$(json_str_array "$NO_CONF")"
+  printf '    "missing_confidence": %s,\n' "$(json_str_array "$NO_CONF")"
+  printf '    "orphan_pages": %s\n' "$(json_str_array "$ORPHANS")"
   printf '  }\n'
   printf '}\n'
 } > "$WIKI/meta/vault-report.json"

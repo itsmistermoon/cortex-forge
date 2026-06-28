@@ -25,9 +25,8 @@ Answer a question using the vault's wiki content as the source.
 2. Read **Vocabulary** and **Domains** from `{vault}/AGENTS.md` (`## Vault identity` section) — use them to interpret the query correctly and scope the search.
 
 3. **Identify relevant pages** — prefer semantic search if the index is available:
-   - If `.cortex/db/vault.db` exists: run `python {vault}/.cortex/db/cortex-search.py "{query}" --top-k 8 --json`
-     and use the returned chunks (path + heading + content) as the primary source set.
-   - Otherwise: read `{vault}/wiki/index.md` and identify pages manually.
+   - If `.cortex/db/vault.db` AND `.cortex/db/cortex-search.py` both exist: run `python {vault}/.cortex/db/cortex-search.py "{query}" --top-k 8 --json` and use the returned chunks (path + heading + content) as the primary source set.
+   - Otherwise (index missing or script not installed): read `{vault}/wiki/index.md` directly and identify the most relevant pages by title and description. This is the explicit fallback — it is NOT a protocol violation.
 
 4. Read the full pages for any result where the chunk alone is insufficient for a complete answer.
 
@@ -52,4 +51,4 @@ Every response must include:
 - If there are contradictions between pages, flag them
 - If the topic is not in the wiki, say so explicitly — only then may you supplement with parametric knowledge, clearly labeled as such
 - **Never answer from active session context alone** — if you believe you already know the answer, that belief is parametric. Stop and run the steps anyway.
-- Using `grep`, `find`, or direct file reads instead of these steps is a protocol violation
+- Using `grep`, `find`, or direct file reads to answer the query **instead of invoking this skill** is a protocol violation. Reading `wiki/index.md` or specific wiki pages as part of step 3–4 is not a violation — it is part of the skill.

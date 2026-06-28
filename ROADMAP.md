@@ -48,7 +48,7 @@ Objetivo: que el Hot Cache Protocol funcione en todos los agentes soportados.
 - [x] Detección de hot cache stale (sin actualizar en N días) — `hot_cache_stale_days:` en `config.yml`; `cortex-reactivate.sh` y `cortex-reactivate-antigravity.sh` inyectan warning al inicio de sesión si supera el umbral
 - [x] Campo `agent:` en frontmatter de snapshots `.cortex/` — identifica qué agente escribió cada entrada; necesario para resolver conflictos en vaults multi-agente
 - [x] Split `Project state` / `Agent context` — `.cortex/MEMORY.md` (estado de sesión) + `.cortex/PRAXIS.md` (contexto acumulado del agente: convenciones permanentes + working context con TTL 30 días). `.hot/` eliminado; todo en `.cortex/`. `CODEX.md` absorbido en `AGENTS.md` (`## Vault identity`). (2026-06-28)
-- [ ] Context fencing en `cortex-imprint` — al escribir páginas wiki, la fuente de verdad es `.raw/`; las páginas wiki existentes son referencia, no fuente; previene contaminación circular donde el agente "recuerda" resúmenes de sus propias memorias
+- [x] Context fencing en `cortex-imprint` — jerarquía de fuentes (sesión > `.raw/` > `wiki/` solo referencia), test de síntesis circular, campo `raw:` en provenance, regla de source fencing en Rules. (2026-06-28)
 - [ ] Tags de comportamiento en skills (`behavior:` en frontmatter) — clasificar skills por lo que el agente *hace* (`#synthesize`, `#ingest`, `#recall`, `#prune`) además de su nombre; un skill con múltiples comportamientos es señal de que debe dividirse
 
 ## Fase 2.5 — Batch 2026-06-12 (prioridad: implementar pronto)

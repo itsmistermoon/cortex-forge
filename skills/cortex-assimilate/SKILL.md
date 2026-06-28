@@ -1,5 +1,6 @@
 ---
 name: cortex-assimilate
+behavior: [#ingest, #synthesize]
 description: Ingest a URL or file into the vault — saves to .raw/, synthesizes wiki pages, updates index. Use --research "<query>" to auto-discover and ingest sources from the web.
 argument-hint: "[vault-name] <url-or-file> | --research \"<query>\" [--rounds N]"
 ---

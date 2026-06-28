@@ -1,5 +1,6 @@
 ---
 name: cortex-crystallize
+behavior: [#snapshot]
 description: Snapshot session context into .cortex/MEMORY.md. Works from any repo — inside the vault or from a linked project.
 argument-hint: "[vault-name] [project-name] [next: <focus>]"
 ---

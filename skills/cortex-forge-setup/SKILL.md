@@ -1,5 +1,6 @@
 ---
 name: cortex-forge-setup
+behavior: [#configure]
 description: Register or deregister the current vault in Cortex Forge, install global skills, and configure lifecycle hooks. Run from inside a vault directory.
 argument-hint: "Optional sub-task: hooks | skills | sync | vaults"
 ---

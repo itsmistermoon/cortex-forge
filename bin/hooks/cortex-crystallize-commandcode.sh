@@ -1,5 +1,5 @@
 #!/bin/bash
-# Stop hook for CommandCode: snapshots session context to .hot/MEMORY.md
+# Stop hook for CommandCode: snapshots session context to .cortex/MEMORY.md
 # Usa cmd -p para sintetizar resúmenes IA desde el transcript JSONL,
 # replicando lo que cortex-crystallize-claude.sh hace con claude -p.
 # Exit 0 en todos los casos — nunca bloquear el cierre de sesión.
@@ -34,8 +34,8 @@ resolve_locale() {
       /^    locale:/ && p == root { print $2; exit }
     ' "$config" 2>/dev/null)
   fi
-  if [ -z "$locale" ] && [ -f "$git_root/.hot/MEMORY.md" ]; then
-    locale=$(grep -m1 '— locale:' "$git_root/.hot/MEMORY.md" | sed 's/.*locale: *//' | tr -d ' \r\n' 2>/dev/null)
+  if [ -z "$locale" ] && [ -f "$git_root/.cortex/MEMORY.md" ]; then
+    locale=$(grep -m1 '— locale:' "$git_root/.cortex/MEMORY.md" | sed 's/.*locale: *//' | tr -d ' \r\n' 2>/dev/null)
   fi
   if [ -z "$locale" ] && [ -f "$git_root/CODEX.md" ]; then
     locale=$(grep -m1 '\*\*locale\*\*:' "$git_root/CODEX.md" | awk '{print $2}' 2>/dev/null)
@@ -44,7 +44,7 @@ resolve_locale() {
 }
 
 # ── Debug: capturar payload del hook para inspección ────────────────────────
-printf '%s' "$PAYLOAD" > "$GIT_ROOT/.hot/stop-hook-payload.json" 2>/dev/null
+printf '%s' "$PAYLOAD" > "$GIT_ROOT/.cortex/stop-hook-payload.json" 2>/dev/null
 
 # ── Resolve transcript path ─────────────────────────────────────────────────
 # transcript_path viene en el payload del hook; fallback por si acaso
@@ -67,13 +67,13 @@ fi
 
 mkdir -p "$GIT_ROOT/.hot" 2>/dev/null || exit 0
 
-if ! grep -qF '.hot/' "$GIT_ROOT/.gitignore" 2>/dev/null; then
-  echo '.hot/' >> "$GIT_ROOT/.gitignore"
+if ! grep -qF '.cortex/' "$GIT_ROOT/.gitignore" 2>/dev/null; then
+  echo '.cortex/' >> "$GIT_ROOT/.gitignore"
 fi
 
 # ── Leer MEMORY.md existente ────────────────────────────────────────────────
 NOW=$(date '+%Y-%m-%d-%H%M')
-HOT_FILE="$GIT_ROOT/.hot/MEMORY.md"
+HOT_FILE="$GIT_ROOT/.cortex/MEMORY.md"
 TMP=$(mktemp -t hot-cache.XXXXXX) || exit 0
 trap 'rm -f "$TMP"' EXIT
 
@@ -170,7 +170,7 @@ done
 # el resumen sintetizado al terminar (puede tardar 30-60s, no bloquea cierre).
 
 # Archive history entries older than 30 days to CONSOLIDATED.md
-CONSOLIDATED="$GIT_ROOT/.hot/CONSOLIDATED.md"
+CONSOLIDATED="$GIT_ROOT/.cortex/CONSOLIDATED.md"
 CUTOFF=$(date -v-30d '+%Y-%m-%d' 2>/dev/null || date -d '30 days ago' '+%Y-%m-%d' 2>/dev/null || echo "")
 
 RECENT_HISTORY="$PREV_HISTORY"
@@ -207,7 +207,7 @@ if [ -n "$PREV_HISTORY" ] && [ -n "$CUTOFF" ]; then
 fi
 
 SENTINEL="__PENDING_SYNTHESIS_${NOW// /_}__"
-HELPER="$GIT_ROOT/.hot/.synthesize-${NOW// /_/}.sh"
+HELPER="$GIT_ROOT/.cortex/.synthesize-${NOW// /_/}.sh"
 
 # Snapshot placeholder escrito de forma síncrona
 {

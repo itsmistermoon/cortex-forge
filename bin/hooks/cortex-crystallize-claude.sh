@@ -1,5 +1,5 @@
 #!/bin/bash
-# SessionEnd + PreCompact hook: snapshots de sesión en .hot/MEMORY.md
+# SessionEnd + PreCompact hook: snapshots de sesión en .cortex/MEMORY.md
 # Ambos triggers usan claude -p para generar bullets descriptivos.
 # SessionEnd  → handoff definitivo (no return path)
 # PreCompact  → compactación mid-session (la sesión continúa)
@@ -89,8 +89,8 @@ resolve_locale() {
       /^    locale:/ && p == root { print $2; exit }
     ' "$config" 2>/dev/null)
   fi
-  if [ -z "$locale" ] && [ -f "$git_root/.hot/MEMORY.md" ]; then
-    locale=$(grep -m1 '— locale:' "$git_root/.hot/MEMORY.md" | sed 's/.*locale: *//' | tr -d ' \r\n' 2>/dev/null)
+  if [ -z "$locale" ] && [ -f "$git_root/.cortex/MEMORY.md" ]; then
+    locale=$(grep -m1 '— locale:' "$git_root/.cortex/MEMORY.md" | sed 's/.*locale: *//' | tr -d ' \r\n' 2>/dev/null)
   fi
   if [ -z "$locale" ] && [ -f "$git_root/CODEX.md" ]; then
     locale=$(grep -m1 '\*\*locale\*\*:' "$git_root/CODEX.md" | awk '{print $2}' 2>/dev/null)
@@ -111,12 +111,12 @@ fi
 
 mkdir -p "$GIT_ROOT/.hot" 2>/dev/null || exit 0
 
-if ! grep -qF '.hot/' "$GIT_ROOT/.gitignore" 2>/dev/null; then
-  echo '.hot/' >> "$GIT_ROOT/.gitignore"
+if ! grep -qF '.cortex/' "$GIT_ROOT/.gitignore" 2>/dev/null; then
+  echo '.cortex/' >> "$GIT_ROOT/.gitignore"
 fi
 
 NOW=$(date '+%Y-%m-%d %H:%M %Z')
-HOT_FILE="$GIT_ROOT/.hot/MEMORY.md"
+HOT_FILE="$GIT_ROOT/.cortex/MEMORY.md"
 TMP=$(mktemp -t hot-cache.XXXXXX) || exit 0
 trap 'rm -f "$TMP"' EXIT
 
@@ -206,7 +206,7 @@ if printf '%s\n' "$SUMMARY" | grep -q "^#### Imprint candidate$" && [ -n "$TRANS
 fi
 
 # Archive history entries older than 30 days to CONSOLIDATED.md
-CONSOLIDATED="$GIT_ROOT/.hot/CONSOLIDATED.md"
+CONSOLIDATED="$GIT_ROOT/.cortex/CONSOLIDATED.md"
 CUTOFF=$(date -v-30d '+%Y-%m-%d' 2>/dev/null || date -d '30 days ago' '+%Y-%m-%d' 2>/dev/null || echo "")
 
 RECENT_HISTORY="$PREV_HISTORY"

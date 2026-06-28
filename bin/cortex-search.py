@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 cortex-search: Semantic search over the vault index.
-Usage: python .cortex/cortex-search.py "query" [--top-k N] [--vault PATH]
+Usage: python {vault}/.cortex/db/cortex-search.py "query" [--top-k N] [--vault PATH]
+Installed to {vault}/.cortex/db/ by cortex-forge-setup. Source lives in bin/.
 """
 import argparse
 import json
@@ -10,25 +11,29 @@ import sys
 from pathlib import Path
 
 
-def _resolve_forge_cortex() -> Path:
-    """Find .cortex/ from cortex-forge via ~/.cortex-forge/config.yml."""
+def _resolve_forge_bin() -> Path:
+    """Find cortex-forge bin/ containing embeddings.py.
+
+    Search order:
+    1. bin/ sibling of this script (canonical: script lives in <forge>/bin/)
+    2. forge path registered in ~/.cortex-forge/config.yml under 'cortex-forge:' or 'forge:'
+    """
+    here = Path(__file__).parent
+    if (here / "embeddings.py").exists():
+        return here
     config = Path.home() / ".cortex-forge" / "config.yml"
     if config.exists():
         for line in config.read_text().splitlines():
             line = line.strip()
-            if line.startswith("path:"):
-                candidate = Path(line.split("path:", 1)[1].strip()) / ".cortex"
+            if line.startswith("cortex-forge:") or line.startswith("forge:"):
+                candidate = Path(line.split(":", 1)[1].strip()) / "bin"
                 if (candidate / "embeddings.py").exists():
                     return candidate
-    # Fallback: this script lives in <forge>/.cortex/, embeddings.py is a sibling
-    fallback = Path(__file__).parent
-    if (fallback / "embeddings.py").exists():
-        return fallback
-    print("ERROR: Cannot locate cortex-forge .cortex/. Check ~/.cortex-forge/config.yml.", file=sys.stderr)
+    print("ERROR: Cannot locate cortex-forge bin/embeddings.py. Check ~/.cortex-forge/config.yml.", file=sys.stderr)
     sys.exit(1)
 
 
-sys.path.insert(0, str(_resolve_forge_cortex()))
+sys.path.insert(0, str(_resolve_forge_bin()))
 import embeddings as emb
 
 DEFAULT_TOP_K = 5

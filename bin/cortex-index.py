@@ -12,25 +12,31 @@ import sys
 from pathlib import Path
 
 
-def _resolve_forge_db() -> Path:
-    """Find .cortex/db/ from cortex-forge via ~/.cortex-forge/config.yml."""
+def _resolve_forge_bin() -> Path:
+    """Find cortex-forge bin/ containing embeddings.py.
+
+    Search order:
+    1. bin/ sibling of this script (works whether run from the forge or any vault)
+    2. forge path registered in ~/.cortex-forge/config.yml
+    """
+    # 1. This script lives in <forge>/bin/ — embeddings.py is a sibling
+    here = Path(__file__).parent
+    if (here / "embeddings.py").exists():
+        return here
+    # 2. Config lookup — forge registered under 'forge:' or first vault named 'cortex-forge'
     config = Path.home() / ".cortex-forge" / "config.yml"
     if config.exists():
         for line in config.read_text().splitlines():
             line = line.strip()
-            if line.startswith("path:"):
-                candidate = Path(line.split("path:", 1)[1].strip()) / ".cortex" / "db"
+            if line.startswith("cortex-forge:") or line.startswith("forge:"):
+                candidate = Path(line.split(":", 1)[1].strip()) / "bin"
                 if (candidate / "embeddings.py").exists():
                     return candidate
-    # Fallback: this script lives in <forge>/bin/, so .cortex/db is sibling of parent
-    fallback = Path(__file__).parent.parent / ".cortex" / "db"
-    if (fallback / "embeddings.py").exists():
-        return fallback
-    print("ERROR: Cannot locate cortex-forge .cortex/db/. Check ~/.cortex-forge/config.yml.", file=sys.stderr)
+    print("ERROR: Cannot locate cortex-forge bin/embeddings.py. Check ~/.cortex-forge/config.yml.", file=sys.stderr)
     sys.exit(1)
 
 
-sys.path.insert(0, str(_resolve_forge_db()))
+sys.path.insert(0, str(_resolve_forge_bin()))
 import embeddings as emb
 
 CHUNK_WORD_LIMIT = 500

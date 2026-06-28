@@ -56,7 +56,7 @@ Always end with the relevant subset of step 9 (confirmation).
    - 1 → steps 4–5
    - 2 → step 6 (session hooks only; skip 6a, 6b, 6c — those have their own entries)
    - 3 → step 3b
-   - 4 → Initialize: run `python3 {forge}/bin/cortex-index.py {vault}`, report chunks indexed. Skip if `.cortex/vault.db` already exists (ask user if they want to re-index instead).
+   - 4 → Initialize: copy `bin/cortex-search.py` and `bin/embeddings.py` from the forge to `{vault}/.cortex/db/` (create dir if needed). Then run `python3 {forge}/bin/cortex-index.py {vault}`, report chunks indexed. Skip the copy if files already exist and are identical. Skip indexing if `.cortex/db/vault.db` already exists (ask user if they want to re-index instead).
    - 5 → step 6b
    - 6 → step 6c (gate still applies: if vault.db doesn't exist, offer option 4 first)
    - 7 → step 7
@@ -252,8 +252,8 @@ Always end with the relevant subset of step 9 (confirmation).
    If yes:
    - Check if `.cortex/vault.db` exists:
      - **Exists** → proceed normally.
-     - **Does not exist** → do NOT skip silently. Instead ask: "Semantic search index not found. Initialize it now? This runs `bin/cortex-index.py` once to build `.cortex/vault.db` (requires `OPENAI_API_KEY` or local mlx/sentence-transformers). Skip if you want to set it up later."
-       - If user confirms: run `python3 {forge}/bin/cortex-index.py {vault}` and wait for it to complete before installing the hook. Report how many chunks were indexed.
+     - **Does not exist** → do NOT skip silently. Instead ask: "Semantic search index not found. Initialize it now? This runs `bin/cortex-index.py` once to build `.cortex/db/vault.db` (requires local mlx/sentence-transformers). Skip if you want to set it up later."
+       - If user confirms: copy `bin/cortex-search.py` and `bin/embeddings.py` from the forge to `{vault}/.cortex/db/` (create dir if needed). Then run `python3 {forge}/bin/cortex-index.py {vault}` and wait for it to complete before installing the hook. Report how many chunks were indexed.
        - If user skips: skip the hook installation and note in the summary that semantic search was not initialized (user can re-run `/cortex-forge-setup` later to add it).
    - Check `git config core.hooksPath` first — if set (husky-style), install into that directory instead of `.git/hooks/`, or warn and skip.
    - Copy `bin/hooks/cortex-reindex-post-commit.sh` from the forge to `~/.cortex-forge/bin/hooks/` if not already there.

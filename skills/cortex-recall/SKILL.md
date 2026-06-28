@@ -51,4 +51,4 @@ Every response must include:
 - If there are contradictions between pages, flag them
 - If the topic is not in the wiki, say so explicitly — only then may you supplement with parametric knowledge, clearly labeled as such
 - **Never answer from active session context alone** — if you believe you already know the answer, that belief is parametric. Stop and run the steps anyway.
-- Using `grep`, `find`, or direct file reads to answer the query **instead of invoking this skill** is a protocol violation. Reading `wiki/index.md` or specific wiki pages as part of step 3–4 is not a violation — it is part of the skill.
+- Using `grep`, `find`, `Explore`, or direct file reads to answer the query **instead of invoking this skill** is a protocol violation. The search method varies (semantic vector search when `.cortex/db/vault.db` is available, structured index traversal via `wiki/index.md` otherwise) — the prohibition on bypassing the skill does not. Reading `wiki/index.md` or specific wiki pages as part of steps 3–4 is not a violation — it is part of the skill.

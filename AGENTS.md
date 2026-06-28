@@ -55,7 +55,7 @@ This applies even if:
 
 Trigger phrases include: "what does the vault say about", "recall", "what do we know about", "is this documented", "what was ingested about", or any question about a topic covered in `wiki/`.
 
-**Do not use `grep`, `find`, or direct file reads as a substitute for `cortex-recall`.** Those tools return raw memory; the skill returns synthesized knowledge with citations.
+**Do not use `grep`, `find`, `Explore`, or direct file reads as a substitute for `cortex-recall`.** Those tools do text matching; `cortex-recall` runs semantic vector search over the embedding index in `.cortex/db/` (1800+ indexed chunks) and returns synthesized knowledge with citations. They are not equivalent.
 
 **Compliance criterion:** every response that draws on vault knowledge must include at least one citation to a `wiki/` page with its `confidence:` value appended. If `cortex-recall` is unavailable in this session, declare it explicitly before answering — do not answer as if recall occurred.
 

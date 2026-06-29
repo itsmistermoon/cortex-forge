@@ -70,6 +70,7 @@ Decisions derived from ingesting obsidian-mind + @affaan's guides (`wiki/sources
 - [x] Add license to the public repo
 - [x] Hook distribution architecture: `bin/hooks/` (source) → `~/.cortex-forge/bin/hooks/` (runtime) → per-agent symlinks (`~/.claude/hooks/`, `~/.gemini/config/hooks/`, `~/.codex/hooks/`, `~/.commandcode/hooks/`); `/cortex-forge-setup update` to propagate changes; `scripts/` collapsed into `bin/`
 - [ ] Onboarding guide: 5 minutes from zero to first ingest
+- [x] `install.sh` — curl installer: clones forge, detects vault, links hooks and skills for all detected agents, pipe-safe (2026-06-28)
 - [ ] Example pages in `wiki/concepts/` (demonstrate the format, not personal content)
 - [ ] `wiki/prompts/` as an optional page type — lets users archive effective agent invocations with sample output; the vault currently stores world knowledge but not operational knowledge about how to work with the agent
 - [ ] MOCs per topic area — `wiki/concepts/_index.md`, `wiki/entities/_index.md` as navigable area indexes, complementary to the global index; helps the agent enter via the right MOC instead of loading the full index

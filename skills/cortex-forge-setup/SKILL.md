@@ -56,7 +56,7 @@ Always end with the relevant subset of step 9 (confirmation).
    - 1 → steps 4–5
    - 2 → step 6 (session hooks only; skip 6a, 6b, 6c — those have their own entries)
    - 3 → step 3b
-   - 4 → Initialize: copy `bin/cortex-search.py` and `bin/embeddings.py` from the forge to `{vault}/.cortex/db/` (create dir if needed). Then run `python3 {forge}/bin/cortex-index.py {vault}`, report chunks indexed. Skip the copy if files already exist and are identical. Skip indexing if `.cortex/db/vault.db` already exists (ask user if they want to re-index instead).
+   - 4 → Initialize: copy `bin/cortex-search.py` and `bin/embeddings.py` from the forge to `{vault}/.cortex/db/` (create dir if needed). Check embedding dependencies before indexing (see dependency check below). Then run `python3 {forge}/bin/cortex-index.py {vault}`, report chunks indexed. Skip the copy if files already exist and are identical. Skip indexing if `.cortex/db/vault.db` already exists (ask user if they want to re-index instead).
    - 5 → step 6b
    - 6 → step 6c (gate still applies: if vault.db doesn't exist, offer option 4 first)
    - 7 → step 7
@@ -191,13 +191,25 @@ Always end with the relevant subset of step 9 (confirmation).
 
    **Codex** (`~/.codex/` exists):
    - Create `~/.codex/hooks/` if it doesn't exist.
-   - Create symlinks `~/.codex/hooks/{script}` → `~/.cortex-forge/bin/hooks/{script}` for each Codex hook script (`cortex-reactivate.sh`, `cortex-crystallize-codex.sh`).
+   - Create symlinks `~/.codex/hooks/{script}` → `~/.cortex-forge/bin/hooks/{script}` for each Codex hook script (`cortex-reactivate-codex.sh`, `cortex-crystallize-codex.sh`).
    - Display instructions for `~/.codex/hooks.json`:
      ```
      Codex (~/.codex/hooks.json):
-       SessionStart → ~/.codex/hooks/cortex-reactivate.sh
-       Stop         → ~/.codex/hooks/cortex-crystallize-codex.sh
+       SessionStart → ~/.codex/hooks/cortex-reactivate-codex.sh
+       Stop         → ~/.codex/hooks/cortex-crystallize-codex.sh  # no-op JSON guard
      ```
+   - ⚠️ **No automatic Codex crystallize.** Codex displays SessionStart injected context in the conversation and its Stop event is turn-scoped rather than a reliable session-close signal. Codex must load hot cache from `AGENTS.md` instructions and crystallize manually via `/cortex-crystallize`.
+   - ⚠️ **Semantic search requires network access in Codex.** Codex CLI runs with an OS-level sandbox that blocks loopback connections by default (`allow_local_binding = false`), which prevents `cortex-search.py` from reaching Ollama on `localhost:11434`. Without this, `cortex-recall` silently falls back to keyword search via `wiki/index.md`. Display and ask the user to add to `~/.codex/config.toml`:
+     ```toml
+     # Required for cortex-recall semantic search (allows Ollama on localhost:11434)
+     [sandbox_workspace_write]
+     network_access = true
+
+     [features.network_proxy]
+     enabled = true
+     allow_local_binding = true
+     ```
+     Source: confirmed via live testing + OpenAI Codex docs (sandboxing, config-reference) — 2026-06-28.
 
    **CommandCode** (`~/.commandcode/` exists):
    - Create `~/.commandcode/hooks/` if it doesn't exist.
@@ -250,10 +262,10 @@ Always end with the relevant subset of step 9 (confirmation).
 
 6c. **Post-commit re-index (opt-in, separate question)** — ask: "Re-index vault embeddings automatically after each commit? (recommended if semantic search is enabled)"
    If yes:
-   - Check if `.cortex/vault.db` exists:
+   - Check if `.cortex/db/vault.db` exists:
      - **Exists** → proceed normally.
-     - **Does not exist** → do NOT skip silently. Instead ask: "Semantic search index not found. Initialize it now? This runs `bin/cortex-index.py` once to build `.cortex/db/vault.db` (requires local mlx/sentence-transformers). Skip if you want to set it up later."
-       - If user confirms: copy `bin/cortex-search.py` and `bin/embeddings.py` from the forge to `{vault}/.cortex/db/` (create dir if needed). Then run `python3 {forge}/bin/cortex-index.py {vault}` and wait for it to complete before installing the hook. Report how many chunks were indexed.
+     - **Does not exist** → do NOT skip silently. Instead ask: "Semantic search index not found. Initialize it now? This runs `bin/cortex-index.py` once to build `.cortex/db/vault.db`. Skip if you want to set it up later."
+       - If user confirms: run dependency check (step 6d) first. If dependencies are satisfied, copy `bin/cortex-search.py` and `bin/embeddings.py` from the forge to `{vault}/.cortex/db/` (create dir if needed). Then run `python3 {forge}/bin/cortex-index.py {vault}` and wait for it to complete before installing the hook. Report how many chunks were indexed.
        - If user skips: skip the hook installation and note in the summary that semantic search was not initialized (user can re-run `/cortex-forge-setup` later to add it).
    - Check `git config core.hooksPath` first — if set (husky-style), install into that directory instead of `.git/hooks/`, or warn and skip.
    - Copy `bin/hooks/cortex-reindex-post-commit.sh` from the forge to `~/.cortex-forge/bin/hooks/` if not already there.
@@ -263,8 +275,45 @@ Always end with the relevant subset of step 9 (confirmation).
      bash ~/.cortex-forge/bin/hooks/cortex-reindex-post-commit.sh
      # <<< cortex-forge reindex <<<
      ```
-   - The hook self-gates: exits immediately if `.cortex/vault.db` or `.cortex/cortex-index.py` don't exist, and only runs when the commit touched `wiki/` files. Never delays the commit perceptibly for unchanged content.
+   - The hook self-gates: exits immediately if `.cortex/db/vault.db` or `bin/cortex-index.py` don't exist, and only runs when the commit touched `wiki/` files. Runs in the background (`&`) — never delays the commit. Appends a timestamped line to `.git/cortex-reindex.log` (ok or error with exit code).
    - Uninstall (deregister path): remove only the marked block — a diff against the pre-install file must be empty.
+
+6d. **Embedding dependency check** — run this before any indexing attempt (option 4 and 6c). This check is also triggered if `cortex-index.py` fails with an import error.
+
+   Detect platform: `uname -m` → `arm64` = Apple Silicon, anything else = generic.
+
+   Run:
+   ```bash
+   python3 -c "import mlx_lm" 2>/dev/null && echo mlx || python3 -c "import sentence_transformers" 2>/dev/null && echo st || echo none
+   ```
+
+   - **`mlx` or `st` available** → proceed silently (report which backend is active in the summary).
+   - **`none`** → do NOT fail silently. Present this message:
+
+     ```
+     Semantic search requires an embedding library to generate vectors locally.
+     No compatible library was found on this machine.
+
+     Why this matters: without embeddings, cortex-recall falls back to keyword search
+     across the full index. With embeddings, it retrieves the most relevant pages
+     semantically — useful as the vault grows beyond ~50 pages.
+
+     Long-term implications of installing:
+     • ~270 MB of model weights downloaded once, stored in ~/.cache/
+     • On Apple Silicon: mlx-embeddings runs via Neural Engine (fast, low power)
+     • On other platforms: sentence-transformers runs on CPU (slower but portable)
+     • No network calls at query time — fully local after the first download
+
+     Install now?
+       [1] Yes — install for this platform ({mlx-embeddings | sentence-transformers})
+       [2] No — skip semantic search for now (can re-run /cortex-forge-setup later)
+     ```
+
+   - If user chooses **[1]**:
+     - Apple Silicon → `pip install mlx-embeddings` (primary); if it fails, fall back to `pip install sentence-transformers` and note the fallback.
+     - Other → `pip install sentence-transformers`.
+     - After install, re-run the detection snippet to confirm. If still failing, report the error and skip indexing — do not proceed blindly.
+   - If user chooses **[2]**: skip indexing, note in the final summary that semantic search is not active.
 
 7. **Install TASTE rule for `cortex-recall`** — ask: "Install a TASTE rule so CommandCode invokes `/cortex-recall` automatically? (recommended)"
    If yes:
@@ -300,9 +349,10 @@ Always end with the relevant subset of step 9 (confirmation).
 
 ## Hook behavior
 
-The hooks provide automatic (no-invoke) session memory:
-- **SessionStart** (`cortex-reactivate.sh`) — reads `.cortex/MEMORY.md` and injects it as context
-- **PreCompact / Stop** (`cortex-crystallize-claude.sh`) — appends a snapshot to `.cortex/MEMORY.md`
+The hooks provide automatic (no-invoke) session memory where the agent lifecycle supports it:
+- **Claude SessionStart** (`cortex-reactivate.sh`) — reads `.cortex/MEMORY.md` and injects it as context
+- **Claude PreCompact / SessionEnd** (`cortex-crystallize-claude.sh`) — appends a snapshot to `.cortex/MEMORY.md`
+- **Codex SessionStart / Stop** (`cortex-reactivate-codex.sh`, `cortex-crystallize-codex.sh`) — no-op JSON guards; Codex loads and saves memory manually via `AGENTS.md` + `/cortex-crystallize`
 
 The hook writes a minimal snapshot (files touched, external actions). For a full snapshot with Current state updated, invoke `/cortex-crystallize` manually — hooks and manual invocation are compatible and complementary.
 

@@ -1,12 +1,21 @@
 """
 Embedding backend selector for cortex-forge.
 Priority: Ollama → mlx-embeddings (Apple Silicon) → sentence-transformers
+
+Ollama is the default: it reuses the daemon already present in most setups
+and avoids downloading model weights separately. Requires the daemon running
+on localhost:11434 — fails in sandboxed environments (e.g. Codex CLI without
+network_access enabled in ~/.codex/config.toml). See agent-hook-compatibility.md.
+
+mlx-embeddings is the in-process fallback for Apple Silicon: no daemon, Neural
+Engine, ~270 MB download on first use. Activates automatically if Ollama is
+unreachable and mlx-embeddings is installed.
+
+sentence-transformers is the universal fallback (CPU, any platform).
 """
-import os
 import platform
 import struct
 import sys
-import urllib.error
 import urllib.request
 
 MODEL_NAME = "nomic-embed-text-v1.5"
@@ -17,6 +26,10 @@ _backend: str | None = None
 _st_model = None
 _mlx_model = None
 _mlx_tokenizer = None
+
+
+def _is_apple_silicon() -> bool:
+    return platform.system() == "Darwin" and platform.machine() == "arm64"
 
 
 def _try_ollama() -> bool:
@@ -31,8 +44,16 @@ def _try_ollama() -> bool:
         return False
 
 
-def _is_apple_silicon() -> bool:
-    return platform.system() == "Darwin" and platform.machine() == "arm64"
+def _try_mlx() -> bool:
+    global _mlx_model, _mlx_tokenizer
+    if not _is_apple_silicon():
+        return False
+    try:
+        from mlx_embeddings import load as mlx_load
+        _mlx_model, _mlx_tokenizer = mlx_load(f"mlx-community/{MODEL_NAME}")
+        return True
+    except Exception:
+        return False
 
 
 def load_embedding_model() -> str:
@@ -45,15 +66,9 @@ def load_embedding_model() -> str:
         _backend = "ollama"
         return _backend
 
-    if _is_apple_silicon():
-        try:
-            import mlx_embeddings
-            from mlx_embeddings import load as mlx_load
-            _mlx_model, _mlx_tokenizer = mlx_load(f"mlx-community/{MODEL_NAME}")
-            _backend = "mlx"
-            return _backend
-        except Exception:
-            pass
+    if _try_mlx():
+        _backend = "mlx"
+        return _backend
 
     try:
         from sentence_transformers import SentenceTransformer
@@ -63,7 +78,19 @@ def load_embedding_model() -> str:
     except Exception:
         pass
 
-    print("ERROR: No embedding backend available. Install Ollama, mlx-embeddings, or sentence-transformers.", file=sys.stderr)
+    print(
+        "ERROR: No embedding backend available.\n"
+        "  Option A (recommended): start Ollama and run `ollama pull nomic-embed-text`\n"
+        "  Option B (in-process, Apple Silicon): pip install mlx-embeddings\n"
+        "  Option C (universal): pip install sentence-transformers\n"
+        "  If running inside Codex CLI: enable network access in ~/.codex/config.toml\n"
+        "    [sandbox_workspace_write]\n"
+        "    network_access = true\n"
+        "    [features.network_proxy]\n"
+        "    enabled = true\n"
+        "    allow_local_binding = true",
+        file=sys.stderr,
+    )
     sys.exit(1)
 
 

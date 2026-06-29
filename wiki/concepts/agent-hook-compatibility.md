@@ -25,13 +25,20 @@ Cortex Forge's Hot Cache Protocol requires two lifecycle events per agent: one a
 |--------|---------------------|-------------|-----------------|
 | Claude Code | `SessionStart` | `SessionEnd` + `PreCompact` | ✅ full — automatic via hooks |
 | Antigravity CLI | `PreInvocation (invocationNum==0)` | **no viable** | ⚠️ partial — SessionStart only; Stop hook unusable (see below) |
-| Codex | `SessionStart` | `Stop` | ✅ full — automatic via hooks; hook context visible in UI |
-| CommandCode | **does not exist** | `Stop` | partial — close only, automatic; IA synthesis via `cmd -p` |
+| Codex | `SessionStart` | `Stop` | manual-only — hooks installed as no-op JSON guards |
+| CommandCode | **does not exist** | **none (retired 2026-06-28)** | manual-only — `/cortex-crystallize` invocation |
 
 ## Degraded mode per agent
 
 ### Claude Code
 Configured via `cortex-forge-setup`. The `load-hot-cache.sh` and `update-hot-cache.sh` hooks run automatically. No agent action required.
+
+### Codex
+Codex supports lifecycle hooks, but Cortex Forge uses them conservatively:
+
+- `SessionStart` points to `cortex-reactivate-codex.sh`, which returns `{}` and intentionally does **not** inject `.cortex/MEMORY.md`. Codex renders `additionalContext` as visible `hook context:` in the conversation, so full hot-cache injection creates user-visible noise and token bloat.
+- `Stop` points to `cortex-crystallize-codex.sh`, which returns `{}` and intentionally does **not** synthesize a snapshot. Live Codex transcripts use a Codex-specific JSONL event stream (`session_meta`, `event_msg`, `response_item`, `turn_context` under `payload`), not the Claude `.message.content[]` format. The event is not treated as a reliable session-close boundary for automatic crystallize.
+- Codex must follow `AGENTS.md`: read `.cortex/MEMORY.md`, `.cortex/PRAXIS.md`, and `wiki/meta/vault-report.json` at session start, then run `/cortex-crystallize` manually after milestones.
 
 **SessionStart details (official docs):**
 - The event has a `source` field with values `startup`, `resume`, `clear`, `compact` — same as Codex. Filter by `startup` if you want to limit the hook to the real session start.
@@ -85,23 +92,37 @@ Transcript path: `~/.gemini/antigravity/brain/{conversationId}/.system_generated
 Configure in `~/.codex/hooks.json`:
 ```json
 {
-  "SessionStart": [{ "command": "bash ~/.codex/hooks/cortex-reactivate.sh" }],
+  "SessionStart": [{ "command": "bash ~/.codex/hooks/cortex-reactivate-codex.sh" }],
   "Stop":         [{ "command": "bash ~/.codex/hooks/cortex-crystallize-codex.sh" }]
 }
 ```
 
-**Findings validated in session (2026-06-08):**
+**⚠️ Semantic search requires explicit network access (confirmed 2026-06-28):** Codex CLI runs with an OS-level sandbox that blocks loopback connections by default (`allow_local_binding = false`). This prevents `cortex-search.py` from reaching Ollama on `localhost:11434` — even when Ollama is running normally — causing `No embedding backend available`. Without the fix, `cortex-recall` silently falls back to keyword search via `wiki/index.md`.
+
+Add to `~/.codex/config.toml`:
+```toml
+[sandbox_workspace_write]
+network_access = true
+
+[features.network_proxy]
+enabled = true
+allow_local_binding = true
+```
+
+**How the sandbox works (macOS):** Codex uses Apple Seatbelt (`sandbox-exec`). The `network_proxy` feature routes sandboxed processes through a built-in MITM proxy; `allow_local_binding = true` unlocks loopback destinations. Source: OpenAI Codex docs — sandboxing + config-reference (2026-06-28).
+
+**Findings validated in session (2026-06-08; corrected 2026-06-28):**
 - Use a stable global hook directory (`~/.codex/hooks/`) rather than a vault-local path. The scripts must be vault-aware at runtime so the same Codex setup works across multiple vaults and from non-vault projects.
-- Wire format identical to Claude Code — the `cortex-reactivate.sh` script is compatible without modifications.
+- The hook payload is JSON, but Codex's persisted session transcript is not Claude-compatible. Live transcripts are JSONL events such as `session_meta`, `event_msg`, `response_item`, and `turn_context` under `payload`.
 - `SessionStart` may fire more than once per session: it has a `source` field with values `startup`, `resume`, `clear`, `compact`. Filter by `source` in the matcher if you want to limit to the real start.
 - Codex hooks are enabled by default. Multiple matching hooks from multiple files all run.
 - The CLI exposes `/hooks` for reviewing, trusting, and disabling non-managed hooks.
-- The `hook context:` is visible in chat by design in the Codex UI. There is no mechanism to suppress it today (`suppressOutput` is reserved for future use). The context reaches the model correctly — the noise is visual only.
-- **Context cost**: `additionalContext` consumes tokens from the session context window like any message. For a hot cache of a few KB it is negligible with 200k+ token windows, but it is a real cost shared with Claude Code and every Layer 2 implementation.
+- The `hook context:` is visible in chat by design in the Codex UI. There is no mechanism to suppress it today (`suppressOutput` is reserved for future use). Therefore Cortex Forge must not inject full `.cortex/MEMORY.md` through Codex `SessionStart`.
+- **Context cost**: `additionalContext` consumes tokens from the session context window like any message. Codex avoids this cost by relying on `AGENTS.md` startup instructions instead of hook injection.
 - First run requires manual hook approval (`Trust: New hook - review required`).
 - `Stop` does not use `matcher`; it expects JSON output on stdout when exiting `0`, or exit code `2` with the continuation reason on stderr.
-- `transcript_path` is a convenience field, but transcript format is not a stable hook interface. Treat it as best-effort input for snapshotting, not as a contract.
-- Stop hooks should call `cortex-crystallize-codex.sh`, which wraps the shared Claude-compatible implementation with Codex-specific labels and transcript fallback paths.
+- `transcript_path` is a convenience field, but transcript format is not a stable hook interface. Treat it as best-effort debug input, not as a snapshotting contract.
+- `cortex-crystallize-codex.sh` is a no-op JSON guard. Actual Codex snapshots are manual via `/cortex-crystallize`.
 
 ### CommandCode
 Has no SessionStart hook. Context is injected via `AGENTS.md`: the global rule to read `.hot/MEMORY.md` on startup is fulfilled by the agent if it reads the instructions file. Closing is automatic via the `Stop` hook.
@@ -249,3 +270,5 @@ If an agent has no startup hook, `AGENTS.md` acts as a fallback: the explicit in
 - 2026-06-13 [CommandCode]: CommandCode crystallize upgraded with `cmd -p` IA synthesis
 - 2026-06-26 [Claude Code]: Antigravity section expanded with full hook event table (PreInvocation/PostInvocation confirmed from official docs); SuperContext injection table added; wire format incompatibility with Claude Code documented. Source: wiki/sources/antigravity-hooks-reference.md — now produces structured `#### What was done / Discarded / Fragile context` entries instead of minimal "Session closed via Stop hook."
 - 2026-06-27 [Claude Code]: Antigravity Stop hook marked unusable — no /exit trigger + deadlock when launching agy -p in background confirmed in live testing. cortex-crystallize-antigravity.sh removed from protocol; crystallize is manual-only for Antigravity. Source: moon-multivac/wiki/sources/antigravity-hooks.md
+- 2026-06-28 [CommandCode / MiniMax-M3]: CommandCode `Stop` hook retired for crystallize — same root cause as Antigravity (no `/exit` hook, `Stop` fires on every invocation). Observed failures: `cmd -p` background synth leaves `__PENDING_SYNTHESIS_*__` placeholders and orphan `.synthesize-*.sh` helpers when the sub-process dies before reaching its `rm -f` cleanup. The hook cannot reliably distinguish "session end" from "agent idle between turns". Decision: `cortex-crystallize-commandcode.sh` retired (`.retired`), CommandCode crystallize is now manual-only via `/cortex-crystallize`. Empty `"hooks": {}` registered in `.commandcode/settings.local.json` as a no-op placeholder so the file structure remains stable for any future hook.
+- 2026-06-28 [Claude Code]: Codex sandbox network restriction documented — `allow_local_binding = false` by default blocks localhost:11434 even when Ollama is running; confirmed via live testing in Codex + OpenAI docs. Fix: `network_access = true` + `network_proxy.allow_local_binding = true` in `~/.codex/config.toml`. Added to Codex section and propagated to `cortex-forge-setup/SKILL.md` step 6 (Codex) and `embeddings.py` error message.

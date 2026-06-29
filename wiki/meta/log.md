@@ -331,3 +331,23 @@ Agent: Antigravity (Gemini 3.5 Flash)
 
 ## [2026-06-28] auto-imprint | Crystallize Automation Architecture
 
+## [2026-06-29] fix | cortex-forge-setup: formato de hook incorrecto en spec de Claude Code
+
+**Problema:** El paso 6 de `skills/cortex-forge-setup/SKILL.md` especificaba los hooks de Claude Code como objetos de comando crudos:
+```json
+[{ "type": "command", "command": "~/.claude/hooks/cortex-reactivate.sh" }]
+```
+
+El formato correcto requiere un wrapper con `matcher` y `hooks`:
+```json
+[{ "matcher": "", "hooks": [{ "type": "command", "command": "~/.claude/hooks/cortex-reactivate.sh" }] }]
+```
+
+**Impacto:** Cuando se ejecutó `/cortex-forge-setup hooks`, el skill aplicó este formato directamente a `~/.claude/settings.json`, creando un segundo entry malformado (index `[1]`) en los eventos `SessionStart`, `PreCompact` y `SessionEnd` — junto al entry válido (index `[0]`) que ya existía con la estructura correcta. El diagnóstico `/doctor` reportó `hooks.SessionStart.1.hooks: Expected array, but received undefined` para los tres eventos.
+
+**Corrección aplicada:**
+- `~/.claude/settings.json` — eliminados los tres entries malformados (`[1]`) de `SessionStart`, `PreCompact` y `SessionEnd`. Los entries válidos al index `[0]` permanecen intactos.
+- `skills/cortex-forge-setup/SKILL.md` líneas 174–179 — corregido el formato en la spec para que futuras ejecuciones del skill escriban la estructura correcta con `matcher` + `hooks`.
+
+Agent: Claude Code (Sonnet 4.6)
+

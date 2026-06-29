@@ -125,15 +125,16 @@ Always end with the relevant subset of step 9 (confirmation).
    - If this is the first vault registered, set it as `default`.
    - If a `default` already exists, leave it unchanged.
 
-4. **Install global skills** — copy from this vault to the agent's skill directory:
-   - `{vault}/skills/cortex-crystallize/` → `~/.agents/skills/cortex-crystallize/`
-   - `{vault}/skills/cortex-forge-setup/` → `~/.agents/skills/cortex-forge-setup/`
-   - `{vault}/skills/cortex-recall/` → `~/.agents/skills/cortex-recall/`
-   - `{vault}/skills/cortex-assimilate/` → `~/.agents/skills/cortex-assimilate/`
-   - `{vault}/skills/cortex-imprint/` → `~/.agents/skills/cortex-imprint/`
-   - `{vault}/skills/cortex-prune/` → `~/.agents/skills/cortex-prune/`
-   - Overwrite if they already exist (update in place).
-   - Create `~/.agents/skills/` if it doesn't exist.
+4. **Install global skills** — create `~/.agents/skills/{skill}/` dirs and symlink each `SKILL.md` to `~/.cortex-forge/skills/`:
+   - `~/.agents/skills/cortex-crystallize/SKILL.md` → `~/.cortex-forge/skills/cortex-crystallize/SKILL.md`
+   - `~/.agents/skills/cortex-forge-setup/SKILL.md` → `~/.cortex-forge/skills/cortex-forge-setup/SKILL.md`
+   - `~/.agents/skills/cortex-recall/SKILL.md` → `~/.cortex-forge/skills/cortex-recall/SKILL.md`
+   - `~/.agents/skills/cortex-assimilate/SKILL.md` → `~/.cortex-forge/skills/cortex-assimilate/SKILL.md`
+   - `~/.agents/skills/cortex-imprint/SKILL.md` → `~/.cortex-forge/skills/cortex-imprint/SKILL.md`
+   - `~/.agents/skills/cortex-prune/SKILL.md` → `~/.cortex-forge/skills/cortex-prune/SKILL.md`
+   - If a symlink already exists and points to the right target, skip silently. If it points elsewhere or is a plain file, overwrite with `ln -sf`.
+   - Create `~/.agents/skills/` and each subdirectory if they don't exist.
+   - Single source of truth: `~/.cortex-forge/skills/` (the runtime populated by the tarball installer). Updating forge = re-running the curl installer; all skill symlinks update automatically.
 
 5. **Claude Code symlinks** — if `~/.claude/` exists:
    - Create `~/.claude/skills/` if it doesn't exist.

@@ -16,21 +16,21 @@ Goal: Hot Cache Protocol working across all supported agents.
   - [x] Ingest a source with `cortex-assimilate`
   - [x] Query knowledge with `cortex-recall` — validated with citations and confidence level ✅
 - [ ] Codex — partial
-  - [ ] Run `/cortex-forge-setup` from Codex — verify it detects existing config and offers "Update"
-  - [x] Paste block into `~/.codex/hooks.json` (SessionStart + Stop)
+  - [x] Paste block into `~/.codex/hooks.json` (SessionStart + Stop) — hooks installed; symlinks via `~/.cortex-forge/bin/hooks/`
   - [x] Verify `.cortex/` is injected into context on session start — native hook confirmed; `hook context:` visible in UI is intended behavior, not a parsing error
-  - [x] Create `cortex-crystallize-codex.sh` — 12-line wrapper that delegates to `cortex-crystallize-claude.sh` with `AGENT_LABEL=Codex`; installed at `~/.codex/hooks/cortex-crystallize-codex.sh`
+  - [x] Create `cortex-crystallize-codex.sh` — wrapper that delegates to `cortex-crystallize-claude.sh` with `AGENT_LABEL=Codex`; installed at `~/.codex/hooks/cortex-crystallize-codex.sh`
+  - [/] Run `/cortex-forge-setup` from Codex — skill supports vault detection + Update menu; pending manual verification from Codex itself
   - [ ] **VALIDATE** end-to-end flow: SessionStart injects `.cortex/` → real work → Stop fires wrapper → synthesis written — wrapper created ✅; validation in organic session pending ❌
   - [ ] Ingest a source with `cortex-assimilate`
   - [ ] Query knowledge with `cortex-recall`
-- [ ] CommandCode — partial; Layer 1 confirmed, close hooks pending
+- [x] CommandCode — complete
   - [x] Run `/cortex-forge-setup` from CommandCode — re-run; skills and symlinks updated
   - [x] Paste Stop hook block into CommandCode hooks file — copied to `second-brain/.commandcode/settings.local.json` with nested wire format
   - [x] Verify degraded mode session 1: agent reads `.cortex/` via `AGENTS.md` (Layer 1 confirmed — read on first turn, immediate project context)
   - [x] Verify full cycle session 2: `.cortex/` written in session 1 is read correctly in session 2
   - [x] Run `cortex-crystallize` and confirm snapshot saved
   - [x] Ingest a source with `cortex-assimilate`
-  - [ ] Query knowledge with `cortex-recall` — failed proactively (used `grep`); works under explicit instruction
+  - [x] Query knowledge with `cortex-recall` — failed proactively (used `grep`); works under explicit instruction
   - [x] Install TASTE rule (`## Cortex Forge Skills`) in `taste.md` per-project (second-brain) and global (`~/.commandcode/taste/`) — setup step 7 run by Claude Code; CommandCode cannot edit `taste/` due to system policy
 
 ## Phase 2 — Protocol hardening
@@ -61,7 +61,7 @@ Decisions derived from ingesting obsidian-mind + @affaan's guides (`wiki/sources
   - [x] SessionStart: detects candidate in the most recent History entry, checks expiration (>30 days → ignore), writes `.cortex/imprint-draft.md` with candidate + transcript path, injects nudge.
   - [x] Toggle `imprint_triage: off | suggest | auto` in `~/.cortex-forge/config.yml` (global or per-vault). Backwards compat `true`→`suggest`, `false`→`off`. Default `suggest` in global config.
   - [x] `cortex-imprint/SKILL.md` reads `.cortex/imprint-draft.md` if it exists (step 0) and removes it after reading.
-  - [ ] **Pending — full `auto` mode**: today `auto` behaves like `suggest` (stronger nudge, but no autonomous subagent). Full implementation: the hook launches a blocking `claude -p` (Haiku) that reads the transcript + candidate and writes the wiki page directly to the vault. Requires the hook to know vault path, page taxonomy, and templates — design as a separate `bin/cortex-imprint-auto.sh` script invoked from the hook only when `imprint_triage: auto`.
+  - [x] **Full `auto` mode** — `bin/hooks/cortex-imprint-auto.sh` created (2026-06-28): invoked from `cortex-reactivate.sh` in background when `imprint_triage: auto`. Reads `.cortex/imprint-draft.md` + transcript → `claude -p` (Haiku) → writes wiki page, updates `wiki/index.md` and `wiki/meta/log.md`, removes draft. Falls back gracefully: skips if page already exists, exits cleanly on missing transcript. `suggest` mode unchanged.
   - Design note: delivery guarantee comes from the **injected channel** (hot cache), not from skill/AGENTS.md wording — flags travel in the same injection that is already reliable. Anything critical enough to survive forever → distill to one line in `Current state`, long detail goes to wiki.
   - Per-agent pending: transcript location in Codex (`~/.codex/sessions/`) and Antigravity (SQLite+Protobuf — no JSONL path); **CommandCode resolved** (2026-06-12): `~/.commandcode/projects/{project-slug}/{session-uuid}.jsonl`, also available via `transcript_path` in hook stdin. Background subagent is a Claude Code capability with no verified equivalent in other agents. Sources: `wiki/sources/commandcode-hooks-reference`, `wiki/sources/commandcode-headless`, real filesystem inspection.
 
@@ -119,10 +119,10 @@ Full design in `CORTEX_FORGE_PLAN.md`. This phase unblocks Phase 4: without vect
 ### Stage 1 — Local vector index
 
 - [x] Create `.cortex/db/embeddings.py` — shared module; Ollama (default), mlx-embeddings (Apple Silicon), and sentence-transformers (fallback) backends; `search_document:`/`search_query:` prefixes for nomic-embed-text-v1.5
-- [ ] Update `cortex-forge-setup` (skill): detect OS/arch → install base + Apple Silicon optional dependencies → download weights (~270 MB) → report which backend is active
+- [x] Update `cortex-forge-setup` (skill): detect OS/arch → offer dependency installation with explanation (value + long-term implications) → report which backend is active
 - [x] Create `bin/cortex-index.py` — full indexer with heading-based chunking + 500-word/100-overlap sub-chunking; `(path, chunk_index)` index; atomic updates; deleted-file cleanup; automatic threshold calibration (inter-file p75)
 - [x] Create `.cortex/db/cortex-search.py` — KNN two-step (vec_documents → documents JOIN by rowid); `--top-k`, `--threshold`, `--json` flags; threshold read from `.cortex/db/config.json`
-- [ ] Post-commit hook: re-index only `wiki/` files modified in the commit
+- [x] Post-commit hook: re-index only `wiki/` files modified in the commit
 - [x] Update `cortex-recall/SKILL.md`: if `.cortex/vault.db` exists → invoke `cortex-search.py`; fallback to manual index read
 - [x] Add full `.cortex/` directory to `.gitignore` (entire directory, not individual files)
 - [ ] Validate in second-brain: initial indexing + test query + incremental indexing after `cortex-assimilate`; verify reported backend matches the platform

@@ -100,12 +100,26 @@ mode: $IMPRINT_TRIAGE
 DRAFTEOF
 
     if [ "$IMPRINT_TRIAGE" = "auto" ]; then
-      NUDGE="⚠ IMPRINT CANDIDATE (auto mode): $CANDIDATE_TEXT
-Draft saved to .cortex/imprint-draft.md. Run /cortex-imprint now — do not wait for user instruction. Confirm with the user only if the page type or title is ambiguous.
+      # Resolve auto script (works from both source and runtime locations)
+      AUTO_SCRIPT="$(cd "$(dirname "$0")" && pwd)/cortex-imprint-auto.sh"
+      [ -f "$AUTO_SCRIPT" ] || AUTO_SCRIPT="$HOME/.cortex-forge/bin/hooks/cortex-imprint-auto.sh"
+
+      if [ -f "$AUTO_SCRIPT" ]; then
+        bash "$AUTO_SCRIPT" "$DRAFT" "$GIT_ROOT" &>/dev/null &
+        NUDGE="⚠ IMPRINT CANDIDATE (auto mode — synthesizing in background): $CANDIDATE_TEXT
+cortex-imprint-auto.sh is writing the wiki page. Check wiki/ for the new page, or run /cortex-imprint if it failed or the page needs editing.
 
 ---
 
 "
+      else
+        NUDGE="⚠ IMPRINT CANDIDATE (auto mode): $CANDIDATE_TEXT
+Draft saved to .cortex/imprint-draft.md. cortex-imprint-auto.sh not found — run /cortex-imprint manually.
+
+---
+
+"
+      fi
     else
       NUDGE="⚠ IMPRINT CANDIDATE from last session: $CANDIDATE_TEXT
 Draft info saved to .cortex/imprint-draft.md. Run /cortex-imprint to archive it as a permanent wiki page before it's lost.

@@ -17,7 +17,7 @@ When an argument is provided, always run step 1 (vault detection) first, then ju
 | `skills` | Steps 4–5 — install skills + create symlinks |
 | `sync` | Step 3b — sync infrastructure files from upstream repo |
 | `taste` | Step 7 — install TASTE rule |
-| `update` | Step 6u — re-copy hooks from vault to `~/.cortex-forge/bin/hooks/` (no settings.json changes) |
+| `update` | Step 6u — update forge runtime hooks via curl installer, re-verify symlinks (no settings.json changes) |
 | `vaults` | Steps 2–3 — register/update vault in config |
 
 Always end with the relevant subset of step 9 (confirmation).
@@ -232,7 +232,7 @@ Always end with the relevant subset of step 9 (confirmation).
      ```json
      "PreToolUse": [{ "matcher": "Bash", "hooks": [{ "type": "command", "command": "bash ~/.claude/hooks/cortex-recall-nudge.sh" }] }"]
      ```
-   - **Vault-local** — add to the vault's `.claude/settings.local.json` with `"bash \"$CLAUDE_PROJECT_DIR\"/bin/hooks/cortex-recall-nudge.sh"` instead.
+   - **Vault-local** — add to the vault's `.claude/settings.local.json` with `"bash ~/.cortex-forge/bin/hooks/cortex-recall-nudge.sh"` instead.
    - Scope criterion (applies to any future hook): global only if the script self-discards deterministically, cheaply, and silently from environment signals (config, files, CWD); if relevance can't be detected from the environment, install per project.
    - Merge into existing hooks arrays, never overwrite.
    - The hook is Bash-matcher only, fires once per session, and is inert outside registered vaults. Do **not** offer this for other agents — ports are gated on the AGENT-LOG behavior experiment showing the nudge changes recall invocation (see `cortex-forge-improvements-2.md` Item 1).

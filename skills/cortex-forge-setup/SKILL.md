@@ -162,20 +162,19 @@ Always end with the relevant subset of step 9 (confirmation).
 6. **Configure lifecycle hooks** — ask: "Set up automatic session memory hooks? (recommended)"
    If yes, first install the runtime hook files (step 6-install), then configure each agent detected (steps below).
 
-   **Step 6-install — Install runtime hooks:**
-   - Create `~/.cortex-forge/bin/hooks/` if it doesn't exist.
-   - Copy all scripts from `{vault}/bin/hooks/` to `~/.cortex-forge/bin/hooks/` (overwrite if already present).
-   - This is the single runtime location for all agents. The vault repo is the source of truth; `~/.cortex-forge/bin/hooks/` is the installed copy.
+   **Step 6-install — Verify runtime hooks:**
+   - Confirm `~/.cortex-forge/bin/hooks/` exists and contains hook scripts. If missing or empty, tell the user to re-run the curl installer (`install.sh`) — the hooks are part of the forge runtime, not the vault.
+   - This is the single runtime location for all agents. Symlinks for each agent point here.
 
    **Claude Code** (`~/.claude/` exists):
    - Create `~/.claude/hooks/` if it doesn't exist.
    - For each hook script, create a symlink `~/.claude/hooks/{script}` → `~/.cortex-forge/bin/hooks/{script}`. If a symlink already exists pointing to the right target, skip silently. If it points elsewhere or is a plain file, overwrite with the symlink.
    - Read `~/.claude/settings.json` (or create it if missing).
-   - Add the following hooks if not already present:
+   - Add the following hooks if not already present (use `matcher: ""` to match all):
      ```json
-     "SessionStart": [{ "type": "command", "command": "~/.claude/hooks/cortex-reactivate.sh" }"]
-     "PreCompact":   [{ "type": "command", "command": "~/.claude/hooks/cortex-crystallize-claude.sh" }"]
-     "SessionEnd":   [{ "type": "command", "command": "~/.claude/hooks/cortex-crystallize-claude.sh", "timeout": 60 }"]
+     "SessionStart": [{ "matcher": "", "hooks": [{ "type": "command", "command": "~/.claude/hooks/cortex-reactivate.sh" }] }]
+     "PreCompact":   [{ "matcher": "", "hooks": [{ "type": "command", "command": "~/.claude/hooks/cortex-crystallize-claude.sh" }] }]
+     "SessionEnd":   [{ "matcher": "", "hooks": [{ "type": "command", "command": "~/.claude/hooks/cortex-crystallize-claude.sh", "timeout": 60 }] }]
      ```
    - Merge carefully — do not overwrite existing hooks, only append to the arrays.
 
@@ -222,11 +221,10 @@ Always end with the relevant subset of step 9 (confirmation).
      ```
    - Note: user scope (`~/.commandcode/settings.json`) is preferred over project scope so the hook works across all vaults. The script resolves the active vault at runtime from CWD. Timeout 120s — the script calls `cmd -p` which requires an API call.
 
-6u. **Update runtime hooks** (sub-task `update` only) — re-copy hook scripts from the vault to the runtime location without touching `settings.json` or agent configs:
-   - Verify `~/.cortex-forge/bin/hooks/` exists (if not, run step 6 instead — this is a first install).
-   - Copy all scripts from `{vault}/bin/hooks/` to `~/.cortex-forge/bin/hooks/` (overwrite).
-   - Report: files updated (list), files unchanged (count).
-   - Symlinks in `~/.claude/hooks/` and `~/.gemini/config/hooks/` do not need updating — they already point to `~/.cortex-forge/bin/hooks/`.
+6u. **Update runtime hooks** (sub-task `update` only) — re-run the curl installer to pull the latest forge runtime (hooks included), then re-verify symlinks:
+   - Tell the user to run: `curl -fsSL https://raw.githubusercontent.com/itsmistermoon/cortex-forge/main/install.sh | bash`
+   - After the installer completes, verify symlinks in `~/.claude/hooks/`, `~/.gemini/config/hooks/`, etc. still point to `~/.cortex-forge/bin/hooks/`. If any are broken, recreate them.
+   - Report: symlinks verified (list), any recreated (list).
 
 6a. **Recall enforcement nudge (Claude Code only, v1)** — ask: "Install the cortex-recall nudge hook? It reminds the agent to use /cortex-recall when it greps vault content directly. (experimental)"
    If yes, ask scope (never the versioned `settings.json` of a template repo):

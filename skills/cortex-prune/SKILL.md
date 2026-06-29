@@ -22,12 +22,12 @@ Health check del vault activo en dos capas: estructural (script) y semántica (a
 
    **Confirmation gate:** if the vault was resolved from an explicit argument (not from CWD), confirm with the user before proceeding: "About to prune `{vault-name}` at `{path}`. Continue?" — do not proceed until confirmed.
 
-   Confirm vault is a Cortex Forge vault: path contains `wiki/` and `bin/cortex-prune.sh`.
+   Confirm vault is a Cortex Forge vault: path contains `wiki/` and `AGENTS.md`.
 
    Read **Domains** and **Out of scope** from `AGENTS.md` (`## Vault identity`) — use them to flag pages whose topics fall outside the vault's defined scope.
    Also read `locale:` from `~/.cortex-forge/config.yml` (match vault by path) — use it for all agent-generated content. Fallback if absent: `.cortex/MEMORY.md` title line (`— locale: {lang}`) → `AGENTS.md` Vault identity (`**locale**:`) → default `en`.
 
-2. **Capa 1 — Structural check**: Run `bash {vault}/bin/cortex-prune.sh {vault}` and capture output.
+2. **Capa 1 — Structural check**: Run `bash ~/.cortex-forge/bin/cortex-prune.sh {vault}` and capture output.
 
 3. **Capa 2 — Semantic analysis**: Run the four semantic checks below. For each check, spawn subagents as described — do not attempt to reason about the wiki pages from memory alone.
 

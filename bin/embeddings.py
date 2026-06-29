@@ -1,29 +1,6 @@
 """
-Embedding backend selector for cortex-forge.
-Priority: Ollama → mlx-embeddings (Apple Silicon) → sentence-transformers
-
-Ollama is the default: it reuses the daemon already present in most setups
-and avoids downloading model weights separately. Requires the daemon running
-on localhost:11434 — fails in sandboxed environments (e.g. Codex CLI without
-network_access enabled in ~/.codex/config.toml). See agent-hook-compatibility.md.
-
-mlx-embeddings is the in-process fallback for Apple Silicon: no daemon, Neural
-Engine, ~270 MB download on first use. Activates automatically if Ollama is
-unreachable and mlx-embeddings is installed.
-
-NOTE (2026-06-28): mlx support for nomic-embed-text-v1.5 is blocked on Python 3.14
-+ transformers 5.x. The model and its dimensions (768) are fully compatible, but
-the available packages fail at runtime:
-  - mlx-embedding-models 0.0.11 (taylorai): uses batch_encode_plus, removed in
-    transformers 5.x.
-  - mlx-embeddings (Blaizzy): architecture nomic_bert not yet supported.
-  - mlx_lm: not designed for embedding inference with this model family.
-The sqlite-vec dependency also pins cortex-search.py to the system Python (3.14),
-making it impossible to use the mlx_lm install in pyenv (3.13) as a workaround.
-When upstream packages resolve the transformers 5.x compatibility, mlx should
-become the preferred backend (in-process, Neural Engine, no daemon required).
-
-sentence-transformers is the universal fallback (CPU, any platform).
+Embedding backend selector. Priority: Ollama → mlx-embeddings → sentence-transformers.
+See wiki/concepts/embedding-backend-selection.md for rationale and known limitations.
 """
 import platform
 import struct

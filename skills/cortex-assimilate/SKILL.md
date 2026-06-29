@@ -94,7 +94,7 @@ If the argument starts with `--research`, enter research mode instead of the nor
 
    **4a. Sanitization check** — before saving to `.raw/`, scan the content for injection and exfiltration vectors:
 
-   Run `bash {vault}/bin/cortex-sanitize.sh <temp-file>` and inspect the JSON output.
+   Run `bash ~/.cortex-forge/bin/cortex-sanitize.sh <temp-file>` and inspect the JSON output.
 
    If `findings` is non-empty:
    - List each finding to the user (type, label, count)

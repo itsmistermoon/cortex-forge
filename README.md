@@ -125,7 +125,7 @@ Tested agents and their hook support:
 | Agent | Session start | Session end | Status |
 |-------|--------------|-------------|--------|
 | Claude Code | `SessionStart` hook | `SessionEnd` + `PreCompact` (both synthesized via `claude -p`) | ✅ automatic |
-| Codex | `SessionStart` hook | `Stop` hook | ✅ automatic |
+| Codex | `SessionStart` no-op guard | `Stop` no-op guard | manual-only |
 | Antigravity CLI | `PreInvocation` (first only) | `Stop` (fullyIdle) | documented, untested |
 | CommandCode | none — via `AGENTS.md` | `Stop` hook | partial (close only) |
 

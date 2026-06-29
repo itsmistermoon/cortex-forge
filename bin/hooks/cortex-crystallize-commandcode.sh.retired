@@ -43,9 +43,6 @@ resolve_locale() {
   echo "${locale:-en}"
 }
 
-# ── Debug: capturar payload del hook para inspección ────────────────────────
-printf '%s' "$PAYLOAD" > "$GIT_ROOT/.cortex/stop-hook-payload.json" 2>/dev/null
-
 # ── Resolve transcript path ─────────────────────────────────────────────────
 # transcript_path viene en el payload del hook; fallback por si acaso
 if [ -z "$TRANSCRIPT_PATH" ] || [ ! -f "$TRANSCRIPT_PATH" ]; then
@@ -116,6 +113,40 @@ TOOL_CALLS=$(tail -n 5000 "$TRANSCRIPT_PATH" | jq -s -r '
 ' 2>/dev/null | head -50)
 
 LAST_REPLY=$(tail -n 5000 "$TRANSCRIPT_PATH" | jq -s -r '.[] | select(.role=="assistant") | .content[]? | select(.type=="text") | .text' 2>/dev/null | tail -3)
+
+# ── Cleanup orphan helpers + stale placeholders from prior runs ─────────────
+# Si un crystallize previo falló (timeout, error de modelo, SIGKILL), el helper
+# y el placeholder quedan huérfanos. Limpiarlos al arrancar evita acumulación.
+find "$GIT_ROOT/.cortex" -maxdepth 1 -type f -name '.synthesize-*.sh' -delete 2>/dev/null
+if [ -f "$GIT_ROOT/.cortex/MEMORY.md" ]; then
+  HOT_FILE_CLEANUP="$GIT_ROOT/.cortex/MEMORY.md"
+  TMP_CLEANUP=$(mktemp -t hot-cache-cleanup.XXXXXX) || exit 0
+  if python3 - "$HOT_FILE_CLEANUP" "$TMP_CLEANUP" <<'PYEOF'
+import re, sys
+src, dst = sys.argv[1], sys.argv[2]
+with open(src) as f:
+    text = f.read()
+# 1. Eliminar sentinels huérfanos
+text = re.sub(r'^__PENDING_SYNTHESIS_[0-9-]+__\n', '', text, flags=re.MULTILINE)
+# 2. Eliminar bloques "### YYYY-MM-DD-HHMM — CommandCode (Stop)" sin timestamp real
+#    (los crea el hook con NOW=$(date '+%Y-%m-%d-%H%M'), sin offset horario,
+#    a diferencia de las entradas manuales bien formadas "YYYY-MM-DD HH:MM -0400")
+#    Coincide con líneas que NO contienen " -04", " -03", etc. (offset horario)
+text = re.sub(
+    r'^### [0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{4} — CommandCode \(Stop\)\n(?=\n|### )',
+    '',
+    text,
+    flags=re.MULTILINE
+)
+with open(dst, 'w') as f:
+    f.write(text)
+PYEOF
+  then
+    mv "$TMP_CLEANUP" "$HOT_FILE_CLEANUP"
+  else
+    rm -f "$TMP_CLEANUP"
+  fi
+fi
 
 # ── Síntesis IA vía headless ────────────────────────────────────────────────
 LOCALE=$(resolve_locale "$GIT_ROOT")
@@ -237,6 +268,9 @@ FULL_PROMPT_ESC=$(printf '%s' "$FULL_PROMPT" | sed "s/'/'\\''/g")
 cat > "$HELPER" <<HEREDOC
 #!/bin/bash
 # Auto-generado por cortex-crystallize-commandcode.sh
+# trap EXIT garantiza que el helper se elimine incluso si el proceso muere
+# por timeout, SIGKILL, o error del modelo.
+trap 'rm -f "$HELPER"' EXIT
 HOT_FILE='$HOT_FILE_ESC'
 SENTINEL='$SENTINEL_ESC'
 FULL_PROMPT='$FULL_PROMPT_ESC'

@@ -43,7 +43,7 @@
 - [[wiki/entities/understand-anything]] — Lum1104's multi-platform plugin that builds knowledge graphs over codebases and wikis
 - [[wiki/entities/pi-cli]] — Terminal AI coding agent from `earendil-works/pi-mono`: TypeScript extensions, JSONL tree sessions, multi-provider (Anthropic, OpenAI, Google, Ollama, vLLM, custom)
 - [[wiki/entities/codebase-memory-mcp]] — High-performance MCP server: codebase → SQLite knowledge graph; 158 languages, 14 tools, zero dependencies, single static binary; 3,902 stars
-- [[wiki/entities/codex]] — Codex CLI (OpenAI): terminal coding agent con hook system compatible con Claude Code; `cortex-crystallize-codex.sh` validated
+- [[wiki/entities/codex]] — Codex CLI (OpenAI): terminal coding agent; Cortex Forge hooks installed as no-op JSON guards, crystallize manual
 - [[wiki/entities/graphify]] — Skill multi-agente que convierte cualquier folder en knowledge graph (`graph.html`); 66.3k stars, YC S26; no soporta CommandCode (brecha que cortex-forge cubre)
 - [[wiki/entities/openhuman]] — Open-source agentic desktop assistant (33k stars); Memory Tree + Obsidian vault + 118 integrations + SuperContext; closest full-harness comparable to Cortex Forge
 
@@ -121,3 +121,6 @@
 - `templates/` — 5 page templates (concept, entity, source, project, reference)
 - `bin/setup-vault.sh` — setup script
 - `skills/` — agent skills (cortex-assimilate, cortex-recall, cortex-prune, cortex-imprint, cortex-crystallize, cortex-forge-setup)
+
+## uconcepts
+- [[wiki/concepts/crystallize-automation-architecture.md]] — Crystallize Automation Architecture

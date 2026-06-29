@@ -13,13 +13,13 @@ schema_version: "0.3"
 
 # Codex CLI
 
-Codex CLI is OpenAI's terminal-first AI coding agent and one of the four agents with full Cortex Forge hook support alongside Claude Code, Antigravity CLI, and CommandCode. It supports a lifecycle hook system with matcher-based routing, structured JSON outputs, and explicit trust review for non-managed hooks.
+Codex CLI is OpenAI's terminal-first AI coding agent. Cortex Forge treats Codex as manual-only for hot-cache persistence, with installed hooks acting as no-op JSON guards instead of automatic memory injection or crystallization.
 
 ## Hook system
 
 - **Events:** `SessionStart`, `SessionEnd`, `PreToolUse`, `PostToolUse`, `SubagentStop`, `Stop`, `PromptSubmit`, `Compaction`
 - **Config:** `~/.codex/hooks.json` (global) or `.codex/hooks.json` (project-local, requires trust)
-- **Wire format:** flat JSON — same structure as Claude Code; compatible with Cortex Forge hook scripts without modification
+- **Wire format:** hook payload is JSON, but Codex session transcripts are a Codex-specific JSONL event stream under `payload`, not the Claude `.message.content[]` transcript format
 - **Trust model:** non-managed hooks require explicit `/hooks` review before first execution; managed (policy-trusted) hooks are not user-disableable
 - **Stop event:** does not use `matcher`; expects JSON stdout on exit 0, or exit 2 with continuation reason on stderr
 - `transcript_path` available in hook input as a convenience field (format not a stable interface)
@@ -27,9 +27,9 @@ Codex CLI is OpenAI's terminal-first AI coding agent and one of the four agents 
 ## Cortex Forge integration
 
 - **Skills:** global install via `cortex-forge-setup` to `~/.codex/` (AGENTS.md instructions)
-- **Hooks:** `SessionStart` → `cortex-reactivate.sh`; `Stop` → `cortex-crystallize-codex.sh`
+- **Hooks:** `SessionStart` → `cortex-reactivate-codex.sh` no-op; `Stop` → `cortex-crystallize-codex.sh` no-op
 - **Note:** hook scripts must live in a stable global path (`~/.codex/hooks/`) and resolve the active vault at runtime — vault-local paths break multi-vault setups
-- **Validation status:** Capa 2 hooks installed, end-to-end validation in organic session pending (see AGENT-LOG)
+- **Validation status:** automatic Codex crystallize is retired; use `/cortex-crystallize` after milestones
 
 ## Relationships
 - Comparable agents: [[wiki/entities/commandcode]], [[wiki/entities/antigravity-cli]], [[wiki/entities/pi-cli]]

@@ -1,11 +1,14 @@
 #!/bin/bash
-# Codex Stop hook wrapper: delegates to the shared crystallize hook logic.
-# Keeps Codex-specific hook paths stable while reusing the Claude-compatible
-# snapshot implementation with Codex-specific labels and transcript search.
+# Codex Stop hook.
+#
+# Codex Stop is turn-scoped and expects valid JSON on stdout. The previous
+# wrapper delegated to the Claude transcript parser and could fail or spam the
+# conversation. Keep this hook non-blocking; use /cortex-crystallize for actual
+# session snapshots from Codex.
 
 set -uo pipefail
 
-export AGENT_LABEL="Codex"
-export TRANSCRIPT_FALLBACK_DIRS="${TRANSCRIPT_FALLBACK_DIRS:-$HOME/.codex/projects:$HOME/.claude/projects}"
+cat >/dev/null 2>&1 || true
 
-exec "$(dirname "$0")/cortex-crystallize-claude.sh"
+# Valid no-op structured output for Codex hooks.
+printf '{}\n'

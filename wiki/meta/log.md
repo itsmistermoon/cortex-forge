@@ -131,6 +131,14 @@ Project linking: skipped (no active project pages related to this SDK).
 
 Agent: Antigravity (Gemini 3.5 Flash)
 
+## [2026-06-28] fix | Codex hook behavior hardened
+
+- Retired full hot-cache injection for Codex `SessionStart`; the Codex-specific hook now returns `{}` so `.cortex/MEMORY.md` is not rendered into the conversation as visible hook context.
+- Retired automatic Codex `Stop` crystallization; the Codex-specific hook now returns `{}` instead of delegating to the Claude transcript parser.
+- Updated setup and compatibility docs to mark Codex hot-cache persistence as manual-only via `/cortex-crystallize`.
+
+Agent: Codex
+
 ## [2026-06-08] ingest | Understand Anything (github.com/Lum1104/Understand-Anything)
 
 Source: `.raw/understand-anything.md` (main README, 350 lines, downloaded from raw.githubusercontent.com)
@@ -320,4 +328,6 @@ Agent: Antigravity (Gemini 3.5 Flash)
 - Confirmed that the global hook configuration for Antigravity (Gemini 3.5 Flash) is fully aligned and functional.
 
 Agent: Antigravity (Gemini 3.5 Flash)
+
+## [2026-06-28] auto-imprint | Crystallize Automation Architecture
 

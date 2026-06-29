@@ -85,19 +85,62 @@ $QUIET || {
   printf "\n"
 }
 
-# ── Step 1: Clone or update the forge repo ───────────────────────────────────
+# ── Step 1: Install forge runtime ────────────────────────────────────────────
 log "Installing forge to ${FORGE_DIR}"
 
+_install_from_tarball() {
+  local tarball_url
+  tarball_url=$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" \
+    | grep '"browser_download_url"' \
+    | grep 'cortex-forge\.tar\.gz' \
+    | head -1 \
+    | sed 's/.*"browser_download_url": "\(.*\)"/\1/')
+  [ -z "$tarball_url" ] && return 1
+  local tmp; tmp=$(mktemp -d)
+  curl -fsSL "$tarball_url" | tar -xz -C "$tmp"
+  rm -rf "$FORGE_DIR"
+  mv "$tmp/cortex-forge" "$FORGE_DIR"
+  rm -rf "$tmp"
+}
+
+_update_from_tarball() {
+  local tarball_url
+  tarball_url=$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" \
+    | grep '"browser_download_url"' \
+    | grep 'cortex-forge\.tar\.gz' \
+    | head -1 \
+    | sed 's/.*"browser_download_url": "\(.*\)"/\1/')
+  [ -z "$tarball_url" ] && return 1
+  local tmp; tmp=$(mktemp -d)
+  curl -fsSL "$tarball_url" | tar -xz -C "$tmp"
+  # Preserve user config, replace everything else
+  [ -f "${FORGE_DIR}/config.yml" ] && cp "${FORGE_DIR}/config.yml" "$tmp/cortex-forge/"
+  rm -rf "$FORGE_DIR"
+  mv "$tmp/cortex-forge" "$FORGE_DIR"
+  rm -rf "$tmp"
+}
+
 if [ -d "${FORGE_DIR}/.git" ]; then
+  # Dev/contributor install — update via git
   git -C "$FORGE_DIR" pull --ff-only --quiet
-  ok "Forge updated"
+  ok "Forge updated (git)"
 elif [ -d "$FORGE_DIR" ] && [ -f "${FORGE_DIR}/AGENTS.md" ]; then
-  # Already populated (e.g. manually cloned or dev setup) — skip clone
-  ok "Forge already present (skipping clone)"
+  # Tarball install — update via tarball, preserving config.yml
+  if _update_from_tarball; then
+    ok "Forge updated"
+  else
+    warn "No release found — forge already present, skipping update"
+  fi
 else
   rm -rf "$FORGE_DIR"
-  git clone --depth=1 --quiet "$REPO_URL" "$FORGE_DIR"
-  ok "Forge cloned"
+  if _install_from_tarball; then
+    ok "Forge installed"
+  else
+    # Fallback for dev environments with no published release yet
+    warn "No release found — falling back to git clone"
+    git clone --depth=1 --quiet "$REPO_URL" "$FORGE_DIR"
+    ok "Forge cloned (git)"
+  fi
 fi
 
 # ── Step 2: Resolve vault ─────────────────────────────────────────────────────

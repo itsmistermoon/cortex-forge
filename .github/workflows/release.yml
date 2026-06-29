@@ -1,0 +1,26 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build runtime tarball
+        run: |
+          mkdir -p dist/cortex-forge
+          cp -r bin skills templates bases AGENTS.md LICENSE dist/cortex-forge/
+          tar -czf dist/cortex-forge.tar.gz -C dist cortex-forge
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/cortex-forge.tar.gz
+          generate_release_notes: true

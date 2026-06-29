@@ -81,15 +81,23 @@ find "$WIKI" -name "*.md" \
 
 # ── MEDIUM: Orphan pages ──────────────────────────────────────────────────────
 # Match by full vault-relative path to avoid basename collisions.
-# A page is an orphan if no other wiki page links to it via [[wiki/...]] wikilink.
+# A page is an orphan if no other wiki page links to it via [[wiki/...]] wikilink
+# OR references it in a sources: YAML frontmatter list.
 find "$WIKI" -name "*.md" \
   | grep -v '_index\|/index\.md\|/log\.md' \
   | while read -r page; do
       rel="${page#$VAULT/}"          # e.g. wiki/concepts/memory-system.md
       rel_noext="${rel%.md}"         # e.g. wiki/concepts/memory-system
+      basename_noext="${rel_noext##*/}"  # e.g. memory-system
       # Count pages that contain a wikilink to this exact path (with or without .md)
       hits=$(grep -rl "\[\[${rel_noext}" "$WIKI" 2>/dev/null \
              | grep -v "^${page}$" | wc -l | tr -d ' ')
+      # Also count pages that reference this page in a sources: frontmatter entry
+      if [ "$hits" -eq 0 ]; then
+        hits=$(grep -rl "^\s*-\s*.*${basename_noext}" "$WIKI" 2>/dev/null \
+               | xargs grep -l "^sources:" 2>/dev/null \
+               | grep -v "^${page}$" | wc -l | tr -d ' ')
+      fi
       if [ "$hits" -eq 0 ]; then
         f MEDIUM "Orphan: ${rel}"
         echo "$rel" >> "$ORPHANS"

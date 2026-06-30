@@ -1,6 +1,6 @@
 ---
 title: Pi extension event types
-type: reference
+type: concept
 created: 2026-06-16
 updated: 2026-06-16
 tags: [pi, extensions, events, lifecycle, reference]
@@ -8,6 +8,7 @@ sources:
   - wiki/sources/pi-extensions.md
 confidence: high
 schema_version: "0.3"
+aliases: []
 ---
 
 # Pi extension event types

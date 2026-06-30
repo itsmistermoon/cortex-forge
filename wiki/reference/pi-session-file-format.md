@@ -1,6 +1,6 @@
 ---
 title: Pi session file format
-type: reference
+type: concept
 created: 2026-06-16
 updated: 2026-06-16
 tags: [pi, session-format, jsonl, reference]
@@ -8,6 +8,7 @@ sources:
   - wiki/sources/pi-session-format.md
 confidence: high
 schema_version: "0.3"
+aliases: []
 ---
 
 # Pi session file format

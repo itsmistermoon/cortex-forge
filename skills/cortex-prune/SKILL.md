@@ -138,7 +138,7 @@ Report verdict as MEDIUM. Never auto-apply — always requires user confirmation
 | HIGH | `.raw/` files with no corresponding `wiki/sources/` page |
 | HIGH | Pages without YAML frontmatter (excl. `index.md`, `log.md`) |
 | MEDIUM | Orphan pages — no incoming wikilinks from any other vault page |
-| MEDIUM | Concepts/entities without `sources:` or `confidence:` frontmatter |
+| MEDIUM | Concepts/entities/references without `sources:` or `confidence:` frontmatter |
 | MEDIUM | Source pages without `confidence:` frontmatter |
 | LOW | Source pages without `tags:` (or `tags: []`) |
 

@@ -1,6 +1,6 @@
 ---
 title: Pi provider API types
-type: reference
+type: concept
 created: 2026-06-16
 updated: 2026-06-16
 tags: [pi, provider, api, streaming, reference]
@@ -9,6 +9,7 @@ sources:
   - wiki/sources/pi-models.md
 confidence: high
 schema_version: "0.3"
+aliases: []
 ---
 
 # Pi provider API types

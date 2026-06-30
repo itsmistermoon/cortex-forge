@@ -1,6 +1,6 @@
 ---
 title: Pi terminal compatibility
-type: reference
+type: concept
 created: 2026-06-16
 updated: 2026-06-16
 tags: [pi, terminal, keybindings, reference]
@@ -8,6 +8,7 @@ sources:
   - wiki/sources/pi-terminal-setup.md
 confidence: high
 schema_version: "0.3"
+aliases: []
 ---
 
 # Pi terminal compatibility

@@ -1,6 +1,6 @@
 ---
 title: CommandCode Models
-type: reference
+type: concept
 created: 2026-06-13
 updated: 2026-06-13
 tags: [commandcode, models, cli, reference]
@@ -8,6 +8,7 @@ sources:
   - .raw/commandcode-models-reference.md
 confidence: high
 schema_version: "0.3"
+aliases: []
 ---
 
 # CommandCode Models

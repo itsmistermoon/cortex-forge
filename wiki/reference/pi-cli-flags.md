@@ -1,6 +1,6 @@
 ---
 title: Pi CLI flags
-type: reference
+type: concept
 created: 2026-06-16
 updated: 2026-06-16
 tags: [pi, cli, flags, reference]
@@ -8,6 +8,7 @@ sources:
   - wiki/sources/pi-usage.md
 confidence: high
 schema_version: "0.3"
+aliases: []
 ---
 
 # Pi CLI flags

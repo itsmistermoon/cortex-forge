@@ -1,6 +1,6 @@
 ---
 title: Pi models.json schema
-type: reference
+type: concept
 created: 2026-06-16
 updated: 2026-06-16
 tags: [pi, models, config, json, reference]
@@ -9,6 +9,7 @@ sources:
   - wiki/sources/pi-custom-provider.md
 confidence: high
 schema_version: "0.3"
+aliases: []
 ---
 
 # Pi models.json schema

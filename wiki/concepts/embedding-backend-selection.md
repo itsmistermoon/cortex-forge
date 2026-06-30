@@ -6,6 +6,8 @@ updated: 2026-06-28
 tags: [embeddings, semantic-search, mlx, ollama, cortex-forge]
 confidence: high
 schema_version: "0.3"
+aliases: []
+sources: []
 ---
 
 # Embedding Backend Selection

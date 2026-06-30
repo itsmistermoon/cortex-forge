@@ -100,13 +100,16 @@ See `CHANGELOG.md` for protocol version history (current: **0.3**). When operati
 
 | Type | Path | Purpose | Template |
 |------|------|---------|----------|
-| **Concept** | `wiki/concepts/` | Ideas, patterns, frameworks | `templates/concept.md` |
-| **Entity** | `wiki/entities/` | People, tools, services | `templates/entity.md` |
-| **Source** | `wiki/sources/` | Articles, docs, external references | `templates/source.md` |
-| **Page** | `wiki/pages/` | Active projects with repo and status | `templates/project.md` |
-| **Reference** | `wiki/reference/` | Lookup tables, wire formats, cheat sheets | `templates/reference.md` |
+| **concept** | `wiki/concepts/` or `wiki/reference/` | Synthesized knowledge — ideas, patterns, frameworks, lookup tables, cheat sheets | `templates/concept.md` |
+| **entity** | `wiki/entities/` | Concrete named things in the world — people, tools, orgs, services | `templates/entity.md` |
+| **source** | `wiki/sources/` | External artifact ingestado — articles, docs, repos, videos, threads | `templates/source.md` |
+| **project** | `wiki/pages/` | Active project with operational state (repo, status, domains) | `templates/project.md` |
 
-**Reference vs Concept:** use Reference when the content is a table, code block, or checklist you scan in seconds to find a specific value. Use Concept when understanding the idea requires reading prose. If in doubt: does it need explanation to be useful? → Concept. Can it be expressed as a table or code block alone? → Reference.
+**concept vs entity:** use `entity` when the thing exists in the world and can become stale (a company can be acquired, a tool can be deprecated). Use `concept` for synthesized knowledge that doesn't have an independent existence outside the vault. If in doubt: could a journalist write a breaking news article about it? → entity. Is it an idea you'd look up in a textbook? → concept.
+
+**concept vs source:** use `source` when the content was created by someone external and has a verifiable URL or raw file. Use `concept` for vault-internal synthesis — even if it derives from sources (listed in `sources:` frontmatter).
+
+**`wiki/reference/`** pages are concepts with tabular or code-block form. They use `type: concept` and the same template. The directory is preserved for navigation; the type is unified.
 
 Each page follows: YAML frontmatter + compiled truth + chronological changelog. **All wiki content must be written in English** — this is a public repo.
 

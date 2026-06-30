@@ -1,6 +1,6 @@
 ---
 title: Workflow Architecture
-type: reference
+type: concept
 created: 2026-06-13
 updated: 2026-06-27
 tags: [cortex-forge, architecture, workflow, hooks, skills, scripts, agents]
@@ -11,6 +11,7 @@ sources:
   - wiki/sources/commandcode-security.md
 confidence: high
 schema_version: "0.3"
+aliases: []
 ---
 
 # Workflow Architecture

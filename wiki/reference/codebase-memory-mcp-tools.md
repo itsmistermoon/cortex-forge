@@ -1,6 +1,6 @@
 ---
 title: codebase-memory-mcp — MCP Tools Reference
-type: reference
+type: concept
 created: 2026-06-16
 updated: 2026-06-16
 tags: [mcp, code-intelligence, reference]
@@ -8,6 +8,7 @@ sources:
   - wiki/sources/codebase-memory-mcp.md
 confidence: high
 schema_version: "0.3"
+aliases: []
 ---
 
 # codebase-memory-mcp — MCP Tools Reference

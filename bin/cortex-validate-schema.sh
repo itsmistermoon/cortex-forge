@@ -23,13 +23,12 @@ trap 'rm -f "$_tmpfile"' EXIT
 f() { echo "[$1] $2" >> "$_tmpfile"; }
 
 # ── Schema definitions ────────────────────────────────────────────────────────
-# Fields that must be present (key must exist in frontmatter, even if empty)
+# Canonical types: source | concept | entity | project
+# reference and series are retired — migrate to concept and source respectively.
 fields_source="title type resource created updated tags confidence schema_version raw"
 fields_concept="title type created updated tags aliases sources confidence schema_version"
 fields_entity="title type created updated tags aliases sources confidence schema_version"
-fields_reference="title type created updated tags sources confidence schema_version"
 fields_project="title type created updated tags status repo domains sources confidence schema_version"
-fields_series="title type created updated tags sources confidence schema_version"
 
 # ── Per-file check ────────────────────────────────────────────────────────────
 check_fields() {
@@ -60,20 +59,8 @@ walk() {
 walk "sources"   "$fields_source"
 walk "concepts"  "$fields_concept"
 walk "entities"  "$fields_entity"
-walk "reference" "$fields_reference"
-walk_pages() {
-  local dir="$WIKI/pages"
-  [ -d "$dir" ] || return
-  find "$dir" -name "*.md" | grep -v '_index\|/index\.md\|/log\.md' | while read -r p; do
-    type_val=$(awk '/^---/{c++} c==1 && /^type:/{print $2; exit}' "$p")
-    if [ "$type_val" = "series" ]; then
-      check_fields "$p" "$fields_series"
-    else
-      check_fields "$p" "$fields_project"
-    fi
-  done
-}
-walk_pages
+walk "reference" "$fields_concept"   # reference/ pages now use type: concept
+walk "pages"     "$fields_project"
 
 # ── Output ────────────────────────────────────────────────────────────────────
 if [ -n "$FINDINGS_FILE" ]; then

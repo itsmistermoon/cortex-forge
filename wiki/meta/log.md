@@ -351,3 +351,24 @@ El formato correcto requiere un wrapper con `matcher` y `hooks`:
 
 Agent: Claude Code (Sonnet 4.6)
 
+
+## [2026-06-30] refactor | consolidación del sistema de types a 4 tipos canónicos
+
+**Decisión:** Resultado de debate adversarial (5 posturas + evaluador). Sistema reducido de 6 a 4 tipos:
+
+| Eliminado | Absorbido por | Motivo |
+|---|---|---|
+| `reference` | `concept` | Sin campos propios — cheatsheet vs. síntesis es diferencia editorial, no ontológica |
+| `series` | `source` | Schema idéntico a otros tipos; colección ordenada = source con body estructurado |
+
+**Tipos canónicos resultantes:** `source · concept · entity · project`
+
+**Cambios aplicados en moon-cortexforge:**
+- 11 páginas `wiki/reference/` migradas a `type: concept`
+- `cortex-validate-schema.sh` simplificado: eliminados `fields_reference` y `fields_series`
+- `templates/reference.md` eliminado
+- `AGENTS.md` actualizado con tabla de 4 tipos + guías de decisión (concept vs entity, concept vs source)
+
+**Pendiente:** Aplicar migración equivalente en moon-multivac y demás vaults registrados.
+
+Agent: Claude Code (Sonnet 4.6)

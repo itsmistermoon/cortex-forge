@@ -2,7 +2,7 @@
 title: cortex-forge
 type: project
 created: 2026-06-08
-updated: 2026-06-28
+updated: 2026-07-01
 tags: [vault, multi-agent, hot-cache, hooks, knowledge-management]
 status: active
 repo: /Users/itsmistermoon/proyectos/moon-cortexforge
@@ -37,13 +37,14 @@ Vault with a hot cache protocol that synchronizes context across multiple agents
 ## Stack / Technologies
 
 - 5 layers: `.raw/`, `wiki/`, `.cortex/`, `wiki/meta/`, `skills/`
-- 5 wiki page types: concepts, entities, sources, projects, reference
+- 4 wiki page types: concept, entity, source, project (reference collapsed into concept — 2026-06-30)
 - 6 vault skills: assimilate, recall, prune, imprint, crystallize, forge-setup
 - Native hooks: PreCompact + SessionEnd (Claude Code), Stop (Antigravity) — bash scripts in `~/.cortex-forge/bin/hooks/` (global runtime; never replicated into consumer vaults)
-- post-commit hook: `cortex-reindex-post-commit.sh` — re-indexa `.cortex/vault.db` automáticamente cuando el commit toca archivos `wiki/`
+- post-commit hook: `cortex-reindex-post-commit.sh` — re-indexes `.cortex/vault.db` automatically when the commit touches `wiki/` files
 - `AGENTS.md` fallback for agents without native session-start hooks (CommandCode, Codex pre-init)
-- Templates co-located with their skills: `MEMORY-FORMAT.md`, `CODEX-FORMAT.md`, `TASTE-FORMAT.md`
-- `AGENT-LOG.md` — append-only session bitácora (self-report per session, not per file)
+- Templates co-located with their skills: `MEMORY-FORMAT.md`, `TASTE-FORMAT.md`
+- Shared reference files co-located with skills: `LOCALE-RESOLUTION.md`, `EMBEDDING-SETUP.md`
+- CI: `bin/check-skill-sync.sh` + `.github/workflows/skill-sync.yml` — 6 cross-skill consistency invariants verified on push
 
 ## Key decisions
 
@@ -70,6 +71,14 @@ Vault with a hot cache protocol that synchronizes context across multiple agents
 - **Platform-aware embedding backend, not a single choice** — the embedding backend is selected at runtime by `.cortex/embeddings.py` based on OS and architecture. On Apple Silicon (`Darwin` + `arm64`), `mlx-embeddings` with `mlx-community/nomic-embed-text-v1.5` is preferred — it uses the Neural Engine and is faster than `sentence-transformers` on M-series. On Linux, Windows, and Intel Mac, `sentence-transformers` with `nomic-ai/nomic-embed-text-v1.5` is used — runs in-process, downloads weights on first use (~270 MB), falls back to CPU universally. If mlx is not installed on Apple Silicon, the code falls back to `sentence-transformers` automatically. All platform detection and fallback logic lives in `.cortex/embeddings.py`; nothing else in the stack duplicates it. `normalize_embeddings=True` is mandatory for the `sentence-transformers` path — without it, dot product and cosine are not equivalent.
 - **Ollama discarded for embeddings** — requires a running server at `localhost:11434`. Breaks in post-commit hooks, CI environments, and any user who hasn't installed it. Not viable for a public project with no infrastructure prerequisites.
 - **Dot product over cosine similarity** — `nomic-embed-text-v1.5` with `normalize_embeddings=True` produces unit-norm vectors. For unit-norm vectors, dot product and cosine are mathematically equivalent. sqlite-vec exposes `vec_distance_dot`, which is computationally cheaper than explicit cosine. No precision is lost.
+- **`disable-model-invocation: true` is the correct mechanism for manual-only skills** — `cortex-imprint` previously tried to prevent auto-invocation through description text ("Do not invoke automatically…"). This is instruction fighting mechanism: if the description is present, the model can still fire the skill. The correct fix is the frontmatter field, which removes the skill from the model's reach entirely. Rule: when a skill must be manual-only, use the mechanism, not a verbal warning in the description.
+
+- **Progressive disclosure for skill reference** — shared reference material that only some skill branches need should live in a co-located file, not inline in SKILL.md. Two instances: `LOCALE-RESOLUTION.md` (locale fallback chain, shared by 6 skills — was duplicated verbatim in each) and `EMBEDDING-SETUP.md` (embedding dependency check, used only when semantic search is enabled — was 25 inline lines in forge-setup step 6d). Pattern: disclose what only some branches need; inline what every branch needs.
+
+- **CI guards skill protocol invariants** — `bin/check-skill-sync.sh` runs 6 checks on push: no legacy `vault:` format, no CODEX.md references, wiki/index.md update mentions, vault-report schema consistency between cortex-prune and AGENTS.md, non-empty descriptions, correct prune script path. GitHub Actions triggers on changes to `skills/**/SKILL.md`, `AGENTS.md`, or `bin/check-skill-sync.sh`. First failure caught: `missing_confidence` was declared in cortex-prune schema but not referenced in AGENTS.md session-start protocol.
+
+- **wiki/meta/ convention: `_index.md` for humans, trigger rules in AGENTS.md for agents** — `_index.md` is not auto-loaded by any agent, so agent behavioral rules placed there are invisible. The convention for when to write to `wiki/meta/log.md` belongs in AGENTS.md `## On session close` — that section IS read every session. `_index.md` documents the directory for human readers (file table, what goes/doesn't, log format). Neither duplicates the other.
+
 - **MCP server deferred to Etapa 2** — sqlite-vec solves retrieval; MCP solves multi-client dispatch. These are separate problems. Implementing both simultaneously creates two simultaneous diagnostic surfaces if something fails. Gate: Etapa 1 validated in an organic session AND the vault is accessed from more than one client. `AGENTS.md` remains the design contract regardless — an agent without MCP can still operate the vault by reading `AGENTS.md` directly.
 - **[[wiki/entities/openhuman|OpenHuman]] is the closest full-harness comparable** — both solve the agent cold-start problem via a local Karpathy-style Obsidian vault as the memory layer, and both implement the [[wiki/concepts/super-context|Super Context]] pattern (harness-level deterministic context injection on session start). Key divergences: OpenHuman is a desktop GUI application with 118+ managed OAuth integrations and automatic 20-minute auto-fetch loops that populate the vault without agent involvement; Cortex Forge is a vault protocol that any CLI agent operates via hooks and skills, with knowledge synthesized manually from ingested sources. OpenHuman's SuperContext runs inside the harness (Python/Rust app); Cortex Forge's equivalent is a bash `SessionStart` hook that injects `.hot/MEMORY.md` before the first prompt. OpenHuman is user-facing and batteries-included; Cortex Forge is agent-infrastructure and composable. TokenJuice (OpenHuman's token compression layer — up to 80% reduction via HTML→Markdown, URL shortening, dedup) has no Cortex Forge equivalent; the vault reduces token cost indirectly by replacing file-by-file retrieval with a pre-built semantic index.
 
@@ -154,3 +163,4 @@ Goal: Hot Cache Protocol working across all supported agents.
 - 2026-06-27 [Claude Code]: Added post-commit reindex hook to stack description; corrected repo path to moon-cortexforge
 - 2026-06-28 [Claude Code]: Added three key decisions — hook scripts global-only (no bin/ in consumer vaults), cortex-forge-setup maintenance menu for existing vaults, semantic search init gate corrected
 - 2026-06-28 [Claude Code]: Major restructure — `.hot/` + `.cortex/` consolidated into single `.cortex/` directory (`db/` for semantic search, `MEMORY.md` + `PRAXIS.md` flat); `CODEX.md` retired and identity absorbed into `AGENTS.md`; PRAXIS.md introduced for two-zone accumulated agent context (permanent + working with 30-day TTL); updated stack layer count from 6 to 5
+- 2026-07-01 [Claude Code]: Skill suite audit (adversarial review + SkillOpt + writing-great-skills) — added CI, extracted LOCALE-RESOLUTION.md and EMBEDDING-SETUP.md, added disable-model-invocation to cortex-imprint, deduplicated Rules/Constraints across skills, removed ## When to invoke redundancy, added completion criterion to assimilate step 5, translated Spanish sediment in cortex-prune, co-located YAML block in forge-setup; wiki/meta/ convention defined; 4 key decisions added

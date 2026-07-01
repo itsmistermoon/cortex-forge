@@ -151,6 +151,7 @@ Goal: Hot Cache Protocol working across all supported agents.
 - [[wiki/sources/ai-coding-dictionary]] — Vocabulary source: handoff, compaction, primary/secondary source, memory system
 - [[wiki/sources/openhuman]] — OpenHuman README: comparable harness with Memory Tree, SuperContext, TokenJuice
 - [[wiki/sources/openhuman-super-context]] — SuperContext feature article (featured): harness-level deterministic context injection
+- [[wiki/sources/openwiki]] — OpenWiki: LLM-generated codebase wiki + git-diff-scoped automated updates (LangChain AI, 2026-07-01)
 
 ---
 

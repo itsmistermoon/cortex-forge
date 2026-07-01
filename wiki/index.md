@@ -38,6 +38,7 @@
 - [[wiki/concepts/vault-mcp-server-pattern]] — Architecture pattern for exposing a vault as an MCP server; skills vs MCP trade-off; gate for Phase 2 transition
 
 ## Entities
+- [[wiki/entities/openwiki]] — CLI by LangChain AI: LLM-generated codebase wiki + automated git-diff-scoped updates via GitHub Actions; injects reference into AGENTS.md/CLAUDE.md
 - [[wiki/entities/openbrain-nate-jones]] — Personal semantic memory system: Postgres + pgvector + MCP server; any agent connects with URL + key
 - [[wiki/entities/google-antigravity]] — Agent-first development platform oriented toward autonomous workflows
 - [[wiki/entities/antigravity-cli]] — Google Antigravity CLI: `agy` binary, two-layer permission model, OS-level sandbox, plugins/skills/hooks
@@ -101,7 +102,8 @@
 - [[wiki/sources/pi-terminal-setup]] — Pi terminal compatibility matrix and per-emulator config (Kitty protocol, Ghostty, WezTerm, Alacritty, VS Code, Windows Terminal) (ingested 2026-06-16)
 - [[wiki/sources/codebase-memory-mcp]] — codebase-memory-mcp GitHub README: knowledge graph indexer, 14 MCP tools, Hybrid LSP, team-shared artifact (ingested 2026-06-16)
 - [[wiki/sources/openhuman]] — OpenHuman README: Memory Tree, SuperContext, TokenJuice, 118+ integrations, agentmemory backend interop (ingested 2026-06-26)
-- [[wiki/sources/openhuman-super-context]] — OpenHuman SuperContext feature article (featured): harness-level deterministic context injection, read-only scout, tag-delimited bundle (ingested 2026-06-26)
+- [[wiki/sources/openhuman-super-context]]
+- [[wiki/sources/openwiki]] — OpenWiki README + architecture + agent workflow + GitHub Actions pattern (ingested 2026-07-01) — OpenHuman SuperContext feature article (featured): harness-level deterministic context injection, read-only scout, tag-delimited bundle (ingested 2026-06-26)
 
 ## Reference
 - [[wiki/reference/workflow-architecture]] — Three-phase session flow: hooks, skills, scripts, degraded modes, config files per agent

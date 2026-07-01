@@ -24,7 +24,7 @@ Health check the active vault in two layers: structural (script) and semantic (a
    Confirm vault is a Cortex Forge vault: path contains `wiki/` and `AGENTS.md`.
 
    Read **Domains** and **Out of scope** from `AGENTS.md` (`## Vault identity`) — use them to flag pages whose topics fall outside the vault's defined scope.
-   Read `locale:` from the vault's entry in `~/.cortex-forge/config.yml` — use it for all agent-generated content. Fallback if absent: `.cortex/MEMORY.md` title line (`— locale: {lang}`) → `AGENTS.md` Vault identity (`**locale**:`) → default `en`.
+   Read `locale:` — see `LOCALE-RESOLUTION.md` (co-located with the skills) for the fallback chain.
 
 2. **Layer 1 — Structural check**: Run `bash ~/.cortex-forge/bin/cortex-prune.sh {vault}` and capture output. If the script is not found, stop and tell the user: "cortex-prune.sh is missing from ~/.cortex-forge/bin/ — run `/cortex-forge-setup` (sub-task: update) to restore the runtime."
 

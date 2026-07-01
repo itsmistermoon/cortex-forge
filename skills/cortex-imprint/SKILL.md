@@ -16,8 +16,7 @@ Archive a valuable session synthesis as a permanent wiki page.
 
 0. **Check for pending draft** — if `.cortex/imprint-draft.md` exists in the active repo, read it. Use `candidate:` as the default synthesis description and `transcript:` as the source path to cite. Delete the file after reading so the nudge doesn't repeat next session. If `transcript:` points to a past session no longer in context, note this to the user and proceed using only `candidate:` as the synthesis description — do not attempt to reconstruct the session from the path.
 
-1. **Resolve vault** — read `~/.cortex-forge/config.yml`:
-   Also read `locale:` from the vault's entry — use it for all agent-generated content. Fallback if absent: `.cortex/MEMORY.md` title line (`— locale: {lang}`) → `AGENTS.md` Vault identity (`**locale**:`) → default `en`.
+1. **Resolve vault** — read `~/.cortex-forge/config.yml`. Also read `locale:` — see `LOCALE-RESOLUTION.md` (co-located with the skills) for the fallback chain.
    - Config format: `vaults: {name: path, ...}` + `default: name`
    - If the first argument matches a registered vault name (e.g., `/cortex-imprint personal`) → use that vault.
    - Otherwise: check if CWD is inside any registered vault → use that vault.

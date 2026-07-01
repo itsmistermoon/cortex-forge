@@ -25,7 +25,7 @@ Always end with the relevant subset of step 9 (confirmation).
 ## Steps
 
 1. **Detect vault from CWD** — validate that the current directory is a valid vault:
-   If `~/.cortex-forge/config.yml` already has an entry for this vault, also read its `locale:` — use it for all agent-generated content. Fallback if absent: `.cortex/MEMORY.md` title line (`— locale: {lang}`) → `AGENTS.md` Vault identity (`**locale**:`) → default `en`.
+   If `~/.cortex-forge/config.yml` already has an entry for this vault, also read its `locale:` — see `LOCALE-RESOLUTION.md` (co-located with the skills) for the fallback chain.
 
    - Required: `.git/`, `wiki/`, `AGENTS.md`
    - If validation fails, report what's missing and stop.

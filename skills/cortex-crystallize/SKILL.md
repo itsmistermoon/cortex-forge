@@ -1,7 +1,7 @@
 ---
 name: cortex-crystallize
 behavior: ["snapshot"]
-description: Snapshot session context into .cortex/MEMORY.md. Works from any repo — inside the vault or from a linked project.
+description: Snapshot session context into .cortex/MEMORY.md — preserves pending tasks, active decisions, and session history so future sessions resume without losing context. Invoke when the user says "save context", "crystallize", "snapshot this", "wrap up", "I'm done for now", or when the session is about to close. Works from any repo, inside or outside the vault.
 argument-hint: "[vault-name] [project-name] [next: <focus>]"
 ---
 
@@ -26,8 +26,7 @@ Behavior depends on where the skill is invoked:
    - `CODEX=1` or `AI_AGENT` starts with `codex` → **Codex**
    - None matched → use self-knowledge (you know what CLI you are)
    Use the detected identity as `{Agent}` in the history header and in the `agent:` frontmatter field.
-2. **Resolve vault** from `~/.cortex-forge/config.yml`. If missing, prompt to run `/cortex-forge-setup` first.
-   Also read `locale:` from the vault's entry — use it for all agent-generated content. Fallback if absent: `.cortex/MEMORY.md` title line (`— locale: {lang}`) → `AGENTS.md` Vault identity (`**locale**:`) → default `en`.
+2. **Resolve vault** from `~/.cortex-forge/config.yml`. If missing, prompt to run `/cortex-forge-setup` first. Also read `locale:` — see `LOCALE-RESOLUTION.md` (co-located with the skills) for the fallback chain.
    - Config format: `vaults: {name: path, ...}` + `default: name`
    - If the first argument matches a registered vault name (e.g., `/cortex-crystallize second-brain`) → use that vault; treat the second argument (if any) as the project name override.
    - Otherwise: check if CWD is inside any registered vault (CWD starts with a vault path) → use that vault.

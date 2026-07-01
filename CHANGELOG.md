@@ -31,6 +31,22 @@ Format: `[semver] — YYYY-MM-DD`
 - `protocol:` `7c8afe5` `cortex-prune` gains Layer 3 — Drift detection: compare `.raw/` mtime against `updated:` in `wiki/sources/`; MEDIUM finding when `.raw/` is newer.
 - `schema:` `7c8afe5` Slash-tag convention (`project/subtopic`) adopted in all vault `AGENTS.md` files and templates; applied retroactively to 11 cortex-forge wiki pages.
 
+## [0.4.0] — 2026-06-29
+
+- `breaking:` `.hot/` → `.cortex/` consolidation. All mutable state (`MEMORY.md`, `PRAXIS.md`, `imprint-draft.md`, `db/`) now under `.cortex/`. Existing vaults: rename `.hot/` to `.cortex/` or re-run `/cortex-forge-setup`.
+- `protocol:` `cortex-imprint` autonomous mode (`imprint_triage: auto`): `bin/hooks/cortex-imprint-auto.sh` runs at SessionStart (background), reads `.cortex/imprint-draft.md` + transcript, calls `claude -p` (Haiku), writes wiki page, updates index and log, removes draft. Never blocks session start.
+- `protocol:` Hook distribution architecture: `bin/hooks/` (git-tracked source) → `~/.cortex-forge/bin/hooks/` (runtime) → symlinks in `~/.claude/`, `~/.gemini/`, `~/.codex/`. `/cortex-forge-setup update` propagates all changes.
+- `protocol:` `.cortex/PRAXIS.md` — permanent agent context split from `MEMORY.md`. `CODEX.md` absorbed into `AGENTS.md` under `## Vault identity`. `CONSOLIDATED.md` fallback added for history archive.
+- `feat:` Multi-vault: `~/.cortex-forge/config.yml` with `vaults: {name: path}` + `default:`. Vault resolved by CWD then default. `/cortex-forge-setup` registers/deregisters by CWD. Legacy `vault:` key supported.
+- `feat:` Stale cache detection: `hot_cache_stale_days:` in `config.yml`; `cortex-reactivate.sh` injects warning at session start if `.cortex/MEMORY.md` exceeds threshold.
+- `protocol:` Context fencing in `cortex-imprint`: source hierarchy session > `.raw/` > `wiki/`. `raw:` field added to provenance.
+- `feat:` `behavior:` frontmatter tags on all skills: `#ingest`, `#synthesize`, `#recall`, `#prune`, `#snapshot`, `#configure`.
+- `feat:` `cortex-prune.sh` link-count scan — orphan page detection; `orphan_pages` added to `vault-report.json`.
+- `fix:` `cortex-recall` blocks Explore as bypass; accounts for optional embedding index; fallback behavior clarified.
+- `feat:` Semantic search backend stable: `bin/embeddings.py` (Ollama → mlx → sentence-transformers), `bin/cortex-index.py`, `bin/cortex-search.py`. Auto-reindex on assimilate + post-commit hook.
+- `fix:` Antigravity crystallize hook removed — `agy -p` deadlocks from hook; no `/exit` trigger. Crystallize in Antigravity is manual-only.
+- `fix:` Multiple path corrections for `cortex-sanitize.sh`, `cortex-prune` executable, and hooks after `.cortex/` migration.
+
 ## [0.3.0] — 2026-06-15
 
 - `schema:` `AGENTS.md` gains YAML frontmatter with `schema_version: "0.3"`. All six templates (`concept`, `entity`, `project`, `reference`, `source`, `wiki-page`) gain `schema_version: "0.3"` in their frontmatter. Pages with an older `schema_version` (or none) may be missing fields introduced after their creation — detectable by `cortex-prune`.

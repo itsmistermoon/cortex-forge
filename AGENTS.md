@@ -94,7 +94,7 @@ Six layers, each with a distinct role:
 
 `.raw/` is the authoritative record. `wiki/` is always a derived view — cheaper to load, but lossy by construction, and subject to drift (the primary changes, the account doesn't follow). When they conflict, `.raw/` wins. Every source page carries a **context pointer** back to its original — the `raw:` frontmatter field; follow it whenever the synthesized account isn't enough.
 
-See `CHANGELOG.md` for protocol version history (current: **0.3**). When operating in a vault that may have been created before a recent protocol change, check the changelog to identify missing fields or behaviors. Pages with `schema_version` lower than the current protocol version may be missing fields introduced after their creation.
+**`schema_version`** tracks the frontmatter field contract — it bumps only when a required field is added, removed, or renamed in the templates. It does NOT track cortex-forge release versions, taxonomy changes, or conventions (those are detectable directly by `cortex-prune` without version comparison). Current schema version: **0.3** (introduced in cortex-forge v0.3.0). Pages with a lower `schema_version` may be missing fields added after their creation.
 
 ## Wiki taxonomy
 
@@ -125,7 +125,7 @@ Each page follows: YAML frontmatter + compiled truth + chronological changelog. 
 | `source_author` | recommended | Author(s) of the original resource |
 | `tags` | recommended | Cross-cutting categorization strings. Use `project/subtopic` slash notation to scope tags to a project (e.g. `cortex-forge/skill-audit`). Obsidian renders these as nested tags. |
 | `confidence` | yes | `high` (primary source) · `medium` (blog, video) · `low` (inference) |
-| `schema_version` | yes | Protocol version this page was written against |
+| `schema_version` | yes | Frontmatter field contract version this page was written against — bumps only when required fields change |
 | `raw` | yes | Path to the immutable primary source in `.raw/` |
 | `section` | optional | Grouping label for multi-part sources from the same origin (e.g. `Antigravity CLI`) |
 

@@ -12,13 +12,13 @@ Protocol-significant changes to cortex-forge are documented here.
 
 **What does not count:** rewording, typos, README prose, cosmetic changes.
 
-Format: `[semver] — YYYY-MM-DD`
+Format: `[semver] — título — YYYY-MM-DD`
 
 ---
 
 ## [Unreleased]
 
-## [0.5.0] — 2026-07-01
+## [0.5.0] — Backward Enrichment, Drift Detection & Skill Quality Hardening — 2026-07-01
 
 - `fix:` `27d1164` `cortex-prune` Layer 2: hard cap (20 pairs, 20 sources); replace "spawn subagents" language with always-inline evaluation.
 - `fix:` `b613627` `bin/cortex-prune.sh`: `sources:` YAML frontmatter now counts as a valid reference — pages linked via `sources:` are no longer reported as orphans.
@@ -31,7 +31,7 @@ Format: `[semver] — YYYY-MM-DD`
 - `protocol:` `7c8afe5` `cortex-prune` gains Layer 3 — Drift detection: compare `.raw/` mtime against `updated:` in `wiki/sources/`; MEDIUM finding when `.raw/` is newer.
 - `schema:` `7c8afe5` Slash-tag convention (`project/subtopic`) adopted in all vault `AGENTS.md` files and templates; applied retroactively to 11 cortex-forge wiki pages.
 
-## [0.4.0] — 2026-06-29
+## [0.4.0] — Protocol Hardening & Autonomous Imprint — 2026-06-29
 
 - `breaking:` `.hot/` → `.cortex/` consolidation. All mutable state (`MEMORY.md`, `PRAXIS.md`, `imprint-draft.md`, `db/`) now under `.cortex/`. Existing vaults: rename `.hot/` to `.cortex/` or re-run `/cortex-forge-setup`.
 - `protocol:` `cortex-imprint` autonomous mode (`imprint_triage: auto`): `bin/hooks/cortex-imprint-auto.sh` runs at SessionStart (background), reads `.cortex/imprint-draft.md` + transcript, calls `claude -p` (Haiku), writes wiki page, updates index and log, removes draft. Never blocks session start.
@@ -47,7 +47,7 @@ Format: `[semver] — YYYY-MM-DD`
 - `fix:` Antigravity crystallize hook removed — `agy -p` deadlocks from hook; no `/exit` trigger. Crystallize in Antigravity is manual-only.
 - `fix:` Multiple path corrections for `cortex-sanitize.sh`, `cortex-prune` executable, and hooks after `.cortex/` migration.
 
-## [0.3.0] — 2026-06-15
+## [0.3.0] — Multi-vault, cortex-prune global — 2026-06-15
 
 - `schema:` `AGENTS.md` gains YAML frontmatter with `schema_version: "0.3"`. All six templates (`concept`, `entity`, `project`, `reference`, `source`, `wiki-page`) gain `schema_version: "0.3"` in their frontmatter. Pages with an older `schema_version` (or none) may be missing fields introduced after their creation — detectable by `cortex-prune`.
 - `protocol:` Pipeline imprint implemented end-to-end: `cortex-crystallize-claude.sh` detects durable insights via Haiku and emits `#### Imprint candidate` with `— transcript: <path>` in History. `cortex-reactivate.sh` (SessionStart) detects the candidate in the most recent History entry, checks 30-day expiry, writes `.hot/imprint-draft.md`, and injects a nudge. Toggle `imprint_triage: off | suggest | auto` in `~/.cortex-forge/config.yml` (global or per-vault; backwards compat `true`→`suggest`, `false`→`off`; default `suggest`). `cortex-imprint/SKILL.md` gains step 0: read and delete `.hot/imprint-draft.md` if present.
@@ -64,23 +64,27 @@ Format: `[semver] — YYYY-MM-DD`
 - `protocol:` `vault-report.json` is now written directly by `bin/cortex-prune.sh` (Layer 1) — single writer, structured output, no stdout parsing. `cortex-prune` step 4a verifies the file instead of writing it.
 - `schema:` `templates/source.md` frontmatter aligned with the convention every existing source page uses and `bin/cortex-prune.sh` verifies: `source:` / `slug:` / `section:` / `fetched:` / `raw:` replace `source_url:` / `source_date:` / `source_author:` / `created:` / `updated:`. `raw:` is the page's context pointer to its `.raw/` primary.
 
-## [0.2.0] — 2026-06-09
+## [0.2.0] — CODEX.md, Reference taxonomy, AI Coding Dictionary, handoff improvements — 2026-06-09
 
-See full release notes: https://github.com/itsmistermoon/cortex-forge/releases/tag/v0.2.0
+- `protocol:` `CODEX.md` — new vault identity file (Mission, Owner, Domains, Vocabulary, Out of scope), read at session start after `.hot/MEMORY.md`. All skills check it for relevance and vocabulary decisions.
+- `protocol:` Parametric knowledge explicitly disqualified in `cortex-recall` — vault is always source of truth for vault topics, regardless of training knowledge.
+- `schema:` `wiki/reference/` — fifth wiki type for lookup tables, wire formats, and cheat sheets (`templates/reference.md`). Distinct from Concept: scannable, not explanatory.
+- `fix:` `cortex-crystallize` PreCompact now uses `claude -p` — previously generated a raw list of file paths with no description. Both PreCompact and SessionEnd synthesize descriptive bullets. Prompts distinguish compaction (mid-session) from handoff (no return path).
+- `protocol:` `MEMORY-FORMAT.md` gains trigger table (PreCompact vs SessionEnd), optional `### Suggested skills` section, and `next: <focus>` argument to orient snapshots.
+- `protocol:` Templates co-located with their skills: `MEMORY-FORMAT.md`, `CODEX-FORMAT.md`, `TASTE-FORMAT.md`.
+- `fix:` `.hot/MEMORY.md` fixed filename — removed project-name detection; one file per repo.
+- `protocol:` `AGENT-LOG.md` — append-only session bitácora with minimal template and drift-prevention rules.
+- `schema:` `AGENTS.md` architecture table labels `.raw/` as primary sources and `wiki/` as secondary sources, with conflict resolution rule.
+- `knowledge:` AI Coding Dictionary ingested (68 entries). New concepts: `parametric-knowledge`, `contextual-knowledge`, `memory-system`, `handoff-artifact`, `smart-zone`.
 
-**Summary:**
-- Fixed PreCompact mechanical branch in `cortex-crystallize`
-- `.hot/MEMORY.md` fixed filename (no project name detection)
-- Added `reference.md` to wiki taxonomy
-- Created `CODEX.md` for vault context
-- Architecture expanded to six layers with primary/secondary source conflict rule
-- Parametric knowledge explicitly disqualified in Recall protocol
+## [0.1.0] — First usable release — 2026-06-08
 
-## [0.1.0] — 2026-06-08
-
-See full release notes: https://github.com/itsmistermoon/cortex-forge/releases/tag/v0.1.0
-
-**Summary:**
-- Initial release of the 6 skills and 3 mandatory protocols
-- Five-layer vault architecture (later expanded to six)
-- Global skills path and multi-vault registry via `~/.cortex-forge/config.yml`
+- `feat:` 6 skills: `cortex-crystallize`, `cortex-assimilate`, `cortex-recall`, `cortex-imprint`, `cortex-prune`, `cortex-forge-setup`.
+- `protocol:` `AGENTS.md` with MANDATORY protocols and verifiable compliance criteria for recall, assimilation, and crystallize.
+- `protocol:` Parametric knowledge disqualified as source for vault topics — epistemological rule, not workflow instruction.
+- `feat:` Multi-vault support via `~/.cortex-forge/config.yml`. Vault selectable as explicit argument: `/cortex-recall second-brain <query>`.
+- `schema:` `CODEX.md` — vault context file (Mission, Owner, Domains, Vocabulary, Out of scope).
+- `schema:` `wiki/reference/` — taxonomy type for lookup tables and wire formats.
+- `feat:` SPA detection fallback in `cortex-assimilate` — JS bundle inspection + static asset reconstruction.
+- `protocol:` Invoke messages per skill (`Crystallizing memory...`, `Recalling memory...`, etc.).
+- `feat:` Agent compatibility: Claude Code (full hook support), Codex (SessionStart confirmed), Antigravity (hooks configured), CommandCode (AGENTS.md MANDATORY confirmed).

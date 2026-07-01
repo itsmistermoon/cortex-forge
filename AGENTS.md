@@ -131,4 +131,18 @@ Each page follows: YAML frontmatter + compiled truth + chronological changelog. 
 
 ## On session close
 
-Before `/cortex-crystallize`, evaluate whether the session produced analysis, design decisions, or synthesis worth persisting. If so, suggest `/cortex-imprint` — never archive without explicit confirmation. Add an entry to `wiki/meta/log.md` for each significant operation.
+Before `/cortex-crystallize`, evaluate whether the session produced analysis, design decisions, or synthesis worth persisting. If so, suggest `/cortex-imprint` — never archive without explicit confirmation.
+
+Add an entry to `wiki/meta/log.md` for each significant operation. Significant operations include:
+
+- Ingesting a new source (`/cortex-assimilate`)
+- Creating or updating wiki pages (`/cortex-imprint`)
+- Running a vault health check (`/cortex-prune`)
+- Improving or refactoring skills (any edit to `skills/**/SKILL.md`)
+- Changing vault protocol or architecture (edits to `AGENTS.md`, `bin/`, CI)
+
+Log format: `## [YYYY-MM-DD] {operation} | {one-line description}`
+
+**`wiki/meta/log.md` vs `/cortex-imprint`:**
+- Log entry → always, for any significant operation. One line, operational.
+- `/cortex-imprint` → only when the session produced a durable insight or decision worth consulting in future sessions (design rationale, ADR, analysis). Requires explicit confirmation.

@@ -372,3 +372,25 @@ Agent: Claude Code (Sonnet 4.6)
 **Pendiente:** Aplicar migración equivalente en moon-multivac y demás vaults registrados.
 
 Agent: Claude Code (Sonnet 4.6)
+
+## [2026-07-01] skill-improvement | Auditoría completa del skill suite (adversarial review + SkillOpt)
+
+Revisión de 6 skills (cortex-assimilate, cortex-crystallize, cortex-imprint, cortex-prune, cortex-recall, cortex-forge-setup) con tres subagentes de review adversarial + hallazgos del repo SkillOpt (microsoft). 13 archivos modificados, 2 nuevos (skill-sync.yml, check-skill-sync.sh), 2 wiki pages creadas.
+
+Cambios principales: descripciones enriquecidas con trigger phrases, sección ## Constraints para restricciones críticas, graceful failure en 4 skills, migración CODEX.md → AGENTS.md, JSON inválidos corregidos, formato `vaults:` consolidado, PRAXIS-FORMAT.md traducido al inglés, CI agregado.
+
+Agent: Claude Code (Sonnet 4.6)
+
+## [2026-07-01] skill-improvement | Auditoría capa 2 — writing-great-skills framework
+
+Segunda pasada sobre el skill suite aplicando el framework writing-great-skills (mattpocock). 9 hallazgos resueltos en 2 commits (d3f6b2e, 99dccc5).
+
+Cambios principales: locale resolution extraído a LOCALE-RESOLUTION.md (single source of truth, 5 archivos simplificados), `disable-model-invocation: true` en cortex-imprint, ## When to invoke eliminado de assimilate e imprint, Rules de cortex-recall deduplicadas contra Constraints, step 6d de forge-setup extraído a EMBEDDING-SETUP.md, sediment español eliminado de cortex-prune, completion criterion checkable en assimilate step 5, YAML de config movido al step 3 correcto.
+
+Agent: Claude Code (Sonnet 4.6)
+
+## [2026-07-01] refactor | wiki/meta/_index.md redefinido como guía humana del directorio
+
+_index.md reescrito: tabla de archivos, qué va/no va en meta/, formato canónico del log. AGENTS.md ## On session close expandido con trigger explícito para log.md y distinción log vs /cortex-imprint.
+
+Agent: Claude Code (Sonnet 4.6)

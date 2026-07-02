@@ -144,22 +144,6 @@ If the argument starts with `--research`, enter research mode instead of the nor
 
 **concept vs source:** use `source` when the content was created by someone external and has a verifiable URL or raw file. Use `concept` for vault-internal synthesis — even if it derives from sources (listed in `sources:` frontmatter).
 
-## Source frontmatter fields
-
-| Field | Required | Description |
-|-------|----------|-------------|
-| `type` | yes | Always `source` |
-| `title` | yes | Display name of the source |
-| `resource` | yes | Canonical URI of the original resource |
-| `fetched` | yes | Date ingested into the vault (`YYYY-MM-DD`) |
-| `timestamp` | recommended | Publication or last-known-accurate date of the resource |
-| `source_author` | recommended | Author(s) of the original resource |
-| `tags` | recommended | Use `project/subtopic` slash notation (e.g. `cortex-forge/skills`) |
-| `confidence` | yes | `high` (primary source) · `medium` (blog, video) · `low` (inference) |
-| `schema_version` | yes | Frontmatter field contract version — bumps only when required fields change |
-| `raw` | yes | Path to the immutable primary in `.raw/` |
-| `section` | optional | Grouping label for multi-part sources from the same origin |
-
 ## Concept criteria
 
 **Create** if:

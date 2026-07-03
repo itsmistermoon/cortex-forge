@@ -110,11 +110,11 @@ If the argument starts with `--research`, enter research mode instead of the nor
 
 6. Update `{vault}/wiki/index.md` with new pages.
 
-7. **Re-index embeddings** — if `{vault}/.cortex/db/vault.db` exists, run:
+7. **Re-index embeddings** — if `{vault}/.cortex/db/vault.db` exists, run `cortex-index.py` — the script co-located with this skill (same directory as this SKILL.md), **never** a script found inside the vault itself — with `{vault}` as its argument:
    ```
-   python {vault}/.cortex/db/cortex-index.py {vault}
+   python3 cortex-index.py {vault}
    ```
-   Report the result inline: "Indexed N new chunk(s)." If `.cortex/vault.db` does not exist, skip silently — the vault may not have semantic search enabled.
+   Report the result inline: "Indexed N new chunk(s)." If `{vault}/.cortex/db/vault.db` does not exist, skip silently — the vault may not have semantic search enabled.
 
 8. **Project linking** — check `{vault}/wiki/pages/` for active projects whose `domains:` match the source; propose the update before writing.
 

@@ -52,7 +52,7 @@ Always end with the relevant subset of step 9 (confirmation).
    For each selected operation, run the corresponding step in sequence:
    - 1 → steps 4–5
    - 2 → step 3b
-   - 3 → Initialize: copy `cortex-search.py`, `embeddings.py`, and `cortex-index.py` (co-located with this skill) to `{vault}/.cortex/db/` (create dir if needed). Check embedding dependencies before indexing (see dependency check below). Then run `python3 {vault}/.cortex/db/cortex-index.py {vault}`, report chunks indexed. Skip the copy if files already exist and are identical. Skip indexing if `.cortex/db/vault.db` already exists (ask user if they want to re-index instead).
+   - 3 → Initialize: check embedding dependencies before indexing (see dependency check below). Then run `cortex-index.py` — the script co-located with this skill (same directory as this SKILL.md) — with `{vault}` as its argument; it writes directly to `{vault}/.cortex/db/vault.db`, no copy into the vault needed. Report chunks indexed. Skip indexing if `.cortex/db/vault.db` already exists (ask user if they want to re-index instead).
    - 4 → step 6b
    - 5 → step 6c (gate still applies: if vault.db doesn't exist, offer option 3 first)
    - 6 → step 7
@@ -195,17 +195,18 @@ Always end with the relevant subset of step 9 (confirmation).
    - Check if `.cortex/db/vault.db` exists:
      - **Exists** → proceed normally.
      - **Does not exist** → do NOT skip silently. Instead ask: "Semantic search index not found. Initialize it now? This runs `cortex-index.py` once to build `.cortex/db/vault.db`. Skip if you want to set it up later."
-       - If user confirms: run dependency check (step 6d) first. If dependencies are satisfied, copy `cortex-search.py`, `embeddings.py`, and `cortex-index.py` (co-located with this skill) to `{vault}/.cortex/db/` (create dir if needed). Then run `python3 {vault}/.cortex/db/cortex-index.py {vault}` and wait for it to complete before installing the hook. Report how many chunks were indexed.
+       - If user confirms: run dependency check (step 6d) first. If dependencies are satisfied, run the co-located `cortex-index.py` with `{vault}` as its argument and wait for it to complete before installing the hook — same as maintenance-menu option 3. Report how many chunks were indexed.
        - If user skips: skip the hook installation and note in the summary that semantic search was not initialized (user can re-run `/cortex-forge-setup` later to add it).
    - Check `git config core.hooksPath` first — if set (husky-style), install into that directory instead of `.git/hooks/`, or warn and skip.
-   - Copy `cortex-reindex-post-commit.sh` (co-located with this skill) to `~/.cortex-forge/bin/hooks/` if not already there — same reasoning as 6b: the git hook needs a fixed absolute path outside any agent session.
+   - Copy `cortex-reindex-post-commit.sh` (co-located with this skill) to `~/.cortex-forge/bin/hooks/` if not already there — same reasoning as 6b: the git hook needs a fixed absolute path outside any agent session, so it can't use "co-located with this skill" resolution.
+   - **Copy `cortex-index.py` and `embeddings.py`** (both co-located with this skill) to `~/.cortex-forge/bin/` if not already there or if different — same reasoning: the git hook needs to run these from a fixed absolute path, never from inside the vault.
    - Append the marked block to `{vault}/.git/hooks/post-commit` (create with shebang if missing; never clobber existing content — only add/remove the `>>> cortex-forge reindex >>>` … `<<< cortex-forge reindex <<<` block) and make it executable:
      ```bash
      # >>> cortex-forge reindex >>>
      bash ~/.cortex-forge/bin/hooks/cortex-reindex-post-commit.sh
      # <<< cortex-forge reindex <<<
      ```
-   - The hook self-gates: exits immediately if `.cortex/db/vault.db` or `.cortex/db/cortex-index.py` don't exist, and only runs when the commit touched `wiki/` files. Runs in the background (`&`) — never delays the commit. Appends a timestamped line to `.git/cortex-reindex.log` (ok or error with exit code).
+   - The hook self-gates: exits immediately if `.cortex/db/vault.db` or `~/.cortex-forge/bin/cortex-index.py` don't exist, and only runs when the commit touched `wiki/` files. Runs in the background (`&`) — never delays the commit. Appends a timestamped line to `.git/cortex-reindex.log` (ok or error with exit code).
    - Uninstall (deregister path): remove only the marked block — a diff against the pre-install file must be empty.
 
 6d. **Embedding dependency check** — run this before any indexing attempt (option 3 and 6c). Also triggered if `cortex-index.py` fails with an import error. See `EMBEDDING-SETUP.md` (co-located with this skill) for the full detection and installation procedure.

@@ -154,6 +154,34 @@ for skill_dir in "$SKILLS_DIR"/*/; do
 done
 
 # ---------------------------------------------------------------------------
+# 8. Intentionally-duplicated scripts stay in sync across skills
+# ---------------------------------------------------------------------------
+# embeddings.py and cortex-index.py are deliberately co-located in more than
+# one skill (each skill must be independently installable and must never
+# execute a script found inside the vault — see wiki/concepts/agent-hook-compatibility.md
+# and the 2026-07-03 E006 fix). That duplication only stays safe if the
+# copies never silently diverge — this check makes drift a CI failure
+# instead of a silent bug.
+check "duplicated-script-sync"
+_check_synced() {  # $1: script filename, $2..$N: skill names that must match
+  local script="$1"; shift
+  local first="" first_skill=""
+  for name in "$@"; do
+    local f="$SKILLS_DIR/$name/$script"
+    [[ -f "$f" ]] || { fail "$name/$script: expected but not found"; continue; }
+    if [[ -z "$first" ]]; then
+      first="$f"; first_skill="$name"
+    elif ! diff -q "$first" "$f" >/dev/null 2>&1; then
+      fail "$script differs between $first_skill and $name — sync them or document why they diverge"
+      return
+    fi
+  done
+  [[ -n "$first" ]] && ok "$script identical across: $*"
+}
+_check_synced "embeddings.py" cortex-forge-setup cortex-recall cortex-assimilate
+_check_synced "cortex-index.py" cortex-forge-setup cortex-assimilate
+
+# ---------------------------------------------------------------------------
 # Summary
 # ---------------------------------------------------------------------------
 echo ""

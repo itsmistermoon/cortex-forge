@@ -13,6 +13,7 @@ When an argument is provided, always run step 1 (vault detection) first, then ju
 
 | Argument | Runs |
 |---|---|
+| `embeddings` | Step 6 — dependency check + tailored offer for semantic search |
 | `skills` | Steps 4–5 — install skills + create symlinks |
 | `sync` | Step 3b — sync infrastructure files from upstream repo |
 | `taste` | Step 7 — install TASTE rule |
@@ -41,7 +42,7 @@ Always end with the relevant subset of step 9 (confirmation).
 
      1. Update skills       — reinstall/update all cortex-forge skills in ~/.agents/skills/
      2. Sync from upstream  — pull updated templates and bin scripts from the upstream repo
-     3. Initialize semantic search — build .cortex/vault.db for the first time (asks for backend choice)
+     3. Initialize semantic search — build .cortex/vault.db for the first time (checks what's available, then offers accordingly)
      4. Add post-commit prune    — install the vault-report refresh git hook
      5. Add post-commit reindex  — install the embedding reindex git hook (requires semantic search)
      6. Install TASTE rule  — add cortex-recall auto-invoke rule for CommandCode
@@ -52,7 +53,7 @@ Always end with the relevant subset of step 9 (confirmation).
    For each selected operation, run the corresponding step in sequence:
    - 1 → steps 4–5
    - 2 → step 3b
-   - 3 → Initialize: check embedding dependencies before indexing (see dependency check below). Then run `cortex-index.py` — the script co-located with this skill (same directory as this SKILL.md) — with `{vault}` as its argument; it writes directly to `{vault}/.cortex/db/vault.db`, no copy into the vault needed. Report chunks indexed. Skip indexing if `.cortex/db/vault.db` already exists (ask user if they want to re-index instead).
+   - 3 → step 6 (same tailored dependency-check-then-offer procedure as the new-vault wizard). Skip indexing if `.cortex/db/vault.db` already exists (ask user if they want to re-index instead).
    - 4 → step 6b
    - 5 → step 6c (gate still applies: if vault.db doesn't exist, offer option 3 first)
    - 6 → step 7
@@ -168,6 +169,8 @@ Always end with the relevant subset of step 9 (confirmation).
     - If a symlink already exists and points to the right target, skip silently.
     - If a symlink exists but points elsewhere, overwrite it.
 
+6. **Offer semantic search (new vault only — for an already-registered vault, use maintenance menu option 3 instead)** — check dependencies *before* asking, so the offer itself is tailored to what's actually available. Run the detection procedure in `EMBEDDING-SETUP.md` (co-located with this skill), then ask using the tailored wording it returns (ready-to-go confirm, one-step-away confirm, or the full backend menu) — never ask a generic "enable semantic search?" without having checked first. If the user accepts, install anything needed and run `cortex-index.py` (co-located with this skill) with `{vault}` as its argument; report chunks indexed. If declined or skipped, note in the final summary that semantic search is not active and can be enabled later via `/cortex-forge-setup` (maintenance menu, option 3).
+
 6b. **Post-commit prune (opt-in, separate question)** — ask: "Refresh vault-report.json automatically after each commit? (optional)"
    If yes:
    - **Resolve the `cortex-prune` skill's script:** git hooks run outside any agent session, so they need a fixed absolute path — the same-directory resolution the agent uses when invoking `/cortex-prune` directly doesn't apply here. Locate the `cortex-prune` skill's own directory (typically a sibling of this skill's directory — e.g. `../cortex-prune/cortex-prune.sh` relative to where this SKILL.md was read from) and copy that file to `~/.cortex-forge/bin/cortex-prune.sh` (create dir if needed; skip copy if already identical). If the file cannot be found anywhere, tell the user the `cortex-prune` skill isn't installed and skip this option.
@@ -194,9 +197,7 @@ Always end with the relevant subset of step 9 (confirmation).
    If yes:
    - Check if `.cortex/db/vault.db` exists:
      - **Exists** → proceed normally.
-     - **Does not exist** → do NOT skip silently. Instead ask: "Semantic search index not found. Initialize it now? This runs `cortex-index.py` once to build `.cortex/db/vault.db`. Skip if you want to set it up later."
-       - If user confirms: run dependency check (step 6d) first. If dependencies are satisfied, run the co-located `cortex-index.py` with `{vault}` as its argument and wait for it to complete before installing the hook — same as maintenance-menu option 3. Report how many chunks were indexed.
-       - If user skips: skip the hook installation and note in the summary that semantic search was not initialized (user can re-run `/cortex-forge-setup` later to add it).
+     - **Does not exist** → do NOT skip silently. Run step 6's tailored dependency-check-then-offer procedure now (this happens if the user is reaching this point without having gone through step 6 first — e.g. via maintenance menu option 5 directly). If the user declines there, skip the hook installation and note in the summary that semantic search was not initialized.
    - Check `git config core.hooksPath` first — if set (husky-style), install into that directory instead of `.git/hooks/`, or warn and skip.
    - Copy `cortex-reindex-post-commit.sh` (co-located with this skill) to `~/.cortex-forge/bin/hooks/` if not already there — same reasoning as 6b: the git hook needs a fixed absolute path outside any agent session, so it can't use "co-located with this skill" resolution.
    - **Copy `cortex-index.py` and `embeddings.py`** (both co-located with this skill) to `~/.cortex-forge/bin/` if not already there or if different — same reasoning: the git hook needs to run these from a fixed absolute path, never from inside the vault.
@@ -209,7 +210,7 @@ Always end with the relevant subset of step 9 (confirmation).
    - The hook self-gates: exits immediately if `.cortex/db/vault.db` or `~/.cortex-forge/bin/cortex-index.py` don't exist, and only runs when the commit touched `wiki/` files. Runs in the background (`&`) — never delays the commit. Appends a timestamped line to `.git/cortex-reindex.log` (ok or error with exit code).
    - Uninstall (deregister path): remove only the marked block — a diff against the pre-install file must be empty.
 
-6d. **Embedding dependency check** — run this before any indexing attempt (option 3 and 6c). Also triggered if `cortex-index.py` fails with an import error. See `EMBEDDING-SETUP.md` (co-located with this skill) for the full detection and installation procedure.
+6d. **Embedding dependency check** — the procedure step 6 (and its fallback inside 6c) both run. Also triggered if `cortex-index.py` fails with an import error after this check already passed (dependency became unavailable mid-session). See `EMBEDDING-SETUP.md` (co-located with this skill) for the full detection-and-offer procedure.
 
 7. **Install TASTE rule for `cortex-recall`** — ask: "Install a TASTE rule so CommandCode invokes `/cortex-recall` automatically? (recommended)"
    If yes:
@@ -244,6 +245,7 @@ Always end with the relevant subset of step 9 (confirmation).
 10. **Confirm result**:
    - Registered vaults: list all entries in `vaults:` with their paths, marking the default
    - Skills installed: `cortex-crystallize`, `cortex-forge-setup`, `cortex-recall`, `cortex-assimilate`, `cortex-imprint`, `cortex-prune`
+   - Semantic search: active (backend: Ollama/mlx-embeddings/sentence-transformers, N chunks indexed) / not active (declined or skipped — how to enable later)
    - Claude Code symlinks: created / up to date / skipped
    - TASTE rule: installed per-project / global / skipped — show exact path
    - AGENTS.md vault identity: added / already present / skipped

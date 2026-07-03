@@ -428,3 +428,9 @@ Agent: Claude Code (Sonnet 4.6)
 _index.md reescrito: tabla de archivos, qué va/no va en meta/, formato canónico del log. AGENTS.md ## On session close expandido con trigger explícito para log.md y distinción log vs /cortex-imprint.
 
 Agent: Claude Code (Sonnet 4.6)
+
+## [2026-07-03] refactor | Hooks eliminados, scripts co-located, auditoría fail-loud, v0.6.0 consolidado
+
+Trabajo de dos días consolidado bajo un solo release v0.6.0: (1) hooks de ciclo de vida del agente eliminados en los 4 agentes soportados, reemplazados por protocolo manual vía AGENTS.md; (2) scripts de skills relocalizados de bin/ a co-located dentro de cada skills/<name>/ para soportar instalación vía `npx skills add` (skills.sh); (3) auditoría fail-loud de todos los scripts — timeouts faltantes, mktemp sin chequear, rutas rotas — que atrapó una regresión del mismo día (cortex-validate-schema.sh no co-located); (4) escrituras atómicas para vault-report.json y config.yml; (5) cortex-forge-setup ahora detecta runtime del tarball incompleto y sugiere npx skills add. Ver wiki/pages/cortex-forge.md Key decisions y wiki/concepts/agent-hook-compatibility.md para el detalle completo.
+
+Agent: Claude Code (Sonnet 5)

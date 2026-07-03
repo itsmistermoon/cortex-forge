@@ -187,6 +187,8 @@ npx skills add itsmistermoon/cortex-forge --all
 npx skills add itsmistermoon/cortex-forge --skill cortex-prune
 ```
 
+`--all` installs to every agent skills.sh recognizes — more than you probably use. To target only the agents you actually have, pass `-a <agent>` (repeatable) instead of `--all`; see the [Supported Agents table](https://github.com/vercel-labs/skills#supported-agents) in skills.sh's own docs for the exact flag value per agent (kept there, not duplicated here, since cortex-forge is agent-agnostic and that list is skills.sh's to maintain).
+
 `/cortex-forge-setup` still works exactly the same afterward — it's a prompt-driven skill (no external script dependency), so it registers the vault in `~/.cortex-forge/config.yml` regardless of which installer brought it in.
 
 ## Platform compatibility

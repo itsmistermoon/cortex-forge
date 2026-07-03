@@ -189,10 +189,13 @@ if [ -n "$VAULT_PATH" ]; then
 fi
 
 # ── Step 3: Register vault in config.yml ─────────────────────────────────────
+# Both writes go to a temp file in the same dir + atomic rename — config.yml
+# holds every registered vault, so a kill/crash mid-write must never zero it out.
 if $VAULT_VALID; then
   mkdir -p "$FORGE_DIR"
   if [ ! -f "$CONFIG" ]; then
-    cat > "$CONFIG" <<YAML
+    CONFIG_TMP=$(mktemp "${FORGE_DIR}/.config.yml.XXXXXX") || { err "mktemp failed"; exit 1; }
+    cat > "$CONFIG_TMP" <<YAML
 vaults:
   ${VAULT_NAME}:
     path: ${VAULT_PATH}
@@ -201,9 +204,11 @@ default: ${VAULT_NAME}
 imprint_triage: suggest
 hot_cache_stale_days: 15
 YAML
+    mv "$CONFIG_TMP" "$CONFIG"
     ok "Config created: ${CONFIG}"
   elif ! grep -qF "$VAULT_PATH" "$CONFIG"; then
     # Append vault entry without clobbering existing entries
+    CONFIG_TMP=$(mktemp "${FORGE_DIR}/.config.yml.XXXXXX") || { err "mktemp failed"; exit 1; }
     python3 - <<PYEOF
 import re, sys
 cfg = open("${CONFIG}").read()
@@ -212,9 +217,16 @@ if "vaults:" not in cfg:
     cfg = "vaults:\n" + entry + cfg
 else:
     cfg = re.sub(r"(vaults:\n)", r"\1" + entry, cfg, count=1)
-open("${CONFIG}", "w").write(cfg)
+open("${CONFIG_TMP}", "w").write(cfg)
 PYEOF
-    ok "Vault registered in config"
+    if [ -s "$CONFIG_TMP" ]; then
+      mv "$CONFIG_TMP" "$CONFIG"
+      ok "Vault registered in config"
+    else
+      err "Failed to update ${CONFIG} — left original untouched, aborting."
+      rm -f "$CONFIG_TMP"
+      exit 1
+    fi
   else
     ok "Vault already registered"
   fi

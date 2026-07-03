@@ -159,7 +159,10 @@ echo "HIGH: $HIGH  MEDIUM: $MED  LOW: $LOW"
 
 # ── vault-report.json ─────────────────────────────────────────────────────────
 # Canonical schema defined in skills/cortex-prune/SKILL.md step 4a.
+# Written atomically (temp file in the same dir + rename) so a kill/crash
+# mid-write never leaves a truncated/corrupt vault-report.json behind.
 mkdir -p "$WIKI/meta"
+REPORT_TMP=$(mktemp "$WIKI/meta/.vault-report.json.XXXXXX") || { echo "ERROR: mktemp failed — cannot write vault-report.json" >&2; exit 2; }
 {
   printf '{\n'
   printf '  "generated": "%s",\n' "$(date +%Y-%m-%d)"
@@ -170,7 +173,7 @@ mkdir -p "$WIKI/meta"
   printf '    "orphan_pages": %s\n' "$(json_str_array "$ORPHANS")"
   printf '  }\n'
   printf '}\n'
-} > "$WIKI/meta/vault-report.json"
+} > "$REPORT_TMP" && mv "$REPORT_TMP" "$WIKI/meta/vault-report.json" || { echo "ERROR: failed to write vault-report.json" >&2; rm -f "$REPORT_TMP"; exit 2; }
 echo "Report written: ${WIKI#$VAULT/}/meta/vault-report.json"
 
 [ "$HIGH" -gt 0 ] && exit 1 || exit 0

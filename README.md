@@ -179,6 +179,16 @@ The skill will:
 
 After setup, all skills are available as `/cortex-assimilate`, `/cortex-crystallize`, `/cortex-imprint`, `/cortex-recall`, `/cortex-prune`, and `/cortex-forge-setup`.
 
+**Alternative: install via [skills.sh](https://www.skills.sh/)** — every script a skill needs is co-located inside its own `skills/<name>/` directory, so each skill is fully self-contained and installable independently:
+
+```bash
+npx skills add itsmistermoon/cortex-forge --all
+# or a specific skill:
+npx skills add itsmistermoon/cortex-forge --skill cortex-prune
+```
+
+`/cortex-forge-setup` still works exactly the same afterward — it's a prompt-driven skill (no external script dependency), so it registers the vault in `~/.cortex-forge/config.yml` regardless of which installer brought it in.
+
 ## Platform compatibility
 
 `/cortex-forge-setup` installs skills to `~/.agents/skills/` — the cross-platform convention adopted by most AI coding agents — and creates agent-specific symlinks where detected.

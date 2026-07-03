@@ -6,7 +6,7 @@ set -euo pipefail
 
 VAULT_ROOT="$(git rev-parse --show-toplevel)"
 DB="$VAULT_ROOT/.cortex/db/vault.db"
-INDEXER="$VAULT_ROOT/bin/cortex-index.py"
+INDEXER="$VAULT_ROOT/.cortex/db/cortex-index.py"
 LOG="$VAULT_ROOT/.git/cortex-reindex.log"
 
 # Only run if semantic search is enabled for this vault

@@ -26,7 +26,7 @@ Health check the active vault in three layers: structural (script), semantic (ag
    Read **Domains** and **Out of scope** from `AGENTS.md` (`## Vault identity`) — use them to flag pages whose topics fall outside the vault's defined scope.
    Read `locale:` — see `LOCALE-RESOLUTION.md` (co-located with the skills) for the fallback chain.
 
-2. **Layer 1 — Structural check**: Run `bash ~/.cortex-forge/bin/cortex-prune.sh {vault}` and capture output. If the script is not found, stop and tell the user: "cortex-prune.sh is missing from ~/.cortex-forge/bin/ — run `/cortex-forge-setup` (sub-task: update) to restore the runtime."
+2. **Layer 1 — Structural check**: Run `bash cortex-prune.sh {vault}`, where `cortex-prune.sh` is the script co-located with this skill (same directory as this SKILL.md — resolve its path from wherever this file was read from). If the script is missing, the skill installation is incomplete — reinstall with `npx skills add itsmistermoon/cortex-forge --skill cortex-prune` (or `/cortex-forge-setup`, sub-task `skills`).
 
 3. **Layer 2 — Semantic analysis**: Run the four semantic checks below. For each check, spawn subagents as described — do not attempt to reason about the wiki pages from memory alone.
 
@@ -125,7 +125,7 @@ Report verdict as MEDIUM. Never auto-apply — always requires user confirmation
 - Add entry to `wiki/index.md` for unindexed pages
 - Add `wiki/meta/log.md` entry: `## [YYYY-MM-DD] prune | {N} findings`
 
-`wiki/meta/vault-report.json` is written automatically by `bin/cortex-prune.sh` on every Layer 1 run — it is not a correction and needs no confirmation.
+`wiki/meta/vault-report.json` is written automatically by the co-located `cortex-prune.sh` on every Layer 1 run — it is not a correction and needs no confirmation.
 
 ## Requires confirmation (never auto-apply)
 
@@ -136,7 +136,7 @@ Report verdict as MEDIUM. Never auto-apply — always requires user confirmation
 
 ---
 
-## Detection criteria — Layer 1 (bin/cortex-prune.sh)
+## Detection criteria — Layer 1 (cortex-prune.sh, co-located with this skill)
 
 | Severity | Check |
 |---|---|

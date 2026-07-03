@@ -116,12 +116,12 @@ done
 # ---------------------------------------------------------------------------
 # 6. cortex-prune.sh runtime script referenced correctly
 # ---------------------------------------------------------------------------
-check "prune-script-path"
+check "prune-script-colocated"
 PRUNE_SKILL="$SKILLS_DIR/cortex-prune/SKILL.md"
-if grep -q '~/.cortex-forge/bin/cortex-prune.sh' "$PRUNE_SKILL"; then
-  ok "cortex-prune: references correct runtime script path"
+if [[ -f "$SKILLS_DIR/cortex-prune/cortex-prune.sh" ]] && grep -q 'co-located with this skill' "$PRUNE_SKILL"; then
+  ok "cortex-prune: script co-located and SKILL.md references it as such"
 else
-  fail "cortex-prune: runtime script path may have changed — verify step 2"
+  fail "cortex-prune: cortex-prune.sh must be co-located in skills/cortex-prune/ and referenced as such"
 fi
 
 # ---------------------------------------------------------------------------

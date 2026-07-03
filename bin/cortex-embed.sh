@@ -8,32 +8,34 @@ set -euo pipefail
 
 CONFIG="$HOME/.cortex-forge/config.yml"
 
-# Resolve forge path: bin/ sibling of this script is the canonical location
+# embeddings.py/cortex-index.py are co-located with the cortex-forge-setup skill,
+# not in bin/ — resolve the skill dir: sibling of this script's repo (dev checkout),
+# else scan config for a vault named 'cortex-forge' (self-hosting checkout).
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-if [[ -f "$SCRIPT_DIR/embeddings.py" ]]; then
-  FORGE_PATH="$(dirname "$SCRIPT_DIR")"
+SKILL_DIR=""
+if [[ -f "$(dirname "$SCRIPT_DIR")/skills/cortex-forge-setup/embeddings.py" ]]; then
+  SKILL_DIR="$(dirname "$SCRIPT_DIR")/skills/cortex-forge-setup"
 else
   # Fallback: scan config for a vault named 'cortex-forge'
-  FORGE_PATH=""
   while IFS= read -r line; do
     trimmed="${line#"${line%%[![:space:]]*}"}"
     if [[ "$trimmed" == cortex-forge:* || "$trimmed" == forge:* ]]; then
       candidate="${trimmed#*:}"
       candidate="${candidate#"${candidate%%[![:space:]]*}"}"
-      if [[ -f "$candidate/bin/embeddings.py" ]]; then
-        FORGE_PATH="$candidate"
+      if [[ -f "$candidate/skills/cortex-forge-setup/embeddings.py" ]]; then
+        SKILL_DIR="$candidate/skills/cortex-forge-setup"
         break
       fi
     fi
   done < "$CONFIG"
 fi
 
-if [[ -z "$FORGE_PATH" ]]; then
-  echo "ERROR: Cannot locate cortex-forge bin/embeddings.py. Check ~/.cortex-forge/config.yml." >&2
+if [[ -z "$SKILL_DIR" ]]; then
+  echo "ERROR: Cannot locate skills/cortex-forge-setup/embeddings.py. Check ~/.cortex-forge/config.yml." >&2
   exit 1
 fi
 
-INDEXER="$FORGE_PATH/bin/cortex-index.py"
+INDEXER="$SKILL_DIR/cortex-index.py"
 
 # Resolve target vault path
 resolve_vault() {
@@ -89,7 +91,7 @@ else
 fi
 
 echo "Vault:  $VAULT_PATH"
-echo "Forge:  $FORGE_PATH"
+echo "Scripts: $SKILL_DIR"
 echo ""
 
 python3 "$INDEXER" "$VAULT_PATH"

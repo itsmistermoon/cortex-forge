@@ -1,6 +1,6 @@
 #!/bin/bash
 # cortex-sanitize.sh — Scan content for injection and exfiltration vectors.
-# Usage: bash bin/cortex-sanitize.sh <file>
+# Usage: bash cortex-sanitize.sh <file> (co-located with the cortex-assimilate skill)
 # Outputs JSON with findings array. Exit 0 always (fail-open).
 # Designed to be called by cortex-assimilate before saving to .raw/.
 

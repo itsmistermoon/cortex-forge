@@ -241,13 +241,22 @@ if $INSTALL_SKILLS; then
 fi
 
 # ── Step 5: Post-commit git hooks (opt-in) ───────────────────────────────────
+# Git hooks run outside any agent session, so they need a fixed absolute path —
+# stage the co-located skill scripts into ~/.cortex-forge/bin/ once, here, rather
+# than referencing them inside ~/.agents/skills/ (path varies by install method).
 if $VAULT_VALID && $INTERACTIVE; then
+  mkdir -p "${FORGE_DIR}/bin/hooks"
+  [ -f "${FORGE_DIR}/skills/cortex-prune/cortex-prune.sh" ] && \
+    cp "${FORGE_DIR}/skills/cortex-prune/cortex-prune.sh" "${FORGE_DIR}/bin/cortex-prune.sh"
+  [ -f "${FORGE_DIR}/skills/cortex-forge-setup/cortex-reindex-post-commit.sh" ] && \
+    cp "${FORGE_DIR}/skills/cortex-forge-setup/cortex-reindex-post-commit.sh" "${FORGE_DIR}/bin/hooks/cortex-reindex-post-commit.sh"
+
   printf "\n"
   if ask "Install post-commit prune hook (refreshes vault-report.json)?" "y"; then
     PC="${VAULT_PATH}/.git/hooks/post-commit"
     [ -f "$PC" ] || printf '#!/bin/bash\n' > "$PC"
     chmod +x "$PC"
-    BLOCK='# >>> cortex-forge prune >>>\nif [ -f bin/cortex-prune.sh ]; then\n  (bash bin/cortex-prune.sh >/dev/null 2>&1 || true) &\nfi\n# <<< cortex-forge prune <<<'
+    BLOCK='# >>> cortex-forge prune >>>\nif [ -f ~/.cortex-forge/bin/cortex-prune.sh ]; then\n  (bash ~/.cortex-forge/bin/cortex-prune.sh >/dev/null 2>&1 || true) &\nfi\n# <<< cortex-forge prune <<<'
     if ! grep -q "cortex-forge prune" "$PC"; then
       printf "\n%b\n" "$BLOCK" >> "$PC"
       ok "Post-commit prune hook installed"

@@ -61,7 +61,7 @@ Secondary blocker: `sqlite-vec` (required by `cortex-search.py`) is only availab
 
 Current `nomic-embed-text` (v1, GGUF) is unaffected — it works correctly via Ollama today.
 
-**Migration cost when the gate opens:** v2-moe produces different vectors (different model weights), so `vault.db` must be fully re-indexed with `bin/cortex-index.py`. Matryoshka dimensions mean the target dimension (768 for maximum quality, 256 for speed) must be fixed at index time and cannot change without re-indexing again.
+**Migration cost when the gate opens:** v2-moe produces different vectors (different model weights), so `vault.db` must be fully re-indexed with `cortex-index.py` (co-located with the `cortex-forge-setup` skill; copied to `{vault}/.cortex/db/` at setup). Matryoshka dimensions mean the target dimension (768 for maximum quality, 256 for speed) must be fixed at index time and cannot change without re-indexing again.
 
 ---
 

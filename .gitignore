@@ -1,5 +1,7 @@
 .cortex/
 .DS_Store
+__pycache__/
+*.pyc
 .commandcode/taste/
 .raw/*.vtt
 .raw/*.html

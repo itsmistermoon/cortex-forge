@@ -8,7 +8,7 @@ Vault metadata and operational records. Not knowledge — these files track what
 |------|---------|--------|
 | `log.md` | Append-only operation log — one entry per significant vault operation | Agent (on session close) |
 | `agent-diagnostics.md` | Freeform session diagnostics — hook failures, behavior anomalies, configuration issues | Agent (when something breaks) |
-| `vault-report.json` | Structural health snapshot — dead links, orphan pages, missing provenance | `bin/cortex-prune.sh` (automated) |
+| `vault-report.json` | Structural health snapshot — dead links, orphan pages, missing provenance | `cortex-prune.sh` (automated, co-located with the `cortex-prune` skill) |
 
 ## What goes here
 

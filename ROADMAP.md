@@ -68,14 +68,14 @@ Reference: `wiki/concepts/skillopt-text-space-optimization.md`
 - MLX packages blocked on Python 3.14 + transformers 5.x — see `wiki/concepts/embedding-backend-selection.md`
 - `nomic-embed-text-v2-moe` upgrade gated on ollama/ollama#16076
 
-- [x] `bin/embeddings.py` — backend selector with per-backend error messages
-- [x] `bin/cortex-index.py` — heading-based chunking + 500-word/100-overlap sub-chunks; atomic updates; auto-threshold calibration
-- [x] `bin/cortex-search.py` — KNN two-step; `--top-k`, `--threshold`, `--json` flags
+- [x] `embeddings.py` — backend selector with per-backend error messages (co-located with `cortex-forge-setup`, 2026-07-03: moved out of `bin/` so it ships with `npx skills add`)
+- [x] `cortex-index.py` — heading-based chunking + 500-word/100-overlap sub-chunks; atomic updates; auto-threshold calibration (co-located with `cortex-forge-setup`)
+- [x] `cortex-search.py` — KNN two-step; `--top-k`, `--threshold`, `--json` flags (co-located with `cortex-forge-setup`)
 - [x] `cortex-recall` updated — invokes `cortex-search.py` if `vault.db` exists; fallback to index read
 - [x] Post-commit reindex hook — re-indexes only `wiki/` files touched in each commit
 - [x] `.cortex/` fully gitignored
 - [ ] Validate in second vault: initial index + test query + incremental reindex after `cortex-assimilate`
-- [ ] MCP server — `bin/server.py` (FastMCP): `vault_ingest`, `vault_query`, `vault_imprint`, `session_snapshot`, `vault_prune` — **gate: Stage 1 validated in second vault**
+- [ ] MCP server — `vault_ingest`, `vault_query`, `vault_imprint`, `session_snapshot`, `vault_prune` — **gate: Stage 1 validated in second vault**. **Distribution:** unlike the skills (installed via `npx skills add`, a static-file installer), an MCP server is a persistent process — the natural fit is publishing it as its own npm package and installing with `npx github:itsmistermoon/cortex-forge-mcp` (or `claude mcp add` once published), not through the vault's skills tarball. The [official MCP Registry](https://modelcontextprotocol.io/registry) is still in preview (breaking changes possible before GA) — track it, but don't block the server's launch on it; npm/GitHub distribution works today independent of registry maturity.
 
 ## Phase 4 — Accumulated intelligence
 

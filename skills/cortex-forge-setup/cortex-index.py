@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 cortex-index: Incremental wiki indexer with semantic embeddings.
-Usage: python bin/cortex-index.py [vault_path]
+Usage: python {vault}/.cortex/db/cortex-index.py [vault_path]
 """
 import hashlib
 import json
@@ -12,18 +12,19 @@ import sys
 from pathlib import Path
 
 
-def _resolve_forge_bin() -> Path:
-    """Find cortex-forge bin/ containing embeddings.py.
+def _resolve_embeddings_dir() -> Path:
+    """Find the directory containing embeddings.py.
 
     Search order:
-    1. bin/ sibling of this script (works whether run from the forge or any vault)
-    2. forge path registered in ~/.cortex-forge/config.yml
+    1. Sibling of this script (canonical — embeddings.py always ships alongside
+       cortex-index.py, whether installed in a vault's .cortex/db/ or still
+       inside the cortex-forge-setup skill directory)
+    2. Legacy fallback: forge path registered in ~/.cortex-forge/config.yml
+       (pre-2026-07-03 tarball installs)
     """
-    # 1. This script lives in <forge>/bin/ — embeddings.py is a sibling
     here = Path(__file__).parent
     if (here / "embeddings.py").exists():
         return here
-    # 2. Config lookup — forge registered under 'forge:' or first vault named 'cortex-forge'
     config = Path.home() / ".cortex-forge" / "config.yml"
     if config.exists():
         for line in config.read_text().splitlines():
@@ -32,11 +33,11 @@ def _resolve_forge_bin() -> Path:
                 candidate = Path(line.split(":", 1)[1].strip()) / "bin"
                 if (candidate / "embeddings.py").exists():
                     return candidate
-    print("ERROR: Cannot locate cortex-forge bin/embeddings.py. Check ~/.cortex-forge/config.yml.", file=sys.stderr)
+    print("ERROR: Cannot locate embeddings.py (expected as a sibling of this script).", file=sys.stderr)
     sys.exit(1)
 
 
-sys.path.insert(0, str(_resolve_forge_bin()))
+sys.path.insert(0, str(_resolve_embeddings_dir()))
 import embeddings as emb
 
 CHUNK_WORD_LIMIT = 500

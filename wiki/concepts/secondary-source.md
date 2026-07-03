@@ -34,7 +34,7 @@ Neither failure makes secondary sources a mistake — the context window is fini
 
 ## Relevance to this vault
 
-Every `wiki/` page is a secondary source by design, and the vault enforces the context-pointer pattern structurally: source pages carry a `raw:` frontmatter field pointing back to their `.raw/` primary, and `bin/cortex-prune.sh` flags `.raw/` files without a source page. The conflict rule in `AGENTS.md` is the drift remedy: on contradiction, the primary wins. `.hot/MEMORY.md` is a manufactured secondary source of the session itself — which is why its History entries name commits and files rather than paraphrasing them.
+Every `wiki/` page is a secondary source by design, and the vault enforces the context-pointer pattern structurally: source pages carry a `raw:` frontmatter field pointing back to their `.raw/` primary, and `cortex-prune.sh` (co-located with the `cortex-prune` skill) flags `.raw/` files without a source page. The conflict rule in `AGENTS.md` is the drift remedy: on contradiction, the primary wins. `.hot/MEMORY.md` is a manufactured secondary source of the session itself — which is why its History entries name commits and files rather than paraphrasing them.
 
 ---
 

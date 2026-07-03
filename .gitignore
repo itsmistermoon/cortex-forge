@@ -9,3 +9,4 @@ __pycache__/
 wiki/meta/vault-report.json
 .serena/
 .hot/
+.firecrawl/

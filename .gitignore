@@ -10,3 +10,6 @@ wiki/meta/vault-report.json
 .serena/
 .hot/
 .firecrawl/
+.claude/
+.agents/
+skills-lock.json

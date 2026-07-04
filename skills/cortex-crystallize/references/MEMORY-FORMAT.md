@@ -7,7 +7,7 @@ Gitignored — local agent artifact, not versioned content.
 
 ## Trigger types
 
-The History zone records two kinds of snapshots — treat them differently when writing. `/cortex-crystallize` is always invoked manually (no agent lifecycle hooks, on any agent) — the trigger reflects *why* the user invoked it now, not which hook fired:
+The History zone records two kinds of snapshots — treat them differently when writing:
 
 | Trigger | What it means | What to prioritize |
 |---------|--------------|-------------------|

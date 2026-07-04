@@ -63,7 +63,7 @@ Skills se invocan manualmente durante la sesión. No tienen hooks — el agente 
 | `/cortex-prune` | Periódicamente, o cuando el vault-report muestra issues | Health check: detecta dead links, raw huérfanos, páginas sin frontmatter, confidence faltante | `skills/cortex-prune/SKILL.md` |
 | `/cortex-imprint` | Cuando la sesión produjo análisis o síntesis que vale la pena persistir | Archiva el hallazgo como página permanente en `wiki/` | `skills/cortex-imprint/SKILL.md` |
 
-**TASTE rules** (CommandCode) en `.commandcode/taste/taste.md` recuerdan al agente qué skills usar y cuándo. En otros agentes, el equivalente es `AGENTS.md`.
+`AGENTS.md` recuerda al agente qué skills usar y cuándo — el mismo mecanismo en todos los agentes soportados. (Antes existía un step opcional en `cortex-forge-setup` que instalaba una TASTE rule específica de CommandCode en `.commandcode/taste/taste.md`; se eliminó el 2026-07-03 por contradecir el principio agent-agnostic del setup.)
 
 ---
 

@@ -5,7 +5,7 @@ description: Register or deregister the current vault in Cortex Forge and verify
 argument-hint: "Optional sub-task: embeddings | skills | sync | vaults"
 ---
 
-Setup for Cortex Forge. Run from inside a vault directory (one containing `wiki/`, `AGENTS.md`, and `.git/`). Registers the vault in the global config. Cortex Forge does not rely on agent lifecycle hooks (SessionStart/PreCompact/SessionEnd/PreToolUse) — support for those is too uneven across agents (Claude Code, Codex, Antigravity, CommandCode). All memory operations (loading `.cortex/MEMORY.md`, crystallizing, recalling) are invoked manually via skills (`/cortex-crystallize`, `/cortex-recall`) so behavior is identical everywhere. This skill does not install skill files itself — [skills.sh](https://www.skills.sh/) (`npx skills add`) is the sole installer, for every agent it supports, not a hardcoded pair.
+Setup for Cortex Forge. Run from inside a vault directory (one containing `wiki/`, `AGENTS.md`, and `.git/`). Registers the vault in the global config. Cortex Forge does not rely on agent lifecycle hooks (SessionStart/PreCompact/SessionEnd/PreToolUse) — support for those is too uneven across agents. All memory operations (loading `.cortex/MEMORY.md`, crystallizing, recalling) are invoked manually via skills (`/cortex-crystallize`, `/cortex-recall`) so behavior is identical everywhere. This skill does not install skill files itself — [skills.sh](https://www.skills.sh/) (`npx skills add`) is the sole installer, for every agent it supports, not a hardcoded pair.
 
 ## Sub-tasks
 
@@ -16,7 +16,6 @@ When an argument is provided, always run step 1 (vault detection) first, then ju
 | `embeddings` | Step 6 — dependency check + tailored offer for semantic search |
 | `skills` | Step 4 — verify skills are installed, point to `npx skills add` if not |
 | `sync` | Step 3b — sync infrastructure files from upstream repo |
-| `taste` | Step 7 — install TASTE rule |
 | `vaults` | Steps 2–3 — register/update vault in config |
 
 Always end with the relevant subset of step 9 (confirmation).
@@ -45,9 +44,8 @@ Always end with the relevant subset of step 9 (confirmation).
      3. Initialize semantic search — build .cortex/vault.db for the first time (checks what's available, then offers accordingly)
      4. Add post-commit prune    — install the vault-report refresh git hook
      5. Add post-commit reindex  — install the embedding reindex git hook (requires semantic search)
-     6. Install TASTE rule  — add cortex-recall auto-invoke rule for CommandCode
-     7. Remove this vault   — deregister from config.yml
-     8. Set as default      — make this vault the default
+     6. Remove this vault   — deregister from config.yml
+     7. Set as default      — make this vault the default
    ```
 
    For each selected operation, run the corresponding step in sequence:
@@ -56,9 +54,8 @@ Always end with the relevant subset of step 9 (confirmation).
    - 3 → step 6 (same tailored dependency-check-then-offer procedure as the new-vault wizard). Skip indexing if `.cortex/db/vault.db` already exists (ask user if they want to re-index instead).
    - 4 → step 6b
    - 5 → step 6c (gate still applies: if vault.db doesn't exist, offer option 3 first)
-   - 6 → step 7
-   - 7 → remove vault from `vaults:`, update default if needed, save config, stop
-   - 8 → step 9
+   - 6 → remove vault from `vaults:`, update default if needed, save config, stop
+   - 7 → step 9
 
    After all selected operations complete, show confirmation (step 10) for only the operations that ran.
 
@@ -175,18 +172,6 @@ Always end with the relevant subset of step 9 (confirmation).
 
 6d. **Embedding dependency check** — the procedure step 6 (and its fallback inside 6c) both run. Also triggered if `cortex-index.py` fails with an import error after this check already passed (dependency became unavailable mid-session). See `EMBEDDING-SETUP.md` (co-located with this skill) for the full detection-and-offer procedure.
 
-7. **Install TASTE rule for `cortex-recall`** — ask: "Install a TASTE rule so CommandCode invokes `/cortex-recall` automatically? (recommended)"
-   If yes:
-   - Ask: "Where should the rule live?"
-     - **Per-project** (`.commandcode/taste/` inside this vault) — applies only when working in this vault directory.
-     - **Global** (`~/.commandcode/taste/`) — applies in every project on this machine.
-   - Read the content from `TASTE-FORMAT.md` (co-located with this skill) and use the matching variant (per-project or global).
-   - Create or append to the target file:
-     - Per-project → `.commandcode/taste/taste.md`
-     - Global → `~/.commandcode/taste/taste.md`
-   - Create the `taste/` directory if it doesn't exist.
-   - If the file already contains a `## Cortex Forge Skills` section, skip — do not duplicate.
-
 8. **Update AGENTS.md vault identity** — check if `AGENTS.md` contains a `## Vault identity` section.
    - If present: skip silently.
    - If missing: append the following stub to `AGENTS.md` and inform the user: "Added `## Vault identity` stub to `AGENTS.md` — fill it out before running `/cortex-assimilate`."
@@ -209,14 +194,13 @@ Always end with the relevant subset of step 9 (confirmation).
    - Registered vaults: list all entries in `vaults:` with their paths, marking the default
    - Skills: all 6 present / missing {list} (with the `npx skills add` command to fix it)
    - Semantic search: active (backend: Ollama/mlx-embeddings/sentence-transformers, N chunks indexed) / not active (declined or skipped — how to enable later)
-   - TASTE rule: installed per-project / global / skipped — show exact path
    - AGENTS.md vault identity: added / already present / skipped
    - Sync (if run): upstream used, files updated (list), files skipped (count), deletions pending user confirmation, AGENTS.md divergence noted if any
    - Next step: fill out vault identity in `AGENTS.md` if just added; invoke `/cortex-crystallize` at the end of any project session
 
 ## Memory model (manual, no agent lifecycle hooks)
 
-Cortex Forge does not use SessionStart/PreCompact/SessionEnd/PreToolUse hooks on any agent — support for those events is too uneven across Claude Code, Codex, Antigravity, and CommandCode to build the suite on top of them. Instead, every agent behaves the same way:
+Cortex Forge does not use SessionStart/PreCompact/SessionEnd/PreToolUse hooks on any agent — support for those events is too uneven across agents to build the suite on top of them. Instead, every agent behaves the same way:
 
 - **Load memory**: the agent reads `.cortex/MEMORY.md` itself (per `AGENTS.md` instructions) at the start of a session, or the user invokes `/cortex-recall`.
 - **Save memory**: the user (or the agent, per `AGENTS.md` instructions near the end of a session) invokes `/cortex-crystallize` manually to append a snapshot to `.cortex/MEMORY.md`.

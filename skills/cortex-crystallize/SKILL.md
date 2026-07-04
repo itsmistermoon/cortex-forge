@@ -26,8 +26,8 @@ Behavior depends on where the skill is invoked:
    - `CODEX=1` or `AI_AGENT` starts with `codex` → **Codex**
    - None matched → use self-knowledge (you know what CLI you are)
    Use the detected identity as `{Agent}` in the history header and in the `agent:` frontmatter field.
-2. **Resolve vault** from `~/.cortex-forge/config.yml`. If missing, prompt to run `/cortex-forge-setup` first. Also read `locale:` — see `LOCALE-RESOLUTION.md` (co-located with the skills) for the fallback chain.
-   - Config format: `vaults: {name: path, ...}` + `default: name`
+2. **Resolve vault** from `~/.cortex-forge/config.yml`. If missing, prompt to run `/cortex-forge-setup` first. Also read `locale:` — see `references/LOCALE-RESOLUTION.md` for the fallback chain.
+   - Config format: `vaults: {name: {path, locale}, ...}` + `default: name`
    - If the first argument matches a registered vault name (e.g., `/cortex-crystallize second-brain`) → use that vault; treat the second argument (if any) as the project name override.
    - Otherwise: check if CWD is inside any registered vault (CWD starts with a vault path) → use that vault.
    - If not, use the `default` vault.
@@ -40,7 +40,7 @@ Behavior depends on where the skill is invoked:
 5b. **Prune PRAXIS.md working context** — if `.cortex/PRAXIS.md` exists, remove any `### Working context` entries older than 30 days (compare entry date against today). Do not touch `## Permanent`. If nothing to prune, skip silently.
 6. **Update current state** (see limits below). Update `agent:` and `updated:` in the file frontmatter to reflect the current agent and date.
    - If an argument with `next: <focus>` was provided (e.g., `/cortex-crystallize next: PostToolUse hook`), add a `### Suggested skills` entry and tailor `### Pending` toward the declared next focus.
-7. **Append snapshot to history** using the format in `MEMORY-FORMAT.md` (co-located with this skill).
+7. **Append snapshot to history** using the format in `references/MEMORY-FORMAT.md` (co-located with this skill).
 8. If cross-vault mode: **run cross-vault update** (see section below).
 
 In `#### Fragile context` and any other section, omit tokens, API keys, and credentials (patterns: `sk-*`, `Bearer *`, `ghp_*`, `?token=*`, flags `--password`/`-u user:pass`). If fragile context requires a credential to reproduce, replace it with `<REDACTED>` and note where to obtain it (e.g. `export ANTHROPIC_API_KEY=<REDACTED>  # see .env.local`).
@@ -63,7 +63,7 @@ Never write to the vault without explicit confirmation.
 
 ## Zone 1 — Current state (MUTABLE)
 
-Update on every `/cortex-crystallize`. Use the canonical format in `MEMORY-FORMAT.md` (co-located with this skill) — do not reproduce it here.
+Update on every `/cortex-crystallize`. Use the canonical format in `references/MEMORY-FORMAT.md` (co-located with this skill) — do not reproduce it here.
 
 Hard limits: **max 5 pending items, max 3 active decisions**. When adding an item, evaluate whether an existing one is obsolete and remove it. The size constraint is what makes this zone reliable — if it grows unbounded, it degrades.
 

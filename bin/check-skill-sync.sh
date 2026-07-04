@@ -154,21 +154,24 @@ for skill_dir in "$SKILLS_DIR"/*/; do
 done
 
 # ---------------------------------------------------------------------------
-# 8. Intentionally-duplicated scripts stay in sync across skills
+# 8. Intentionally-duplicated files stay in sync across skills
 # ---------------------------------------------------------------------------
 # embeddings.py and cortex-index.py are deliberately co-located in more than
 # one skill (each skill must be independently installable and must never
 # execute a script found inside the vault — see wiki/concepts/agent-hook-compatibility.md
-# and the 2026-07-03 E006 fix). That duplication only stays safe if the
-# copies never silently diverge — this check makes drift a CI failure
-# instead of a silent bug.
+# and the 2026-07-03 E006 fix). LOCALE-RESOLUTION.md is duplicated for the
+# same independent-installability reason (fixed 2026-07-03 — it previously
+# lived one level up at skills/, outside every skill dir, so it was never
+# actually installed by `npx skills add --skill X`). That duplication only
+# stays safe if the copies never silently diverge — this check makes drift
+# a CI failure instead of a silent bug.
 check "duplicated-script-sync"
-_check_synced() {  # $1: script filename, $2..$N: skill names that must match
-  local script="$1"; shift
+_check_synced() {  # $1: subdir ("scripts" or "references"), $2: filename, $3..$N: skill names that must match
+  local subdir="$1" script="$2"; shift 2
   local first="" first_skill=""
   for name in "$@"; do
-    local f="$SKILLS_DIR/$name/scripts/$script"
-    [[ -f "$f" ]] || { fail "$name/$script: expected but not found"; continue; }
+    local f="$SKILLS_DIR/$name/$subdir/$script"
+    [[ -f "$f" ]] || { fail "$name/$subdir/$script: expected but not found"; continue; }
     if [[ -z "$first" ]]; then
       first="$f"; first_skill="$name"
     elif ! diff -q "$first" "$f" >/dev/null 2>&1; then
@@ -178,8 +181,9 @@ _check_synced() {  # $1: script filename, $2..$N: skill names that must match
   done
   [[ -n "$first" ]] && ok "$script identical across: $*"
 }
-_check_synced "embeddings.py" cortex-forge-setup cortex-recall cortex-assimilate
-_check_synced "cortex-index.py" cortex-forge-setup cortex-assimilate
+_check_synced "scripts" "embeddings.py" cortex-forge-setup cortex-recall cortex-assimilate
+_check_synced "scripts" "cortex-index.py" cortex-forge-setup cortex-assimilate
+_check_synced "references" "LOCALE-RESOLUTION.md" cortex-assimilate cortex-crystallize cortex-imprint
 
 # ---------------------------------------------------------------------------
 # Summary

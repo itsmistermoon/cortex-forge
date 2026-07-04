@@ -79,15 +79,19 @@ Al cerrar la sesión, el agente necesita escribir qué se hizo, qué se descart�
 
 ### Co-located con su skill (viajan con `npx skills add`)
 
-Los scripts que invocan las skills viven **dentro del directorio de la skill que los usa**, no en un `bin/` separado — así `npx skills add itsmistermoon/cortex-forge --skill X` instala un skill completo y funcional. `npx skills add` es el único instalador de skills que existe — no hay tarball ni curl installer (eliminados 2026-07-03, ver changelog).
+Los scripts que invocan las skills viven **dentro del directorio de la skill que los usa**, bajo un subdirectorio `scripts/` (convención de agentskills.io/skill-creation/using-scripts, adoptada 2026-07-03) — no en un `bin/` separado, así `npx skills add itsmistermoon/cortex-forge --skill X` instala un skill completo y funcional. `npx skills add` es el único instalador de skills que existe — no hay tarball ni curl installer (eliminados 2026-07-03, ver changelog).
 
 | Script | Vive en | Quién lo invoca | Cómo se resuelve |
 |--------|---------|------------------|-------------------|
-| `cortex-prune.sh`, `cortex-validate-schema.sh` | `skills/cortex-prune/` | `/cortex-prune` (directo) | El agente lo resuelve como hermano de `SKILL.md` — misma carpeta de donde leyó las instrucciones |
-| `cortex-sanitize.sh` | `skills/cortex-assimilate/` | `/cortex-assimilate` paso 4a | Igual — hermano de `SKILL.md` |
-| `cortex-search.py`, `embeddings.py` | `skills/cortex-recall/` | `/cortex-recall` paso 3 | Igual — hermano de `SKILL.md`. **Nunca** ejecuta un script que viva dentro del vault (fix E006, ver [[wiki/concepts/agent-hook-compatibility]]) |
-| `cortex-index.py`, `embeddings.py` | `skills/cortex-forge-setup/` **y** `skills/cortex-assimilate/` (copias, deliberadamente duplicadas) | `/cortex-forge-setup` (indexación inicial) y `/cortex-assimilate` paso 7 (reindex tras ingesta), cada uno con su propia copia | Igual — hermano de `SKILL.md`. Las dos copias deben ser idénticas byte a byte; `bin/check-skill-sync.sh` (`duplicated-script-sync`) falla el CI si divergen |
+| `cortex-prune.sh`, `cortex-validate-schema.sh` | `skills/cortex-prune/scripts/` | `/cortex-prune` (directo) | El agente lo resuelve relativo a la raíz de la skill (hermano de `scripts/`, sibling de dónde leyó `SKILL.md`) |
+| `cortex-sanitize.sh` | `skills/cortex-assimilate/scripts/` | `/cortex-assimilate` paso 4a | Igual |
+| `cortex-search.py`, `embeddings.py` | `skills/cortex-recall/scripts/` | `/cortex-recall` paso 3 | Igual. **Nunca** ejecuta un script que viva dentro del vault (fix E006, ver [[wiki/concepts/agent-hook-compatibility]]) |
+| `cortex-index.py`, `embeddings.py` | `skills/cortex-forge-setup/scripts/` **y** `skills/cortex-assimilate/scripts/` (copias, deliberadamente duplicadas) | `/cortex-forge-setup` (indexación inicial) y `/cortex-assimilate` paso 7 (reindex tras ingesta), cada uno con su propia copia | Igual. Las dos copias deben ser idénticas byte a byte; `bin/check-skill-sync.sh` (`duplicated-script-sync`) falla el CI si divergen |
 | `setup-vault.sh` | `bin/` (repo fuente, no co-located) | Una vez, al crear un vault nuevo desde cero | No es invocado por ninguna skill instalada — solo tiene sentido dentro del repo `moon-cortexforge` |
+
+### Referencias no ejecutables (`references/`)
+
+Documentación que el agente lee bajo demanda, distinta de un script ejecutable — misma convención de agentskills.io. `MEMORY-FORMAT.md` y `PRAXIS-FORMAT.md` en `skills/cortex-crystallize/references/`; `EMBEDDING-SETUP.md` en `skills/cortex-forge-setup/references/`. `LOCALE-RESOLUTION.md` está duplicado en `references/` de `cortex-assimilate`, `cortex-crystallize` y `cortex-imprint` (2026-07-04, fix: antes vivía en `skills/` a secas — fuera de toda skill individual, así que `npx skills add --skill X` nunca lo instalaba) — solo en esas 3, porque son las únicas que escriben prosa persistente al vault en el idioma del usuario; `cortex-forge-setup`, `cortex-recall` y `cortex-prune` no lo necesitan (ver changelog para el razonamiento completo por skill) y `bin/check-skill-sync.sh` (`duplicated-script-sync`) vigila que las 3 copias no diverjan.
 
 **`{vault}/.cortex/db/` contiene solo datos, nunca código.** Antes (hasta 2026-07-03), `cortex-forge-setup` copiaba `cortex-search.py` y `cortex-index.py` al vault, y `cortex-recall`/`cortex-assimilate` ejecutaban esas copias vault-local — un scanner de seguridad (Snyk, vía skills.sh) lo marcó como riesgo CRITICAL (E006: "ejecuta Python arbitrario desde rutas del vault"). Ahora cada skill ejecuta únicamente su propio script co-located; `.cortex/db/` solo guarda `vault.db` y `config.json`. Un vault de terceros (clonado, compartido, descargado) ya no puede plantar código que alguna skill ejecute — solo puede aportar datos.
 
@@ -97,8 +101,8 @@ Los scripts que invocan las skills viven **dentro del directorio de la skill que
 
 | Bloque instalado en `<vault>/.git/hooks/post-commit` | Script invocado | Copiado desde | Qué hace | Condición |
 |--------|----------------|----------------|----------|-----------|
-| `cortex-forge prune` | `~/.cortex-forge/bin/cortex-prune.sh` | `skills/cortex-prune/cortex-prune.sh` | Refresca `wiki/meta/vault-report.json`; log en `.git/cortex-prune.log` | Siempre (backgrounded, fail-open) |
-| `cortex-forge reindex` | `~/.cortex-forge/bin/hooks/cortex-reindex-post-commit.sh` | `skills/cortex-forge-setup/cortex-reindex-post-commit.sh` | Re-indexa embeddings cuando el commit tocó archivos `wiki/` | Solo si `.cortex/db/vault.db` existe Y el commit incluyó cambios en `wiki/` |
+| `cortex-forge prune` | `~/.cortex-forge/bin/cortex-prune.sh` | `skills/cortex-prune/scripts/cortex-prune.sh` | Refresca `wiki/meta/vault-report.json`; log en `.git/cortex-prune.log` | Siempre (backgrounded, fail-open) |
+| `cortex-forge reindex` | `~/.cortex-forge/bin/hooks/cortex-reindex-post-commit.sh` | `skills/cortex-forge-setup/scripts/cortex-reindex-post-commit.sh` | Re-indexa embeddings cuando el commit tocó archivos `wiki/` | Solo si `.cortex/db/vault.db` existe Y el commit incluyó cambios en `wiki/` |
 
 **Flujo del reindex:** el script detecta cuántos archivos `wiki/` cambiaron en el commit (`git diff-tree`), y solo entonces invoca `~/.cortex-forge/bin/cortex-index.py` (la caché de runtime, copiada ahí por `cortex-forge-setup` — nunca un script que viva dentro del vault) sobre la raíz del vault. Si la DB no existe o no hay archivos wiki modificados, sale silenciosamente (`exit 0`). El bloque usa `|| true` para ser fail-open — nunca bloquea un commit.
 

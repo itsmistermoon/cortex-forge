@@ -8,6 +8,7 @@ aliases: [observer skill, outer loop, skill optimization loop]
 sources:
   - wiki/sources/skill-optimization-loop.md
   - wiki/sources/anthropic-skill-creator.md
+  - wiki/sources/agentskills-best-practices.md
 confidence: high
 schema_version: "0.3"
 ---
@@ -59,6 +60,16 @@ Key constraint: simple queries don't trigger skills regardless of description qu
 | Output is subjective (writing style, design taste) | No — human review only |
 | Skill has a bounded, clear definition of done | Yes |
 
+## Manual variant: reading execution traces
+
+agentskills.io's best-practices guide describes a lighter-weight version of the same outer loop, without requiring observer-skill infrastructure: run the skill against real tasks, then read the agent's **execution traces** (not just final outputs) to diagnose *why* a run went wrong. Three recurring causes it names:
+
+- Instructions too vague — the agent tries several approaches before finding one that works
+- Instructions that don't apply to the current task, but the agent follows them anyway
+- Too many options presented without a clear default (see [[wiki/concepts/skill-design-principles]] Principle "provide defaults, not menus")
+
+Feed back *all* results, not just failures — a single execute-then-revise pass measurably improves quality; complex domains benefit from several. This is the same outer-loop shape as the observer skill pattern above, minus the automation: a human (or the authoring agent itself) plays the role of observer, reading traces instead of running a structured eval harness.
+
 ## Limitations
 
 - Susceptible to **local maxima**: the observer's quality signal only captures what the observer can measure. Failure modes outside the observer's perception go undetected.
@@ -78,3 +89,4 @@ Cortex-forge's skill suite could benefit from this pattern. The `skill-design-pr
 ---
 
 - 2026-07-01 [Claude Code]: Page created — synthesized from Zach Lloyd's replatformer (outer loop pattern) and Anthropic's skill-creator (description optimization loop)
+- 2026-07-03 [Claude Code]: Added "Manual variant" section — agentskills.io's execution-trace-reading approach as the lightweight version of the same outer loop, no observer infrastructure required

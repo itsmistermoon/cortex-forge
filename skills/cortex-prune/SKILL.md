@@ -17,7 +17,7 @@ Health check the active vault in three layers: structural (script), semantic (ag
 ## Steps
 
 1. **Resolve vault** — read `~/.cortex-forge/config.yml`:
-   - Config format: `vaults: {name: path, ...}` + `default: name`
+   - Config format: `vaults: {name: {path, locale}, ...}` + `default: name`
    - If the first argument matches a registered vault name (e.g., `/cortex-prune personal`) → use that vault.
    - Otherwise: check if CWD is inside any registered vault → use that vault.
    - If not, use the `default` vault.
@@ -29,7 +29,6 @@ Health check the active vault in three layers: structural (script), semantic (ag
    Confirm vault is a Cortex Forge vault: path contains `wiki/` and `AGENTS.md`.
 
    Read **Domains** and **Out of scope** from `AGENTS.md` (`## Vault identity`) — use them to flag pages whose topics fall outside the vault's defined scope.
-   Read `locale:` — see `LOCALE-RESOLUTION.md` (co-located with the skills) for the fallback chain.
 
 2. **Layer 1 — Structural check**: Run `bash scripts/cortex-prune.sh {vault}`, where `cortex-prune.sh` is the script co-located with this skill (`scripts/` subdirectory — resolve its path from wherever this file was read from). If the script is missing, the skill installation is incomplete — reinstall with `npx skills add itsmistermoon/cortex-forge --skill cortex-prune` (or `/cortex-forge-setup`, sub-task `skills`).
 

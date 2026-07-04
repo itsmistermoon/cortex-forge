@@ -62,8 +62,8 @@ If the argument starts with `--research`, enter research mode instead of the nor
 
 ## Steps
 
-1. **Resolve vault** — read `~/.cortex-forge/config.yml`. Also read `locale:` — see `LOCALE-RESOLUTION.md` (co-located with the skills) for the fallback chain.
-   - Config format: `vaults: {name: path, ...}` + `default: name`
+1. **Resolve vault** — read `~/.cortex-forge/config.yml`. Also read `locale:` — see `references/LOCALE-RESOLUTION.md` for the fallback chain.
+   - Config format: `vaults: {name: {path, locale}, ...}` + `default: name`
    - If the first argument matches a registered vault name (e.g., `/cortex-assimilate second-brain <url>`) → use that vault; treat the remaining argument as the URL or file path.
    - Otherwise: check if CWD is inside any registered vault → use that vault.
    - If not, use the `default` vault.

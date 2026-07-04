@@ -110,6 +110,8 @@
 - [[wiki/sources/anthropic-skill-creator]] — Anthropic's official skill-creator: creation loop, eval harness, description optimization (ingested 2026-07-01)
 - [[wiki/sources/compound-engineering-plugin]] — Compound Engineering README + June 2026 architectural update: agents→skill-local prompt assets, unified plan doc (ingested 2026-07-01)
 - [[wiki/sources/skill-optimization-loop]] — Zach Lloyd's outer-loop skill optimization: observer skill + computer use grader + SKILL.md diffs (ingested 2026-07-01)
+- [[wiki/sources/agentskills-best-practices]] — agentskills.io's skill-creation best practices: grounding in real expertise, context budgeting, calibrating specificity, named instruction patterns (ingested 2026-07-03)
+- [[wiki/sources/agentskills-using-scripts]] — agentskills.io's guide to bundling and designing scripts in skills: `scripts/` convention, self-contained inline dependencies, agentic CLI design (ingested 2026-07-03)
 - [[wiki/sources/openwiki]] — OpenWiki README + architecture + agent workflow + GitHub Actions pattern (ingested 2026-07-01) — OpenHuman SuperContext feature article (featured): harness-level deterministic context injection, read-only scout, tag-delimited bundle (ingested 2026-06-26)
 
 ## Reference

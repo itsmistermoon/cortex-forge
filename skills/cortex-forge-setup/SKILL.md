@@ -22,15 +22,13 @@ When an argument is provided, always run step 1 (vault detection) first, then ju
 | `embeddings` | Step 6 — dependency check + tailored offer for semantic search |
 | `skills` | Step 4 — verify skills are installed, point to `npx skills add` if not |
 | `sync` | Step 3b — sync infrastructure files from upstream repo |
-| `vaults` | Steps 2–3 — register/update vault in config |
+| `vaults` | Steps 2–3a — register/update vault in config |
 
 Always end with the relevant subset of step 9 (confirmation).
 
 ## Steps
 
 1. **Detect vault from CWD** — validate that the current directory is a valid vault:
-   If `~/.cortex-forge/config.yml` already has an entry for this vault, also read its `locale:` — see `LOCALE-RESOLUTION.md` (co-located with the skills) for the fallback chain.
-
    - Required: `.git/`, `wiki/`, `AGENTS.md`
    - If validation fails, report what's missing and stop.
    - Derive vault name from `basename` of CWD (e.g., `/Users/jp/second-brain` → `second-brain`).
@@ -52,6 +50,7 @@ Always end with the relevant subset of step 9 (confirmation).
      5. Add post-commit reindex  — install the embedding reindex git hook (requires semantic search)
      6. Remove this vault   — deregister from config.yml
      7. Set as default      — make this vault the default
+     8. Change locale       — update the vault's locale and re-word AGENTS.md's Vault identity stub accordingly
    ```
 
    For each selected operation, run the corresponding step in sequence:
@@ -62,14 +61,33 @@ Always end with the relevant subset of step 9 (confirmation).
    - 5 → step 6c (gate still applies: if vault.db doesn't exist, offer option 3 first)
    - 6 → remove vault from `vaults:`, update default if needed, save config, stop
    - 7 → step 9
+   - 8 → steps 3 and 3a (re-run the locale prompt and config write; skip step 8's AGENTS.md stub re-wording if the `## Vault identity` section already has user-written content beyond the stub — ask before overwriting anything the user has since filled in)
 
    After all selected operations complete, show confirmation (step 10) for only the operations that ran.
 
-3. **Write config** — add the vault entry in `~/.cortex-forge/config.yml` (new vault only):
+3. **Set vault locale (new vault only)** — detect the language of the current conversation and propose it as the default, asking for confirmation:
+
+   ```
+   Detected you're writing in {detected-language}. Set this vault's locale to "{code}"?
+
+   This determines the language cortex-assimilate, cortex-crystallize, and
+   cortex-imprint use when writing new content to the vault (wiki pages,
+   session snapshots, permanent knowledge pages).
+
+     1. {code} (detected — matches this conversation)
+     2. en
+     3. Other (type an ISO 639-1 code)
+   ```
+
+   Use the chosen code (ISO 639-1, e.g. `en`, `es`, `pt`) in steps 3a and 8 below.
+
+3a. **Write config** — add the vault entry in `~/.cortex-forge/config.yml` (new vault only):
 
    ```yaml
    vaults:
-     {name}: {absolute-path}
+     {name}:
+       path: {absolute-path}
+       locale: {code}
      # ... other registered vaults preserved as-is
    default: {name}   # set as default only if this is the first vault, or if it was already default
    ```
@@ -135,7 +153,7 @@ Always end with the relevant subset of step 9 (confirmation).
      > To limit which agents get symlinks (the default installs to every agent skills.sh recognizes), pass `-a <agent>` instead of `--all` — see the [Supported Agents table](https://github.com/vercel-labs/skills#supported-agents) for the exact flag per agent.
    - Never hand-roll agent-specific symlink logic here — that duplicates what `npx skills add` already does correctly for every agent it supports, not just whichever ones this skill happened to hardcode.
 
-6. **Offer semantic search (new vault only — for an already-registered vault, use maintenance menu option 3 instead)** — check dependencies *before* asking, so the offer itself is tailored to what's actually available. Run the detection procedure in `EMBEDDING-SETUP.md` (co-located with this skill), then ask using the tailored wording it returns (ready-to-go confirm, one-step-away confirm, or the full backend menu) — never ask a generic "enable semantic search?" without having checked first. If the user accepts, install anything needed and run `scripts/cortex-index.py` (co-located with this skill) with `{vault}` as its argument; report chunks indexed. If declined or skipped, note in the final summary that semantic search is not active and can be enabled later via `/cortex-forge-setup` (maintenance menu, option 3).
+6. **Offer semantic search (new vault only — for an already-registered vault, use maintenance menu option 3 instead)** — check dependencies *before* asking, so the offer itself is tailored to what's actually available. Run the detection procedure in `references/EMBEDDING-SETUP.md` (co-located with this skill), then ask using the tailored wording it returns (ready-to-go confirm, one-step-away confirm, or the full backend menu) — never ask a generic "enable semantic search?" without having checked first. If the user accepts, install anything needed and run `scripts/cortex-index.py` (co-located with this skill) with `{vault}` as its argument; report chunks indexed. If declined or skipped, note in the final summary that semantic search is not active and can be enabled later via `/cortex-forge-setup` (maintenance menu, option 3).
 
 6b. **Post-commit prune (opt-in, separate question)** — ask: "Refresh vault-report.json automatically after each commit? (optional)"
    If yes:
@@ -176,11 +194,12 @@ Always end with the relevant subset of step 9 (confirmation).
    - The hook self-gates: exits immediately if `.cortex/db/vault.db` or `~/.cortex-forge/bin/cortex-index.py` don't exist, and only runs when the commit touched `wiki/` files. Runs in the background (`&`) — never delays the commit. Appends a timestamped line to `.git/cortex-reindex.log` (ok or error with exit code).
    - Uninstall (deregister path): remove only the marked block — a diff against the pre-install file must be empty.
 
-6d. **Embedding dependency check** — the procedure step 6 (and its fallback inside 6c) both run. Also triggered if `cortex-index.py` fails with an import error after this check already passed (dependency became unavailable mid-session). See `EMBEDDING-SETUP.md` (co-located with this skill) for the full detection-and-offer procedure.
+6d. **Embedding dependency check** — the procedure step 6 (and its fallback inside 6c) both run. Also triggered if `cortex-index.py` fails with an import error after this check already passed (dependency became unavailable mid-session). See `references/EMBEDDING-SETUP.md` (co-located with this skill) for the full detection-and-offer procedure.
 
 8. **Update AGENTS.md vault identity** — check if `AGENTS.md` contains a `## Vault identity` section.
    - If present: skip silently.
-   - If missing: append the following stub to `AGENTS.md` and inform the user: "Added `## Vault identity` stub to `AGENTS.md` — fill it out before running `/cortex-assimilate`."
+   - If missing: append the stub below to `AGENTS.md` and inform the user (in the vault's own locale, resolved in step 3) that it was added and needs filling out before running `/cortex-assimilate`.
+   - **Word the stub in the vault's locale** (from step 3): field labels and the HTML-comment prompts are translated; `<!-- -->` comment syntax and the `**locale**:` value itself (an ISO code, not translated) stay as-is. If `locale` is `en`, use the stub exactly as shown:
      ```markdown
      ## Vault identity
 
@@ -190,6 +209,17 @@ Always end with the relevant subset of step 9 (confirmation).
      **out of scope**: <!-- Topics to reject at ingestion time -->
      **vocabulary**: <!-- Key terms and preferred names used in this vault -->
      ```
+     If `locale` is `es`, translate to:
+     ```markdown
+     ## Vault identity
+
+     **locale**: es
+     **misión**: <!-- Para qué es este vault -->
+     **dominios**: <!-- Lista de temas dentro de alcance, separados por coma -->
+     **fuera de alcance**: <!-- Temas a rechazar al momento de la ingesta -->
+     **vocabulario**: <!-- Términos clave y nombres preferidos usados en este vault -->
+     ```
+     For any other locale, translate the same five field labels and comment prompts into that language — do not leave them in English.
 
 9. **Set default vault** — if more than one vault is registered:
    - Ask: "Which vault should be the default? ({list of registered names})"
@@ -197,7 +227,7 @@ Always end with the relevant subset of step 9 (confirmation).
    - If only one vault is registered, set it as default automatically without asking.
 
 10. **Confirm result**:
-   - Registered vaults: list all entries in `vaults:` with their paths, marking the default
+   - Registered vaults: list all entries in `vaults:` with their paths and locales, marking the default
    - Skills: all 6 present / missing {list} (with the `npx skills add` command to fix it)
    - Semantic search: active (backend: Ollama/mlx-embeddings/sentence-transformers, N chunks indexed) / not active (declined or skipped — how to enable later)
    - AGENTS.md vault identity: added / already present / skipped

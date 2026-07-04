@@ -2,13 +2,15 @@
 title: Skill Design Principles
 type: concept
 created: 2026-07-01
-updated: 2026-07-01
+updated: 2026-07-03
 tags: [skills, agent-design, quality, writing-great-skills, cortex-forge/skills]
 aliases: [good skill checklist, skill quality, writing skills, skill whiteness test]
 sources:
   - wiki/sources/writing-great-skills.md
   - wiki/sources/anthropic-skill-creator.md
   - wiki/sources/skill-optimization-loop.md
+  - wiki/sources/agentskills-best-practices.md
+  - wiki/sources/agentskills-using-scripts.md
   - conversation 2026-06-24 (no-op audit)
 confidence: high
 schema_version: "0.3"
@@ -16,7 +18,9 @@ schema_version: "0.3"
 
 # Skill Design Principles
 
-A compiled checklist of what separates a skill that works from one that appears to work. Derived from three primary sources: Matt Pocock's [[wiki/sources/writing-great-skills|writing-great-skills framework]] (vocabulary and failure modes), Anthropic's [[wiki/sources/anthropic-skill-creator|skill-creator]] (creation loop and description optimization), and two audit passes over the cortex-forge skill suite (2026-06-24 no-op audit, 2026-07-01 writing-great-skills audit). Use this page to evaluate any new or modified skill before committing.
+A compiled checklist of what separates a skill that works from one that appears to work. Derived from five primary sources: Matt Pocock's [[wiki/sources/writing-great-skills|writing-great-skills framework]] (vocabulary and failure modes), Anthropic's [[wiki/sources/anthropic-skill-creator|skill-creator]] (creation loop and description optimization), agentskills.io's [[wiki/sources/agentskills-best-practices|best-practices]] and [[wiki/sources/agentskills-using-scripts|using-scripts]] guides (the Agent Skills specification's own authoring guidance), and two audit passes over the cortex-forge skill suite (2026-06-24 no-op audit, 2026-07-01 writing-great-skills audit). Use this page to evaluate any new or modified skill before committing.
+
+Two of these sources converge independently on the same core test: this page's whiteness test ("does the agent produce different, verifiable output with vs. without this instruction?") and agentskills.io's best-practices phrasing ("would the agent get this wrong without this instruction?") are the same check, reached from different frameworks. Convergence across independently-authored sources is treated as corroboration, not redundancy — see Principle 1 below.
 
 ## The whiteness test
 
@@ -26,6 +30,8 @@ A skill passes if every instruction in it satisfies two conditions:
 2. **Verifiability** — a reviewer can determine from the output whether the instruction was followed.
 
 If an instruction fails either condition, it is a no-op or needs reformulation. See [[wiki/concepts/no-op-audit-adversarial-debate]] for the methodology to decide which.
+
+agentskills.io's [[wiki/sources/agentskills-best-practices|best-practices guide]] independently arrives at the same test, phrased as "would the agent get this wrong without this instruction?" — evaluate every line of a skill against it, not just the ones that look suspicious.
 
 ---
 
@@ -107,6 +113,14 @@ A no-op is an instruction the model satisfies by default. Removing it produces n
 
 Every step and instruction should open with an imperative verb or a condition. This is ergonomic but has a real effect: instructions starting with conditions or hedges ("if possible, try to...") are weaker signal than those starting with the action ("Run / Read / Evaluate / Report").
 
+### 10. Scripts live in `scripts/`, listed up front
+
+Bundled executable scripts belong in a `scripts/` subdirectory of the skill, referenced with paths relative to the skill root (the agent runs commands from there — no absolute paths needed). List every co-located script in a `## Available scripts` section immediately after the skill's intro paragraph, before `## Steps`/`## Sub-tasks`, so the agent knows what exists before reading the full procedure. Source: [[wiki/sources/agentskills-using-scripts]] — this is the Agent Skills specification's own convention, not a cortex-forge-specific choice; cortex-forge adopted it directly on 2026-07-03 (see `wiki/pages/cortex-forge.md` changelog) after having previously kept scripts flat in the skill root.
+
+The same source's guidance on *designing* scripts for agentic callers — non-interactive input only (no TTY prompts, since agents cannot respond to them and a blocking prompt hangs forever instead of failing loud), `--help` as the primary interface documentation, error messages that state what went wrong and what to try next, structured stdout with diagnostics on stderr, idempotency, `--dry-run` for destructive operations, and capped/paginated output for anything that could exceed a harness's truncation threshold — has not yet been audited against cortex-forge's own scripts (`cortex-prune.sh`, `cortex-sanitize.sh`, `cortex-index.py`, `cortex-search.py`). Candidate follow-up, not yet applied.
+
+Reasonable to bundle a script only when the trigger has actually occurred: the agent reinventing the same logic across multiple execution traces (parsing a format, running a repeated multi-flag command). Writing scripts preemptively, before that signal appears, adds maintenance surface without a demonstrated need.
+
 ---
 
 ## Checklist for new or modified skills
@@ -124,6 +138,7 @@ Run this against any SKILL.md before committing:
 - [ ] No orphaned config blocks or YAML that floated from their step?
 - [ ] Every "constraint" is a mechanism or has a falsifiable failure condition?
 - [ ] No obvious no-ops (quality appeals, metaphorical principles, generic exclusions)?
+- [ ] Bundled scripts live in `scripts/`, listed in a `## Available scripts` section before `## Steps`?
 
 ---
 
@@ -136,3 +151,4 @@ Run this against any SKILL.md before committing:
 
 - 2026-07-01 [Claude Code]: Page created — consolidated from two audit passes: no-op audit (2026-06-24) and writing-great-skills framework audit (2026-07-01)
 - 2026-07-01 [Claude Code]: Sources updated to primary sources — writing-great-skills SKILL.md+GLOSSARY.md, Anthropic skill-creator SKILL.md, skill-optimization-loop (replatformer)
+- 2026-07-03 [Claude Code]: Added Principle 10 (scripts live in `scripts/`, listed in `## Available scripts`) and a corroboration note on the whiteness test, both from agentskills.io's best-practices and using-scripts guides. Checklist item added for script organization.

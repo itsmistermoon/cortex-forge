@@ -7,7 +7,7 @@ argument-hint: "[vault-name] <query>"
 
 # cortex-recall
 
-Begin your response by outputting exactly: `Recalling memory...`
+Begin your response with a short flavor line announcing the skill started, translated to the language of the user's current message (anchor: `Recalling memory...`; Spanish: `Recuperando memoria...`; translate analogously for other languages). Output this literally as the first thing in your response.
 
 Answer a question using the vault's wiki content as the source.
 

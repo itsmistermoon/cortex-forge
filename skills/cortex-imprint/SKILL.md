@@ -8,7 +8,7 @@ argument-hint: "[vault-name]"
 
 # cortex-imprint
 
-Begin your response by outputting exactly: `Imprinting reference...`
+Begin your response with a short flavor line announcing the skill started, translated to the language of the user's current message (anchor: `Imprinting reference...`; Spanish: `Archivando referencia...`; translate analogously for other languages). Output this literally as the first thing in your response.
 
 Archive a valuable session synthesis as a permanent wiki page.
 

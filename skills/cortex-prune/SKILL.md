@@ -5,7 +5,7 @@ description: Health check the vault — detects dead links, orphan pages, missin
 argument-hint: "[vault-name]"
 ---
 
-Begin your response by outputting exactly: `Pruning vault...`
+Begin your response with a short flavor line announcing the skill started, translated to the language of the user's current message (anchor: `Pruning vault...`; Spanish: `Podando el vault...`; translate analogously for other languages). Output this literally as the first thing in your response.
 
 Health check the active vault in three layers: structural (script), semantic (agents), and drift (metadata comparison).
 

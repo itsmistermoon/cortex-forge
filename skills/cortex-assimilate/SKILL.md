@@ -7,7 +7,7 @@ argument-hint: "[vault-name] <url-or-file> | --research \"<query>\" [--rounds N]
 
 # cortex-assimilate
 
-Begin your response by outputting exactly: `Assimilating source...`
+Begin your response with a short flavor line announcing the skill started, translated to the language of the user's current message (anchor: `Assimilating source...`; Spanish: `Asimilando fuente...`; translate analogously for other languages). Output this literally as the first thing in your response.
 
 Ingest a new source and synthesize wiki pages from it.
 

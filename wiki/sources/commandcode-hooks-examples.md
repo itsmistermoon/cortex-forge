@@ -35,7 +35,7 @@ Four ready-to-adapt hook examples covering the most common usage patterns: secur
 ## Connections
 
 - Related concepts: [[wiki/concepts/agent-hook-compatibility]]
-- Projects: [[wiki/pages/cortex-forge]]
+- Projects: [[wiki/projects/cortex-forge]]
 
 ---
 

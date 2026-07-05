@@ -32,7 +32,7 @@ Introductory article that positions TASTE within CommandCode's three-layer stack
 
 ## Connections
 - Related concepts: [[wiki/concepts/commandcode-taste]]
-- Projects: [[wiki/pages/cortex-forge]]
+- Projects: [[wiki/projects/cortex-forge]]
 
 ---
 

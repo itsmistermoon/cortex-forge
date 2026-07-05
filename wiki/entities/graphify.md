@@ -63,7 +63,7 @@ Platform pattern mirrors cortex-forge: PreToolUse hooks where available, AGENTS.
 - Comparable: [[wiki/entities/codebase-memory-mcp]] (MCP-native alternative)
 - Concept: [[wiki/concepts/knowledge-graph-code-intelligence]]
 - Concept: [[wiki/concepts/treesitter-llm-hybrid-parsing]] (shared parsing layer)
-- Project: [[wiki/pages/cortex-forge]] (CommandCode gap)
+- Project: [[wiki/projects/cortex-forge]] (CommandCode gap)
 
 ---
 

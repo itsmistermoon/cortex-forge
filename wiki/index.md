@@ -3,7 +3,7 @@
 [//]: # "Master index — maintained by the agent. Update after every cortex-assimilate or cortex-imprint operation."
 
 ## Projects
-- [[wiki/pages/cortex-forge]] — Vault with multi-agent hot cache protocol (Claude Code, Codex, Antigravity, CommandCode)
+- [[wiki/projects/cortex-forge]] — Vault with multi-agent hot cache protocol (Claude Code, Codex, Antigravity, CommandCode)
 
 ## Concepts
 - [[wiki/concepts/crystallize-vs-imprint]] — Design boundary between cortex-crystallize (hot cache, ephemeral, automatic) and cortex-imprint (wiki, permanent, manual)
@@ -38,6 +38,17 @@
 - [[wiki/concepts/cortex-forge-vs-alternatives]] — Comprehensive comparison of cortex-forge vs 16+ alternative systems (OpenHuman, GBrain, Hermes, Obsidian Mind, OpenBrain, Mem0, etc.)
 - [[wiki/concepts/vault-design-karpathy-vs-hq]] — Two design reference models (epistemic vs executive); gaps analysis with Hermes cross-reference; cortex-forge chose Karpathy
 - [[wiki/concepts/vault-mcp-server-pattern]] — Architecture pattern for exposing a vault as an MCP server; skills vs MCP trade-off; gate for Phase 2 transition
+- [[wiki/concepts/workflow-architecture]] — Session flow (start/during/end), skills, and scripts — manual `AGENTS.md`-driven protocol, no agent lifecycle hooks
+- [[wiki/concepts/commandcode-models]] — Model ids for `cmd -m` / `cmd --model`, grouped by provider
+- [[wiki/concepts/pi-cli-flags]] — Every `pi` CLI flag by category: modes, model/session/tool/resource/other options, env vars (PI_CODING_AGENT_DIR, PI_OFFLINE, etc.)
+- [[wiki/concepts/pi-slash-commands]] — All built-in Pi slash commands with one-line descriptions
+- [[wiki/concepts/pi-session-file-format]] — Pi JSONL session entry types, message content blocks, AgentMessage union, tree structure
+- [[wiki/concepts/pi-terminal-compat]] — Pi terminal compatibility matrix and config snippets for Ghostty/WezTerm/Alacritty/VS Code/Windows Terminal
+- [[wiki/concepts/pi-models-json]] — `~/.pi/agent/models.json` full schema: provider/model fields, value resolution, compat flags
+- [[wiki/concepts/pi-provider-api-types]] — Pi supported streaming APIs: anthropic-messages, openai-completions, mistral-conversations, etc., with compat flag matrix
+- [[wiki/concepts/pi-event-types]] — Pi extension event taxonomy (startup/session/agent/tool/user_bash/input) and ExtensionContext properties
+- [[wiki/concepts/pi-extension-api]] — All `pi.*` ExtensionAPI methods (registerTool, registerCommand, registerProvider, etc.)
+- [[wiki/concepts/codebase-memory-mcp-tools]] — All 14 MCP tools, node labels, edge types, Cypher read subset, CLI mode, env vars, troubleshooting
 
 ## Entities
 - [[wiki/entities/compound-engineering]] — Every Inc's compound engineering plugin: 27 skills, compound loop (brainstorm→plan→work→simplify→review→compound), skill-local prompt assets architecture; 22k stars
@@ -114,22 +125,8 @@
 - [[wiki/sources/agentskills-using-scripts]] — agentskills.io's guide to bundling and designing scripts in skills: `scripts/` convention, self-contained inline dependencies, agentic CLI design (ingested 2026-07-03)
 - [[wiki/sources/openwiki]] — OpenWiki README + architecture + agent workflow + GitHub Actions pattern (ingested 2026-07-01) — OpenHuman SuperContext feature article (featured): harness-level deterministic context injection, read-only scout, tag-delimited bundle (ingested 2026-06-26)
 
-## Reference
-- [[wiki/reference/workflow-architecture]] — Session flow (start/during/end), skills, and scripts — manual `AGENTS.md`-driven protocol, no agent lifecycle hooks
-- [[wiki/reference/commandcode-models]] — Model ids for `cmd -m` / `cmd --model`, grouped by provider
-- [[wiki/reference/pi-cli-flags]] — Every `pi` CLI flag by category: modes, model/session/tool/resource/other options, env vars (PI_CODING_AGENT_DIR, PI_OFFLINE, etc.)
-- [[wiki/reference/pi-slash-commands]] — All built-in Pi slash commands with one-line descriptions
-- [[wiki/reference/pi-session-file-format]] — Pi JSONL session entry types, message content blocks, AgentMessage union, tree structure
-- [[wiki/reference/pi-terminal-compat]] — Pi terminal compatibility matrix and config snippets for Ghostty/WezTerm/Alacritty/VS Code/Windows Terminal
-- [[wiki/reference/pi-models-json]] — `~/.pi/agent/models.json` full schema: provider/model fields, value resolution, compat flags
-- [[wiki/reference/pi-provider-api-types]] — Pi supported streaming APIs: anthropic-messages, openai-completions, mistral-conversations, etc., with compat flag matrix
-- [[wiki/reference/pi-event-types]] — Pi extension event taxonomy (startup/session/agent/tool/user_bash/input) and ExtensionContext properties
-- [[wiki/reference/pi-extension-api]] — All `pi.*` ExtensionAPI methods (registerTool, registerCommand, registerProvider, etc.)
-- [[wiki/reference/codebase-memory-mcp-tools]] — All 14 MCP tools, node labels, edge types, Cypher read subset, CLI mode, env vars, troubleshooting
-
 ## Meta
 - [[wiki/meta/log]] — Append-only vault operation log
-- [[wiki/meta/agent-diagnostics]] — Bitácora de sesiones y diagnósticos de comportamiento de agentes
 - [[wiki/meta/_index|Vault meta]]
 - `templates/` — 5 page templates (concept, entity, source, project, reference)
 - `bin/setup-vault.sh` — setup script

@@ -40,7 +40,7 @@ Not an incidental tool. Its multi-platform compatibility and ability to graph Ka
 1. **`cortex-forge`** — graph the entire vault (`wiki/`) as a navigable knowledge graph, in line with Karpathy's vision for LLM wikis.
 2. **`second-brain`** — apply `/understand-knowledge` to discover implicit relationships between pages.
 
-If actively used in the future, create a project page at `wiki/pages/understand-anything.md` and move this content there.
+If actively used in the future, create a project page at `wiki/projects/understand-anything.md` and move this content there.
 
 ---
 

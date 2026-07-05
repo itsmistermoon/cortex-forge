@@ -26,9 +26,9 @@ The structural difference: in Karpathy the LLM has agency over knowledge structu
 
 **Objective 1 — warm memory and context for agents:** well-resolved in protocol (`.hot/`, hooks, skill), incomplete in content. Missing: explicit spec of what a good `.hot/` entry should contain (which decisions, which pending items, what the next agent needs). Missing: staleness signal — context from 6 weeks ago reads as fresh.
 
-**Objective 2 — building knowledge for projects:** partially resolved. Ingest works. What's missing: when something relevant to an active project is ingested, that connection doesn't materialize in `wiki/pages/{project}.md`. Knowledge exists but doesn't flow where it's operationally needed.
+**Objective 2 — building knowledge for projects:** partially resolved. Ingest works. What's missing: when something relevant to an active project is ingested, that connection doesn't materialize in `wiki/projects/{project}.md`. Knowledge exists but doesn't flow where it's operationally needed.
 
-**Internal tension:** the two objectives have different cadences. The hot cache ages; the wiki shouldn't. What's missing is a third layer: **project state** as distinct from domain knowledge. It partially exists in `wiki/pages/` but without the operational structure that would make that distinction explicit.
+**Internal tension:** the two objectives have different cadences. The hot cache ages; the wiki shouldn't. What's missing is a third layer: **project state** as distinct from domain knowledge. It partially exists in `wiki/projects/` but without the operational structure that would make that distinction explicit.
 
 ## Actionable gaps from Karpathy
 
@@ -38,7 +38,7 @@ The structural difference: in Karpathy the LLM has agency over knowledge structu
 
 ## Actionable gaps from HQ
 
-- **Bottleneck tracking** — when an agent detects a recurring problem in a project, there's no mechanism to generate an action entry in `.hot/` or `wiki/pages/{project}.md`
+- **Bottleneck tracking** — when an agent detects a recurring problem in a project, there's no mechanism to generate an action entry in `.hot/` or `wiki/projects/{project}.md`
 - **Reverse traceability** — no way to mark that a wiki page was used in a real project decision; without that signal it's impossible to know what knowledge is fertile vs. dead archive
 
 ## Multi-agent protocol debt

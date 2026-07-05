@@ -62,7 +62,7 @@ Karpathy's LLM Wiki / Obsidian wiki. Builds interconnected Wikipedia-like knowle
 
 ## Connections
 - Related concepts: [[wiki/concepts/agent-hook-compatibility]], [[wiki/concepts/progressive-disclosure-hooks]], [[wiki/concepts/handoff-artifact]], [[wiki/concepts/karpathy-wiki-pattern]], [[wiki/concepts/memory-system]]
-- Projects: [[wiki/pages/cortex-forge]]
+- Projects: [[wiki/projects/cortex-forge]]
 - Sources: [[wiki/sources/graphify]], [[wiki/sources/obsidian-mind]]
 - Entities: [[wiki/entities/commandcode]]
 

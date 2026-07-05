@@ -87,7 +87,7 @@ TASTE is the closest productized equivalent of [[wiki/concepts/continuous-learni
 
 ## Relevance for cortex-forge
 
-The pending [[wiki/pages/cortex-forge]] item about TASTE rule scope for `cortex-recall` is resolved by this ingestion:
+The pending [[wiki/projects/cortex-forge]] item about TASTE rule scope for `cortex-recall` is resolved by this ingestion:
 
 - **The decision is contextual**: if the rule is vault-specific → `.commandcode/taste/` (per-project); if it should apply in any project where `cortex-recall` is used → `~/.commandcode/taste/` (global with `-g`).
 - `cortex-forge-setup` can populate both locations; the question is which one to offer as the default to the user.

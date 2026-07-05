@@ -50,7 +50,7 @@ The result: **navigable graph with a reproducible structural base** (wikilinks a
 
 ## Direct applicability
 
-The `cortex-forge` vault already implements this pattern (see [[wiki/index]]): index.md as entry point, frontmatter per page, `templates/` for page types, categories `wiki/concepts/`, `wiki/entities/`, `wiki/sources/`, `wiki/pages/`. Still missing:
+The `cortex-forge` vault already implements this pattern (see [[wiki/index]]): index.md as entry point, frontmatter per page, `templates/` for page types, categories `wiki/concepts/`, `wiki/entities/`, `wiki/sources/`, `wiki/projects/`. Still missing:
 
 - Adopting explicit `[[wikilinks]]` (currently there are few).
 - Validating that the deterministic parser can extract the graph from the current filesystem.

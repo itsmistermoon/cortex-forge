@@ -33,7 +33,7 @@ This guide covers day-to-day CLI usage: persistent settings, slash commands, key
 
 ## Connections
 - Related concepts: [[wiki/entities/antigravity-cli]]
-- Projects: [[wiki/pages/cortex-forge]]
+- Projects: [[wiki/projects/cortex-forge]]
 
 ---
 

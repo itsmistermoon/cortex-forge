@@ -184,6 +184,7 @@ _check_synced() {  # $1: subdir ("scripts" or "references"), $2: filename, $3..$
 _check_synced "scripts" "embeddings.py" cortex-forge-setup cortex-recall cortex-assimilate
 _check_synced "scripts" "cortex-index.py" cortex-forge-setup cortex-assimilate
 _check_synced "references" "LOCALE-RESOLUTION.md" cortex-assimilate cortex-crystallize cortex-imprint
+_check_synced "references" "VAULT-RESOLUTION.md" cortex-assimilate cortex-crystallize cortex-imprint cortex-prune cortex-recall
 
 # ---------------------------------------------------------------------------
 # Summary

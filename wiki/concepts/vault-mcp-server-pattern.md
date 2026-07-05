@@ -69,7 +69,7 @@ The MCP server pattern is justified when:
 
 cortex-forge Phase 1 (multi-agent parity) is resolving exactly the problem an MCP server would solve with less friction. The trade-off: an MCP server requires process infrastructure (the server running); skills are static files.
 
-**Gate for the MCP transition (from [[wiki/pages/cortex-forge]]):** Phase 1 validated in an organic session AND the vault is accessed from more than one client. AGENTS.md remains the design contract regardless — an agent without MCP can still operate the vault by reading AGENTS.md directly.
+**Gate for the MCP transition (from [[wiki/projects/cortex-forge]]):** Phase 1 validated in an organic session AND the vault is accessed from more than one client. AGENTS.md remains the design contract regardless — an agent without MCP can still operate the vault by reading AGENTS.md directly.
 
 ---
 

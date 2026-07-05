@@ -29,7 +29,7 @@ Official README of graphify v8: AI coding assistant skill that turns any folder 
 ## Connections
 - Part of: [[wiki/sources/graphify]] (combined synthesis)
 - Related concepts: [[wiki/concepts/agent-hook-compatibility]], [[wiki/concepts/progressive-disclosure-hooks]]
-- Projects: [[wiki/pages/cortex-forge]]
+- Projects: [[wiki/projects/cortex-forge]]
 
 ---
 

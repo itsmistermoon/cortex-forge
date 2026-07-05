@@ -184,7 +184,7 @@ GUI/harness  ────────────── OpenHuman ────�
 - [[wiki/concepts/progressive-disclosure-hooks]] — just-in-time context loading; complements the comparison
 - [[wiki/entities/openhuman]] — closest full-harness comparable (added 2026-06-26)
 - [[wiki/entities/openbrain-nate-jones]] — cross-tool alternative with embeddings
-- [[wiki/pages/cortex-forge]] — main project page
+- [[wiki/projects/cortex-forge]] — main project page
 
 ---
 

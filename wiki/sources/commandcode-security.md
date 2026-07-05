@@ -31,7 +31,7 @@ Official documentation for Command Code's security model: permission modes (Defa
 
 ## Connections
 - Related concepts: [[wiki/concepts/agent-hook-compatibility]], [[wiki/concepts/progressive-disclosure-hooks]]
-- Projects: [[wiki/pages/cortex-forge]]
+- Projects: [[wiki/projects/cortex-forge]]
 - Sources: [[wiki/sources/commandcode-headless]], [[wiki/sources/commandcode-hooks-configuration]], [[wiki/sources/commandcode-hooks-reference]]
 
 ---

@@ -7,7 +7,6 @@ Vault metadata and operational records. Not knowledge — these files track what
 | File | Purpose | Writer |
 |------|---------|--------|
 | `log.md` | Append-only operation log — one entry per significant vault operation | Agent (on session close) |
-| `agent-diagnostics.md` | Freeform session diagnostics — hook failures, behavior anomalies, configuration issues | Agent (when something breaks) |
 | `vault-report.json` | Structural health snapshot — dead links, orphan pages, missing provenance | `cortex-prune.sh` (automated, co-located with the `cortex-prune` skill) |
 
 ## What goes here
@@ -19,8 +18,8 @@ Vault metadata and operational records. Not knowledge — these files track what
 ## What does NOT go here
 
 - Knowledge synthesized from sources → `wiki/concepts/`, `wiki/entities/`, `wiki/sources/`
-- Design decisions and ADRs → `wiki/pages/` (via `/cortex-imprint`)
-- Active project state → `wiki/pages/`
+- Design decisions and ADRs → `wiki/projects/` (via `/cortex-imprint`)
+- Active project state → `wiki/projects/`
 - Session working memory → `.cortex/MEMORY.md` (not versioned)
 
 ## Log entry format

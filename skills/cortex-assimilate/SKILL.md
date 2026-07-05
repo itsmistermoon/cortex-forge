@@ -62,15 +62,10 @@ If the argument starts with `--research`, enter research mode instead of the nor
 
 ## Steps
 
-1. **Resolve vault** — read `~/.cortex-forge/config.yml`. Also read `locale:` — see `references/LOCALE-RESOLUTION.md` for the fallback chain.
-   - Config format: `vaults: {name: {path, locale}, ...}` + `default: name`
+1. **Resolve vault** — follow `references/VAULT-RESOLUTION.md` (argument → CWD → default). Then read `locale:`, using the fallback chain in `references/LOCALE-RESOLUTION.md`.
    - If the first argument matches a registered vault name (e.g., `/cortex-assimilate second-brain <url>`) → use that vault; treat the remaining argument as the URL or file path.
-   - Otherwise: check if CWD is inside any registered vault → use that vault.
-   - If not, use the `default` vault.
-   - If no default and multiple vaults → ask the user to pick one.
-   - If no vaults registered → stop and prompt to run `/cortex-forge-setup`.
 
-2. If `{vault}/AGENTS.md` exists, read **Domains**, **Out of scope**, **Mission**, and **Vocabulary** from the `## Vault identity` section:
+2. Read **Domains**, **Out of scope**, **Mission**, and **Vocabulary** from `{vault}/AGENTS.md`'s `## Vault identity` section:
    - If the source falls under **Out of scope**, stop and tell the user — do not ingest.
    - If the source domain is not in **Domains**, flag it before proceeding.
    - Use **Vocabulary** when naming pages and writing content.
@@ -122,14 +117,14 @@ If the argument starts with `--research`, enter research mode instead of the nor
    ```
    Report the result inline: "Indexed N new chunk(s)." If `{vault}/.cortex/db/vault.db` does not exist, skip silently — the vault may not have semantic search enabled.
 
-8. **Project linking** — check `{vault}/wiki/pages/` for active projects whose `domains:` match the source; propose the update before writing.
+8. **Project linking** — check `{vault}/wiki/projects/` for active projects whose `domains:` match the source; propose the update before writing.
 
 9. **Backward enrichment** — scan existing wiki pages for candidates that should now reference the new source.
 
    Skip this step if the new source page has no `tags:` or if fewer than 5 wiki pages exist total.
 
    1. Read `tags:` from the newly created `wiki/sources/{slug}.md`.
-   2. Scan every page in `wiki/concepts/`, `wiki/entities/`, and `wiki/pages/`. For each page: read its frontmatter and check if it shares at least one tag with the new source AND does not already list `wiki/sources/{slug}.md` in its `sources:` field. These are candidates.
+   2. Scan every page in `wiki/concepts/`, `wiki/entities/`, and `wiki/projects/`. For each page: read its frontmatter and check if it shares at least one tag with the new source AND does not already list `wiki/sources/{slug}.md` in its `sources:` field. These are candidates.
    3. For each candidate, evaluate inline: does the new source add substantive information this page should reference? Possible reasons: the page covers a comparable tool/pattern and the new source is a notable comparable; the page has a comparison table or list where the new source belongs; the new source contradicts or refines a claim in the page. Classify as **ENRICHABLE** (clear gap identified, specific addition stated) or **FALSE_POSITIVE** (tag overlap is incidental or thematic only).
    4. For each ENRICHABLE candidate: state exactly what to add and where — e.g., "Add OpenWiki to the comparison table in §Key mechanisms" or "Add a `[[wiki/entities/openwiki]]` wikilink in §Comparable tools."
    5. Report all ENRICHABLE candidates to the user. Do not apply any changes without explicit confirmation per candidate.
@@ -139,11 +134,9 @@ If the argument starts with `--research`, enter research mode instead of the nor
 | Type | Path | Template |
 |------|------|----------|
 | **Source** | `wiki/sources/` | `templates/source.md` |
-| **Concept** | `wiki/concepts/` or `wiki/reference/` | `templates/concept.md` |
+| **Concept** | `wiki/concepts/` | `templates/concept.md` |
 | **Entity** | `wiki/entities/` | `templates/entity.md` |
-| **Project** | `wiki/pages/` | `templates/project.md` |
-
-`wiki/reference/` pages are concepts in tabular or code-block form — use `type: concept` and the same template. The directory is preserved for navigation; the type is unified.
+| **Project** | `wiki/projects/` | `templates/project.md` |
 
 ## Type disambiguation
 
@@ -214,5 +207,8 @@ After completing ingestion, your response must confirm:
 
 ## Changelog
 
+- 2026-07-04 [Claude Code]: Centralized vault structure validation (`wiki/`+`AGENTS.md`) in `references/VAULT-RESOLUTION.md`; removed the redundant "if `{vault}/AGENTS.md` exists" guard from step 2
+- 2026-07-04 [Claude Code]: Reworded "Resolve vault" step intro to distinguish VAULT-RESOLUTION.md (decision flow) from LOCALE-RESOLUTION.md (fallback chain), removing the repeated closing phrase
+- 2026-07-04 [Claude Code]: Extracted "Resolve vault" logic to shared `references/VAULT-RESOLUTION.md`, co-located across 5 skills (was duplicated inline with real drift between copies)
 - 2026-07-01 [Claude Code]: Added Step 9 — backward enrichment: tag-based scan of existing pages after ingest, inline ENRICHABLE/FALSE_POSITIVE classification, confirmation required before any change
 - 2026-06-24 [Claude Code]: Reformulated "compiled truth" rule into a verifiable rewrite contract with a concrete violation signal (no-op audit)

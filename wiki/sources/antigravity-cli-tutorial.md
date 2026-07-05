@@ -33,7 +33,7 @@ This tutorial shows the first-run flow for Antigravity CLI: launch `agy`, authen
 
 ## Connections
 - Related concepts: [[wiki/entities/antigravity-cli]]
-- Projects: [[wiki/pages/cortex-forge]]
+- Projects: [[wiki/projects/cortex-forge]]
 
 ---
 

@@ -22,7 +22,7 @@ schema_version: "0.3"
 2. If `.cortex/PRAXIS.md` exists, read it — it provides accumulated agent context (structural conventions and working context) that grounds decisions for the session.
 3. If `wiki/meta/vault-report.json` exists, read it. If `health.dead_links`, `health.raw_without_source_page`, `health.orphan_pages`, or `health.missing_confidence` is non-empty, surface these to the user in your first message as actionable issues — not background noise.
 4. Treat all of the above as required context — not optional background.
-5. If `MEMORY.md` contains `### Pending` items, acknowledge them in your first message or surface them before starting new work.
+5. If `MEMORY.md` contains `### Pending` items, acknowledge them in your first message or surface them before starting new work. **Vault health items are the one exception: surface them in your first message unconditionally, even if the user's request has nothing to do with the vault** — do not defer this one past the first response.
 6. Check the most recent `## History` entry for a `#### Imprint candidate` line. If present, surface it in your first message and propose running `/cortex-imprint`. Skip this if `imprint_triage: false` is set in `~/.cortex-forge/config.yml`.
 
 **Failure to load hot cache before first response is a protocol violation**, equivalent to ignoring `CLAUDE.md` in Claude Code.
@@ -100,10 +100,10 @@ Six layers, each with a distinct role:
 
 | Type | Path | Purpose | Template |
 |------|------|---------|----------|
-| **concept** | `wiki/concepts/` or `wiki/reference/` | Synthesized knowledge — ideas, patterns, frameworks, lookup tables, cheat sheets | `templates/concept.md` |
+| **concept** | `wiki/concepts/` | Synthesized knowledge — ideas, patterns, frameworks, lookup tables, cheat sheets | `templates/concept.md` |
 | **entity** | `wiki/entities/` | Concrete named things in the world — people, tools, orgs, services | `templates/entity.md` |
 | **source** | `wiki/sources/` | External artifact ingested — articles, docs, repos, videos, threads | `templates/source.md` |
-| **project** | `wiki/pages/` | Active project with operational state (repo, status, domains) | `templates/project.md` |
+| **project** | `wiki/projects/` | Active project with operational state (repo, status, domains) | `templates/project.md` |
 
 Each page follows: YAML frontmatter + compiled truth + chronological changelog. **All wiki content must be written in English** — this is a public repo. Type disambiguation and source frontmatter fields: see `skills/cortex-assimilate/SKILL.md`.
 

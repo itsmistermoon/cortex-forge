@@ -20,7 +20,7 @@ In this vault's context, OpenHuman is the closest known comparable project to Co
 
 ## Relationships
 
-- Comparable project: [[wiki/pages/cortex-forge]] — shared problem (agent memory / cold start), different architecture (harness app vs vault protocol)
+- Comparable project: [[wiki/projects/cortex-forge]] — shared problem (agent memory / cold start), different architecture (harness app vs vault protocol)
 - Concept origin: [[wiki/concepts/karpathy-wiki-pattern]] — both implement this pattern
 - Concept: [[wiki/concepts/super-context]] — OpenHuman's harness-level context injection feature
 - Related entity: [[wiki/entities/openbrain-nate-jones]] — also builds on local Postgres+pgvector; different scope (developer-only, MCP-first)

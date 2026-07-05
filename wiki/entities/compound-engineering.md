@@ -73,7 +73,7 @@ The skill-local prompt assets pattern is what cortex-forge uses with LOCALE-RESO
 
 - Concepts: [[wiki/concepts/skill-design-principles]], [[wiki/concepts/continuous-learning-loop]], [[wiki/concepts/no-op-audit-adversarial-debate]]
 - Sources: [[wiki/sources/compound-engineering-plugin]]
-- Comparable: [[wiki/pages/cortex-forge]] (`/cortex-imprint` ≈ `/ce-compound`)
+- Comparable: [[wiki/projects/cortex-forge]] (`/cortex-imprint` ≈ `/ce-compound`)
 
 ---
 

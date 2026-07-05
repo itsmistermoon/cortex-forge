@@ -34,7 +34,7 @@ Studied as the canonical implementation of Level 6 memory (cross-platform semant
 ## Connections
 
 - Detailed breakdown: [[wiki/sources/openbrain.md]]
-- Compared with cortex-forge: [[wiki/pages/cortex-forge]]
+- Compared with cortex-forge: [[wiki/projects/cortex-forge]]
 - Context: [[wiki/sources/yt-claude-code-memory-compared]]
 
 ---

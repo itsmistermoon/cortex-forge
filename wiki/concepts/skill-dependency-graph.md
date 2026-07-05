@@ -108,4 +108,4 @@ AGENTS.md reads this file at SessionStart to surface health signals to the agent
 
 - [[wiki/concepts/crystallize-vs-imprint]] — design boundary between the two session-end skills
 - [[wiki/concepts/memory-system]] — broader context on stateful agents
-- [[wiki/reference/workflow-architecture]] — session flow: hooks, skills, scripts
+- [[wiki/concepts/workflow-architecture]] — session flow: hooks, skills, scripts

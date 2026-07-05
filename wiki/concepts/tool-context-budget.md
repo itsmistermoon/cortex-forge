@@ -43,7 +43,7 @@ Sessions that hit the smart zone degradation early (see [[wiki/concepts/smart-zo
 
 ## Design implication for cortex-forge
 
-Skills (text injected via AGENTS.md or hooks) have near-zero schema cost. MCP servers have fixed schema cost at session start regardless of whether their tools are used. This is the reason cortex-forge uses script-based hooks + skills rather than MCP tools for the core protocol — see [[wiki/pages/cortex-forge]] key decision "MCP deferral."
+Skills (text injected via AGENTS.md or hooks) have near-zero schema cost. MCP servers have fixed schema cost at session start regardless of whether their tools are used. This is the reason cortex-forge uses script-based hooks + skills rather than MCP tools for the core protocol — see [[wiki/projects/cortex-forge]] key decision "MCP deferral."
 
 When Fase 3.6 (semantic retrieval) adds a FastMCP server, it adds ~10–15K tokens of schema cost to every session. This cost is gated: the MCP is installed only after Etapa 1 is validated and there is >1 client requesting it.
 
@@ -53,7 +53,7 @@ Tool context budget is the quantitative extension of [[wiki/concepts/progressive
 
 ## Relationships
 - Concepts: [[wiki/concepts/progressive-disclosure-hooks]], [[wiki/concepts/smart-zone]]
-- Project: [[wiki/pages/cortex-forge]] (MCP deferral decision)
+- Project: [[wiki/projects/cortex-forge]] (MCP deferral decision)
 - Entity: [[wiki/entities/codebase-memory-mcp]] (high-schema-cost MCP example)
 
 ---

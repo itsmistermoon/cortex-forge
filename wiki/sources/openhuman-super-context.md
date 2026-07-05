@@ -39,7 +39,7 @@ SuperContext is OpenHuman's harness-level mechanism that eliminates cold starts.
 
 - Related concepts: [[wiki/concepts/super-context]], [[wiki/concepts/progressive-disclosure-hooks]], [[wiki/concepts/memory-system]], [[wiki/concepts/handoff-artifact]]
 - Entities: [[wiki/entities/openhuman]]
-- Projects: [[wiki/pages/cortex-forge]] — Cortex Forge's `SessionStart` hook + `.hot/MEMORY.md` is the architectural equivalent; key difference is hook-script vs harness-level execution
+- Projects: [[wiki/projects/cortex-forge]] — Cortex Forge's `SessionStart` hook + `.hot/MEMORY.md` is the architectural equivalent; key difference is hook-script vs harness-level execution
 - Related sources: [[wiki/sources/openhuman]]
 
 ---

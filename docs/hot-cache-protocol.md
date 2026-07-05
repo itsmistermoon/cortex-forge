@@ -3,7 +3,7 @@
 Este archivo está desactualizado. La referencia completa de la arquitectura de workflow,
 hooks por agente, scripts, skills y modos degradados está en:
 
-→ **`wiki/reference/workflow-architecture.md`**
+→ **`wiki/concepts/workflow-architecture.md`**
 
 Lo que cubre el nuevo doc y esto no:
 

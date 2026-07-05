@@ -69,7 +69,7 @@ See [[wiki/concepts/headless-agent-mode]] for the full headless execution surfac
 - Concept: [[wiki/concepts/headless-agent-mode]] (headless write permissions)
 - Concept: [[wiki/concepts/agent-hook-compatibility]] (why cortex-forge no longer uses agent lifecycle hooks)
 - Concept: [[wiki/concepts/memory-as-attack-surface]] (MCP injection vectors)
-- Project: [[wiki/pages/cortex-forge]] (protocol decisions)
+- Project: [[wiki/projects/cortex-forge]] (protocol decisions)
 
 ---
 

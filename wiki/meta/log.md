@@ -44,7 +44,7 @@ Two related staleness patterns identified and documented during OpenWiki ingesti
 
 Both mechanisms use structured page metadata (tags, updated:, raw: frontmatter field) to detect staleness without re-reading all content.
 
-Documented in: `wiki/pages/cortex-forge.md` (Key decisions + Roadmap Phase 4), `README.md` (`/cortex-assimilate` section).
+Documented in: `wiki/projects/cortex-forge.md` (Key decisions + Roadmap Phase 4), `README.md` (`/cortex-assimilate` section).
 
 Agent: Claude Code
 
@@ -131,7 +131,7 @@ Updated:
 - `wiki/concepts/antigravity-hooks.md` — `settings.json` vs `hooks.json` contradiction documented; scopes and script path clarified
 - `wiki/index.md` (Concepts, Sources)
 
-Project linking: skipped (no active projects in `wiki/pages/`).
+Project linking: skipped (no active projects in `wiki/projects/`).
 
 Agent: Claude Code
 
@@ -187,7 +187,7 @@ Created:
 Updated:
 - `wiki/index.md` (4 sections: Projects, Concepts, Entities, Sources)
 
-Project linking: skipped — no active projects in `wiki/pages/` with `status: active`. Understand Anything is a third-party project (MIT, Lum1104), not the user's; no `wiki/pages/` page created per skill criteria.
+Project linking: skipped — no active projects in `wiki/projects/` with `status: active`. Understand Anything is a third-party project (MIT, Lum1104), not the user's; no `wiki/projects/` page created per skill criteria.
 
 Concepts skipped (considered but discarded due to lack of transferable proper name or UI specificity):
 - Persona-adaptive UI (UI-specific, no reusable conceptual identity)
@@ -220,7 +220,7 @@ Updated:
 
 No new concepts/entities created. The source is operational configuration for a product already covered by `wiki/concepts/agent-hook-compatibility` and `wiki/sources/commandcode-hooks-configuration` (referenced in the concept). The nested wire format differing from Codex/Claude Code is an operational note, not a reusable concept with a proper name.
 
-Project linking: skipped — `wiki/pages/` only contains `.gitkeep`; no active user projects with `status: active`. Cortex-forge knowledge lives as pages, not as a wiki project page.
+Project linking: skipped — `wiki/projects/` only contains `.gitkeep`; no active user projects with `status: active`. Cortex-forge knowledge lives as pages, not as a wiki project page.
 
 Key operational finding: CommandCode's official wire format (`hooks: [{ matcher, hooks: [{ type, command, timeout? }] }]`) differs from the flat wire format of Claude Code/Codex. Hot cache scripts written for Claude Code/Codex are NOT drop-in for CommandCode; each handler would need to be wrapped in a `hooks` sub-array per matcher.
 
@@ -244,7 +244,7 @@ Updated:
 
 No new concepts/entities. The example patterns (block dangerous commands, warn on sensitive reads, audit, quality gate) are instances of patterns already covered by `progressive-disclosure-hooks` and the new §Common usage patterns in `agent-hook-compatibility`.
 
-Project linking: `wiki/pages/cortex-forge.md` vinculado en todas las sources (dominio: hooks, cortex-forge).
+Project linking: `wiki/projects/cortex-forge.md` vinculado en todas las sources (dominio: hooks, cortex-forge).
 
 Agent: Claude Code (claude-sonnet-4-6)
 
@@ -318,7 +318,7 @@ Updated: `wiki/concepts/agent-hook-compatibility.md` (matrix + síntesis upgrade
 
 Sources: `.raw/commandcode-security.md`
 Pages created: `wiki/sources/commandcode-security.md`
-Updated: `wiki/sources/commandcode-headless.md` (cross-reference to security), `wiki/index.md`, `wiki/pages/cortex-forge.md`
+Updated: `wiki/sources/commandcode-headless.md` (cross-reference to security), `wiki/index.md`, `wiki/projects/cortex-forge.md`
 Key finding: `cmd -p --yolo` is the headless equivalent of `claude -p` for synthesis in hooks, but requires explicit `--yolo` to enable writes. Crystallize hooks currently do not use this — they just append minimal "Session closed via Stop hook." entries.
 
 ## [2026-06-13] fix | `cortex-prune.sh` — multi-source page detection
@@ -431,6 +431,6 @@ Agent: Claude Code (Sonnet 4.6)
 
 ## [2026-07-03] refactor | Hooks eliminados, scripts co-located, auditoría fail-loud, v0.6.0 consolidado
 
-Trabajo de dos días consolidado bajo un solo release v0.6.0: (1) hooks de ciclo de vida del agente eliminados en los 4 agentes soportados, reemplazados por protocolo manual vía AGENTS.md; (2) scripts de skills relocalizados de bin/ a co-located dentro de cada skills/<name>/ para soportar instalación vía `npx skills add` (skills.sh); (3) auditoría fail-loud de todos los scripts — timeouts faltantes, mktemp sin chequear, rutas rotas — que atrapó una regresión del mismo día (cortex-validate-schema.sh no co-located); (4) escrituras atómicas para vault-report.json y config.yml; (5) cortex-forge-setup ahora detecta runtime del tarball incompleto y sugiere npx skills add. Ver wiki/pages/cortex-forge.md Key decisions y wiki/concepts/agent-hook-compatibility.md para el detalle completo.
+Trabajo de dos días consolidado bajo un solo release v0.6.0: (1) hooks de ciclo de vida del agente eliminados en los 4 agentes soportados, reemplazados por protocolo manual vía AGENTS.md; (2) scripts de skills relocalizados de bin/ a co-located dentro de cada skills/<name>/ para soportar instalación vía `npx skills add` (skills.sh); (3) auditoría fail-loud de todos los scripts — timeouts faltantes, mktemp sin chequear, rutas rotas — que atrapó una regresión del mismo día (cortex-validate-schema.sh no co-located); (4) escrituras atómicas para vault-report.json y config.yml; (5) cortex-forge-setup ahora detecta runtime del tarball incompleto y sugiere npx skills add. Ver wiki/projects/cortex-forge.md Key decisions y wiki/concepts/agent-hook-compatibility.md para el detalle completo.
 
 Agent: Claude Code (Sonnet 5)

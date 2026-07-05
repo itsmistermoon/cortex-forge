@@ -30,7 +30,7 @@ Pipeline architecture: detect() → extract() → build_graph() → cluster() �
 ## Connections
 - Part of: [[wiki/sources/graphify]] (combined synthesis)
 - Related concepts: [[wiki/concepts/treesitter-llm-hybrid-parsing]]
-- Projects: [[wiki/pages/cortex-forge]]
+- Projects: [[wiki/projects/cortex-forge]]
 
 ---
 

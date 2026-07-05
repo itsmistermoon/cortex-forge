@@ -19,7 +19,7 @@ schema_version: "0.3"
 
 Cortex Forge does not use agent lifecycle hooks (`SessionStart`, `PreCompact`, `SessionEnd`, `Stop`, `PreToolUse`) anywhere, as of 2026-07-02. This page is the decision record: what was tried, what broke, and why the fix was to remove hooks entirely rather than patch around each agent's quirks. It also absorbs the former `crystallize-automation-architecture.md` page, which covered the same ground from the crystallize-specific angle.
 
-**Current mechanism (all agents, identical):** `AGENTS.md` mandates reading `.cortex/MEMORY.md` before the first response, and invoking `/cortex-crystallize` manually at milestones and session close. See [[wiki/reference/workflow-architecture]] for the operational protocol.
+**Current mechanism (all agents, identical):** `AGENTS.md` mandates reading `.cortex/MEMORY.md` before the first response, and invoking `/cortex-crystallize` manually at milestones and session close. See [[wiki/concepts/workflow-architecture]] for the operational protocol.
 
 ## Why hooks were dropped, not fixed
 
@@ -34,7 +34,7 @@ Only Claude Code had genuinely complete, reliable hook support (`SessionStart`, 
 
 ## The actual decision (2026-07-02)
 
-Rather than maintain four different degradation strategies (full hooks / no-op guards / manual-only / structurally-impossible), cortex-forge dropped agent lifecycle hooks everywhere, including Claude Code, and standardized on one mechanism: `AGENTS.md` instructions, identical on every agent. This trades "automatic when it works" for "always the same, everywhere" — the guarantee comes from the protocol being unconditional and simple to follow, not from a harness feature only some agents implement. See [[wiki/pages/cortex-forge]] key decisions and the README "Design rationale" section for the fuller argument.
+Rather than maintain four different degradation strategies (full hooks / no-op guards / manual-only / structurally-impossible), cortex-forge dropped agent lifecycle hooks everywhere, including Claude Code, and standardized on one mechanism: `AGENTS.md` instructions, identical on every agent. This trades "automatic when it works" for "always the same, everywhere" — the guarantee comes from the protocol being unconditional and simple to follow, not from a harness feature only some agents implement. See [[wiki/projects/cortex-forge]] key decisions and the README "Design rationale" section for the fuller argument.
 
 ## What was removed
 

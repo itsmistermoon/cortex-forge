@@ -88,7 +88,7 @@ ANTHROPIC_API_KEY (Claude), GEMINI_API_KEY (Gemini), OPENAI_API_KEY (OpenAI), DE
 
 ## Connections
 - Related concepts: [[wiki/concepts/agent-hook-compatibility]], [[wiki/concepts/progressive-disclosure-hooks]]
-- Projects: [[wiki/pages/cortex-forge]] (comparable direct)
+- Projects: [[wiki/projects/cortex-forge]] (comparable direct)
 - Sources: [[wiki/sources/obsidian-mind]] (another comparable)
 
 ---

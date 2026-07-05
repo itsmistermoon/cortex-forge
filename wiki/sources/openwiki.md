@@ -64,7 +64,7 @@ steps:
 
 - Related concepts: [[wiki/concepts/karpathy-wiki-pattern]], [[wiki/concepts/knowledge-graph-code-intelligence]], [[wiki/concepts/super-context]]
 - Related entities: [[wiki/entities/graphify]], [[wiki/entities/understand-anything]], [[wiki/entities/codebase-memory-mcp]]
-- Projects: [[wiki/pages/cortex-forge]]
+- Projects: [[wiki/projects/cortex-forge]]
 
 ---
 

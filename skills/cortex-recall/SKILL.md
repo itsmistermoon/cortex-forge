@@ -18,13 +18,8 @@ Answer a question using the vault's wiki content as the source.
 
 ## Steps
 
-1. **Resolve vault** — read `~/.cortex-forge/config.yml`.
-   - Config format: `vaults: {name: {path, locale}, ...}` + `default: name`
+1. **Resolve vault** — follow `references/VAULT-RESOLUTION.md` (argument → CWD → default).
    - If the first argument matches a registered vault name (e.g., `/cortex-recall second-brain <query>`) → use that vault; treat the remaining text as the query.
-   - Otherwise: check if CWD is inside any registered vault → use that vault.
-   - If not, use the `default` vault.
-   - If no default and multiple vaults are registered → ask the user to pick one.
-   - If no vaults registered → stop and prompt to run `/cortex-forge-setup`.
 
 2. Read **Vocabulary** and **Domains** from `{vault}/AGENTS.md` (`## Vault identity` section) — use them to interpret the query correctly and scope the search.
 
@@ -59,3 +54,9 @@ Every response must include:
 - If there are contradictions between pages, flag them
 - If the topic is not in the wiki, say so explicitly — only then may you supplement with parametric knowledge, clearly labeled as such
 - The search method varies (semantic vector search when `.cortex/db/vault.db` is available, structured index traversal via `wiki/index.md` otherwise) — the bypass prohibition applies regardless of which method is used. Reading `wiki/index.md` or specific wiki pages as part of steps 3–4 is not a violation — it is part of the skill.
+
+## Changelog
+
+- 2026-07-04 [Claude Code]: Centralized vault structure validation (`wiki/`+`AGENTS.md`) in `references/VAULT-RESOLUTION.md`, closing a gap where step 2 assumed `AGENTS.md` existed without validating it
+- 2026-07-04 [Claude Code]: Reworded "Resolve vault" step intro to point directly at VAULT-RESOLUTION.md's decision flow, removing the vague closing phrase
+- 2026-07-04 [Claude Code]: Extracted "Resolve vault" logic to shared `references/VAULT-RESOLUTION.md`, co-located across 5 skills (was duplicated inline with real drift between copies)

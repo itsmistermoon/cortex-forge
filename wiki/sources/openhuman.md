@@ -39,7 +39,7 @@ OpenHuman is an open-source agentic assistant desktop app designed to integrate 
 
 - Related concepts: [[wiki/concepts/karpathy-wiki-pattern]], [[wiki/concepts/memory-system]], [[wiki/concepts/tool-context-budget]], [[wiki/concepts/progressive-disclosure-hooks]], [[wiki/concepts/super-context]]
 - Entities: [[wiki/entities/openhuman]]
-- Projects: [[wiki/pages/cortex-forge]] — comparable project (agent-operated knowledge vault); key differences documented in that page's Key decisions section
+- Projects: [[wiki/projects/cortex-forge]] — comparable project (agent-operated knowledge vault); key differences documented in that page's Key decisions section
 - Related sources: [[wiki/sources/obsidian-mind]], [[wiki/sources/openbrain]], [[wiki/sources/openhuman-super-context]]
 
 ---

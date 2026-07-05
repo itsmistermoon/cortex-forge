@@ -35,7 +35,7 @@ Operational guide for writing safe and efficient hooks in CommandCode. Covers in
 ## Connections
 
 - Related concepts: [[wiki/concepts/agent-hook-compatibility]]
-- Projects: [[wiki/pages/cortex-forge]]
+- Projects: [[wiki/projects/cortex-forge]]
 
 ---
 

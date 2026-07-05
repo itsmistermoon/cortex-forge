@@ -33,7 +33,7 @@ This page describes the higher-order capabilities of the CLI: work in natural la
 
 ## Connections
 - Related concepts: [[wiki/entities/antigravity-cli]]
-- Projects: [[wiki/pages/cortex-forge]]
+- Projects: [[wiki/projects/cortex-forge]]
 
 ---
 

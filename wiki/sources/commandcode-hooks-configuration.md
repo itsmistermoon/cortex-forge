@@ -36,7 +36,7 @@ Within a single event, hooks fire in declared order; `PreToolUse` runs sequentia
 
 ## Connections
 - Related concepts: [[wiki/concepts/agent-hook-compatibility]]
-- Projects: [[wiki/pages/cortex-forge]]
+- Projects: [[wiki/projects/cortex-forge]]
 
 ---
 

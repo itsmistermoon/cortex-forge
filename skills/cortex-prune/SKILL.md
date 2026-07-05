@@ -16,19 +16,12 @@ Health check the active vault in three layers: structural (script), semantic (ag
 
 ## Steps
 
-1. **Resolve vault** — read `~/.cortex-forge/config.yml`:
-   - Config format: `vaults: {name: {path, locale}, ...}` + `default: name`
+1. **Resolve vault** — follow `references/VAULT-RESOLUTION.md` (argument → CWD → default).
    - If the first argument matches a registered vault name (e.g., `/cortex-prune personal`) → use that vault.
-   - Otherwise: check if CWD is inside any registered vault → use that vault.
-   - If not, use the `default` vault.
-   - If no default and multiple vaults → ask the user to pick one.
-   - If no vaults registered → stop and prompt to run `/cortex-forge-setup`.
 
    **Confirmation gate:** if the vault was resolved from an explicit argument (not from CWD), confirm with the user before proceeding: "About to prune `{vault-name}` at `{path}`. Continue?" — do not proceed until confirmed.
 
-   Confirm vault is a Cortex Forge vault: path contains `wiki/` and `AGENTS.md`.
-
-   Read **Domains** and **Out of scope** from `AGENTS.md` (`## Vault identity`) — use them to flag pages whose topics fall outside the vault's defined scope.
+   Read **Domains** and **Out of scope** from `{vault}/AGENTS.md` (`## Vault identity`) — use them to flag pages whose topics fall outside the vault's defined scope.
 
 2. **Layer 1 — Structural check**: Run `bash scripts/cortex-prune.sh {vault}`, where `cortex-prune.sh` is the script co-located with this skill (`scripts/` subdirectory — resolve its path from wherever this file was read from). If the script is missing, the skill installation is incomplete — reinstall with `npx skills add itsmistermoon/cortex-forge --skill cortex-prune` (or `/cortex-forge-setup`, sub-task `skills`).
 
@@ -96,7 +89,7 @@ Read `wiki/index.md` to get the full list of entities and concepts. Then:
 
 ### 2b. Body text mentions without wikilinks
 
-For each page in `wiki/concepts/`, `wiki/entities/`, and `wiki/pages/`:
+For each page in `wiki/concepts/`, `wiki/entities/`, and `wiki/projects/`:
 
 1. Extract entity and concept titles + aliases from the index.
 2. Scan the page body for plain-text mentions of those names (case-insensitive) not already wrapped in `[[...]]`.
@@ -165,4 +158,7 @@ Report verdict as MEDIUM. Never auto-apply — always requires user confirmation
 
 ## Changelog
 
+- 2026-07-04 [Claude Code]: Centralized vault structure validation (`wiki/`+`AGENTS.md`) in `references/VAULT-RESOLUTION.md`; removed the now-redundant explicit "Confirm vault is a Cortex Forge vault" line from step 1 (confirmation gate left untouched)
+- 2026-07-04 [Claude Code]: Reworded "Resolve vault" step intro to point directly at VAULT-RESOLUTION.md's decision flow, removing the vague closing phrase
+- 2026-07-04 [Claude Code]: Extracted "Resolve vault" logic to shared `references/VAULT-RESOLUTION.md`, co-located across 5 skills (was duplicated inline with real drift between copies)
 - 2026-07-01 [Claude Code]: Added Layer 3 — drift detection: mtime of `.raw/` vs `updated:` in `wiki/sources/`; intro updated from two to three layers

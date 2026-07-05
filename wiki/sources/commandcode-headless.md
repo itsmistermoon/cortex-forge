@@ -34,7 +34,7 @@ Official documentation for CommandCode's headless mode (`-p`/`--print`). Covers 
 
 ## Connections
 - Related concepts: [[wiki/concepts/agent-hook-compatibility]]
-- Projects: [[wiki/pages/cortex-forge]]
+- Projects: [[wiki/projects/cortex-forge]]
 - Sources: [[wiki/sources/commandcode-hooks-configuration]], [[wiki/sources/commandcode-hooks-reference]], [[wiki/sources/commandcode-security]]
 
 ---

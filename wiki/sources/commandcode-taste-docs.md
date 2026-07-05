@@ -32,7 +32,7 @@ Official TASTE documentation. Describes the `taste-1` model (meta neuro-symbolic
 
 ## Connections
 - Related concepts: [[wiki/concepts/commandcode-taste]]
-- Projects: [[wiki/pages/cortex-forge]]
+- Projects: [[wiki/projects/cortex-forge]]
 
 ---
 

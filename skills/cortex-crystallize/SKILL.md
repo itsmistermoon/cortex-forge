@@ -19,13 +19,13 @@ Save a session snapshot to `.cortex/MEMORY.md` in the active repo (the nearest `
 
 2. **Prepare state** — create `.cortex/` if it doesn't exist and add it to `.gitignore`. Read `.cortex/MEMORY.md` in full if it exists; on malformed YAML frontmatter, don't stop — read the body as plain text, note the issue in the next `#### Fragile context` entry, and overwrite the frontmatter in step 4.
 
-   If `.cortex/PRAXIS.md` exists, remove any `### Working context` entries older than 30 days (never touch `## Permanent`); skip silently if nothing qualifies.
+   If `.cortex/PRAXIS.md` exists, remove any `### Working context` entries older than 15 days (never touch `## Permanent`); skip silently if nothing qualifies.
 
-   Rotate `## History` entries older than 30 days out of `.cortex/MEMORY.md`: append each verbatim, oldest-first, to `.cortex/CONSOLIDATED.md` (create it with a one-line header — `# {vault-name} — consolidated history` — if it doesn't exist), then remove it from `MEMORY.md`. Never reorder entries in either file. **Done when:** every History entry older than 30 days has been moved — zero left behind in `MEMORY.md`.
+   Rotate `## History` entries older than 15 days out of `.cortex/MEMORY.md`: append each verbatim, oldest-first, to `.cortex/CONSOLIDATED.md` (if it doesn't exist, create it with a one-line header — `# {vault-name} — consolidated history`), then remove it from `MEMORY.md`. Never reorder entries in either file. **Done when:** every History entry older than 15 days has been moved — zero left behind in `MEMORY.md`.
 
 3. **Consider PRAXIS.md updates** — a deliberate judgment call, not an automatic log entry: does this session surface durable operational knowledge (an environment workaround, operator preference, vault-specific convention, recurring failure pattern, or similar) the next agent needs to avoid re-discovering? Classify per the gate in `references/PRAXIS-FORMAT.md`. **Done when:** every candidate insight has been written to the correct zone or explicitly evaluated and rejected — not silently forgotten.
 4. **Write the snapshot** — update Current state and append the History entry in `.cortex/MEMORY.md`, per `references/MEMORY-FORMAT.md`; never modify previous History entries.
-   - If an argument with `next: <focus>` was provided (e.g., `/cortex-crystallize next: PostToolUse hook`), add a `### Suggested skills` entry and tailor `### Pending` toward the declared next focus.
+   - If an argument with `next: <focus>` was provided (e.g., `/cortex-crystallize next: PostToolUse hook`), mention relevant skills inline and tailor `### Pending` toward the declared next focus.
    - **Vault health triage** — if `wiki/meta/vault-report.json` exists and any of `health.dead_links`, `health.raw_without_source_page`, `health.orphan_pages`, or `health.missing_confidence` is non-empty, add a dated entry to `### Pending` (if full, this takes priority over the least-recent item): `- [ ] Vault health: {N} finding(s) unresolved ({types}) — see wiki/meta/vault-report.json`. If a Pending item for vault health already exists, update its count instead of duplicating; if the report has zero findings and a prior item exists, remove it. Never optional to report — call it out explicitly in the confirmation whenever the report has non-empty findings, don't fold it silently into a generic summary.
 
 ## Cross-vault update

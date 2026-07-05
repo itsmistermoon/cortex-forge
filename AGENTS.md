@@ -85,7 +85,7 @@ Six layers, each with a distinct role:
 | **Raw** | `.raw/` | Primary sources — immutable originals (articles, docs, transcripts) | Never modify |
 | **Wiki** | `wiki/` | Secondary sources — synthesized knowledge; one step removed from primaries | Agent writes and maintains |
 | **Hot** | `.cortex/` | Per-project session cache (MEMORY.md, PRAXIS.md) and semantic search DB (`db/`) | Read on session start, write via /cortex-crystallize |
-| **Consolidated** | `.cortex/CONSOLIDATED.md` | Archive of MEMORY.md History entries older than 30 days | Never read automatically — consult on-demand only when a session needs older history |
+| **Consolidated** | `.cortex/CONSOLIDATED.md` | Archive of MEMORY.md History entries older than 15 days | Never read automatically — consult on-demand only when a session needs older history |
 | **Meta** | `wiki/meta/` | Vault metadata and guides | Agent maintains |
 | **Skills** | `skills/` | Invocable agent skills | Extend, don't modify |
 | **Docs** | `docs/` | Design notes, protocol rationale, resilience proposals | Reference before implementing changes |

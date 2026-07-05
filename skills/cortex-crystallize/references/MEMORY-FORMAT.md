@@ -56,7 +56,7 @@ When in doubt: ask "does the next session need to act on this?" If no → Histor
 
 ## Zone 2 — History (APPEND-ONLY)
 
-Never modify previous entries. Append at the end. Entries older than 30 days are rotated to `.cortex/CONSOLIDATED.md` — MEMORY.md's History always reflects only the last 30 days (see SKILL.md step 5c). `CONSOLIDATED.md` is never read automatically — consult it directly only when a session needs older history.
+Never modify previous entries. Append at the end. Entries older than 30 days are rotated to `.cortex/CONSOLIDATED.md` — MEMORY.md's History always reflects only the last 30 days (see SKILL.md step 2). `CONSOLIDATED.md` is never read automatically — consult it directly only when a session needs older history.
 
 ```markdown
 ## History
@@ -81,3 +81,7 @@ Never modify previous entries. Append at the end. Entries older than 30 days are
 ```
 
 Empty sections (Discarded, Attempted and failed, Fragile context, Imprint candidate): omit entirely — never write `_(none)_`.
+
+Don't duplicate content already in ADRs, PRDs, issues, or commits — reference by path.
+
+In `#### Fragile context` and any other section, omit tokens, API keys, and credentials (patterns: `sk-*`, `Bearer *`, `ghp_*`, `?token=*`, flags `--password`/`-u user:pass`). If fragile context requires a credential to reproduce, replace it with `<REDACTED>` and note where to obtain it (e.g. `export ANTHROPIC_API_KEY=<REDACTED>  # see .env.local`).

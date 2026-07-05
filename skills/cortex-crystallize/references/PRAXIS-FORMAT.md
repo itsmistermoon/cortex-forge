@@ -12,6 +12,13 @@ The agent decides when something deserves to go into PRAXIS. It is not an automa
 - **`## Permanent`** — structural conventions, architecture invariants, confirmed technical workarounds. No TTL. Write here if the next agent, 6 months from now, needs to know this to avoid breaking something.
 - **`## Working context`** — active context with a date. Automatically pruned by `/cortex-crystallize` when older than 30 days.
 
+**Gate — which zone:**
+- **Confirmed** → `## Permanent`: the user stated it explicitly as a standing rule, or it already appears once in `## Working context` from a prior session and has now held true again. In the latter case, promote it — remove the old entry from `## Working context`, never keep the same fact in both zones.
+- **Provisional** → `## Working context`, dated: a single-session observation not yet confirmed (an untested workaround, a first-seen failure pattern, an inferred convention).
+- **Genuinely ambiguous** → ask once: "This looks like it might be a standing convention — write it to Permanent, or keep it as working context for now?" Default to `## Working context` unless the user approves `## Permanent`.
+
+Skip entirely if nothing from the session qualifies.
+
 ---
 
 ## Zone 1 — Permanent (NO TTL)

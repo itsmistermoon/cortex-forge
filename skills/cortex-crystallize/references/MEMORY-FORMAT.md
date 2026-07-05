@@ -50,12 +50,13 @@ updated: {YYYY-MM-DD}
 **Current state vs. History:**
 - **Current state** — requires action in a future session (tasks, decisions to revisit, incomplete work)
 - **History** — complete and closed within this session; belongs only in History
+When in doubt: ask "does the next session need to act on this?" If no → History only. If yes → add to `### Pending`.
 
 ---
 
 ## Zone 2 — History (APPEND-ONLY)
 
-Never modify previous entries. Append at the end. Entries older than 30 days are rotated to `.cortex/CONSOLIDATED.md` — MEMORY.md's History always reflects only the last 30 days (see SKILL.md step 5c).
+Never modify previous entries. Append at the end. Entries older than 30 days are rotated to `.cortex/CONSOLIDATED.md` — MEMORY.md's History always reflects only the last 30 days (see SKILL.md step 5c). `CONSOLIDATED.md` is never read automatically — consult it directly only when a session needs older history.
 
 ```markdown
 ## History

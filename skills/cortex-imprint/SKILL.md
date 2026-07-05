@@ -14,35 +14,15 @@ Archive a valuable session synthesis as a permanent wiki page.
 
 ## Steps
 
-1. **Resolve vault** — follow `references/VAULT-RESOLUTION.md` (argument → CWD → default). Then read `locale:`, using the fallback chain in `references/LOCALE-RESOLUTION.md`.
-   - If the first argument matches a registered vault name (e.g., `/cortex-imprint personal`) → use that vault.
+1. **Resolve vault** — per `references/VAULT-RESOLUTION.md`, then its `locale:` per `references/LOCALE-RESOLUTION.md`. If the first argument matches a registered vault name (e.g., `/cortex-imprint personal`), use that vault.
 
-2. Review the current conversation and identify the main synthesis produced. Apply source hierarchy (see Rules) to determine what the synthesis derives from — and whether a `.raw/` primary source needs to be read before writing.
+2. **Identify the synthesis** — review the current conversation and identify the main synthesis produced. Apply the source hierarchy (see ## Source hierarchy below) to determine what the synthesis derives from — and whether a `.raw/` primary source needs to be read before writing.
 
-3. Propose: page type, suggested title, proposed path inside the resolved vault.
+3. **Propose and confirm** — propose the page type, suggested title, and path inside the resolved vault. Wait for confirmation or adjustment before proceeding.
 
-4. Wait for confirmation or adjustment.
+4. **Create the page** — use the corresponding template at `{vault}/templates/{type}.md`, saved to `wiki/concepts/`, `wiki/entities/`, `wiki/sources/`, or `wiki/projects/` (matching the type). For a project design decision, update the project's existing page instead — add the decision under `## Key decisions` rather than creating a new page.
 
-5. Create the page using the corresponding template.
-
-6. Add `[[wikilinks]]` to related existing pages.
-
-7. Update `{vault}/wiki/index.md`.
-
-8. Add entry to `{vault}/wiki/meta/log.md`: `## [YYYY-MM-DD] imprint | {title}`
-
-## Constraints
-
-- **No circular synthesis:** content derived only from wiki pages (no `.raw/` or session analysis behind it) must not be imprinted — see circular synthesis test in Rules.
-
-## Valid types and paths
-
-| What was produced | Type | Path |
-|-------------------|------|------|
-| Principle, pattern, framework | concept | `wiki/concepts/` |
-| Design decision for a project | page (ADR) | `wiki/projects/` |
-| Analysis of a tool or person | entity | `wiki/entities/` |
-| Synthesis of an external source | source | `wiki/sources/` |
+5. **Link, index, and log** — add `[[wikilinks]]` to related existing pages, update `{vault}/wiki/index.md`, and add an entry to `{vault}/wiki/meta/log.md`: `## [YYYY-MM-DD] imprint | {title}`.
 
 ## Source hierarchy
 
@@ -52,19 +32,11 @@ The synthesis must derive from one of these, in order:
 2. **`.raw/` primary source** — if the session worked from an ingested source, read the `.raw/` file directly before writing. Do not read the derived `wiki/sources/` page as a substitute.
 3. **`wiki/` pages** — reference only. Use them to detect pages to update and to add `[[wikilinks]]`. Never use a wiki page as the input for new synthesis.
 
-**Circular synthesis test:** before writing, ask — "could I justify this content by citing only wiki pages, with no `.raw/` file or session analysis behind it?" If yes, stop. Trace the claim back to its primary source first. If no primary source exists, the content may not be ready to imprint.
+**Circular synthesis test:** before writing, ask — "could I justify this content by citing only wiki pages, with no `.raw/` file or session analysis behind it?" If yes, stop — this is circular synthesis, and it amplifies drift instead of grounding knowledge. Trace the claim back to its primary source first; when in doubt, read the `.raw/` file. If no primary source exists, the content may not be ready to imprint.
 
 ## Provenance
 
-Create the page using the corresponding template (step 5) — all frontmatter fields come from the template. Then populate these provenance fields:
-
-```yaml
-sources:
-  - conversation {YYYY-MM-DD}
-  - .raw/{slug}.md              # if the session derived from a primary source — prefer .raw/ over wiki/sources/
-confidence: high | medium | low
-raw: .raw/{slug}.md             # only when the imprint directly synthesizes a specific primary source
-```
+Create the page using the corresponding template (step 4) — all frontmatter fields come from the template. Populate `sources:` with `conversation {YYYY-MM-DD}`, plus `.raw/{slug}.md` if a primary source was involved (preferred over `wiki/sources/{slug}.md`). Populate `raw:` only when the imprint directly synthesizes a specific primary source.
 
 **`confidence` criteria:**
 - `high` — conclusion derived from a primary source or exhaustive evidence-based analysis
@@ -74,8 +46,5 @@ raw: .raw/{slug}.md             # only when the imprint directly synthesizes a s
 ## Rules
 
 - The page must be self-contained for a reader with no session context. Verifiable criteria: (1) every acronym and proper name is expanded or defined on first use; (2) every decision includes its justification or the problem it solves; (3) no deictic references without an explicit antecedent ("this", "the previous discussion", "as agreed"); (4) any relevant prior state is described in the page itself, not assumed known. A reviewer must be able to read the page cold and understand it without accessing the session.
-- No references to the conversation ("as we discussed today") — content must stand on its own
 - If the page already exists, rewrite the body integrating the new information — do not append "Update" sections or addendum blocks. The result must read as a cohesive document with no visible edit seams.
-- If a page already exists on the topic, update it instead of duplicating
-- Include the agent in the changelog: `- YYYY-MM-DD [Claude Code]: description`
-- **Source fencing:** wiki pages are reference, not source. Content derived only from wiki pages (no `.raw/` or session analysis behind it) is circular synthesis — it amplifies drift instead of grounding knowledge. When in doubt, read the `.raw/` file first.
+- Include the agent in the page's own changelog: `- YYYY-MM-DD [Claude Code]: description`

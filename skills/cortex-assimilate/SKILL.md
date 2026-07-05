@@ -21,8 +21,7 @@ Paths are relative to this skill's directory.
 
 ## Steps
 
-1. **Resolve vault** — follow `references/VAULT-RESOLUTION.md` (argument → CWD → default). Then read `locale:`, using the fallback chain in `references/LOCALE-RESOLUTION.md`.
-   - If the first argument matches a registered vault name (e.g., `/cortex-assimilate second-brain <url>`) → use that vault; treat the remaining argument as the URL or file path.
+1. **Resolve vault** — per `references/VAULT-RESOLUTION.md`, then its `locale:` per `references/LOCALE-RESOLUTION.md`. If the first argument matches a registered vault name (e.g., `/cortex-assimilate second-brain <url>`), use that vault and treat the remaining argument as the URL or file path.
 
 2. **Download or read** — input is a URL or a `.raw/` file path:
    - URL → fetch content, run the **SPA check** and the **sanitization check** below, then save to `{vault}/.raw/{slug}.md` (never overwrite if exists).

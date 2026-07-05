@@ -4,13 +4,12 @@
 
 Goal: Hot Cache Protocol working across all supported agents.
 
-- [x] Claude Code — hooks + skills via `cortex-forge-setup`
+- [x] Claude Code — skills via `cortex-forge-setup`; manual AGENTS.md protocol (hooks removed 2026-07-02)
 - [x] Compatibility matrix → `wiki/concepts/agent-hook-compatibility.md`
-- [x] Antigravity CLI — reactivate + crystallize hooks; TASTE; validate end-to-end ✅
-- [x] CommandCode — Stop hook; TASTE rule (per-project + global); validate end-to-end ✅
+- [x] Antigravity CLI — manual AGENTS.md protocol (hooks + TASTE removed 2026-07-02); validated end-to-end
+- [x] CommandCode — manual AGENTS.md protocol (Stop hook + TASTE rule removed 2026-07-02); validated end-to-end
 - [ ] Codex — partial
-  - [x] Hooks installed (`SessionStart` + `Stop` no-op guards); symlinks via `~/.cortex-forge/bin/hooks/`
-  - [x] `cortex-reactivate-codex.sh` confirmed: context injected on startup (visible as `hook context:` in UI — intended)
+  - [x] Manual AGENTS.md protocol supported (hooks removed 2026-07-02)
   - [ ] Validate end-to-end: ingest source → recall → crystallize in organic session
 
 ## Phase 2 — Protocol hardening ✓
@@ -18,19 +17,18 @@ Goal: Hot Cache Protocol working across all supported agents.
 - [x] `.hot/` → `.cortex/` consolidation — single mutable zone; `CODEX.md` absorbed into `AGENTS.md`
 - [x] `MEMORY.md` / `PRAXIS.md` split — session state vs. accumulated conventions (30-day TTL)
 - [x] Multi-vault — `~/.cortex-forge/config.yml` with `vaults:` + `default:`; CWD-first resolution
-- [x] Hook distribution architecture — `bin/hooks/` (source) → `~/.cortex-forge/bin/hooks/` (runtime) → per-agent symlinks; `/cortex-forge-setup update` to propagate
+- [x] ~~Hook distribution architecture~~ — superseded 2026-07-02 by manual AGENTS.md protocol; the two remaining post-commit git hooks (prune/reindex) use a separate, still-active mechanism — see `cortex-forge-setup` `references/POST-COMMIT-HOOKS.md`
 - [x] Schema versioning — `schema_version: "0.3"` in `AGENTS.md` and all templates
 - [x] `agent:` field in snapshot frontmatter — identifies last writer in multi-agent vaults
-- [x] Stale cache detection — `hot_cache_stale_days:` in config; warning injected at SessionStart
+- [x] Stale cache detection — `hot_cache_stale_days:` in config (global); checked at MEMORY.md read time per AGENTS.md protocol (re-implemented 2026-07-05 after SessionStart-hook removal)
 - [x] Compliance guardrails — verifiable contracts in `AGENTS.md`; mandatory output format in `cortex-recall`, `cortex-assimilate`, `cortex-crystallize`
 - [x] Behavior tags in skills — `behavior:` frontmatter; 6 tags: `#ingest #synthesize #recall #prune #snapshot #configure`
 - [x] Context fencing in `cortex-imprint` — source hierarchy (session > `.raw/` > `wiki/` reference only); circular synthesis test; `raw:` provenance field
-- [x] Link-count scan — orphan page detection in `cortex-prune.sh`; `orphan_pages` in `vault-report.json`, surfaced at SessionStart
+- [x] Link-count scan — orphan page detection in `cortex-prune.sh`; `orphan_pages` in `vault-report.json`, surfaced via `AGENTS.md`'s mandatory read protocol
 - [x] Post-commit hooks — prune refreshes `vault-report.json`; reindex updates `vault.db` (opt-in, both gated on `wiki/` changes)
 - [x] "Attempted and failed" section in crystallize template
 - [x] Sanitization in `cortex-assimilate` — `bin/cortex-sanitize.sh`; scans invisible Unicode, HTML comments, base64, egress commands
-- [x] Imprint pipeline — detection at Stop (Haiku), triage at SessionStart (`off | suggest | auto`), draft written to `.cortex/imprint-draft.md`
-- [x] Imprint `auto` mode — `cortex-imprint-auto.sh` runs `claude -p` (Haiku) in background at SessionStart; writes page, updates index + log, removes draft
+- [x] Imprint candidate flagging — cortex-crystallize step 6a writes `#### Imprint candidate` to History when warranted; AGENTS.md protocol surfaces it and proposes `/cortex-imprint` at next session start (manual, no automated draft-writing pipeline — the Stop-hook/SessionStart-triage/auto-mode design was retired 2026-07-02)
 
 ## Phase 3 — Adoptability
 

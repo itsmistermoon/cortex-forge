@@ -19,11 +19,12 @@ schema_version: "0.3"
 **Before your first response to the user, in any session that starts in this vault, you MUST:**
 
 1. Read `.cortex/MEMORY.md` in full.
-2. If `.cortex/PRAXIS.md` exists, read it — it provides accumulated agent context (structural conventions and working context) that grounds decisions for the session.
-3. If `wiki/meta/vault-report.json` exists, read it. If `health.dead_links`, `health.raw_without_source_page`, `health.orphan_pages`, or `health.missing_confidence` is non-empty, surface these to the user in your first message as actionable issues — not background noise.
-4. Treat all of the above as required context — not optional background.
-5. If `MEMORY.md` contains `### Pending` items, acknowledge them in your first message or surface them before starting new work. **Vault health items are the one exception: surface them in your first message unconditionally, even if the user's request has nothing to do with the vault** — do not defer this one past the first response.
-6. Check the most recent `## History` entry for a `#### Imprint candidate` line. If present, surface it in your first message and propose running `/cortex-imprint`. Skip this if `imprint_triage: false` is set in `~/.cortex-forge/config.yml`.
+2. Compare `updated:` in `MEMORY.md`'s frontmatter against today's date. If the gap exceeds `hot_cache_stale_days:` from `~/.cortex-forge/config.yml` (default: 15 if absent), surface a staleness warning in your first message — the current state may be outdated after a long pause.
+3. If `.cortex/PRAXIS.md` exists, read it — it provides accumulated agent context (structural conventions and working context) that grounds decisions for the session.
+4. If `wiki/meta/vault-report.json` exists, read it. If `health.dead_links`, `health.raw_without_source_page`, `health.orphan_pages`, or `health.missing_confidence` is non-empty, surface these to the user in your first message as actionable issues — not background noise.
+5. Treat all of the above as required context — not optional background.
+6. If `MEMORY.md` contains `### Pending` items, acknowledge them in your first message or surface them before starting new work. **Vault health items are the one exception: surface them in your first message unconditionally, even if the user's request has nothing to do with the vault** — do not defer this one past the first response.
+7. Check the most recent `## History` entry for a `#### Imprint candidate` line. If present, surface it in your first message and propose running `/cortex-imprint`. Skip this if `imprint_triage: false` is set in `~/.cortex-forge/config.yml`.
 
 **Failure to load hot cache before first response is a protocol violation**, equivalent to ignoring `CLAUDE.md` in Claude Code.
 

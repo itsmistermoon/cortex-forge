@@ -51,6 +51,7 @@ Always end with the relevant subset of step 7 (confirmation).
      6. Remove this vault   — deregister from config.yml
      7. Set as default      — make this vault the default
      8. Change locale       — update the vault's locale and re-word AGENTS.md's Vault identity stub accordingly
+     9. Set stale-cache threshold — configure hot_cache_stale_days (global, applies to all vaults)
    ```
 
    For each selected operation, run the corresponding step in sequence:
@@ -62,6 +63,7 @@ Always end with the relevant subset of step 7 (confirmation).
    - 6 → remove vault from `vaults:`, update default if needed, save config, stop
    - 7 → step 7
    - 8 → steps 3 and 3a (re-run the locale prompt and config write; skip step 6's AGENTS.md stub re-wording if the `## Vault identity` section already has user-written content beyond the stub — ask before overwriting anything the user has since filled in)
+   - 9 → step 3c
 
    After all selected operations complete, show confirmation (step 8) for only the operations that ran.
 
@@ -97,6 +99,12 @@ Always end with the relevant subset of step 7 (confirmation).
    - If a `default` already exists, leave it unchanged.
 
 3b. **Sync infrastructure from upstream** — pull infrastructure files from the upstream repo and apply them to the current vault. See `references/UPSTREAM-SYNC.md` (co-located with this skill) for resolution, sync scope, exclusions, and rate limits.
+
+3c. **Offer stale-cache warning threshold (opt-in, global setting)** — this is a single global value in `~/.cortex-forge/config.yml` (top-level, like `imprint_triage`), not per-vault. Read the config first:
+    - **If `hot_cache_stale_days:` is already set** → inform the user of the current value and ask if they want to change it, rather than asking as if for the first time.
+    - **If not set** → ask: "Warn if this vault's memory hasn't been touched in N days? (default: 15, 0 to disable)"
+    - Write the chosen value as `hot_cache_stale_days: N` at the top level of `config.yml` (not nested under `vaults:`).
+    - This is read by the `AGENTS.md` Crystallize protocol (step 2) to compare against `MEMORY.md`'s `updated:` frontmatter.
 
 4. **Verify global skills are installed** — cortex-forge has no installer of its own; the sole distribution channel is [skills.sh](https://www.skills.sh/) (`npx skills add`), which is agent-agnostic by design (installs to whichever of the 40+ agents it recognizes, not a hardcoded pair). Check whether the 6 skills (`cortex-crystallize`, `cortex-forge-setup`, `cortex-recall`, `cortex-assimilate`, `cortex-imprint`, `cortex-prune`) are present under `~/.agents/skills/`.
    - **All present** → this step is done implicitly (running this skill at all means it was already installed by something). Report which skills are present and move on.
@@ -151,6 +159,7 @@ Always end with the relevant subset of step 7 (confirmation).
    - Skills: all 6 present / missing {list} (with the `npx skills add` command to fix it)
    - Semantic search: active (backend: Ollama/mlx-embeddings/sentence-transformers, N chunks indexed) / not active (declined or skipped — how to enable later)
    - AGENTS.md vault identity: added / already present / skipped
+   - Stale-cache threshold (if set/changed): `hot_cache_stale_days` value, or "default (15)" if left unset
    - Sync (if run): upstream used, files updated (list), files skipped (count), deletions pending user confirmation, AGENTS.md divergence noted if any
    - Next step: fill out vault identity in `AGENTS.md` if just added; invoke `/cortex-crystallize` at the end of any project session
 

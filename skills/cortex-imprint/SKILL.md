@@ -8,7 +8,7 @@ argument-hint: "[vault-name]"
 
 # cortex-imprint
 
-Begin your response with a short flavor line announcing the skill started, translated to the language of the user's current message (anchor: `Imprinting reference...`; Spanish: `Archivando referencia...`; translate analogously for other languages). Output this literally as the first thing in your response.
+Start your response with the flavor line `Imprinting reference...`, translated to the language of the user's current message (Spanish: `Archivando referencia...`), with nothing before it.
 
 Archive a valuable session synthesis as a permanent wiki page.
 
@@ -17,21 +17,19 @@ Archive a valuable session synthesis as a permanent wiki page.
 1. **Resolve vault** — follow `references/VAULT-RESOLUTION.md` (argument → CWD → default). Then read `locale:`, using the fallback chain in `references/LOCALE-RESOLUTION.md`.
    - If the first argument matches a registered vault name (e.g., `/cortex-imprint personal`) → use that vault.
 
-2. Read **Vault identity** from `{vault}/AGENTS.md` — use **Mission**, **Domains**, and **Vocabulary** to validate whether the synthesis is worth persisting and to name the page consistently with vault terminology.
+2. Review the current conversation and identify the main synthesis produced. Apply source hierarchy (see Rules) to determine what the synthesis derives from — and whether a `.raw/` primary source needs to be read before writing.
 
-3. Review the current conversation and identify the main synthesis produced. Apply source hierarchy (see Rules) to determine what the synthesis derives from — and whether a `.raw/` primary source needs to be read before writing.
+3. Propose: page type, suggested title, proposed path inside the resolved vault.
 
-4. Propose: page type, suggested title, proposed path inside the resolved vault.
+4. Wait for confirmation or adjustment.
 
-5. Wait for confirmation or adjustment.
+5. Create the page using the corresponding template.
 
-6. Create the page using the corresponding template.
+6. Add `[[wikilinks]]` to related existing pages.
 
-7. Add `[[wikilinks]]` to related existing pages.
+7. Update `{vault}/wiki/index.md`.
 
-8. Update `{vault}/wiki/index.md`.
-
-9. Add entry to `{vault}/wiki/meta/log.md`: `## [YYYY-MM-DD] imprint | {title}`
+8. Add entry to `{vault}/wiki/meta/log.md`: `## [YYYY-MM-DD] imprint | {title}`
 
 ## Constraints
 
@@ -81,12 +79,3 @@ raw: .raw/{slug}.md             # only when the imprint directly synthesizes a s
 - If a page already exists on the topic, update it instead of duplicating
 - Include the agent in the changelog: `- YYYY-MM-DD [Claude Code]: description`
 - **Source fencing:** wiki pages are reference, not source. Content derived only from wiki pages (no `.raw/` or session analysis behind it) is circular synthesis — it amplifies drift instead of grounding knowledge. When in doubt, read the `.raw/` file first.
-
-## Changelog
-
-- 2026-07-04 [Claude Code]: Centralized vault structure validation (`wiki/`+`AGENTS.md`) in `references/VAULT-RESOLUTION.md`, closing a gap where step 2 assumed `AGENTS.md` existed without validating it
-- 2026-07-04 [Claude Code]: Reworded "Resolve vault" step intro to distinguish VAULT-RESOLUTION.md (decision flow) from LOCALE-RESOLUTION.md (fallback chain), removing the repeated closing phrase
-- 2026-07-04 [Claude Code]: Extracted "Resolve vault" logic to shared `references/VAULT-RESOLUTION.md`, co-located across 5 skills (was duplicated inline with real drift between copies)
-- 2026-06-24 [Claude Code]: Reformulated vague Rules into verifiable criteria (no-op audit — "durable page" → 4 testable conditions; "compiled truth" → explicit rewrite contract)
-- 2026-06-28 [Claude Code]: Context fencing — added source hierarchy section, circular synthesis test, source fencing rule, and `raw:` provenance field; updated step 2 (CODEX.md → AGENTS.md vault identity) and step 3 (references source hierarchy)
-- 2026-07-04 [Claude Code]: Removed dead step 0 (pending draft check) — `.cortex/imprint-draft.md` was never created by any process; it was a vestige of a superseded design

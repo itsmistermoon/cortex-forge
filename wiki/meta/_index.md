@@ -8,6 +8,7 @@ Vault metadata and operational records. Not knowledge — these files track what
 |------|---------|--------|
 | `log.md` | Append-only operation log — one entry per significant vault operation | Agent (on session close) |
 | `vault-report.json` | Structural health snapshot — dead links, orphan pages, missing provenance | `cortex-prune.sh` (automated, co-located with the `cortex-prune` skill) |
+| `{skill-name}-changelog.md` | Change history for a `skills/{skill-name}/SKILL.md` file, moved out of the skill to keep it lean (newest first) | Agent, when editing the corresponding skill |
 
 ## What goes here
 

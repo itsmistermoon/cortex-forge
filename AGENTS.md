@@ -4,11 +4,8 @@ schema_version: "0.3"
 
 # AGENTS.md — cortex-forge
 
-## Vault identity
+## Vocabulary
 
-**locale**: en — locale for agent-generated content (hot cache entries, skill acknowledgments).
-
-**Vocabulary:**
 - **hot cache**: session memory per project (`.cortex/`), not persistent knowledge
 - **vault**: a knowledge base managed by Cortex Forge, not a password manager
 
@@ -39,8 +36,6 @@ schema_version: "0.3"
 The skill accepts two input modes:
 - **URL** — agent downloads content, saves to `.raw/`, synthesizes
 - **`.raw/` file** — agent reads the file and synthesizes directly
-
-See full creation/omission criteria in `skills/cortex-assimilate.md`.
 
 **Compliance criterion:** after completing ingestion, your response must confirm: (1) `.raw/` file path saved, (2) wiki pages created or updated. If the URL returned HTML with no readable body text, declare `SPA detected` before attempting content extraction — never save an empty HTML shell to `.raw/`. If extraction fails after the SPA fallback, tell the user explicitly and stop.
 

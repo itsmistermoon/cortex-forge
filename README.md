@@ -39,7 +39,7 @@ Six layers, each with a distinct role:
 | **Raw** | `.raw/` | Primary sources — immutable originals | Never modify |
 | **Wiki** | `wiki/` | Secondary sources — synthesized knowledge | Agent writes and maintains |
 | **Hot** | `.cortex/` | Per-project session cache | Read on session start |
-| **Identity** | `AGENTS.md` | Vault identity: mission, owner, domains, vocabulary | Read on session start |
+| **Instructions** | `AGENTS.md` | Agent protocols (crystallize, assimilate, recall) | Read on session start |
 | **Meta** | `wiki/meta/` | Vault metadata and guides | Agent maintains |
 | **Skills** | `skills/` | Invocable agent skills | Extend, don't modify |
 

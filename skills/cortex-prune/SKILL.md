@@ -5,7 +5,7 @@ description: Health check the vault — detects dead links, orphan pages, missin
 argument-hint: "[vault-name]"
 ---
 
-Begin your response with a short flavor line announcing the skill started, translated to the language of the user's current message (anchor: `Pruning vault...`; Spanish: `Podando el vault...`; translate analogously for other languages). Output this literally as the first thing in your response.
+Start your response with the flavor line `Pruning vault...`, translated to the language of the user's current message (Spanish: `Podando el vault...`), with nothing before it.
 
 Health check the active vault in three layers: structural (script), semantic (agents), and drift (metadata comparison).
 
@@ -20,8 +20,6 @@ Health check the active vault in three layers: structural (script), semantic (ag
    - If the first argument matches a registered vault name (e.g., `/cortex-prune personal`) → use that vault.
 
    **Confirmation gate:** if the vault was resolved from an explicit argument (not from CWD), confirm with the user before proceeding: "About to prune `{vault-name}` at `{path}`. Continue?" — do not proceed until confirmed.
-
-   Read **Domains** and **Out of scope** from `{vault}/AGENTS.md` (`## Vault identity`) — use them to flag pages whose topics fall outside the vault's defined scope.
 
 2. **Layer 1 — Structural check**: Run `bash scripts/cortex-prune.sh {vault}`, where `cortex-prune.sh` is the script co-located with this skill (`scripts/` subdirectory — resolve its path from wherever this file was read from). If the script is missing, the skill installation is incomplete — reinstall with `npx skills add itsmistermoon/cortex-forge --skill cortex-prune` (or `/cortex-forge-setup`, sub-task `skills`).
 
@@ -155,10 +153,3 @@ Report verdict as MEDIUM. Never auto-apply — always requires user confirmation
 - Never delete or merge pages without explicit user confirmation
 - Debate pattern (2d) only triggers on genuine ambiguity — not on clear component relationships
 - Layer 3 drift findings are informational — never auto-re-synthesize; always ask the user
-
-## Changelog
-
-- 2026-07-04 [Claude Code]: Centralized vault structure validation (`wiki/`+`AGENTS.md`) in `references/VAULT-RESOLUTION.md`; removed the now-redundant explicit "Confirm vault is a Cortex Forge vault" line from step 1 (confirmation gate left untouched)
-- 2026-07-04 [Claude Code]: Reworded "Resolve vault" step intro to point directly at VAULT-RESOLUTION.md's decision flow, removing the vague closing phrase
-- 2026-07-04 [Claude Code]: Extracted "Resolve vault" logic to shared `references/VAULT-RESOLUTION.md`, co-located across 5 skills (was duplicated inline with real drift between copies)
-- 2026-07-01 [Claude Code]: Added Layer 3 — drift detection: mtime of `.raw/` vs `updated:` in `wiki/sources/`; intro updated from two to three layers

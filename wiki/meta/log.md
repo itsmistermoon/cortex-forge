@@ -434,3 +434,9 @@ Agent: Claude Code (Sonnet 4.6)
 Trabajo de dos días consolidado bajo un solo release v0.6.0: (1) hooks de ciclo de vida del agente eliminados en los 4 agentes soportados, reemplazados por protocolo manual vía AGENTS.md; (2) scripts de skills relocalizados de bin/ a co-located dentro de cada skills/<name>/ para soportar instalación vía `npx skills add` (skills.sh); (3) auditoría fail-loud de todos los scripts — timeouts faltantes, mktemp sin chequear, rutas rotas — que atrapó una regresión del mismo día (cortex-validate-schema.sh no co-located); (4) escrituras atómicas para vault-report.json y config.yml; (5) cortex-forge-setup ahora detecta runtime del tarball incompleto y sugiere npx skills add. Ver wiki/projects/cortex-forge.md Key decisions y wiki/concepts/agent-hook-compatibility.md para el detalle completo.
 
 Agent: Claude Code (Sonnet 5)
+
+## [2026-07-05] refactor | Changelog de las 5 skills con historial movido a wiki/meta/
+
+La sección `## Changelog` de `cortex-assimilate`, `cortex-crystallize`, `cortex-imprint`, `cortex-prune` y `cortex-recall` fue extraída a `wiki/meta/{skill-name}-changelog.md` (uno por skill), dejando el `SKILL.md` solo con instrucciones operativas. Se revisó el árbol git de cada skill para confirmar que ninguna entrada histórica se perdió — el historial en git nunca mostró una eliminación real de `## Changelog`, así que el contenido movido es el acumulado completo. `cortex-forge-setup` no tenía sección de changelog, no requirió cambios. `wiki/meta/_index.md` actualizado con la nueva convención de archivo.
+
+Agent: Claude Code (Sonnet 5)

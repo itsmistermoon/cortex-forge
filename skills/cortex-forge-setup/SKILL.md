@@ -35,8 +35,8 @@ Always end with the relevant subset of step 7 (confirmation).
 
 2. **Read existing config** — read `~/.cortex-forge/config.yml` if it exists.
    - Check if the current vault path is already registered.
-   - **If not registered** → vault is new. Proceed through steps 3–9 in full, asking each optional step interactively.
-   - **If already registered** → vault exists. Skip steps 3–9. Instead show a menu (step 2b) and execute only what the user selects.
+   - **If not registered** → vault is new. Proceed through steps 3–7 in full, asking each optional step interactively.
+   - **If already registered** → vault exists. Skip steps 3–7. Instead show a menu (step 2b) and execute only what the user selects.
 
 2b. **Maintenance menu (existing vault only)** — present a numbered list of available operations. The user can select one or more numbers (comma-separated), or "all":
 
@@ -50,7 +50,7 @@ Always end with the relevant subset of step 7 (confirmation).
      5. Add post-commit reindex  — install the embedding reindex git hook (requires semantic search)
      6. Remove this vault   — deregister from config.yml
      7. Set as default      — make this vault the default
-     8. Change locale       — update the vault's locale and re-word AGENTS.md's Vault identity stub accordingly
+     8. Change locale       — update the vault's locale in config.yml
      9. Set stale-cache threshold — configure hot_cache_stale_days (global, applies to all vaults)
    ```
 
@@ -61,11 +61,11 @@ Always end with the relevant subset of step 7 (confirmation).
    - 4 → step 5b
    - 5 → step 5c (gate still applies: if vault.db doesn't exist, offer option 3 first)
    - 6 → remove vault from `vaults:`, update default if needed, save config, stop
-   - 7 → step 7
-   - 8 → steps 3 and 3a (re-run the locale prompt and config write; skip step 6's AGENTS.md stub re-wording if the `## Vault identity` section already has user-written content beyond the stub — ask before overwriting anything the user has since filled in)
+   - 7 → step 6
+   - 8 → steps 3 and 3a (re-run the locale prompt and config write)
    - 9 → step 3c
 
-   After all selected operations complete, show confirmation (step 8) for only the operations that ran.
+   After all selected operations complete, show confirmation (step 7) for only the operations that ran.
 
 3. **Set vault locale (new vault only)** — detect the language of the current conversation and propose it as the default, asking for confirmation:
 
@@ -81,7 +81,7 @@ Always end with the relevant subset of step 7 (confirmation).
      3. Other (type an ISO 639-1 code)
    ```
 
-   Use the chosen code (ISO 639-1, e.g. `en`, `es`, `pt`) in steps 3a and 8 below.
+   Use the chosen code (ISO 639-1, e.g. `en`, `es`, `pt`) in steps 3a and 7 below.
 
 3a. **Write config** — add the vault entry in `~/.cortex-forge/config.yml` (new vault only):
 
@@ -124,44 +124,18 @@ Always end with the relevant subset of step 7 (confirmation).
 
 5d. **Embedding dependency check** — the procedure step 5 (and its fallback inside 5c) both run. Also triggered if `cortex-index.py` fails with an import error after this check already passed (dependency became unavailable mid-session). See `references/EMBEDDING-SETUP.md` (co-located with this skill) for the full detection-and-offer procedure.
 
-6. **Update AGENTS.md vault identity** — check if `AGENTS.md` contains a `## Vault identity` section.
-   - If present: skip silently.
-   - If missing: append the stub below to `AGENTS.md` and inform the user (in the vault's own locale, resolved in step 3) that it was added and needs filling out before running `/cortex-assimilate`.
-   - **Word the stub in the vault's locale** (from step 3): field labels and the HTML-comment prompts are translated; `<!-- -->` comment syntax and the `**locale**:` value itself (an ISO code, not translated) stay as-is. If `locale` is `en`, use the stub exactly as shown:
-     ```markdown
-     ## Vault identity
-
-     **locale**: en
-     **mission**: <!-- What this vault is for -->
-     **domains**: <!-- Comma-separated list of topics in scope -->
-     **out of scope**: <!-- Topics to reject at ingestion time -->
-     **vocabulary**: <!-- Key terms and preferred names used in this vault -->
-     ```
-     If `locale` is `es`, translate to:
-     ```markdown
-     ## Vault identity
-
-     **locale**: es
-     **misión**: <!-- Para qué es este vault -->
-     **dominios**: <!-- Lista de temas dentro de alcance, separados por coma -->
-     **fuera de alcance**: <!-- Temas a rechazar al momento de la ingesta -->
-     **vocabulario**: <!-- Términos clave y nombres preferidos usados en este vault -->
-     ```
-     For any other locale, translate the same five field labels and comment prompts into that language — do not leave them in English.
-
-7. **Set default vault** — if more than one vault is registered:
+6. **Set default vault** — if more than one vault is registered:
    - Ask: "Which vault should be the default? ({list of registered names})"
    - Update `default:` in the config with the chosen name.
    - If only one vault is registered, set it as default automatically without asking.
 
-8. **Confirm result**:
+7. **Confirm result**:
    - Registered vaults: list all entries in `vaults:` with their paths and locales, marking the default
    - Skills: all 6 present / missing {list} (with the `npx skills add` command to fix it)
    - Semantic search: active (backend: Ollama/mlx-embeddings/sentence-transformers, N chunks indexed) / not active (declined or skipped — how to enable later)
-   - AGENTS.md vault identity: added / already present / skipped
    - Stale-cache threshold (if set/changed): `hot_cache_stale_days` value, or "default (15)" if left unset
    - Sync (if run): upstream used, files updated (list), files skipped (count), deletions pending user confirmation, AGENTS.md divergence noted if any
-   - Next step: fill out vault identity in `AGENTS.md` if just added; invoke `/cortex-crystallize` at the end of any project session
+   - Next step: invoke `/cortex-crystallize` at the end of any project session
 
 ## Memory model (manual, no agent lifecycle hooks)
 

@@ -7,7 +7,7 @@ argument-hint: "[vault-name] <query>"
 
 # cortex-recall
 
-Start your response with the flavor line `Recalling memory...`, translated to the language of the user's current message (Spanish: `Recuperando memoria...`), with nothing before it.
+Start your response with the flavor line `Recalling memory...`, translated to the language of the user's current message (Spanish: `Recuperando memoria...`), with nothing before it. Use that same language for every prompt, question, menu, and confirmation this skill produces — persisted vault content (if any) still follows the vault's locale, not the conversation language.
 
 Answer a question using the vault's wiki content as the source.
 

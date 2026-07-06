@@ -8,7 +8,7 @@ argument-hint: "[vault-name]"
 
 # cortex-imprint
 
-Start your response with the flavor line `Imprinting reference...`, translated to the language of the user's current message (Spanish: `Archivando referencia...`), with nothing before it.
+Start your response with the flavor line `Imprinting reference...`, translated to the language of the user's current message (Spanish: `Archivando referencia...`), with nothing before it. Use that same language for every prompt, question, menu, and confirmation this skill produces — persisted vault content (if any) still follows the vault's locale, not the conversation language.
 
 Archive a valuable session synthesis as a permanent wiki page.
 

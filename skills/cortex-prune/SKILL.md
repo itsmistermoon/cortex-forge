@@ -5,7 +5,7 @@ description: Health check the vault — detects dead links, orphan pages, missin
 argument-hint: "[vault-name]"
 ---
 
-Start your response with the flavor line `Pruning vault...`, translated to the language of the user's current message (Spanish: `Podando el vault...`), with nothing before it.
+Start your response with the flavor line `Pruning vault...`, translated to the language of the user's current message (Spanish: `Podando el vault...`), with nothing before it. Use that same language for every prompt, question, menu, and confirmation this skill produces — persisted vault content (if any) still follows the vault's locale, not the conversation language.
 
 Health check the active vault in three layers: structural (script), semantic (agents), and drift (metadata comparison).
 

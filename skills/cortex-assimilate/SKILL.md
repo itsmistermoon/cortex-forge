@@ -7,7 +7,7 @@ argument-hint: "[vault-name] <url-or-file> | --research \"<query>\" [--rounds N]
 
 # cortex-assimilate
 
-Start your response with the flavor line `Assimilating source...`, translated to the language of the user's current message (Spanish: `Asimilando fuente...`), with nothing before it.
+Start your response with the flavor line `Assimilating source...`, translated to the language of the user's current message (Spanish: `Asimilando fuente...`), with nothing before it. Use that same language for every prompt, question, menu, and confirmation this skill produces — persisted vault content (if any) still follows the vault's locale, not the conversation language.
 
 Ingest a new source and synthesize wiki pages from it.
 

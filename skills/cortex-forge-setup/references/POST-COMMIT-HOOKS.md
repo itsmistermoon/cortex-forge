@@ -1,6 +1,6 @@
 # Post-commit hooks
 
-Reference for `cortex-forge-setup` (steps 5b/5c, maintenance menu options 4/5). Plain git hooks, not agent lifecycle hooks — identical across agents. Both backgrounded or fail-open: never block a commit.
+Reference for `cortex-forge-setup` (step 5a to install, maintenance menu options 6/7; maintenance menu option 9 to uninstall). Plain git hooks, not agent lifecycle hooks — identical across agents. Both backgrounded or fail-open: never block a commit.
 
 ## Shared mechanics
 
@@ -9,7 +9,7 @@ Reference for `cortex-forge-setup` (steps 5b/5c, maintenance menu options 4/5). 
 - Uninstall (deregister path): remove only the marked block — diff against the pre-install file must be empty.
 - Hooks run outside any agent session, so skill-relative script resolution doesn't apply; both hooks stage their scripts once into `~/.cortex-forge/bin/` at a fixed absolute path.
 
-## Prune hook (step 5b)
+## Prune hook
 
 Ask: "Refresh vault-report.json automatically after each commit? (optional)"
 
@@ -32,13 +32,13 @@ fi
 
 Backgrounded; logs a summary line to `.git/cortex-prune.log` each run.
 
-## Reindex hook (step 5c)
+## Reindex hook
 
 Ask: "Re-index vault embeddings automatically after each commit? (recommended if semantic search is enabled)"
 
 If yes:
-1. If `.cortex/db/vault.db` doesn't exist, run step 5's dependency-check-then-offer procedure first (don't skip silently) — the case when reached directly via maintenance menu option 5.
-2. Copy `scripts/cortex-reindex-post-commit.sh`, `scripts/cortex-index.py`, `scripts/embeddings.py` (co-located with this skill) to `~/.cortex-forge/bin/` (and `bin/hooks/` for the first) if missing or different.
+1. If `.cortex/db/vault.db` doesn't exist, run step 5's dependency-check-then-offer procedure first (don't skip silently) — the case when reached directly via maintenance menu option 7.
+2. Copy `scripts/cortex-reindex-post-commit.sh`, `scripts/cortex-index.py`, `scripts/embeddings.py` to `~/.cortex-forge/bin/` (and `bin/hooks/` for the first) if missing or different.
 3. Install:
 
 ```bash

@@ -1,6 +1,6 @@
 # Embedding dependency check
 
-Disclosed reference for `cortex-forge-setup`. Reached from step 6 (new-vault wizard), maintenance menu option 3, and step 6c's fallback.
+Disclosed reference for `cortex-forge-setup`. Reached from step 5 (new-vault wizard), maintenance menu option 5, and step 5a's reindex-hook fallback.
 
 **Core rule: check before asking.** Never ask a generic "enable semantic search?" — detect what's already available first, then tailor the question to that. A user who already has Ollama running gets a one-line confirm, not a menu. A user with nothing gets the full menu with every option's tradeoffs spelled out. This mirrors `embeddings.py`'s own runtime backend priority: Ollama → mlx-embeddings (Apple Silicon) → sentence-transformers.
 
@@ -16,11 +16,16 @@ Disclosed reference for `cortex-forge-setup`. Reached from step 6 (new-vault wiz
      ```
      - **`pulled`** → fully ready. Skip straight to "Ready-to-go" wording below.
      - **`not-pulled`** → one step away. Use "One step away" wording below.
-   - **`not-running`** → continue to step 2.
+   - **`not-running`** → check if the binary is installed at all:
+     ```bash
+     command -v ollama >/dev/null 2>&1 && echo installed || echo not-installed
+     ```
+     - **`installed`** → Ollama is present but not running. Use "Installed but not running" wording below — do not jump to install instructions.
+     - **`not-installed`** → continue to step 2.
 
 2. **Platform + Python libraries.** Detect platform: `uname -m` → `arm64` = Apple Silicon, anything else = generic. Then:
    ```bash
-   python3 -c "import mlx_lm" 2>/dev/null && echo mlx || python3 -c "import sentence_transformers" 2>/dev/null && echo st || echo none
+   if python3 -c "import mlx_embeddings" 2>/dev/null; then echo mlx; elif python3 -c "import sentence_transformers" 2>/dev/null; then echo st; else echo none; fi
    ```
    - **`mlx` or `st`** → fully ready (a library is already importable). Use "Ready-to-go" wording.
    - **`none`** → nothing is available. Use "Full menu" wording.
@@ -41,6 +46,12 @@ Semantic search needs the "nomic-embed-text" model (~274 MB, downloaded once).
 Download it and initialize semantic search now? [Y/n]
 ```
 If yes: `ollama pull nomic-embed-text`, show progress, then proceed to indexing.
+
+**Installed but not running** (Ollama binary present, server not responding):
+```
+Ollama is installed but not running. Start it (`ollama serve`, or launch the Ollama app), then try again.
+```
+Re-run the detection above once the user confirms it's running.
 
 **Full menu** (nothing detected):
 ```
@@ -64,4 +75,4 @@ Choose [1-4]:
 - **mlx-embeddings**: `pip install mlx-embeddings`. If it fails, fall back to `pip install sentence-transformers` and note the fallback.
 - **sentence-transformers**: `pip install sentence-transformers`.
 - After any install, re-run the relevant detection snippet to confirm before proceeding to indexing. If still failing, report the error and skip indexing — do not proceed blindly.
-- **"Not now" / declined**: skip indexing, note in the final summary that semantic search is not active and how to enable it later (`/cortex-forge-setup`, maintenance menu option 3).
+- **"Not now" / declined**: skip indexing, note in the final summary that semantic search is not active and how to enable it later (`/cortex-forge-setup`, maintenance menu option 5).

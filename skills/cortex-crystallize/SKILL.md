@@ -5,7 +5,7 @@ description: Snapshot session context into .cortex/MEMORY.md — preserves pendi
 argument-hint: "[vault-name] [project-name] [next: <focus>]"
 ---
 
-Start your response with the flavor line `Crystallizing memory...`, translated to the language of the user's current message (Spanish: `Cristalizando memoria...`), with nothing before it.
+Start your response with the flavor line `Crystallizing memory...`, translated to the language of the user's current message (Spanish: `Cristalizando memoria...`), with nothing before it. Use that same language for every prompt, question, menu, and confirmation this skill produces — persisted vault content (if any) still follows the vault's locale, not the conversation language.
 
 Save a session snapshot to `.cortex/MEMORY.md` in the active repo (the nearest `.git`), so any agent can resume without losing context.
 

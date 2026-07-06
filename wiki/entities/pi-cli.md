@@ -52,7 +52,7 @@ Pi sits in the same family as the other terminals-first coding CLIs the vault tr
 
 - [[wiki/entities/commandcode]] — uses a JSONL transcript per session with the same `id`/`parentId` shape (parity in forking), but with a hooks/events model that runs shell commands; pi's equivalent is the TypeScript extension lifecycle.
 - [[wiki/entities/openbrain-nate-jones]] — orthogonal: cross-platform semantic memory rather than a CLI. Pluggable into any MCP-capable agent including pi via an extension.
-- [[wiki/entities/understand-anything]] — multi-platform codebase-to-knowledge-graph plugin; supports "Pi Agent" alongside Claude Code, Codex, Cursor, Copilot, etc.
+- [[wiki/entities/understand-anything]] — multi-platform codebase-to-knowledge-graph plugin; supports "Pi Agent" alongside Claude Code, [[wiki/entities/codex|Codex]], Cursor, Copilot, etc.
 - [[wiki/entities/google-antigravity]] — agent-first dev platform with its own terminal CLI (`agy`); shares the "no MCP by default, plugins for everything" instinct with pi but ships its own GraphQL-style skills system.
 
 ## Connections

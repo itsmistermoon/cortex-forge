@@ -63,7 +63,7 @@ With minimum tools:
 ## When this upgrade makes sense
 
 The MCP server pattern is justified when:
-- The vault is consumed by more than one distinct agent (Claude, Codex, CommandCode, Antigravity)
+- The vault is consumed by more than one distinct agent (Claude, [[wiki/entities/codex|Codex]], [[wiki/entities/commandcode|CommandCode]], [[wiki/entities/google-antigravity|Antigravity]])
 - Per-agent skills generate drift — each agent learns different conventions
 - You want the interface to be the stable contract, not the prompts
 

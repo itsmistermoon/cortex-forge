@@ -13,7 +13,7 @@ schema_version: "0.3"
 
 # Understand Anything (entity)
 
-Tool/plugin maintained by **Lum1104** that builds navigable knowledge graphs over codebases, knowledge bases, and documentation. Multi-platform: Claude Code, Codex, Cursor, Copilot, Gemini CLI, OpenCode, Vibe CLI, Trae, Hermes, Cline, KIMI, Antigravity.
+Tool/plugin maintained by **Lum1104** that builds navigable knowledge graphs over codebases, knowledge bases, and documentation. Multi-platform: Claude Code, [[wiki/entities/codex|Codex]], Cursor, Copilot, Gemini CLI, OpenCode, Vibe CLI, Trae, Hermes, Cline, KIMI, [[wiki/entities/google-antigravity|Antigravity]].
 
 **Type:** AI coding plugin (not SaaS, not a hosted service — runs locally).
 **License:** MIT.

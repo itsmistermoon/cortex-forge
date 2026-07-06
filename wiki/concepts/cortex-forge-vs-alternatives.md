@@ -42,7 +42,7 @@ Both implement the same core patterns (Karpathy-style wiki, session-start contex
 | Knowledge source | Auto-fetched from 118+ OAuth integrations (20-min loop) | Agent-synthesized from manually ingested sources |
 | Storage | SQLite + Obsidian-compatible `.md` files | Pure markdown in git (no database) |
 | Token compression | TokenJuice: HTML→Markdown, URL shortening, dedup (up to 80%) | No equivalent |
-| Multi-agent | Single harness (all models via OpenHuman router) | Protocol-level (Claude Code, Codex, Antigravity, CommandCode) |
+| Multi-agent | Single harness (all models via OpenHuman router) | Protocol-level (Claude Code, [[wiki/entities/codex|Codex]], [[wiki/entities/google-antigravity|Antigravity]], [[wiki/entities/commandcode|CommandCode]]) |
 | Cross-agent interop | Optional `agentmemory` backend proxy | AGENTS.md + hot cache protocol |
 | Setup | Install desktop app, connect OAuth accounts | `git clone` + `cortex-forge-setup` |
 | License | GNU | MIT |

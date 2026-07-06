@@ -16,7 +16,7 @@ schema_version: "0.3"
 
 # CommandCode
 
-AI coding agent with a CLI that integrates continuous personalization via TASTE. Shares the coding-first agent space with Claude Code, Codex, and [[wiki/entities/antigravity-cli|Antigravity CLI]].
+AI coding agent with a CLI that integrates continuous personalization via TASTE. Shares the coding-first agent space with Claude Code, [[wiki/entities/codex|Codex]], and [[wiki/entities/antigravity-cli|Antigravity CLI]].
 
 ## Identity
 

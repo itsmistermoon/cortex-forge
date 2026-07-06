@@ -15,7 +15,7 @@ aliases: []
 
 Cómo opera cortex-forge a través de agentes: qué instruye `AGENTS.md` en cada fase de una sesión, qué skills usar en medio, y qué scripts siguen corriendo por fuera del ciclo de vida del agente (git hooks).
 
-Cortex Forge no usa hooks de ciclo de vida del agente (`SessionStart`, `PreCompact`, `SessionEnd`, `Stop`, `PreToolUse`) — el soporte era demasiado desigual entre Claude Code, Codex, Antigravity y CommandCode para construir el sistema sobre esa base. Ver [[wiki/concepts/agent-hook-compatibility]] para los hallazgos concretos que motivaron esa decisión (2026-07-02).
+Cortex Forge no usa hooks de ciclo de vida del agente (`SessionStart`, `PreCompact`, `SessionEnd`, `Stop`, `PreToolUse`) — el soporte era demasiado desigual entre Claude Code, [[wiki/entities/codex|Codex]], [[wiki/entities/google-antigravity|Antigravity]] y [[wiki/entities/commandcode|CommandCode]] para construir el sistema sobre esa base. Ver [[wiki/concepts/agent-hook-compatibility]] para los hallazgos concretos que motivaron esa decisión (2026-07-02).
 
 ---
 
@@ -63,7 +63,7 @@ Skills se invocan manualmente durante la sesión. No tienen hooks — el agente 
 | `/cortex-prune` | Periódicamente, o cuando el vault-report muestra issues | Health check: detecta dead links, raw huérfanos, páginas sin frontmatter, confidence faltante | `skills/cortex-prune/SKILL.md` |
 | `/cortex-imprint` | Cuando la sesión produjo análisis o síntesis que vale la pena persistir | Archiva el hallazgo como página permanente en `wiki/` | `skills/cortex-imprint/SKILL.md` |
 
-`AGENTS.md` recuerda al agente qué skills usar y cuándo — el mismo mecanismo en todos los agentes soportados. (Antes existía un step opcional en `cortex-forge-setup` que instalaba una TASTE rule específica de CommandCode en `.commandcode/taste/taste.md`; se eliminó el 2026-07-03 por contradecir el principio agent-agnostic del setup.)
+`AGENTS.md` recuerda al agente qué skills usar y cuándo — el mismo mecanismo en todos los agentes soportados. (Antes existía un step opcional en `cortex-forge-setup` que instalaba una [[wiki/concepts/commandcode-taste|TASTE]] rule específica de CommandCode en `.commandcode/taste/taste.md`; se eliminó el 2026-07-03 por contradecir el principio agent-agnostic del setup.)
 
 ---
 

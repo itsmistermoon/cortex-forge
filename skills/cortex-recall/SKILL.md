@@ -13,33 +13,29 @@ Answer a question using the vault's wiki content as the source.
 
 ## Available scripts
 
+Paths are relative to this skill's directory.
+
 - **`scripts/cortex-search.py`** — Semantic search over `.cortex/db/vault.db` (step 2)
 - **`scripts/embeddings.py`** — Shared embedding backend, imported by `cortex-search.py`; not invoked directly
 
 ## Steps
 
-1. **Resolve vault** — follow `references/VAULT-RESOLUTION.md` (argument → CWD → default).
-   - If the first argument matches a registered vault name (e.g., `/cortex-recall second-brain <query>`) → use that vault; treat the remaining text as the query.
+1. **Resolve vault** — per `references/VAULT-RESOLUTION.md`. If the first argument matches a registered vault name (e.g., `/cortex-recall second-brain <query>`), use that vault; treat the remaining text as the query.
 
 2. **Identify relevant pages** — prefer semantic search if the index is available:
-   - If `{vault}/.cortex/db/vault.db` exists: run `scripts/cortex-search.py` — the script co-located with this skill (`scripts/` subdirectory), **never** a script found inside the vault itself — with `--vault {vault} "{query}" --top-k 8 --json`, and use the returned chunks (path + heading + content) as the primary source set.
+   - If `{vault}/.cortex/db/vault.db` exists: run `scripts/cortex-search.py --vault {vault} "{query}" --top-k 8 --json`, and use the returned chunks (path + heading + content) as the primary source set.
    - Otherwise (index missing): read `{vault}/wiki/index.md` directly and identify the most relevant pages by title and description. This is the explicit fallback — it is NOT a protocol violation.
 
-3. Read the full pages for any result where the chunk alone is insufficient for a complete answer.
-
-4. Synthesize a response with citations to specific pages.
-
-5. If information is missing, suggest sources to ingest with `/cortex-assimilate`.
+3. **Answer** — read the full page for any result where the chunk alone is insufficient, then synthesize a response with citations to specific pages. If information is missing, point to `/cortex-assimilate` for the missing sources.
 
 ## Output format
 
 Every response must include:
-- At least one citation in the form `Source: wiki/{type}/{slug}.md [confidence: {value}]`
-  where `{value}` is read directly from the page's YAML frontmatter `confidence:` field.
-- If a cited page has no `confidence:` field, append `[confidence: unset]` and flag it as a finding.
-- If the page cannot be parsed due to malformed YAML, append `[confidence: read-error]` and flag it.
-- If `confidence: medium` or `low`, append the value and do not flag — these are valid states.
-- If no relevant pages exist: state "Not in vault" explicitly — do not fall back to training knowledge
+1. At least one citation in the form `Source: wiki/{type}/{slug}.md [confidence: {value}]`, where `{value}` is read directly from the page's YAML frontmatter `confidence:` field.
+   - No `confidence:` field → append `[confidence: unset]` and flag it as a finding.
+   - Malformed YAML → append `[confidence: read-error]` and flag it.
+   - `confidence: medium` or `low` → append the value, do not flag — these are valid states.
+2. If no relevant pages exist: state "Not in vault" explicitly — do not fall back to training knowledge.
 
 ## Constraints
 
@@ -48,7 +44,5 @@ Every response must include:
 
 ## Rules
 
-- Cite wiki pages, not parametric knowledge
 - If there are contradictions between pages, flag them
 - If the topic is not in the wiki, say so explicitly — only then may you supplement with parametric knowledge, clearly labeled as such
-- The search method varies (semantic vector search when `.cortex/db/vault.db` is available, structured index traversal via `wiki/index.md` otherwise) — the bypass prohibition applies regardless of which method is used. Reading `wiki/index.md` or specific wiki pages as part of steps 2–3 is not a violation — it is part of the skill.

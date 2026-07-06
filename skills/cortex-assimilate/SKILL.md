@@ -38,7 +38,7 @@ Paths are relative to this skill's directory.
 
    If `rg` or `jq` is not available, or the script errors: skip the check (fail-open), but tell the user explicitly that credential redaction did not run for this source — do not proceed silently.
 
-3. **Synthesize** — evaluate the source against the criteria below and create pages for every qualifying type. **Done when:** every content type (concept, entity, project) that meets its creation criteria has a page — zero qualifying types skipped. If a topic is borderline, evaluate it rather than skipping.
+3. **Synthesize** — evaluate the source against the type criteria in `## Page types` below and create pages for every qualifying type. **Done when:** every content type (concept, entity, project) that meets its creation criteria has a page — zero qualifying types skipped. If a topic is borderline, evaluate it rather than skipping.
 
 4. Update `{vault}/wiki/index.md` with new pages.
 

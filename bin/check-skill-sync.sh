@@ -73,27 +73,31 @@ done
 # 4. vault-report.json schema fields consistent between cortex-prune and AGENTS.md
 # ---------------------------------------------------------------------------
 check "vault-report-schema"
-PRUNE_SKILL="$SKILLS_DIR/cortex-prune/SKILL.md"
+PRUNE_SCHEMA="$SKILLS_DIR/cortex-prune/references/VAULT-REPORT-SCHEMA.md"
 AGENTS_FILE="$SKILLS_DIR/../AGENTS.md"
 
-if [[ ! -f "$PRUNE_SKILL" ]]; then
-  fail "cortex-prune/SKILL.md not found"
+if [[ ! -f "$PRUNE_SCHEMA" ]]; then
+  fail "cortex-prune/references/VAULT-REPORT-SCHEMA.md not found"
 elif [[ ! -f "$AGENTS_FILE" ]]; then
   fail "AGENTS.md not found — cannot verify vault-report.json consumer"
 else
-  # Extract field names declared in cortex-prune schema block
-  prune_fields=$(grep -oE '"(dead_links|raw_without_source_page|missing_confidence|orphan_pages)"' "$PRUNE_SKILL" | sort -u)
-  # Check each field is referenced in AGENTS.md
-  all_ok=true
-  while IFS= read -r field; do
-    clean="${field//\"/}"
-    if ! grep -q "$clean" "$AGENTS_FILE"; then
-      fail "vault-report field '$clean' declared in cortex-prune but not referenced in AGENTS.md"
-      all_ok=false
+  # Extract field names declared in the canonical schema reference
+  prune_fields=$(grep -oE '"(dead_links|raw_without_source_page|missing_confidence|orphan_pages)"' "$PRUNE_SCHEMA" | sort -u || true)
+  if [[ -z "$prune_fields" ]]; then
+    fail "no vault-report.json fields found in $PRUNE_SCHEMA — schema may have moved again"
+  else
+    # Check each field is referenced in AGENTS.md
+    all_ok=true
+    while IFS= read -r field; do
+      clean="${field//\"/}"
+      if ! grep -q "$clean" "$AGENTS_FILE"; then
+        fail "vault-report field '$clean' declared in cortex-prune schema but not referenced in AGENTS.md"
+        all_ok=false
+      fi
+    done <<< "$prune_fields"
+    if $all_ok; then
+      ok "vault-report.json schema fields consistent between cortex-prune and AGENTS.md"
     fi
-  done <<< "$prune_fields"
-  if $all_ok; then
-    ok "vault-report.json schema fields consistent between cortex-prune and AGENTS.md"
   fi
 fi
 
@@ -114,47 +118,36 @@ for skill_dir in "$SKILLS_DIR"/*/; do
 done
 
 # ---------------------------------------------------------------------------
-# 6. cortex-prune.sh runtime script referenced correctly
-# ---------------------------------------------------------------------------
-check "prune-script-colocated"
-PRUNE_SKILL="$SKILLS_DIR/cortex-prune/SKILL.md"
-if [[ -f "$SKILLS_DIR/cortex-prune/scripts/cortex-prune.sh" ]] && grep -q 'co-located with this skill' "$PRUNE_SKILL"; then
-  ok "cortex-prune: script co-located and SKILL.md references it as such"
-else
-  fail "cortex-prune: cortex-prune.sh must be co-located in skills/cortex-prune/scripts/ and referenced as such"
-fi
-
-# ---------------------------------------------------------------------------
-# 7. Every co-located script a SKILL.md references actually exists (same dir)
+# 6. Every script listed in "## Available scripts" actually exists (same dir)
 # ---------------------------------------------------------------------------
 # Catches exactly the 2026-07-03 regression: cortex-prune.sh was relocated but
 # cortex-validate-schema.sh (which it calls as a sibling) was left in bin/,
-# silently disabling schema-drift checks for every install.
-check "colocated-script-exists"
+# silently disabling schema-drift checks for every install. Scans the
+# "## Available scripts" section structurally rather than grepping for the
+# word "co-located" — that phrasing was intentionally removed everywhere in
+# favor of a single "Paths are relative to this skill's directory" line per
+# skill, which made the old keyword-based detection silently check nothing.
+check "available-script-exists"
 for skill_dir in "$SKILLS_DIR"/*/; do
   name=$(basename "$skill_dir")
   file="$skill_dir/SKILL.md"
   [[ -f "$file" ]] || continue
-  # Only check scripts named on a line that itself claims co-location — avoids
-  # false positives from mentioning another skill's or a vault-local runtime
-  # copy's script name (e.g. "{vault}/.cortex/db/cortex-index.py") elsewhere.
-  # Only match backtick-quoted filenames (how real script refs are always
-  # written) — avoids false positives like prose links (e.g. "skills.sh").
-  refs=$(grep -i 'co-located' "$file" | grep -oE '`(scripts/)?[A-Za-z0-9_-]+\.(sh|py)`' | tr -d '`' | sed 's#^scripts/##' | sort -u || true)
+  refs=$(awk '/^## Available scripts/{p=1; next} /^## /{p=0} p' "$file" \
+    | grep -oE '`scripts/[A-Za-z0-9_-]+\.(sh|py)`' | tr -d '`' | sed 's#^scripts/##' | sort -u || true)
   missing=""
   while IFS= read -r script; do
     [[ -z "$script" ]] && continue
-    [[ -f "$skill_dir/$script" || -f "$skill_dir/scripts/$script" ]] || missing="$missing $script"
+    [[ -f "$skill_dir/scripts/$script" ]] || missing="$missing $script"
   done <<< "$refs"
   if [[ -n "$missing" ]]; then
-    fail "$name: script(s) claimed co-located but not found in $skill_dir:$missing"
+    fail "$name: script(s) listed in Available scripts but not found: $missing"
   else
-    ok "$name: all co-located scripts present"
+    ok "$name: all scripts in Available scripts are present"
   fi
 done
 
 # ---------------------------------------------------------------------------
-# 8. Intentionally-duplicated files stay in sync across skills
+# 7. Intentionally-duplicated files stay in sync across skills
 # ---------------------------------------------------------------------------
 # embeddings.py and cortex-index.py are deliberately co-located in more than
 # one skill (each skill must be independently installable and must never

@@ -47,7 +47,7 @@ cortex-prune
        │
        ├── validates ← .raw/ files            produced by: cortex-assimilate
        ├── validates ← wiki/ pages            produced by: cortex-assimilate, cortex-imprint
-       └── produces  → wiki/meta/vault-report.json  consumed by: AGENTS.md (mandatory session-start read)
+       └── produces  → wiki/meta/vault-report.json  consumed by: cortex-crystallize (vault health triage → ### Pending)
 ```
 
 ## Contracts per dependency
@@ -77,7 +77,7 @@ The handoff is passive: crystallize does not call imprint, and imprint does not 
 ### imprint → recall
 imprint writes permanent `wiki/` pages into the same directory tree that recall searches. A successful imprint immediately expands recall's coverage without requiring a new assimilate run. **Contract:** imprint must update `wiki/index.md` on every successful write (step 8 of cortex-imprint).
 
-### prune → AGENTS.md (via vault-report.json)
+### prune → crystallize → AGENTS.md (via vault-report.json)
 prune produces `wiki/meta/vault-report.json` with this schema:
 
 ```json
@@ -92,7 +92,7 @@ prune produces `wiki/meta/vault-report.json` with this schema:
 }
 ```
 
-`AGENTS.md`'s mandatory session-start read protocol reads this file before the agent's first response, to surface health signals before any work begins. **If the schema changes in cortex-prune without updating AGENTS.md**, the agent reads a stale or mismatched report silently. This is the only cross-skill contract where a format change in one skill corrupts a consumer that is not itself a skill.
+`cortex-crystallize`'s vault-health-triage step reads this file and writes a `### Pending` item in `.cortex/MEMORY.md` whenever any field is non-empty; `AGENTS.md`'s mandatory session-start read then surfaces it to the agent as part of the normal Pending read — there is no longer a direct AGENTS.md read of the JSON file (removed 2026-07-06, redundant with the Pending item crystallize already writes). **If the schema changes in cortex-prune without updating `cortex-crystallize`**, the triage step reads wrong field names silently. This is the only cross-skill contract where a format change in one skill corrupts a consumer that is not itself a skill.
 
 ## Failure modes by dependency
 
@@ -103,7 +103,7 @@ prune produces `wiki/meta/vault-report.json` with this schema:
 | assimilate incomplete (mid-run failure) | `.raw/` file exists, no wiki page | cortex-prune layer 1 |
 | Agent skips AGENTS.md's mandatory read protocol | Imprint candidates accumulate, no nudge | Manual inspection of MEMORY.md |
 | imprint skips index update | recall misses imprinted pages | cortex-prune (orphan detection) |
-| prune schema change, AGENTS.md not updated | Agent reads wrong field names silently | No automatic detection |
+| prune schema change, cortex-crystallize not updated | Vault-health triage reads wrong field names silently | No automatic detection |
 
 ## Related
 

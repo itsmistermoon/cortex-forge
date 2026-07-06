@@ -18,6 +18,8 @@ Format: `[semver] — title — YYYY-MM-DD`
 
 ## [Unreleased]
 
+- `protocol:` — 2026-07-06 — `AGENTS.md`'s three "{Crystallize,Assimilate,Recall} protocol — MANDATORY" sections (123 lines) collapsed into one 3-line "Session start" section: read `.cortex/MEMORY.md` (+ `PRAXIS.md` if present) before the first response, propose `/cortex-imprint` if the latest History entry flags one. Each skill already states when to trigger via its own `description:` — `AGENTS.md` no longer duplicates that. Dropped the stale-cache warning and the direct `wiki/meta/vault-report.json` read (both redundant with the `### Pending` item `cortex-crystallize` already writes every run); kept the `PRAXIS.md` read and the Imprint-candidate nudge (no skill owns session-start behavior, so removing them would have silently dropped the feature). `bin/check-skill-sync.sh`'s `vault-report-schema` check now verifies field references against `cortex-crystallize/SKILL.md` instead of `AGENTS.md`, matching the real consumer.
+
 ## [0.7.0] — npx-only Distribution, Security Hardening & Suite Compaction — 2026-07-06
 
 Eliminates all local vault code execution (scripts skills invoke now live co-located inside each `skills/<name>/`, never copied to `{vault}/.cortex/db/`), drops the tarball/curl-installer in favor of `npx skills add` (skills.sh) as the sole distribution channel, and closes out the session with a full compaction pass across all 6 skills — less text, zero loss of decision logic, and several real bugs fixed along the way (contradictory instructions, broken references, a script that silently stopped validating `wiki/projects/`).

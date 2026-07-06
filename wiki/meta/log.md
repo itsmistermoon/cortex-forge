@@ -448,3 +448,15 @@ Layer 1 (`cortex-prune.sh`): 3 dead wikilinks sin candidato de retarget, 6 `wiki
 Auto-aplicado: `wiki/concepts/embedding-backend-selection.md` (orphan real) indexado en `wiki/index.md`; los 17 wikilinks L2b agregados. No aplicado (requiere confirmación): 3 dead links, `aliases:` faltantes en 2 páginas, texto desactualizado de hooks en 3 páginas (`crystallize-vs-imprint.md`, `handoff-artifact.md`, `super-context.md`).
 
 Agent: Claude Code (Sonnet 5)
+
+## [2026-07-06] refactor | AGENTS.md recortado — protocolos eliminados, solo queda la lectura obligatoria
+
+Las 3 secciones "{Crystallize,Assimilate,Recall} protocol — MANDATORY" (123 líneas totales) se redujeron a una sola sección "Session start" de 3 líneas: leer `.cortex/MEMORY.md` (+ `PRAXIS.md` si existe) antes de la primera respuesta, y proponer `/cortex-imprint` si la última entrada de History tiene un flag `#### Imprint candidate`. Decisión explícita del usuario: las skills deben valerse por sí mismas (cada una ya dispara sola vía su propio `description:`), `AGENTS.md` no debe duplicar esa lógica.
+
+Evaluado caso a caso qué del protocolo Crystallize sobrevivía: la alerta de stale-cache y la lectura directa de `wiki/meta/vault-report.json` se eliminaron (redundantes con el ítem de `### Pending` que `cortex-crystallize` ya escribe en cada corrida); la lectura de `PRAXIS.md` y el nudge de Imprint candidate se mantuvieron (sin dueño natural en ninguna skill, se pierden silenciosamente si no quedan en algún lado).
+
+Efecto en cascada: `bin/check-skill-sync.sh`'s `vault-report-schema` check verificaba que los 4 campos del schema de `vault-report.json` aparecieran en `AGENTS.md` — ahora ya no aparecen ahí, así que el check se corrigió para verificar contra `cortex-crystallize/SKILL.md` (el consumidor real desde hoy). `wiki/concepts/skill-dependency-graph.md` y `wiki/concepts/workflow-architecture.md` actualizados para reflejar el nuevo flujo (prune → crystallize → Pending, no prune → AGENTS.md directo).
+
+Verificado: `bash skills/cortex-prune/scripts/cortex-prune.sh .` — 0 HIGH/MEDIUM/LOW. `bin/check-skill-sync.sh`: 31/31.
+
+Agent: Claude Code (Sonnet 5)

@@ -74,12 +74,12 @@ done
 # ---------------------------------------------------------------------------
 check "vault-report-schema"
 PRUNE_SCHEMA="$SKILLS_DIR/cortex-prune/references/VAULT-REPORT-SCHEMA.md"
-AGENTS_FILE="$SKILLS_DIR/../AGENTS.md"
+CRYSTALLIZE_FILE="$SKILLS_DIR/cortex-crystallize/SKILL.md"
 
 if [[ ! -f "$PRUNE_SCHEMA" ]]; then
   fail "cortex-prune/references/VAULT-REPORT-SCHEMA.md not found"
-elif [[ ! -f "$AGENTS_FILE" ]]; then
-  fail "AGENTS.md not found — cannot verify vault-report.json consumer"
+elif [[ ! -f "$CRYSTALLIZE_FILE" ]]; then
+  fail "cortex-crystallize/SKILL.md not found — cannot verify vault-report.json consumer"
 else
   # Discover field names structurally from the "## Field definitions" bullet list
   # (`- \`health.foo\` — ...`) instead of enumerating known names, so a newly
@@ -88,16 +88,18 @@ else
   if [[ -z "$prune_fields" ]]; then
     fail "no vault-report.json fields found in $PRUNE_SCHEMA — schema may have moved again"
   else
-    # Check each field is referenced in AGENTS.md
+    # Check each field is referenced in cortex-crystallize's vault-health triage
+    # step — the actual consumer since AGENTS.md stopped reading vault-report.json
+    # directly (2026-07-06) in favor of the Pending item crystallize already writes.
     all_ok=true
     while IFS= read -r field; do
-      if ! grep -q "$field" "$AGENTS_FILE"; then
-        fail "vault-report field '$field' declared in cortex-prune schema but not referenced in AGENTS.md"
+      if ! grep -q "$field" "$CRYSTALLIZE_FILE"; then
+        fail "vault-report field '$field' declared in cortex-prune schema but not referenced in cortex-crystallize/SKILL.md"
         all_ok=false
       fi
     done <<< "$prune_fields"
     if $all_ok; then
-      ok "vault-report.json schema fields consistent between cortex-prune and AGENTS.md"
+      ok "vault-report.json schema fields consistent between cortex-prune and cortex-crystallize"
     fi
   fi
 fi

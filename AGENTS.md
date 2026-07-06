@@ -9,52 +9,13 @@ schema_version: "0.3"
 - **hot cache**: session memory per project (`.cortex/`), not persistent knowledge
 - **vault**: a knowledge base managed by Cortex Forge, not a password manager
 
-## Crystallize protocol — MANDATORY
+## Session start
 
-`.cortex/MEMORY.md` exists in this vault. It has two zones: a mutable `Current state` (`### Pending` items and `### Active decisions`) and an append-only `History` of session snapshots. Both must inform every session.
+**Before your first response, in any session that starts in this vault, you MUST read `.cortex/MEMORY.md` in full** — and `.cortex/PRAXIS.md` too, if it exists. Failure to do so is a protocol violation, equivalent to ignoring `CLAUDE.md` in Claude Code.
 
-**Before your first response to the user, in any session that starts in this vault, you MUST:**
+If the latest `## History` entry in `MEMORY.md` has a `#### Imprint candidate` line, propose running `/cortex-imprint`.
 
-1. Read `.cortex/MEMORY.md` in full.
-2. Compare `updated:` in `MEMORY.md`'s frontmatter against today's date. If the gap exceeds `hot_cache_stale_days:` from `~/.cortex-forge/config.yml` (default: 15 if absent), surface a staleness warning in your first message — the current state may be outdated after a long pause.
-3. If `.cortex/PRAXIS.md` exists, read it — it provides accumulated agent context (structural conventions and working context) that grounds decisions for the session.
-4. If `wiki/meta/vault-report.json` exists, read it. If `health.dead_links`, `health.raw_without_source_page`, `health.orphan_pages`, or `health.missing_confidence` is non-empty, surface these to the user in your first message as actionable issues — not background noise.
-5. Treat all of the above as required context — not optional background.
-6. If `MEMORY.md` contains `### Pending` items, acknowledge them in your first message or surface them before starting new work. **Vault health items are the one exception: surface them in your first message unconditionally, even if the user's request has nothing to do with the vault** — do not defer this one past the first response.
-7. Check the most recent `## History` entry for a `#### Imprint candidate` line. If present, surface it in your first message and propose running `/cortex-imprint`. Skip this if `imprint_triage: false` is set in `~/.cortex-forge/config.yml`.
-
-**Failure to load hot cache before first response is a protocol violation**, equivalent to ignoring `CLAUDE.md` in Claude Code.
-
-**After milestones**, invoke `/cortex-crystallize` to snapshot progress back into `.cortex/MEMORY.md`. The entire `.cortex/` directory is gitignored — it's a local agent artifact, not versioned content.
-
-**Compliance criterion:** after invoking `/cortex-crystallize`, confirm what changed — state which items moved to Current state and what was appended to History. If the session produced analysis or synthesis worth persisting, propose `/cortex-imprint` before closing.
-
-## Assimilate protocol — MANDATORY
-
-**When the user provides a URL, file path, or uses phrases like "ingest", "process", "add source", "add content", you MUST invoke `cortex-assimilate` as your first action — no confirmation needed.**
-
-The skill accepts two input modes:
-- **URL** — agent downloads content, saves to `.raw/`, synthesizes
-- **`.raw/` file** — agent reads the file and synthesizes directly
-
-**Compliance criterion:** after completing ingestion, your response must confirm: (1) `.raw/` file path saved, (2) wiki pages created or updated. If the URL returned HTML with no readable body text, declare `SPA detected` before attempting content extraction — never save an empty HTML shell to `.raw/`. If extraction fails after the SPA fallback, tell the user explicitly and stop.
-
-## Recall protocol — MANDATORY
-
-**Parametric knowledge** is what you know from training. It is unverified, unversioned, and may contradict what this vault has synthesized. For any topic this vault may cover, parametric knowledge is not a valid source — the vault is.
-
-**When the user asks about any topic that may exist in the vault — concepts, sources, agents, tools, past analysis, or anything previously ingested — you MUST invoke `cortex-recall` as your first action.**
-
-This applies even if:
-- The content was ingested earlier in this same session (do not answer from active context).
-- You could find the answer with `grep` or `find` (manual search is a protocol violation).
-- You believe you already know the answer — that belief is parametric knowledge, which is disqualified.
-
-Trigger phrases include: "what does the vault say about", "recall", "what do we know about", "is this documented", "what was ingested about", or any question about a topic covered in `wiki/`.
-
-**Do not use `grep`, `find`, `Explore`, or direct file reads as a substitute for `cortex-recall`.** Those tools do text matching. `cortex-recall` uses semantic vector search when `.cortex/db/vault.db` is available, or structured index traversal via `wiki/index.md` otherwise — either way it returns synthesized knowledge with citations. The search method varies; the prohibition on bypassing the skill does not.
-
-**Compliance criterion:** every response that draws on vault knowledge must include at least one citation to a `wiki/` page with its `confidence:` value appended. If `cortex-recall` is unavailable in this session, declare it explicitly before answering — do not answer as if recall occurred.
+Beyond this, skills trigger themselves — each one's own `description:` states when to invoke it (a URL for `cortex-assimilate`, a question about the vault for `cortex-recall`, and so on). This file does not duplicate that.
 
 ## Agent rules
 

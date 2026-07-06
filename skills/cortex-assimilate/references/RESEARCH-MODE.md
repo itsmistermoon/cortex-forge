@@ -2,7 +2,7 @@
 
 Reference for `cortex-assimilate`. Read when the first argument starts with `--research`, discovering and ingesting sources on the web instead of processing a single given URL or file.
 
-```
+```text
 /cortex-assimilate --research "embeddings for second brains" [--rounds N]
 ```
 

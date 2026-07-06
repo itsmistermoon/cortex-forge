@@ -3,7 +3,7 @@
 cortex-search: Semantic search over the vault index.
 Usage: python {vault}/.cortex/db/cortex-search.py "query" [--top-k N] [--vault PATH]
 Installed to {vault}/.cortex/db/ by cortex-forge-setup. Source co-located with the
-cortex-forge-setup skill (skills/cortex-forge-setup/).
+cortex-recall skill (skills/cortex-recall/scripts/).
 """
 import argparse
 import json
@@ -65,9 +65,14 @@ def open_db(db_path: Path) -> sqlite3.Connection:
 
     conn = sqlite3.connect(str(db_path))
     conn.enable_load_extension(True)
+    loaded = False
     if sqlite_vec_path:
-        conn.load_extension(sqlite_vec_path)
-    else:
+        try:
+            conn.load_extension(sqlite_vec_path)
+            loaded = True
+        except sqlite3.OperationalError:
+            pass
+    if not loaded:
         try:
             import sqlite_vec
             sqlite_vec.load(conn)
@@ -119,6 +124,9 @@ def main():
     cortex_dir = vault / ".cortex"
     # Canonical path; fall back to legacy .cortex/vault.db for older vaults
     db_path = (cortex_dir / "db" / "vault.db") if (cortex_dir / "db" / "vault.db").exists() else (cortex_dir / "vault.db")
+    if not db_path.exists():
+        print("ERROR: vault.db not found. Run cortex-index first.", file=sys.stderr)
+        sys.exit(1)
     threshold = args.threshold if args.threshold is not None else load_threshold(cortex_dir / "db" if (cortex_dir / "db").exists() else cortex_dir)
 
     emb.load_embedding_model()

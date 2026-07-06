@@ -118,9 +118,14 @@ def init_db(db_path: Path) -> sqlite3.Connection:
 
     conn = sqlite3.connect(str(db_path))
     conn.enable_load_extension(True)
+    loaded = False
     if sqlite_vec_path:
-        conn.load_extension(sqlite_vec_path)
-    else:
+        try:
+            conn.load_extension(sqlite_vec_path)
+            loaded = True
+        except sqlite3.OperationalError:
+            pass
+    if not loaded:
         try:
             import sqlite_vec
             sqlite_vec.load(conn)

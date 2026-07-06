@@ -19,7 +19,7 @@ Save a session snapshot to `.cortex/MEMORY.md` in the active repo (the nearest `
 
 2. **Prepare state** — create `.cortex/` if it doesn't exist and add it to `.gitignore`. Read `.cortex/MEMORY.md` in full if it exists; on malformed YAML frontmatter, don't stop — read the body as plain text, note the issue in the next `#### Fragile context` entry, and overwrite the frontmatter in step 4.
 
-   If `.cortex/PRAXIS.md` exists, remove any `### Working context` entries older than 15 days (never touch `## Permanent`); skip silently if nothing qualifies.
+   If `.cortex/PRAXIS.md` exists, remove dated subsections (`### YYYY-MM-DD`) under `## Working context` older than 15 days (never touch `## Permanent`); skip silently if nothing qualifies.
 
    Rotate `## History` entries older than 15 days out of `.cortex/MEMORY.md`: append each verbatim, oldest-first, to `.cortex/CONSOLIDATED.md` (if it doesn't exist, create it with a one-line header — `# {vault-name} — consolidated history`), then remove it from `MEMORY.md`. Never reorder entries in either file. **Done when:** every History entry older than 15 days has been moved — zero left behind in `MEMORY.md`.
 

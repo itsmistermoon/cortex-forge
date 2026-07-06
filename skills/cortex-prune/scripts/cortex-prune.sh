@@ -89,12 +89,14 @@ find "$WIKI" -name "*.md" \
       rel="${page#$VAULT/}"          # e.g. wiki/concepts/memory-system.md
       rel_noext="${rel%.md}"         # e.g. wiki/concepts/memory-system
       basename_noext="${rel_noext##*/}"  # e.g. memory-system
-      # Count pages that contain a wikilink to this exact path (with or without .md)
-      hits=$(grep -rl "\[\[${rel_noext}" "$WIKI" 2>/dev/null \
+      # Count pages that contain a wikilink to this exact path (with or without .md),
+      # anchored so e.g. [[wiki/concepts/foo-bar]] never counts as a hit for foo.
+      hits=$(grep -rlE "\[\[${rel_noext}(\.md)?(\||\]\])" "$WIKI" 2>/dev/null \
              | grep -v "^${page}$" | wc -l | tr -d ' ')
-      # Also count pages that reference this page in a sources: frontmatter entry
+      # Also count pages that reference this page in a sources: frontmatter entry.
+      # [[:space:]] instead of \s — \s is a GNU extension, not POSIX BRE (BSD grep on macOS lacks it).
       if [ "$hits" -eq 0 ]; then
-        hits=$(grep -rl "^\s*-\s*.*${basename_noext}" "$WIKI" 2>/dev/null \
+        hits=$(grep -rl "^[[:space:]]*-[[:space:]]*.*${basename_noext}" "$WIKI" 2>/dev/null \
                | xargs grep -l "^sources:" 2>/dev/null \
                | grep -v "^${page}$" | wc -l | tr -d ' ')
       fi

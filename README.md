@@ -63,7 +63,7 @@ What was worth keeping from the session becomes a stable wiki page. A memory tra
 
 ### `/cortex-recall` — Query
 
-The agent searches the vault, retrieves relevant pages, and synthesizes a response with citations. It can only return what was assimilated — if it's not in the vault, it doesn't exist for the system.
+The agent searches the vault, retrieves relevant pages, and synthesizes a response with citations. It can only return what's already in the vault — assimilated or imprinted — if it's not there, it doesn't exist for the system.
 
 ### `/cortex-prune` — Vault hygiene
 
@@ -102,7 +102,7 @@ Most agent-memory systems fail in the same places. These are the failure modes w
 
 **State and lessons are different artifacts.** Session-end snapshots capture *state* (pending work, decisions, fragile context). Lessons — the workaround you'd otherwise re-explain next week — get lost because nobody archives them at the moment of fatigue. Cortex Forge splits the work across the session boundary: at session end, `/cortex-crystallize` (invoked manually, with full context) *flags* imprint candidates in the history entry. At the next session start, reading `.cortex/MEMORY.md` surfaces that flag and the agent proposes `/cortex-imprint` with fresh eyes. Detection happens where context is richest; the decision happens where judgment is freshest — no separate automation needed.
 
-**Memory is attack surface.** A vault that auto-loads files nobody re-reads is exactly where injection payloads persist (see Microsoft's AI Recommendation Poisoning report, Feb 2026). Cortex Forge treats this structurally: `.raw/` is immutable so provenance is always auditable; ingestion scans foreign content for hidden Unicode, embedded payloads, and egress commands before it enters the vault; and automated archiving defaults to *suggest* *(imprint pipeline landing in v0.4)* — a human approves before anything becomes ground truth. Convenience never outruns the isolation layer.
+**Memory is attack surface.** A vault that auto-loads files nobody re-reads is exactly where injection payloads persist (see Microsoft's AI Recommendation Poisoning report, Feb 2026). Cortex Forge treats this structurally: `.raw/` is immutable so provenance is always auditable; ingestion scans foreign content for hidden Unicode, embedded payloads, and egress commands before it enters the vault; and the crystallize-flags → imprint-proposes handoff described above always defaults to *suggest* — a human approves before anything becomes ground truth. Convenience never outruns the isolation layer.
 
 **Failed attempts are knowledge.** Session memory that only records what worked condemns the next session to retry what didn't. The hot cache contract records attempted-and-failed approaches, with evidence, as a first-class section.
 

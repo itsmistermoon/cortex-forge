@@ -77,7 +77,7 @@ pi.registerTool({
 ```
 
 - Registering a tool with the same name as a built-in overrides it.
-- Tools can run commands on remote systems via `ctx.exec()`.
+- Tools can run commands on remote systems via `pi.exec()`.
 - Tool results are truncated by default; configure via `truncation` field in tool definition.
 - One extension can register many tools.
 

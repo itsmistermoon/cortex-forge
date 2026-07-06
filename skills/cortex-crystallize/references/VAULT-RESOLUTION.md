@@ -10,8 +10,9 @@ Apply in order:
 1. If the first argument matches a registered vault name → use that vault.
 2. Otherwise: check if CWD is inside any registered vault (CWD starts with a vault path) → use that vault.
 3. If not, use the `default` vault.
-4. If no default and multiple vaults are registered → ask the user to pick one.
-5. If no vaults registered → stop and prompt to run `/cortex-forge-setup`.
+4. If no default is set and exactly one vault is registered → use that vault.
+5. If no default and multiple vaults are registered → ask the user to pick one.
+6. If no vaults registered → stop and prompt to run `/cortex-forge-setup`.
 
 ## Validate vault structure
 

@@ -23,7 +23,7 @@ Paths are relative to this skill's directory.
 1. **Resolve vault** — per `references/VAULT-RESOLUTION.md`. If the first argument matches a registered vault name (e.g., `/cortex-recall second-brain <query>`), use that vault; treat the remaining text as the query.
 
 2. **Identify relevant pages** — prefer semantic search if the index is available:
-   - If `{vault}/.cortex/db/vault.db` exists: run `scripts/cortex-search.py --vault {vault} "{query}" --top-k 8 --json`, and use the returned chunks (path + heading + content) as the primary source set.
+   - If `{vault}/.cortex/db/vault.db` (canonical) or `{vault}/.cortex/vault.db` (legacy) exists: run `scripts/cortex-search.py --vault {vault} "{query}" --top-k 8 --json`, and use the returned chunks (path + heading + content) as the primary source set.
    - Otherwise (index missing): read `{vault}/wiki/index.md` directly and identify the most relevant pages by title and description. This is the explicit fallback — it is NOT a protocol violation.
 
 3. **Answer** — read the full page for any result where the chunk alone is insufficient, then synthesize a response with citations to specific pages. If information is missing, point to `/cortex-assimilate` for the missing sources.

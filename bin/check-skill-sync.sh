@@ -81,17 +81,18 @@ if [[ ! -f "$PRUNE_SCHEMA" ]]; then
 elif [[ ! -f "$AGENTS_FILE" ]]; then
   fail "AGENTS.md not found — cannot verify vault-report.json consumer"
 else
-  # Extract field names declared in the canonical schema reference
-  prune_fields=$(grep -oE '"(dead_links|raw_without_source_page|missing_confidence|orphan_pages)"' "$PRUNE_SCHEMA" | sort -u || true)
+  # Discover field names structurally from the "## Field definitions" bullet list
+  # (`- \`health.foo\` — ...`) instead of enumerating known names, so a newly
+  # added field is picked up automatically instead of silently skipped.
+  prune_fields=$(grep -oE '`health\.[a-z_]+`' "$PRUNE_SCHEMA" | tr -d '`' | sed 's/^health\.//' | sort -u || true)
   if [[ -z "$prune_fields" ]]; then
     fail "no vault-report.json fields found in $PRUNE_SCHEMA — schema may have moved again"
   else
     # Check each field is referenced in AGENTS.md
     all_ok=true
     while IFS= read -r field; do
-      clean="${field//\"/}"
-      if ! grep -q "$clean" "$AGENTS_FILE"; then
-        fail "vault-report field '$clean' declared in cortex-prune schema but not referenced in AGENTS.md"
+      if ! grep -q "$field" "$AGENTS_FILE"; then
+        fail "vault-report field '$field' declared in cortex-prune schema but not referenced in AGENTS.md"
         all_ok=false
       fi
     done <<< "$prune_fields"

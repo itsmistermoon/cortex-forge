@@ -69,7 +69,7 @@ Always end with the relevant subset of ## Output format.
    default: {name}   # set as default only if this is the first vault, or if it was already default
    ```
    - Create `~/.cortex-forge/` if it doesn't exist.
-   - Preserve all existing vault entries — never overwrite other vaults.
+   - Preserve all existing vault entries — never overwrite other vaults — and all other top-level keys (`upstream:`, `upstream_ref:`, `imprint_triage:`, `hot_cache_stale_days:`, etc.) unchanged. Read the full file, merge in the new vault entry, and write back the whole document — never reconstruct it from only the fields this step cares about.
    - If this is the first vault registered, set it as `default`. If a `default` already exists, leave it unchanged.
 
 3b. **Sync infrastructure from upstream** — pull infrastructure files from the upstream repo and apply them to the current vault. See `references/UPSTREAM-SYNC.md` for resolution, sync scope, exclusions, and rate limits.
@@ -80,8 +80,8 @@ Always end with the relevant subset of ## Output format.
     - Write the chosen value as `hot_cache_stale_days: N` at the top level of `config.yml` (not nested under `vaults:`).
     - This is read by the `AGENTS.md` Crystallize protocol (step 2) to compare against `MEMORY.md`'s `updated:` frontmatter.
 
-4. **Verify global skills are installed** — check whether the 6 skills (`cortex-crystallize`, `cortex-forge-setup`, `cortex-recall`, `cortex-assimilate`, `cortex-imprint`, `cortex-prune`) are present under `~/.agents/skills/`.
-   - **All present** → this step is done implicitly (running this skill at all means it was already installed by something). Report which skills are present and move on.
+4. **Verify global skills are installed** — check each of the 6 skills (`cortex-crystallize`, `cortex-forge-setup`, `cortex-recall`, `cortex-assimilate`, `cortex-imprint`, `cortex-prune`) individually for presence under `~/.agents/skills/` — do not assume presence just because this skill is running.
+   - **All present** → report which 6 skills are present and move on.
    - **Some missing** — do not attempt to install them yourself. Tell the user:
      > Missing skills: {list}. Install them with:
      > ```

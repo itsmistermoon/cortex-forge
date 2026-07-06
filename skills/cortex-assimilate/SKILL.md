@@ -16,7 +16,7 @@ Ingest a new source and synthesize wiki pages from it.
 Paths are relative to this skill's directory.
 
 - **`scripts/cortex-sanitize.sh`** — Detects and auto-redacts credentials in a temp file before ingestion (step 2)
-- **`scripts/cortex-index.py`** — Re-indexes vault embeddings after a new source is ingested (step 5)
+- **`scripts/cortex-index.py`** — Re-indexes vault embeddings after a new source is ingested (step 7)
 - **`scripts/embeddings.py`** — Shared embedding backend, imported by `cortex-index.py`; not invoked directly
 
 ## Steps
@@ -42,11 +42,9 @@ Paths are relative to this skill's directory.
 
 4. Update `{vault}/wiki/index.md` with new pages.
 
-5. **Re-index embeddings** — if `{vault}/.cortex/db/vault.db` exists, run `python3 -B scripts/cortex-index.py {vault}` and report the result inline: "Indexed N new chunk(s)." If the db does not exist, skip silently — the vault may not have semantic search enabled.
+5. **Project linking** — check `{vault}/wiki/projects/` for active projects whose `domains:` match the source; propose the update before writing.
 
-6. **Project linking** — check `{vault}/wiki/projects/` for active projects whose `domains:` match the source; propose the update before writing.
-
-7. **Backward enrichment** — scan existing wiki pages for candidates that should now reference the new source.
+6. **Backward enrichment** — scan existing wiki pages for candidates that should now reference the new source.
 
    Skip this step if the new source page has no `tags:` or if fewer than 5 wiki pages exist total.
 
@@ -55,6 +53,8 @@ Paths are relative to this skill's directory.
    3. Evaluate each candidate: does the new source add substantive information this page should reference — a notable comparable, an entry for an existing comparison or list, a contradiction or refinement of a claim? Classify as **ENRICHABLE** (specific addition stated) or **FALSE_POSITIVE** (tag overlap is incidental or thematic only).
    4. For each ENRICHABLE candidate, state exactly what to add and where — e.g., "Add OpenWiki to the comparison table in §Key mechanisms."
    5. Report all ENRICHABLE candidates to the user. Do not apply any changes without explicit confirmation per candidate.
+
+7. **Re-index embeddings** — runs last so it captures every page this run touched, including step 5/6 updates to existing pages — if `{vault}/.cortex/db/vault.db` exists, run `python3 -B scripts/cortex-index.py {vault}` and report the result inline: "Indexed N new chunk(s)." If the db does not exist, skip silently — the vault may not have semantic search enabled.
 
 ## --research mode
 

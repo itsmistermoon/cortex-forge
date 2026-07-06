@@ -9,6 +9,7 @@
 - [[wiki/concepts/crystallize-vs-imprint]] — Design boundary between cortex-crystallize (hot cache, ephemeral, automatic) and cortex-imprint (wiki, permanent, manual)
 - [[wiki/concepts/skill-dependency-graph]] — What each skill produces and consumes; contracts, failure modes, and the data flow between all 6 skills
 - [[wiki/concepts/skill-design-principles]] — Compiled checklist of what separates a working skill from one that appears to work; whiteness test, 9 principles, commit checklist
+- [[wiki/concepts/fail-loud-design]] — Error clearly and immediately instead of degrading silently; origin in the 2026-07-03 script audit, manifestations across CLI scripts, CI, and session-state writes
 - [[wiki/concepts/skill-self-improvement-loop]] — Observer skill pattern: run inner skill → evaluate with computer use → generate diff → improve SKILL.md; inner vs outer loop distinction
 - [[wiki/concepts/no-op-audit-adversarial-debate]] — Methodology for identifying and rehabilitating no-op skill instructions via adversarial subagent debate (defender / attacker / judge)
 - [[wiki/concepts/parametric-knowledge]] — What the model knows from training; frozen, unverifiable, disqualified as a source for vault topics

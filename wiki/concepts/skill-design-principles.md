@@ -2,7 +2,7 @@
 title: Skill Design Principles
 type: concept
 created: 2026-07-01
-updated: 2026-07-03
+updated: 2026-07-06
 tags: [skills, agent-design, quality, writing-great-skills, cortex-forge/skills]
 aliases: [good skill checklist, skill quality, writing skills, skill whiteness test]
 sources:
@@ -117,7 +117,7 @@ Every step and instruction should open with an imperative verb or a condition. T
 
 Bundled executable scripts belong in a `scripts/` subdirectory of the skill, referenced with paths relative to the skill root (the agent runs commands from there — no absolute paths needed). List every co-located script in a `## Available scripts` section immediately after the skill's intro paragraph, before `## Steps`/`## Sub-tasks`, so the agent knows what exists before reading the full procedure. Source: [[wiki/sources/agentskills-using-scripts]] — this is the Agent Skills specification's own convention, not a cortex-forge-specific choice; cortex-forge adopted it directly on 2026-07-03 (see `wiki/projects/cortex-forge.md` changelog) after having previously kept scripts flat in the skill root.
 
-The same source's guidance on *designing* scripts for agentic callers — non-interactive input only (no TTY prompts, since agents cannot respond to them and a blocking prompt hangs forever instead of failing loud), `--help` as the primary interface documentation, error messages that state what went wrong and what to try next, structured stdout with diagnostics on stderr, idempotency, `--dry-run` for destructive operations, and capped/paginated output for anything that could exceed a harness's truncation threshold — has not yet been audited against cortex-forge's own scripts (`cortex-prune.sh`, `cortex-sanitize.sh`, `cortex-index.py`, `cortex-search.py`). Candidate follow-up, not yet applied.
+The same source's guidance on *designing* scripts for agentic callers — non-interactive input only (no TTY prompts, since agents cannot respond to them and a blocking prompt hangs forever instead of failing loud), `--help` as the primary interface documentation, error messages that state what went wrong and what to try next, structured stdout with diagnostics on stderr, idempotency, `--dry-run` for destructive operations, and capped/paginated output for anything that could exceed a harness's truncation threshold — was audited against cortex-forge's own scripts the same day (2026-07-03): unbounded waits, silent mid-run corruption, and broken path references across every script in the suite. See [[wiki/concepts/fail-loud-design]] for the resulting principle and its concrete manifestations.
 
 Reasonable to bundle a script only when the trigger has actually occurred: the agent reinventing the same logic across multiple execution traces (parsing a format, running a repeated multi-flag command). Writing scripts preemptively, before that signal appears, adds maintenance surface without a demonstrated need.
 
@@ -146,9 +146,11 @@ Run this against any SKILL.md before committing:
 
 - [[wiki/concepts/no-op-audit-adversarial-debate]] — Methodology for identifying and rehabilitating no-op instructions via adversarial subagent debate
 - [[wiki/concepts/progressive-disclosure-hooks]] — Just-in-time context loading pattern; same progressive disclosure principle applied to context injection
+- [[wiki/concepts/fail-loud-design]] — Script-design principle referenced in Principle 10 above
 
 ---
 
 - 2026-07-01 [Claude Code]: Page created — consolidated from two audit passes: no-op audit (2026-06-24) and writing-great-skills framework audit (2026-07-01)
+- 2026-07-06 [Claude Code]: Corrected Principle 10 — claimed the fail-loud audit against cortex-forge's own scripts "has not yet been audited", but it was completed the same day (2026-07-03) mentioned earlier in the same paragraph. Linked to new [[wiki/concepts/fail-loud-design]] page.
 - 2026-07-01 [Claude Code]: Sources updated to primary sources — writing-great-skills SKILL.md+GLOSSARY.md, Anthropic skill-creator SKILL.md, skill-optimization-loop (replatformer)
 - 2026-07-03 [Claude Code]: Added Principle 10 (scripts live in `scripts/`, listed in `## Available scripts`) and a corroboration note on the whiteness test, both from agentskills.io's best-practices and using-scripts guides. Checklist item added for script organization.

@@ -2,8 +2,9 @@
 title: skill dependency graph
 type: concept
 created: 2026-06-30
-updated: 2026-06-30
+updated: 2026-07-06
 tags: [cortex-forge/skills, skills, architecture, dependency, data-flow]
+aliases: [skill contracts, skill data flow, cortex-forge dependencies]
 sources:
   - conversation 2026-06-30
 confidence: high
@@ -19,7 +20,7 @@ Maps what each Cortex Forge skill produces and what it consumes — the contract
 ```
 cortex-forge-setup
        │
-       └── prerequisite for ALL skills (vault registration, hook config)
+       └── prerequisite for ALL skills (vault registration, opt-in post-commit git hooks)
        
 cortex-assimilate
        │
@@ -35,7 +36,7 @@ cortex-recall
 cortex-crystallize
        │
        └── produces → .cortex/MEMORY.md
-                         └── #### Imprint candidate → triggers nudge → consumed by: cortex-imprint
+                         └── #### Imprint candidate → surfaced by AGENTS.md's mandatory read protocol → consumed by: cortex-imprint
 
 cortex-imprint
        │
@@ -46,13 +47,13 @@ cortex-prune
        │
        ├── validates ← .raw/ files            produced by: cortex-assimilate
        ├── validates ← wiki/ pages            produced by: cortex-assimilate, cortex-imprint
-       └── produces  → .cortex/vault-report.json  consumed by: AGENTS.md (SessionStart)
+       └── produces  → wiki/meta/vault-report.json  consumed by: AGENTS.md (mandatory session-start read)
 ```
 
 ## Contracts per dependency
 
 ### forge-setup → all skills
-Every skill resolves the vault from `~/.cortex-forge/config.yml`, which setup writes. If the vault is not registered, all skills stop at step 1. Setup also installs the SessionStart/SessionEnd hooks that drive crystallize automatically.
+Every skill resolves the vault from `~/.cortex-forge/config.yml`, which setup writes. If the vault is not registered, all skills stop at step 1. Setup also offers opt-in post-commit git hooks (prune refresh, embedding reindex) — separate from, and simpler than, agent lifecycle hooks, which cortex-forge does not use. `cortex-crystallize` is invoked manually, never automatically.
 
 ### assimilate → recall
 assimilate writes `wiki/` pages that recall searches. recall's semantic index (`.cortex/db/vault.db`) is built from those pages. If assimilate skips updating `wiki/index.md`, recall's fallback path (index traversal) misses the new page. **Contract:** assimilate must update `wiki/index.md` on every successful ingestion.
@@ -69,15 +70,15 @@ prune layer 1 (structural script) checks:
 If assimilate produces incomplete output (network error mid-ingestion, missing synthesis step), prune is the detection mechanism. **There is no automatic repair** — prune flags, the user decides.
 
 ### crystallize → imprint (via imprint candidate)
-crystallize writes `#### Imprint candidate` entries in `.cortex/MEMORY.md` when a session produces something worth permanent archiving. The SessionStart hook detects this flag and surfaces a nudge to run `/cortex-imprint`. imprint then reads the synthesis from the session and writes a permanent `wiki/` page.
+crystallize writes `#### Imprint candidate` entries in `.cortex/MEMORY.md` when a session produces something worth permanent archiving. `AGENTS.md`'s mandatory session-start read protocol instructs the agent to check the latest History entry for this flag and propose running `/cortex-imprint`. imprint then reads the synthesis from the session and writes a permanent `wiki/` page.
 
-The handoff is passive: crystallize does not call imprint, and imprint does not read MEMORY.md directly. The hook is the bridge. If the SessionStart hook is not installed (forge-setup step 6 was skipped or declined), the nudge never fires — imprint candidates accumulate silently in MEMORY.md.
+The handoff is passive: crystallize does not call imprint, and imprint does not read MEMORY.md directly. `AGENTS.md`'s read protocol is the bridge — every agent reads `.cortex/MEMORY.md` before its first response, identically, with no hook wiring required. If an agent skips that mandatory read (a protocol violation, not an opt-out), the nudge never fires — imprint candidates accumulate silently in MEMORY.md.
 
 ### imprint → recall
 imprint writes permanent `wiki/` pages into the same directory tree that recall searches. A successful imprint immediately expands recall's coverage without requiring a new assimilate run. **Contract:** imprint must update `wiki/index.md` on every successful write (step 8 of cortex-imprint).
 
 ### prune → AGENTS.md (via vault-report.json)
-prune produces `.cortex/vault-report.json` with this schema:
+prune produces `wiki/meta/vault-report.json` with this schema:
 
 ```json
 {
@@ -91,7 +92,7 @@ prune produces `.cortex/vault-report.json` with this schema:
 }
 ```
 
-AGENTS.md reads this file at SessionStart to surface health signals to the agent before any work begins. **If the schema changes in cortex-prune without updating AGENTS.md**, the agent reads a stale or mismatched report silently. This is the only cross-skill contract where a format change in one skill corrupts a consumer that is not itself a skill.
+`AGENTS.md`'s mandatory session-start read protocol reads this file before the agent's first response, to surface health signals before any work begins. **If the schema changes in cortex-prune without updating AGENTS.md**, the agent reads a stale or mismatched report silently. This is the only cross-skill contract where a format change in one skill corrupts a consumer that is not itself a skill.
 
 ## Failure modes by dependency
 
@@ -100,7 +101,7 @@ AGENTS.md reads this file at SessionStart to surface health signals to the agent
 | forge-setup not run | All skills stop at vault resolution step 1 | Immediate, loud |
 | assimilate skips index update | recall misses new pages via index fallback | cortex-prune (orphan detection) |
 | assimilate incomplete (mid-run failure) | `.raw/` file exists, no wiki page | cortex-prune layer 1 |
-| SessionStart hook not installed | Imprint candidates accumulate, no nudge | Manual inspection of MEMORY.md |
+| Agent skips AGENTS.md's mandatory read protocol | Imprint candidates accumulate, no nudge | Manual inspection of MEMORY.md |
 | imprint skips index update | recall misses imprinted pages | cortex-prune (orphan detection) |
 | prune schema change, AGENTS.md not updated | Agent reads wrong field names silently | No automatic detection |
 

@@ -2,8 +2,9 @@
 title: crystallize vs imprint — design boundary
 type: concept
 created: 2026-06-30
-updated: 2026-06-30
+updated: 2026-07-06
 tags: [cortex-forge/protocol, skills, memory, knowledge-management, design-decision]
+aliases: [crystallize vs imprint, memory vs wiki, hot cache vs knowledge graph]
 sources:
   - conversation 2026-06-30
 confidence: high
@@ -21,7 +22,7 @@ Two skills in Cortex Forge that both "preserve something valuable from a session
 | **Destination** | `.cortex/MEMORY.md` (gitignored) | `wiki/` (versioned) |
 | **Permanence** | Mutable — overwritten on every session | Immutable — updated as a document |
 | **Audience** | The next agent in this same session or project | Any agent in any future project |
-| **Trigger** | Automatic (SessionEnd / PreCompact hooks) | Manual — always explicit |
+| **Trigger** | Manual, but routine — invoked at milestones and session close every session | Manual, exceptional — invoked only when something is worth permanent archiving |
 | **What it captures** | Operational state: what's pending, what was decided, what to resume | Distilled knowledge: principles, analyses, decisions that outlast the project |
 | **Scope** | Project-scoped — tied to the active repo's context | Vault-scoped — part of the knowledge graph, queryable by any skill |
 
@@ -34,10 +35,10 @@ Both skills run at the end of a session. Both write something that persists. But
 
 ## The handoff mechanism
 
-crystallize is the upstream step. The `#### Imprint candidate` section in a history entry flags a synthesis produced during the session that *might* deserve permanent archiving. The SessionStart hook surfaces this flag the next session as a nudge to run `/cortex-imprint`. The user decides whether to act on it.
+crystallize is the upstream step. The `#### Imprint candidate` section in a history entry flags a synthesis produced during the session that *might* deserve permanent archiving. `AGENTS.md`'s mandatory session-start read protocol surfaces this flag the next session as a nudge to run `/cortex-imprint`. The user decides whether to act on it.
 
 This means:
-- crystallize runs on every session, automatically.
+- crystallize runs at every milestone and session close — manually invoked, never via a hook.
 - imprint runs only when something exceptional happened — a non-obvious conclusion, a grounded design decision, a pattern worth consulting in unrelated future projects.
 
 ## Decision rule
@@ -53,3 +54,9 @@ If neither question fits cleanly, it belongs in crystallize and can be reconside
 - [[wiki/concepts/memory-system]] — broader context on stateful agents
 - [[wiki/concepts/handoff-artifact]] — MEMORY.md as an instance of this pattern
 - [[wiki/concepts/primary-source]] — why imprint requires tracing to primary sources before writing
+- [[wiki/concepts/agent-hook-compatibility]] — why cortex-forge removed agent lifecycle hooks entirely (2026-07-02), replacing them with the manual protocol both skills now rely on
+- [[wiki/concepts/workflow-architecture]] — the current session flow (hooks-free) this page's Trigger row describes
+
+---
+
+- 2026-07-06 [Claude Code]: Corrected "Trigger" row and handoff mechanism — both described SessionEnd/PreCompact/SessionStart hooks removed 2026-07-02; crystallize is manually invoked, not automatic.

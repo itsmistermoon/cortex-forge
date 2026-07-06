@@ -20,7 +20,7 @@ raw: .raw/openwiki.md
 
 ## Summary
 
-OpenWiki is a TypeScript CLI that generates and maintains codebase documentation for AI coding agents. It runs an LLM agent (via [[wiki/entities/deepagents|DeepAgents]]) against the repo, produces a structured `openwiki/` wiki directory, and injects a reference into `AGENTS.md` and/or `CLAUDE.md`. The key differentiator is automated maintenance: a GitHub Actions workflow runs `openwiki --update` on a schedule, uses git diffs since the last successful run, and opens a PR only when documentation actually changed (verified via SHA-256 content snapshot).
+OpenWiki is a TypeScript CLI that generates and maintains codebase documentation for AI coding agents. It runs an LLM agent (via DeepAgents, a LangChain agent framework) against the repo, produces a structured `openwiki/` wiki directory, and injects a reference into `AGENTS.md` and/or `CLAUDE.md`. The key differentiator is automated maintenance: a GitHub Actions workflow runs `openwiki --update` on a schedule, uses git diffs since the last successful run, and opens a PR only when documentation actually changed (verified via SHA-256 content snapshot).
 
 ## Key ideas
 

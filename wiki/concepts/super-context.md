@@ -2,7 +2,7 @@
 title: Super Context
 type: concept
 created: 2026-06-26
-updated: 2026-06-26
+updated: 2026-07-06
 tags: [session-start, context-injection, harness, cold-start]
 aliases: [supercontext, super-context, context-scout]
 sources:
@@ -36,15 +36,16 @@ Key properties:
 
 ## Cortex Forge equivalent
 
-Cortex Forge implements the same guarantee via a different mechanism: the `SessionStart` hook (OS-level script executed by the agent runtime) reads `.hot/MEMORY.md` and injects it into the session before the agent reads the user's prompt. The functional result is identical — the agent is never cold — but the execution layer differs:
+Cortex Forge pursues the same guarantee via a different mechanism: `AGENTS.md` mandates that the agent read `.cortex/MEMORY.md` before its first response — identically on every agent, with no hook wiring required. This wasn't the original design: Cortex Forge used a `SessionStart` hook for this until 2026-07-02, when it was removed because hook support was too uneven across Claude Code, Codex, Antigravity, and CommandCode to build the suite on top of it (see [[wiki/concepts/agent-hook-compatibility]]). The tradeoff was deliberate: giving up harness-guaranteed determinism (the model literally cannot skip a hook) for cross-agent portability (a written protocol works anywhere, a hook only works where the harness supports one) — the same result depends on the agent following an instruction rather than an OS-level guarantee.
 
 | | OpenHuman SuperContext | Cortex Forge |
 |---|---|---|
-| **Execution layer** | Harness-internal (Python/Rust app) | OS-level hook script (bash) |
-| **Context source** | Memory Tree (auto-fetched from integrations) | `.hot/MEMORY.md` (agent-synthesized from wiki) |
+| **Execution layer** | Harness-internal (Python/Rust app) | Manual protocol — `AGENTS.md` instructs the agent, no hook or harness-level guarantee |
+| **Context source** | Memory Tree (auto-fetched from integrations) | `.cortex/MEMORY.md` (agent-synthesized from wiki) |
 | **Scout** | Dedicated read-only sub-agent | Not applicable — file read is direct |
-| **Portability** | OpenHuman-only | Any agent with a SessionStart hook |
+| **Portability** | OpenHuman-only | Any agent capable of reading a file and following a written instruction — no hook support required |
 | **Content origin** | Automatic (integrations pull data) | Manual / agent-synthesized (cortex-crystallize) |
+| **Guarantee** | Harness-enforced — the model cannot skip it | Protocol-enforced — depends on the agent following `AGENTS.md` |
 
 ## When to use this pattern
 
@@ -57,10 +58,12 @@ Any agent system where:
 ## See also
 
 - [[wiki/concepts/progressive-disclosure-hooks]] — complementary: loads context just-in-time for specific queries rather than upfront
-- [[wiki/concepts/handoff-artifact]] — `.hot/MEMORY.md` as the Cortex Forge instance of the context bundle
+- [[wiki/concepts/handoff-artifact]] — `.cortex/MEMORY.md` as the Cortex Forge instance of the context bundle
 - [[wiki/concepts/memory-system]] — broader pattern of which super-context is a session-start component
 - [[wiki/entities/openhuman]] — origin of the term and reference implementation
+- [[wiki/concepts/agent-hook-compatibility]] — why the SessionStart hook this page originally described was removed (2026-07-02)
 
 ---
 
 - 2026-06-26 [Claude Code]: Concept created from OpenHuman SuperContext feature article; Cortex Forge equivalence mapped
+- 2026-07-06 [Claude Code]: Corrected the "Cortex Forge equivalent" section and comparison table — described a `SessionStart` hook and `.hot/MEMORY.md` path that no longer exist (hooks removed 2026-07-02, path moved to `.cortex/`). Rewrote as the current manual `AGENTS.md` protocol, and added the harness-guarantee-vs-portability tradeoff this change represents.

@@ -33,8 +33,8 @@ Paths are relative to this skill's directory.
 
    **Sanitization check** — before saving to `.raw/`, run `bash scripts/cortex-sanitize.sh <temp-file>` (detects injection, exfiltration, and credential vectors) and inspect the JSON output:
 
-   - **If `redacted: true`** — the script already replaced every matched credential (API keys, bearer tokens, AWS keys, basic-auth `user:pass`) with `<REDACTED>` in `<temp-file>`. Tell the user how many credentials were redacted and proceed with the redacted content. Never reconstruct or reinsert the original secret anywhere — not even on explicit user request.
-   - **Any other finding type** (`invisible_unicode`, `html_comment`, `base64`, `egress_command`, `anthropic_base_url`) is informational, not blocking: list each finding (type, label, count) and ask "This content has [N] findings (see above). Proceed with ingestion?" — default is **yes**. If the user declines, stop without saving; if they accept, save to `.raw/` and note the findings in the source page's changelog.
+   - **If `redacted: true`** — tell the user how many credentials were redacted in `<temp-file>` and proceed with the redacted content. Never reconstruct or reinsert the original secret anywhere — not even on explicit user request.
+   - **Any other finding type** is informational, not blocking: list each finding (type, label, count) and ask "This content has [N] findings (see above). Proceed with ingestion?" — default is **yes**. If the user declines, stop without saving; if they accept, save to `.raw/` and note the findings in the source page's changelog.
 
    If `rg` or `jq` is not available, or the script errors: skip the check (fail-open), but tell the user explicitly that credential redaction did not run for this source — do not proceed silently.
 

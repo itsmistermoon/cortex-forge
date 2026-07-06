@@ -129,7 +129,7 @@ def init_db(db_path: Path) -> sqlite3.Connection:
             sys.exit(1)
     conn.enable_load_extension(False)
 
-    conn.executescript("""
+    conn.executescript(f"""
         CREATE TABLE IF NOT EXISTS documents (
             rowid INTEGER PRIMARY KEY AUTOINCREMENT,
             path TEXT NOT NULL,
@@ -141,7 +141,7 @@ def init_db(db_path: Path) -> sqlite3.Connection:
         );
         CREATE VIRTUAL TABLE IF NOT EXISTS vec_documents USING vec0(
             rowid INTEGER PRIMARY KEY,
-            embedding float[768] distance_metric=cosine
+            embedding float[{emb.DIMENSIONS}] distance_metric=cosine
         );
         CREATE INDEX IF NOT EXISTS idx_documents_path
             ON documents(path);
@@ -289,7 +289,8 @@ def main():
             for p in deleted:
                 delete_file(conn, p)
 
-    updated = skipped = 0
+    updated = skipped = failed = 0
+    failed_files: list[str] = []
     for md_path in md_files:
         rel = str(md_path.relative_to(vault))
         current_hash = sha256(md_path)
@@ -297,16 +298,32 @@ def main():
             skipped += 1
             continue
         print(f"  indexing {rel}")
-        index_file(conn, vault, md_path)
-        updated += 1
+        try:
+            index_file(conn, vault, md_path)
+            updated += 1
+        except emb.EmbeddingBackendError as e:
+            print(f"  FAILED: {rel} — {e}", file=sys.stderr)
+            failed += 1
+            failed_files.append(rel)
 
     print(f"Done: {updated} indexed, {skipped} skipped, {len(deleted)} removed.")
+    if failed:
+        print(
+            f"FAILED: {failed} file(s) could not be embedded — already-indexed files are "
+            f"unaffected; re-run this command to retry only the failures: {', '.join(failed_files)}"
+        )
 
     if updated > 0 or len(deleted) > 0:
         print("Calibrating distance threshold...")
-        calibrate(conn, vault, config_path)
+        try:
+            calibrate(conn, vault, config_path)
+        except emb.EmbeddingBackendError as e:
+            print(f"  Calibration skipped — {e}", file=sys.stderr)
 
     conn.close()
+
+    if failed:
+        sys.exit(1)
 
 
 if __name__ == "__main__":

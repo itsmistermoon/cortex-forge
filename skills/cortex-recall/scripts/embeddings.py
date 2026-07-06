@@ -22,13 +22,22 @@ def _is_apple_silicon() -> bool:
     return platform.system() == "Darwin" and platform.machine() == "arm64"
 
 
-def _try_ollama() -> bool:
+class EmbeddingBackendError(RuntimeError):
+    """Raised when a single embed call fails (e.g. Ollama timeout) — recoverable
+    per-call, unlike total backend unavailability (which exits at load time)."""
+
+
+def _ollama_post(prompt: str, timeout: float):
     import json
-    payload = json.dumps({"model": "nomic-embed-text", "prompt": "test"}).encode()
+    payload = json.dumps({"model": "nomic-embed-text", "prompt": prompt}).encode()
     req = urllib.request.Request(OLLAMA_URL, data=payload, method="POST",
                                  headers={"Content-Type": "application/json"})
+    return urllib.request.urlopen(req, timeout=timeout)
+
+
+def _try_ollama() -> bool:
     try:
-        with urllib.request.urlopen(req, timeout=3) as r:
+        with _ollama_post("test", timeout=3) as r:
             return r.status == 200
     except Exception:
         return False
@@ -90,32 +99,33 @@ def embed(text: str, prefix: str = "") -> list[float]:
 
     if backend == "ollama":
         import json
-        payload = json.dumps({"model": "nomic-embed-text", "prompt": full_text}).encode()
-        req = urllib.request.Request(OLLAMA_URL, data=payload, method="POST",
-                                     headers={"Content-Type": "application/json"})
         try:
-            with urllib.request.urlopen(req, timeout=OLLAMA_EMBED_TIMEOUT) as r:
+            with _ollama_post(full_text, timeout=OLLAMA_EMBED_TIMEOUT) as r:
                 data = json.loads(r.read())
         except (TimeoutError, OSError) as e:
-            print(
-                f"ERROR: Ollama did not respond within {OLLAMA_EMBED_TIMEOUT}s while embedding "
-                f"({e}). Check `ollama ps` / restart the Ollama server.",
-                file=sys.stderr,
-            )
-            sys.exit(1)
-        return data["embedding"]
+            raise EmbeddingBackendError(
+                f"Ollama did not respond within {OLLAMA_EMBED_TIMEOUT}s while embedding "
+                f"({e}). Check `ollama ps` / restart the Ollama server."
+            ) from e
+        vec = data["embedding"]
 
-    if backend == "mlx":
+    elif backend == "mlx":
         import mlx.core as mx
         tokens = _mlx_tokenizer(full_text, return_tensors="mlx", padding=True, truncation=True)
         output = _mlx_model(**tokens)
-        vec = output.last_hidden_state[0].mean(axis=0)
-        return vec.tolist()
+        vec = output.last_hidden_state[0].mean(axis=0).tolist()
 
-    if backend == "sentence-transformers":
-        return _st_model.encode(full_text, normalize_embeddings=True).tolist()
+    elif backend == "sentence-transformers":
+        vec = _st_model.encode(full_text, normalize_embeddings=True).tolist()
 
-    raise RuntimeError(f"Unknown backend: {backend}")
+    else:
+        raise RuntimeError(f"Unknown backend: {backend}")
+
+    if len(vec) != DIMENSIONS:
+        raise EmbeddingBackendError(
+            f"Backend '{backend}' returned a {len(vec)}-dim vector, expected {DIMENSIONS}"
+        )
+    return vec
 
 
 def embed_document(text: str) -> list[float]:

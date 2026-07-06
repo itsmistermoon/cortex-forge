@@ -42,7 +42,7 @@ Paths are relative to this skill's directory.
 
 4. Update `{vault}/wiki/index.md` with new pages.
 
-5. **Re-index embeddings** — if `{vault}/.cortex/db/vault.db` exists, run `python3 scripts/cortex-index.py {vault}` and report the result inline: "Indexed N new chunk(s)." If the db does not exist, skip silently — the vault may not have semantic search enabled.
+5. **Re-index embeddings** — if `{vault}/.cortex/db/vault.db` exists, run `python3 -B scripts/cortex-index.py {vault}` and report the result inline: "Indexed N new chunk(s)." If the db does not exist, skip silently — the vault may not have semantic search enabled.
 
 6. **Project linking** — check `{vault}/wiki/projects/` for active projects whose `domains:` match the source; propose the update before writing.
 

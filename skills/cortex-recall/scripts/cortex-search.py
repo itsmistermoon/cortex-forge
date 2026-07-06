@@ -122,7 +122,11 @@ def main():
     threshold = args.threshold if args.threshold is not None else load_threshold(cortex_dir / "db" if (cortex_dir / "db").exists() else cortex_dir)
 
     emb.load_embedding_model()
-    query_vec = emb.embed_query(args.query)
+    try:
+        query_vec = emb.embed_query(args.query)
+    except emb.EmbeddingBackendError as e:
+        print(f"ERROR: {e}", file=sys.stderr)
+        sys.exit(1)
     query_bytes = emb.vec_to_bytes(query_vec)
 
     conn = open_db(db_path)

@@ -26,7 +26,7 @@ command -v timeout >/dev/null 2>&1 && TIMEOUT_BIN="timeout 300"
 [ -z "$TIMEOUT_BIN" ] && command -v gtimeout >/dev/null 2>&1 && TIMEOUT_BIN="gtimeout 300"
 
 (
-  $TIMEOUT_BIN python3 "$INDEXER" "$VAULT_ROOT" \
+  $TIMEOUT_BIN python3 -B "$INDEXER" "$VAULT_ROOT" \
     && echo "$(date '+%F %T') cortex-reindex: ok, wiki_files=$CHANGED" >> "$LOG" \
     || {
       code=$?

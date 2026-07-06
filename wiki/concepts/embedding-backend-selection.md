@@ -16,7 +16,7 @@ sources: []
 
 ## Priority rationale
 
-**Ollama (default):** reuses the daemon already present in most setups; avoids downloading model weights separately. The model (`nomic-embed-text`) is already pulled and produces 768-dimensional vectors. Downside: requires the daemon running — fails in sandboxed environments without explicit network access (see [[wiki/concepts/agent-hook-compatibility]] § Codex).
+**Ollama (default):** reuses the daemon already present in most setups; avoids downloading model weights separately. The model (`nomic-embed-text`) is already pulled and produces 768-dimensional vectors. Downside: requires the daemon running — fails in sandboxed environments without explicit network access (see [[wiki/concepts/agent-hook-compatibility]] § [[wiki/entities/codex|Codex]]).
 
 **mlx-embeddings (Apple Silicon fallback):** runs in-process via the Neural Engine — no daemon required. Same model family (`nomic-embed-text-v1.5`), same 768 dimensions, so the existing `vault.db` index remains valid without re-indexing. Activates automatically if Ollama is unreachable and the package is installed.
 

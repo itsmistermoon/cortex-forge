@@ -49,6 +49,7 @@
 - [[wiki/concepts/pi-event-types]] — Pi extension event taxonomy (startup/session/agent/tool/user_bash/input) and ExtensionContext properties
 - [[wiki/concepts/pi-extension-api]] — All `pi.*` ExtensionAPI methods (registerTool, registerCommand, registerProvider, etc.)
 - [[wiki/concepts/codebase-memory-mcp-tools]] — All 14 MCP tools, node labels, edge types, Cypher read subset, CLI mode, env vars, troubleshooting
+- [[wiki/concepts/embedding-backend-selection]] — Runtime backend priority (Ollama → mlx-embeddings → sentence-transformers) encapsulated in `embeddings.py`'s `_try_ollama()`/`_try_mlx()`
 
 ## Entities
 - [[wiki/entities/compound-engineering]] — Every Inc's compound engineering plugin: 27 skills, compound loop (brainstorm→plan→work→simplify→review→compound), skill-local prompt assets architecture; 22k stars

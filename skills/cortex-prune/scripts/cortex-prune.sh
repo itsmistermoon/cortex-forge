@@ -72,9 +72,10 @@ if [ -d "$RAW" ]; then
 fi
 
 # ── HIGH: Pages without frontmatter ──────────────────────────────────────────
-# index.md y log.md son intencionalmente sin frontmatter
+# index.md, log.md, and everything under wiki/meta/ (operational records, not
+# knowledge — see wiki/meta/_index.md) are intentionally frontmatter-less.
 find "$WIKI" -name "*.md" \
-  | grep -v '_index\|/index\.md\|/log\.md' \
+  | grep -v '_index\|/index\.md\|/log\.md\|/meta/' \
   | while read -r p; do
       head -1 "$p" | grep -q "^---" || f HIGH "No frontmatter: ${p#$VAULT/}"
     done
@@ -83,8 +84,10 @@ find "$WIKI" -name "*.md" \
 # Match by full vault-relative path to avoid basename collisions.
 # A page is an orphan if no other wiki page links to it via [[wiki/...]] wikilink
 # OR references it in a sources: YAML frontmatter list.
+# wiki/meta/ excluded — operational records are indexed via wiki/meta/_index.md,
+# not the [[wikilink]] graph (see wiki/meta/_index.md).
 find "$WIKI" -name "*.md" \
-  | grep -v '_index\|/index\.md\|/log\.md' \
+  | grep -v '_index\|/index\.md\|/log\.md\|/meta/' \
   | while read -r page; do
       rel="${page#$VAULT/}"          # e.g. wiki/concepts/memory-system.md
       rel_noext="${rel%.md}"         # e.g. wiki/concepts/memory-system

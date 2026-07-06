@@ -11,7 +11,7 @@ schema_version: "0.3"
 aliases: []
 ---
 
-# codebase-memory-mcp — MCP Tools Reference
+# [[wiki/entities/codebase-memory-mcp|codebase-memory-mcp]] — MCP Tools Reference
 
 14 tools exposed via MCP. Run `get_graph_schema` first to understand a new project's structure.
 

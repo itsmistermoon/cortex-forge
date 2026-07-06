@@ -440,3 +440,11 @@ Agent: Claude Code (Sonnet 5)
 La sección `## Changelog` de `cortex-assimilate`, `cortex-crystallize`, `cortex-imprint`, `cortex-prune` y `cortex-recall` fue extraída a `wiki/meta/{skill-name}-changelog.md` (uno por skill), dejando el `SKILL.md` solo con instrucciones operativas. Se revisó el árbol git de cada skill para confirmar que ninguna entrada histórica se perdió — el historial en git nunca mostró una eliminación real de `## Changelog`, así que el contenido movido es el acumulado completo. `cortex-forge-setup` no tenía sección de changelog, no requirió cambios. `wiki/meta/_index.md` actualizado con la nueva convención de archivo.
 
 Agent: Claude Code (Sonnet 5)
+
+## [2026-07-06] prune | 9 HIGH / 14 MEDIUM / 17 LOW findings
+
+Layer 1 (`cortex-prune.sh`): 3 dead wikilinks sin candidato de retarget, 6 `wiki/meta/*-changelog.md` marcados sin frontmatter/orphan — falsos positivos: el regex de exclusión del script (`_index|/index\.md|/log\.md`) no contemplaba `*-changelog.md` pese a que `wiki/meta/_index.md` ya documenta esos archivos como operational records fuera del grafo de wikilinks. Corregido en la misma pasada: el regex ahora excluye `wiki/meta/` completo de los checks de frontmatter y orphan (`_index|/index\.md|/log\.md|/meta/`) — re-verificado contra el vault real, HIGH bajó de 9 a 3, MEDIUM de 14 a 8. Layer 2: 5 relaciones sin wikilink cruzado (L2a), veredicto KEEP_SEPARATE para `karpathy-wiki-pattern.md`/`vault-design-karpathy-vs-hq.md` (L2d), 17 menciones sin wikilink (L2b), cobertura de fuentes completa (L2c, sin hallazgos). Layer 3: sin drift.
+
+Auto-aplicado: `wiki/concepts/embedding-backend-selection.md` (orphan real) indexado en `wiki/index.md`; los 17 wikilinks L2b agregados. No aplicado (requiere confirmación): 3 dead links, `aliases:` faltantes en 2 páginas, texto desactualizado de hooks en 3 páginas (`crystallize-vs-imprint.md`, `handoff-artifact.md`, `super-context.md`).
+
+Agent: Claude Code (Sonnet 5)

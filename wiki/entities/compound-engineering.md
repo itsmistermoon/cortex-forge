@@ -13,7 +13,7 @@ schema_version: "0.3"
 
 # Compound Engineering
 
-AI plugin for engineering work by Every Inc (Trevin Chow). 27 skills organized around a compound loop where each engineering cycle leaves behind learnings that make the next cycle cheaper. Cross-harness: Claude Code, Codex, Cursor, Pi, OpenCode.
+AI plugin for engineering work by Every Inc (Trevin Chow). 27 skills organized around a compound loop where each engineering cycle leaves behind learnings that make the next cycle cheaper. Cross-harness: Claude Code, [[wiki/entities/codex|Codex]], Cursor, Pi, OpenCode.
 
 **Repo:** https://github.com/EveryInc/compound-engineering-plugin
 **Stars:** 22,410 (2026-07-01)

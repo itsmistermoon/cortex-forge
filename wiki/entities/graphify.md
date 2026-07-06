@@ -36,7 +36,7 @@ Three cost tiers: free (AST only), local (whisper), API (Claude subagents). User
 |----------|-----------|
 | Claude Code | `~/.claude/skills/` + PreToolUse hooks (`.claude/settings.local.json`) |
 | [[wiki/entities/codex|Codex]] | `AGENTS.md` + PreToolUse hooks (`.codex/hooks.json`) |
-| Gemini CLI / Antigravity | `GEMINI.md` + BeforeTool hook |
+| Gemini CLI / [[wiki/entities/antigravity-cli|Antigravity]] | `GEMINI.md` + BeforeTool hook |
 | Cursor | `.cursor/rules/graphify.mdc` (`alwaysApply: true`) |
 | Kilo Code | Native skill + `tool.execute.before` plugin |
 | Aider, OpenClaw, Trae | `AGENTS.md` fallback |

@@ -11,7 +11,7 @@ schema_version: "0.3"
 aliases: []
 ---
 
-# CommandCode Models
+# [[wiki/entities/commandcode|CommandCode]] Models
 
 Model ids for `cmd -m` / `cmd --model` and `/model` in-session. Run `cmd --list-models` for the live list — this table may drift.
 

@@ -13,7 +13,7 @@ schema_version: "0.3"
 
 # codebase-memory-mcp
 
-A high-performance MCP server for persistent code intelligence via knowledge graphs, built by DeusData. Indexes codebases into a persistent SQLite-backed knowledge graph using tree-sitter AST parsing across 158 languages. Designed to be the structural backend for AI coding agents — the agent (Claude Code, Codex, Gemini CLI, etc.) is the intelligence layer; this tool answers structural graph queries.
+A high-performance MCP server for persistent code intelligence via knowledge graphs, built by DeusData. Indexes codebases into a persistent SQLite-backed knowledge graph using tree-sitter AST parsing across 158 languages. Designed to be the structural backend for AI coding agents — the agent (Claude Code, [[wiki/entities/codex|Codex]], Gemini CLI, etc.) is the intelligence layer; this tool answers structural graph queries.
 
 ## Core capabilities
 

@@ -22,9 +22,9 @@ Each AI coding agent exposes a permission surface that controls what actions it 
 | Agent | Default mode | Write files | Shell commands | Headless write | Override flag |
 |-------|-------------|-------------|----------------|----------------|---------------|
 | Claude Code | Auto-accept | ✅ | ✅ | ✅ | `--dangerously-skip-permissions` (already skipped) |
-| CommandCode | Interactive | ❌ (requires approval) | ❌ (requires approval) | ❌ **blocked** | `--yolo` / `--dangerously-skip-permissions` |
-| Antigravity CLI | Sandbox | Per action type | Per action type | Sandbox controls | `--sandbox-mode off` |
-| Codex | Controlled | Controlled by mode | Controlled by mode | Controlled by mode | `--full-auto` |
+| [[wiki/entities/commandcode|CommandCode]] | Interactive | ❌ (requires approval) | ❌ (requires approval) | ❌ **blocked** | `--yolo` / `--dangerously-skip-permissions` |
+| [[wiki/entities/antigravity-cli|Antigravity CLI]] | Sandbox | Per action type | Per action type | Sandbox controls | `--sandbox-mode off` |
+| [[wiki/entities/codex|Codex]] | Controlled | Controlled by mode | Controlled by mode | Controlled by mode | `--full-auto` |
 
 ## Critical: CommandCode headless writes (historical)
 

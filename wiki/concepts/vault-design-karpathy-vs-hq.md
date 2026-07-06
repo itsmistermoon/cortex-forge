@@ -43,7 +43,7 @@ The structural difference: in Karpathy the LLM has agency over knowledge structu
 
 ## Multi-agent protocol debt
 
-Neither Karpathy nor HQ models an async vault with multiple agents. Karpathy assumes a single LLM; HQ assumes a single human. When Claude Code, Codex, etc. write to the same wiki in independent sessions, `.hot/` is the only anti-conflict mechanism — and it's gitignored. Debt to resolve if the project scales.
+Neither Karpathy nor HQ models an async vault with multiple agents. Karpathy assumes a single LLM; HQ assumes a single human. When Claude Code, [[wiki/entities/codex|Codex]], etc. write to the same wiki in independent sessions, `.hot/` is the only anti-conflict mechanism — and it's gitignored. Debt to resolve if the project scales.
 
 ## Cross-reference: Hermes Agent (Nous Research)
 

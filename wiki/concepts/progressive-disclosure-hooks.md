@@ -51,7 +51,7 @@ The useful addition is the *budget*: each tier has a known cost ceiling, so the 
 
 ## Tension with visibility
 
-In Codex, context injected by hooks is visible in the chat (`hook context:`). The progressive disclosure pattern reduces the impact of this visibility by minimizing the injected volume — less visible noise, fewer tokens consumed.
+In [[wiki/entities/codex|Codex]], context injected by hooks is visible in the chat (`hook context:`). The progressive disclosure pattern reduces the impact of this visibility by minimizing the injected volume — less visible noise, fewer tokens consumed.
 
 ## Connections
 - Related concepts: [[wiki/concepts/agent-hook-compatibility]], [[wiki/concepts/antigravity-hooks]], [[wiki/concepts/prompt-classification-hook]]

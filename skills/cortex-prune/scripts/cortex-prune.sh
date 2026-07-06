@@ -158,7 +158,7 @@ echo "── Summary ───────────────────�
 echo "HIGH: $HIGH  MEDIUM: $MED  LOW: $LOW"
 
 # ── vault-report.json ─────────────────────────────────────────────────────────
-# Canonical schema defined in skills/cortex-prune/SKILL.md step 4a.
+# Canonical schema defined in skills/cortex-prune/references/VAULT-REPORT-SCHEMA.md
 # Written atomically (temp file in the same dir + rename) so a kill/crash
 # mid-write never leaves a truncated/corrupt vault-report.json behind.
 mkdir -p "$WIKI/meta"

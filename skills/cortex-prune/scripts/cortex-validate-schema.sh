@@ -59,8 +59,7 @@ walk() {
 walk "sources"   "$fields_source"
 walk "concepts"  "$fields_concept"
 walk "entities"  "$fields_entity"
-walk "reference" "$fields_concept"   # reference/ pages now use type: concept
-walk "pages"     "$fields_project"
+walk "projects"  "$fields_project"
 
 # ── Output ────────────────────────────────────────────────────────────────────
 if [ -n "$FINDINGS_FILE" ]; then

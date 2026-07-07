@@ -4,7 +4,6 @@ type: source
 resource: https://agentskills.io/skill-creation/using-scripts
 created: 2026-07-03
 updated: 2026-07-03
-timestamp: 2026-07-03
 source_author: agentskills.io
 tags: [skills, agent-design, scripts, agentic-cli-design]
 confidence: high

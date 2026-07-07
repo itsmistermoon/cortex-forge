@@ -2,10 +2,8 @@
 title: "OpenHuman — SuperContext feature documentation"
 type: source
 resource: https://github.com/tinyhumansai/openhuman/blob/main/gitbooks/features/super-context.md
-section: Features / SuperContext
 created: 2026-06-26
 updated: 2026-06-26
-timestamp: 2026-06-26
 source_author: senamakel (tinyhumansai)
 tags: [agent-harness, context-injection, session-start, comparable-project]
 confidence: high

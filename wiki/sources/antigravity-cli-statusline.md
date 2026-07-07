@@ -2,7 +2,6 @@
 type: source
 title: "Antigravity CLI — Status Line Customization"
 resource: https://antigravity.google/docs/cli-statusline
-section: Antigravity CLI / Customizations
 created: 2026-06-08
 updated: 2026-06-08
 tags: [antigravity, cli, statusline, tui]

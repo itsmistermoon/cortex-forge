@@ -2,10 +2,8 @@
 title: {{title}}
 type: source
 resource: 
-section: 
 created: {{date:YYYY-MM-DD}}
 updated: {{date:YYYY-MM-DD}}
-timestamp: 
 source_author: 
 tags: []  # project/subtopic for nested grouping
 confidence: high

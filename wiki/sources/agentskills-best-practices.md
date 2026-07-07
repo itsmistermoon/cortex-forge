@@ -4,7 +4,6 @@ type: source
 resource: https://agentskills.io/skill-creation/best-practices
 created: 2026-07-03
 updated: 2026-07-03
-timestamp: 2026-07-03
 source_author: agentskills.io
 tags: [skills, agent-design, skill-quality, progressive-disclosure, scripts]
 confidence: high

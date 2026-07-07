@@ -2,10 +2,8 @@
 title: "Antigravity 2.0 — Hooks Reference"
 type: source
 resource: https://antigravity.google/docs/hooks
-section: Hooks
 created: 2026-06-26
 updated: 2026-06-26
-timestamp: 2026-06-26
 source_author: Google (Antigravity team)
 tags: [antigravity, hooks, agent-hook-compatibility, pre-invocation, inject-steps]
 confidence: high

@@ -4,7 +4,6 @@ type: source
 resource: https://github.com/mattpocock/skills/tree/main/skills/productivity/writing-great-skills
 created: 2026-07-01
 updated: 2026-07-01
-timestamp: 2026-07-01
 source_author: Matt Pocock
 tags: [skills, agent-design, skill-quality, vocabulary, predictability]
 confidence: high

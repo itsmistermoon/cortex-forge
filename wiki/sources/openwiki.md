@@ -4,7 +4,6 @@ type: source
 resource: https://github.com/langchain-ai/openwiki
 created: 2026-07-01
 updated: 2026-07-01
-timestamp: 2026-06-22
 source_author: LangChain AI
 tags: [codebase-documentation, agent-tools, github-actions, langchain, deepagents]
 confidence: high

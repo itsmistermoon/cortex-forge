@@ -2,10 +2,8 @@
 title: "OpenHuman — GitHub README"
 type: source
 resource: https://github.com/tinyhumansai/openhuman
-section: README
 created: 2026-06-26
 updated: 2026-06-26
-timestamp: 2026-06-26
 source_author: senamakel (tinyhumansai)
 tags: [agent-harness, memory, obsidian, open-source, comparable-project]
 confidence: high

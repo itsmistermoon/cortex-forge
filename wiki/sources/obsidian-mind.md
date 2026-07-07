@@ -2,7 +2,6 @@
 type: source
 title: "Obsidian Mind — persistent memory vault for coding agents"
 resource: https://github.com/breferrari/obsidian-mind
-section: README
 created: 2026-06-12
 updated: 2026-06-12
 tags: [memory, hooks, obsidian, multi-agent, token-efficiency]

@@ -2,7 +2,6 @@
 type: source
 title: "Antigravity CLI — Settings, Rendering & Keybindings"
 resource: https://antigravity.google/docs/cli-settings
-section: Antigravity CLI / Settings
 created: 2026-06-08
 updated: 2026-06-08
 tags: [antigravity, cli, settings, configuration]

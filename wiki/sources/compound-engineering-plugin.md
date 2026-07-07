@@ -4,7 +4,6 @@ type: source
 resource: https://github.com/EveryInc/compound-engineering-plugin
 created: 2026-07-01
 updated: 2026-07-01
-timestamp: 2026-06-26
 source_author: Every Inc (Trevin Chow)
 tags: [skills, agent-design, skill-architecture, plugin-design, multi-harness]
 confidence: high

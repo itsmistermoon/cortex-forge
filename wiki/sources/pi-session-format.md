@@ -2,7 +2,6 @@
 type: source
 title: "Pi Session File Format"
 resource: https://pi.dev/docs/latest/session-format
-section: session-format
 created: 2026-06-16
 updated: 2026-06-16
 tags: [pi, sessions, jsonl, tree, message-types, sessionmanager, versioning]

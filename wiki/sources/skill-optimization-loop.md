@@ -4,7 +4,6 @@ type: source
 resource: https://github.com/warpdotdev-demos/replatformer
 created: 2026-07-01
 updated: 2026-07-01
-timestamp: 2026-07-01
 source_author: Zach Lloyd (Warp)
 tags: [skills, skill-optimization, observer-pattern, computer-use, evals, self-improvement]
 confidence: high

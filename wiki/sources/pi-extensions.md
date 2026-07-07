@@ -2,7 +2,6 @@
 type: source
 title: "Pi Extensions"
 resource: https://pi.dev/docs/latest/extensions
-section: extensions
 created: 2026-06-16
 updated: 2026-06-16
 tags: [pi, extensions, typescript, lifecycle, events, tools, custom-ui]

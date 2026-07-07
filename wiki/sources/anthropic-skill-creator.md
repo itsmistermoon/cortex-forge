@@ -4,7 +4,6 @@ type: source
 resource: https://github.com/anthropics/claude-plugins-official/tree/main/plugins/skill-creator/skills/skill-creator
 created: 2026-07-01
 updated: 2026-07-01
-timestamp: 2026-07-01
 source_author: Anthropic
 tags: [skills, agent-design, evals, skill-optimization, claude-code]
 confidence: high

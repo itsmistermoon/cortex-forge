@@ -2,7 +2,6 @@
 type: source
 title: "Antigravity CLI — Best Practices"
 resource: https://antigravity.google/docs/cli-best-practices
-section: Antigravity CLI
 created: 2026-06-08
 updated: 2026-06-08
 tags: [antigravity, cli, best-practices]

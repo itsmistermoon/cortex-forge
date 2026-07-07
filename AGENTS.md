@@ -21,8 +21,10 @@ Beyond this, skills trigger themselves — each one's own `description:` states 
 
 ## Agent rules
 
-- **Route every edit to `skills/**/SKILL.md` or its co-located `references/`/`scripts/` through a branch and PR**, even when self-merging — each change gets its own auditable page (diff + description + changeset), not a commit buried in `git log`. Add a changeset (`npx changeset`) in the same branch, matching `.changeset/README.md`'s workflow.
-- **Run `bash bin/check-skill-sync.sh`** before opening that PR.
+- **Route every change in this repo through a branch and PR**, even when self-merging — each change gets its own auditable page (diff + description + changeset), not a commit buried in `git log`. Never commit directly to `main`.
+- **Add a changeset (`npx changeset`) in the same branch** for anything that changes a skill's behavior, matching `.changeset/README.md`'s workflow. For changes with no user-facing effect (docs, CI, internal refactors), run `npx changeset add --empty` instead — `changeset-check.yml` blocks the PR without one or the other.
+- **Open a GitHub Issue first for larger or multi-step work** — a feature spanning several PRs, a design decision worth discussing before writing code. Reference it from the PR(s) that implement it (`Closes #N`), so the issue becomes the audit trail for the whole arc, not just the final diff.
+- **Run `bash bin/check-skill-sync.sh`** before opening a PR that touches `skills/**/SKILL.md` or its co-located `references/`/`scripts/`.
 - **Edit this repo as the single source of truth**, then refresh installs with `npx skills add itsmistermoon/cortex-forge --all -g -y`; `~/.agents/skills/` is a generated target.
 - **Treat `.env` and credential files as off-limits** to reading or modifying.
 - **Treat `wiki/` and `templates/` here as the canonical schema** — every vault that installs this suite inherits their shape.

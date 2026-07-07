@@ -11,7 +11,7 @@ Save a session snapshot to `.cortex/MEMORY.md` in the active repo (the nearest `
 
 ## Steps
 
-1. **Resolve context** — detect the active repo (nearest `.git` from CWD; ask if none) and the invoking agent: identify via self-knowledge first, corroborate with agent-identifying `env` vars if present (don't rely on a fixed hardcoded list — new agents appear continuously), and if still undetermined walk the process tree from `$PPID` upward (`ps -o comm= -p <pid>`) for a known CLI binary name. Append the model in parentheses if known (e.g. `Claude Code (claude-sonnet-5)`); otherwise use `Unknown agent`. Use this identity as `{Agent}` in the history header and the `agent:` frontmatter field.
+1. **Resolve context** — detect the active repo (nearest `.git` from CWD; ask if none) and the invoking agent: identify via self-knowledge first, corroborate with agent-identifying `env` vars if present (don't rely on a fixed hardcoded list — new agents appear continuously), and if still undetermined walk the process tree from `$PPID` upward (`ps -o comm= -p <pid>`) for a known CLI binary name. Append the model in parentheses if known (e.g. `{agent-name} ({model-id})`); otherwise use `Unknown agent`. Use this identity as `{Agent}` in the history header and the `agent:` frontmatter field.
 
    Resolve the vault per `references/VAULT-RESOLUTION.md`, then its `locale:` per `references/LOCALE-RESOLUTION.md`. If the first argument matches a registered vault name, use that vault and treat the remaining argument as a project-name override.
 

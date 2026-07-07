@@ -47,4 +47,4 @@ Create the page using the corresponding template (step 4) — all frontmatter fi
 
 - The page must be self-contained for a reader with no session context. Verifiable criteria: (1) every acronym and proper name is expanded or defined on first use; (2) every decision includes its justification or the problem it solves; (3) no deictic references without an explicit antecedent ("this", "the previous discussion", "as agreed"); (4) any relevant prior state is described in the page itself, not assumed known. A reviewer must be able to read the page cold and understand it without accessing the session.
 - If the page already exists, rewrite the body integrating the new information — do not append "Update" sections or addendum blocks. The result must read as a cohesive document with no visible edit seams.
-- Include the agent in the page's own changelog: `- YYYY-MM-DD [Claude Code]: description`
+- Include the agent in the page's own changelog: `- YYYY-MM-DD [{agent}]: description`

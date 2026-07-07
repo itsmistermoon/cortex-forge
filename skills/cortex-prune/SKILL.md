@@ -24,7 +24,7 @@ Paths are relative to this skill's directory.
 
 2. **Layer 1 — Structural check**: Run `bash scripts/cortex-prune.sh {vault}`. If the script is missing, the skill installation is incomplete — reinstall with `npx skills add itsmistermoon/cortex-forge --skill cortex-prune` (or `/cortex-forge-setup`, sub-task `skills`).
 
-3. **Layer 2 — Semantic analysis**: Run the four semantic checks below (L2a–L2d) — read the actual pages, never reason about relationships from memory alone.
+3. **Layer 2 — Semantic analysis**: Run the semantic checks below (L2a–L2e) — read the actual pages, never reason about relationships from memory alone.
 
 4. **Layer 3 — Drift detection**: For each `wiki/sources/` page, check whether its `.raw/` file was modified after the page was last synthesized.
 
@@ -63,8 +63,8 @@ Read `wiki/index.md` to get the full list of entities and concepts. Then:
 1. Identify candidate pairs where EITHER is true (read the files directly — no scripts):
    - One page's `title`, `aliases`, or `tags` contains a term in the other page's title or aliases
    - One page's body text mentions the other entity/concept by name without `[[wikilink]]` syntax
-2. Evaluate each candidate pair inline: read both pages and classify as RELATED or COINCIDENCE with one sentence of justification. If RELATED, note the exact wikilink to add to each page. Do not spawn subagents for this step.
-3. Report RELATED findings as MEDIUM. Discard COINCIDENCE.
+2. Evaluate each candidate pair inline, reading both pages once, and render two judgments from that read: relationship — RELATED or COINCIDENCE, with one sentence of justification, noting the exact wikilink to add to each page if RELATED; and contradiction — CONTRADICTION or CONSISTENT, comparing their claims on the shared subject (incompatible facts vs. mere differences in emphasis, scope, or vintage), noting the exact conflicting excerpt from each page if CONTRADICTION. Do not spawn subagents for this step.
+3. Report RELATED findings as MEDIUM (the wikilink to add). Report CONTRADICTION findings as a separate MEDIUM (both excerpts side by side, no proposed action — resolving a factual conflict needs human judgment, not a suggested fix). Discard COINCIDENCE and CONSISTENT.
 
 ### L2b. Body text mentions without wikilinks
 
@@ -92,6 +92,14 @@ Evaluate inline: read both pages, argue FOR merge (max 3 bullets), argue AGAINST
 
 Report verdict as MEDIUM. Never auto-apply — always requires user confirmation.
 
+### L2e. Recurring recall misses
+
+Reads `wiki/meta/log.md`, not vault pages — a different data source from L2a–L2d, but still bounded by the same hard cap.
+
+1. Collect `## [YYYY-MM-DD] recall-miss | {query}` entries from the last 30 days (or the most recent 20, whichever is fewer).
+2. Group by topic similarity — same or near-identical query text, or queries a reasonable reading would consider the same underlying question asked differently.
+3. Report any group with 2+ occurrences as MEDIUM: "`{N}` recall misses on `{topic}` since `{earliest-date}` — propose `/cortex-assimilate` for a source, or confirm a wiki page should exist." Single-occurrence misses are normal noise — discard them.
+
 ---
 
 ## Auto-correctable (propose + apply on confirmation)
@@ -109,6 +117,8 @@ Report verdict as MEDIUM. Never auto-apply — always requires user confirmation
 - Add cross-links between entities/concepts (check L2a verdict: RELATED)
 - Create missing concept/entity pages (check L2c verdict: NEEDS_PAGE)
 - Merge pages (check L2d verdict: MERGE or RESTRUCTURE)
+- Resolve a contradiction (check L2a verdict: CONTRADICTION) — present both excerpts, let the user decide which stands, both, or neither
+- Act on a recurring recall-miss group (check L2e) — propose `/cortex-assimilate` or a new page, per the user's call
 - Delete orphan pages
 - Fix a dead `[[wikilink]]` — search the vault for a page with a matching slug or title; propose retargeting there, or propose removal if none found
 - Synthesize an unprocessed `.raw/` file — propose invoking `/cortex-assimilate {vault} .raw/{slug}.md` within this session
@@ -144,4 +154,6 @@ Report verdict as MEDIUM. Never auto-apply — always requires user confirmation
 - Source pages use `source:` (URL) and `raw:` for provenance — `raw:` is the page's context pointer back to its `.raw/` primary. `sources:` (wiki links) is for concepts and entities only
 - Orphan sources are normal if freshly ingested and not yet linked from concepts/entities
 - Debate pattern (L2d) only triggers on genuine ambiguity — not on clear component relationships
+- L2a's contradiction check flags factual conflicts, not differences in emphasis, scope, or vintage — when in doubt, classify CONSISTENT
+- L2e skips `wiki/meta/log.md` entirely if it has no `recall-miss` entries — this is the normal case for a vault where every query has been answered
 - Layer 3 drift findings are informational — never auto-re-synthesize; always ask the user

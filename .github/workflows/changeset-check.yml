@@ -1,0 +1,29 @@
+name: Changeset check
+
+on:
+  pull_request:
+    branches:
+      - main
+
+# Blocking version of the changeset-bot's reminder: fails the PR if it
+# touches something without a changeset covering it. Use `npx changeset add
+# --empty` for a change that genuinely needs no CHANGELOG.md entry (typos,
+# internal-only refactors) — that satisfies this check without producing a
+# release note.
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Require a changeset
+        run: npx changeset status --since=origin/main

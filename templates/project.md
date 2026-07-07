@@ -42,4 +42,4 @@ schema_version: "0.3"
 
 ---
 
-- {{date:YYYY-MM-DD}} [{agent}]: Page created
+- {{date:YYYY-MM-DD}}: Page created

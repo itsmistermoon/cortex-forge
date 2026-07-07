@@ -34,4 +34,4 @@ raw: .raw/{{slug}}.md
 
 ---
 
-- {{date:YYYY-MM-DD}} [{agent}]: Page created
+- {{date:YYYY-MM-DD}}: Page created

@@ -48,6 +48,10 @@ grep -ro '\[\[wiki/[^]|]*' "$WIKI" --include="*.md" 2>/dev/null \
   | while IFS=: read -r src link; do
       # strip trailing .md if present — wikilinks may or may not include extension
       link="${link%.md}"
+      # strip trailing backslash — happens when the wikilink uses an escaped alias
+      # pipe inside a markdown table cell, e.g. [[path\|Display text]]; the backslash
+      # is part of the table escaping, not the link target
+      link="${link%\\}"
       if [ ! -f "$VAULT/${link}.md" ]; then
         f HIGH "Dead link in ${src#$VAULT/}: [[${link}]]"
         printf '%s\t%s\n' "${src#$VAULT/}" "$link" >> "$DEAD_LINKS"

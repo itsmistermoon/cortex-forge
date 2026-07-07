@@ -133,6 +133,83 @@ find "$WIKI/sources" -name "*.md" | grep -v '_index' | while read -r p; do
   { [ -z "$val" ] || [ "$val" = "tags: []" ]; } && f LOW "No tags: ${p#$VAULT/}"
 done
 
+# ── Frontmatter vs templates/{type}.md ────────────────────────────────────────
+# Generic diff against the vault's own templates — HIGH for duplicate keys
+# (invalid/ambiguous YAML), MEDIUM for keys the page has that its template
+# doesn't (or vice versa). Confidence/tags omissions stay in the dedicated
+# checks above (they feed vault-report.json); skip them here to avoid double
+# reporting the same gap under two messages.
+TEMPLATES="$VAULT/templates"
+fm_keys() {  # $1: file -> one frontmatter key per line, duplicates preserved
+  awk '
+    /^---$/ { c++; next }
+    c==1 && $0 ~ /^[A-Za-z_][A-Za-zA-Z0-9_]*:/ { k=$0; sub(/:.*/,"",k); print k }
+    c==2 { exit }
+  ' "$1" 2>/dev/null
+}
+
+tmpl_val_nonempty() {  # $1: template file, $2: key -> "1" if template ships a non-blank default, else "0"
+  awk -v key="$2" '
+    /^---$/ { c++; next }
+    c==1 && $0 ~ "^"key":" {
+      v=$0; sub("^"key":[ \t]*","",v); gsub(/[ \t]+$/,"",v)
+      print (length(v)>0) ? "1" : "0"; found=1; exit
+    }
+    c==2 { exit }
+    END { if (!found) print "0" }
+  ' "$1"
+}
+
+if [ -d "$TEMPLATES" ]; then
+  find "$WIKI" -name "*.md" \
+    | grep -v '_index\|/index\.md\|/log\.md\|/meta/' \
+    | while read -r p; do
+        rel="${p#$VAULT/}"
+        keys=$(fm_keys "$p")
+        [ -z "$keys" ] && continue  # no frontmatter — already flagged above
+
+        dups=$(echo "$keys" | sort | uniq -d)
+        if [ -n "$dups" ]; then
+          echo "$dups" | while read -r dk; do
+            [ -n "$dk" ] && f HIGH "Duplicate frontmatter key '${dk}' in ${rel}"
+          done
+        fi
+
+        type=$(grep -m1 "^type:" "$p" | sed 's/^type:[[:space:]]*//' | tr -d '[:space:]')
+        tmpl="$TEMPLATES/${type}.md"
+        if [ -n "$type" ] && [ -f "$tmpl" ]; then
+          tmpl_keys=$(fm_keys "$tmpl" | sort -u)
+          page_keys=$(echo "$keys" | sort -u)
+          extra=$(comm -23 <(echo "$page_keys") <(echo "$tmpl_keys") | grep -vx 'confidence\|tags')
+          missing=$(comm -13 <(echo "$page_keys") <(echo "$tmpl_keys") | grep -vx 'confidence\|tags')
+          [ -n "$extra" ] && echo "$extra" | while read -r ek; do
+            [ -n "$ek" ] && f MEDIUM "Frontmatter key '${ek}' in ${rel} not in templates/${type}.md"
+          done
+          [ -n "$missing" ] && echo "$missing" | while read -r mk; do
+            [ -z "$mk" ] && continue
+            if [ "$(tmpl_val_nonempty "$tmpl" "$mk")" = "1" ]; then
+              f MEDIUM "Frontmatter missing key '${mk}' (per templates/${type}.md) in ${rel}"
+            else
+              f LOW "Frontmatter missing key '${mk}' (optional — blank default in templates/${type}.md) in ${rel}"
+            fi
+          done
+        fi
+      done
+fi
+
+# ── LOW: Directories with no matching templates/{type}.md ────────────────────
+# Structural drift is a user decision, not an auto-fix — informational only.
+if [ -d "$TEMPLATES" ]; then
+  EXPECTED_DIRS=$(find "$TEMPLATES" -maxdepth 1 -name "*.md" -exec basename {} .md \; \
+    | awk '{ if ($0 ~ /y$/) { sub(/y$/,"ies"); print } else print $0 "s" }')
+  find "$WIKI" -mindepth 1 -maxdepth 1 -type d | while read -r d; do
+    dname=$(basename "$d")
+    [ "$dname" = "meta" ] && continue
+    echo "$EXPECTED_DIRS" | grep -qx "$dname" \
+      || f LOW "Carpeta fuera de estructura: wiki/${dname}/ (sin templates/*.md correspondiente — decisión del usuario)"
+  done
+fi
+
 # ── Schema validation (delegated) ────────────────────────────────────────────
 VALIDATE_SCRIPT="$(dirname "$0")/cortex-validate-schema.sh"
 if [ -x "$VALIDATE_SCRIPT" ]; then

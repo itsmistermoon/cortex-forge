@@ -114,6 +114,9 @@ Report verdict as MEDIUM. Never auto-apply — always requires user confirmation
 - Synthesize an unprocessed `.raw/` file — propose invoking `/cortex-assimilate {vault} .raw/{slug}.md` within this session
 - Reconstruct missing frontmatter — read the page's body and draft a best-effort frontmatter block (type, tags, sources) for review
 - Add `sources:` to a concept/entity — propose candidate sources drawn from the page's existing `[[wikilinks]]` and body mentions
+- Resolve a duplicate frontmatter key — show both values, ask which to keep (never guess the "right" one)
+- Reconcile a frontmatter key that diverges from `templates/{type}.md` — propose removing an extra key or adding a missing one, per page
+- Decide on an out-of-template directory (`wiki/pages/`, `wiki/reference/`, etc.) — propose one of: adopt it into the template set (add `templates/{type}.md`), migrate its content into an existing type, or leave as-is; never move/delete files without this decision
 
 ---
 
@@ -128,6 +131,11 @@ Report verdict as MEDIUM. Never auto-apply — always requires user confirmation
 | MEDIUM | Concepts/entities without `sources:` or `confidence:` frontmatter |
 | MEDIUM | Source pages without `confidence:` frontmatter |
 | LOW | Source pages without `tags:` (or `tags: []`) |
+| HIGH | Duplicate frontmatter key within a single page (invalid/ambiguous YAML) |
+| MEDIUM | Frontmatter key in a page but absent from its `templates/{type}.md` (excludes `confidence`/`tags`, covered above) |
+| MEDIUM | Frontmatter key missing that its `templates/{type}.md` ships with a non-blank default |
+| LOW | Frontmatter key missing that its `templates/{type}.md` ships blank (e.g. `timestamp:`, `section:`) — optional, informational only |
+| LOW | Top-level `wiki/` directory with no matching `templates/{type}.md` (e.g. legacy `pages/`, `reference/`) — structural, not auto-fixed |
 
 ## Rules
 

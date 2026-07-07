@@ -13,3 +13,5 @@ wiki/meta/vault-report.json
 .claude/
 .agents/
 skills-lock.json
+node_modules/
+pnpm-lock.yaml

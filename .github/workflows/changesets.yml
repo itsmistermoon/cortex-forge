@@ -1,0 +1,38 @@
+name: Changesets
+
+on:
+  push:
+    branches:
+      - main
+
+# No publish step — cortex-forge distributes exclusively via `npx skills add
+# itsmistermoon/cortex-forge` (skills.sh), never the npm registry. This
+# workflow only opens/updates the "Version Packages" PR that consolidates
+# pending changesets into CHANGELOG.md and bumps package.json; cutting the
+# actual release (tag + GitHub Release) stays manual, per release.yml.
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Create/update Version Packages PR
+        uses: changesets/action@v1
+        with:
+          version: npx changeset version
+          commit: "chore: version bump"
+          title: "chore: version bump"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

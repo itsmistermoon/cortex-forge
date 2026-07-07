@@ -10,7 +10,7 @@ The system separates two kinds of memory:
 - **Operational memory** — what's happening now and what was decided. Lives in `.cortex/MEMORY.md` (session cache), read by the agent at every session start per `AGENTS.md` instructions. Small, fast, always loaded.
 - **Knowledge base** — what the vault knows about the world. Lives in `wiki/` (synthesized pages). Large, deep, consulted on demand.
 
-**You never have to be inside the vault to use it.** The skills are installed globally. From any project, in any session, you can recall knowledge, ingest sources, or snapshot context into a vault that lives somewhere else entirely. The vault is a target, not a working directory.
+**The skills work from anywhere.** Installed globally, they let you recall knowledge, ingest sources, or snapshot context from any project, in any session, into a vault that lives somewhere else entirely — the vault is a target, addressed by name, not a place you need to be.
 
 ## Setup
 
@@ -37,7 +37,7 @@ Six layers, each with a distinct role:
 
 | Layer | Path | Purpose | Rule |
 |-------|------|---------|------|
-| **Raw** | `.raw/` | Primary sources — immutable originals | Never modify |
+| **Raw** | `.raw/` | Primary sources — immutable originals | Read-only |
 | **Wiki** | `wiki/` | Secondary sources — synthesized knowledge | Agent writes and maintains |
 | **Hot** | `.cortex/` | Per-project session cache | Read on session start |
 | **Instructions** | `AGENTS.md` | Agent protocols (crystallize, assimilate, recall) | Read on session start |
@@ -50,13 +50,13 @@ Six skills that map to how knowledge actually moves through a system.
 
 ### `/cortex-assimilate` — Ingest
 
-Sources land in `.raw/`: articles, PDFs, transcripts, URLs. The agent processes them and produces structured wiki pages. The brain doesn't store what it perceives — it stores what it processes. Without this step, information enters the system in name only.
+Sources land in `.raw/`: articles, PDFs, transcripts, URLs. The agent processes them and produces structured wiki pages — the step that turns perceived input into stored, queryable knowledge.
 
 After synthesizing new pages, it scans existing wiki pages and selects those who are candidates for backward enrichment — existing concept pages, entity entries, and comparison tables that should now mention the new source but don't. An agent evaluates each candidate before any change is made.
 
 ### `/cortex-crystallize` — Session context
 
-Working memory lasts seconds, `.cortex/MEMORY.md` extends it indefinitely in two zones: a mutable `Current state` (max 5 pending items, max 3 active decisions) and an append-only `History`. The agent reads it on session start per `AGENTS.md` instructions; you invoke `/cortex-crystallize` at milestones and before closing a session. Without it, every conversation starts from zero. Works from any repo, not just the vault. 
+`.cortex/MEMORY.md` extends working memory indefinitely across two zones: a mutable `Current state` (max 5 pending items, max 3 active decisions) and an append-only `History`. The agent reads it on session start per `AGENTS.md` instructions; you invoke `/cortex-crystallize` at milestones and before closing a session, carrying context forward into the next one. Works from any repo, not just the vault.
 
 ### `/cortex-imprint` — Permanent archive
 
@@ -64,11 +64,11 @@ What was worth keeping from the session becomes a stable wiki page. A memory tra
 
 ### `/cortex-recall` — Query
 
-The agent searches the vault, retrieves relevant pages, and synthesizes a response with citations. It can only return what's already in the vault — assimilated or imprinted — if it's not there, it doesn't exist for the system.
+The agent searches the vault, retrieves relevant pages, and synthesizes a response with citations, drawn from what's been assimilated or imprinted into it.
 
 ### `/cortex-prune` — Vault hygiene
 
-Detects orphan pages, dead links, contradictory claims, stale information. Forgetting in the brain isn't a failure — it's maintenance. Prune does this deliberately: removes what weakens the network so what remains is more reliable.
+Detects orphan pages, dead links, contradictory claims, stale information. Forgetting functions as maintenance: prune removes what weakens the network deliberately, so what remains stays reliable.
 
 ### `/cortex-forge-setup` — Setup and configuration
 
@@ -93,19 +93,17 @@ Three behaviors are mandatory for any agent operating the vault, defined in `AGE
 
 **Assimilate** — when the user provides a URL, file, or uses words like "ingest" or "process", invoke `/cortex-assimilate` as the first action.
 
-**Recall** — when the user asks about any topic that may exist in the vault, invoke `/cortex-recall` as the first action. Do not answer from active context or use `grep` as a substitute — the skill returns synthesized knowledge with citations. Agent training knowledge is disqualified for vault topics.
+**Recall** — when the user asks about any topic that may exist in the vault, invoke `/cortex-recall` as the first action. The skill returns synthesized knowledge with citations; treat that as the authoritative answer over active context, `grep`, or training knowledge on vault topics.
 
-## Design rationale
+## Design principles
 
-Most agent-memory systems fail in the same places. These are the failure modes we found studying comparable projects, and the design decisions that answer them.
+**One consumption channel, identical everywhere.** `AGENTS.md` mandates reading `.cortex/MEMORY.md` (hard size caps) before the first response, on every agent, with no hook wiring required. The guarantee comes from the protocol itself — unconditional, explicit, and simple enough to follow the same way across any coding agent.
 
-**There is only one reliable consumption channel, and it's not a hook.** Instructions in `AGENTS.md`, skill descriptions, and "the agent will remember to check" are best-effort — but so is lifecycle hook support: it varies too much across Claude Code, Codex, Antigravity, and CommandCode to be a foundation. Cortex Forge doesn't try to guarantee delivery via automatic injection; instead it makes the read/write contract explicit and identical everywhere — `AGENTS.md` mandates reading `.cortex/MEMORY.md` (hard size caps) before the first response, on every agent, with no hook wiring required. The guarantee comes from the protocol being unconditional and simple to follow, not from a mechanism only some agents support.
+**State and lessons as separate artifacts.** Session-end snapshots capture *state* — pending work, decisions, fragile context. Lessons get a dedicated path: at session end, `/cortex-crystallize` flags imprint candidates in the history entry, invoked manually with full context; at the next session start, reading `.cortex/MEMORY.md` surfaces that flag and the agent proposes `/cortex-imprint` with fresh eyes. Detection happens where context is richest; the decision happens where judgment is freshest.
 
-**State and lessons are different artifacts.** Session-end snapshots capture *state* (pending work, decisions, fragile context). Lessons — the workaround you'd otherwise re-explain next week — get lost because nobody archives them at the moment of fatigue. Cortex Forge splits the work across the session boundary: at session end, `/cortex-crystallize` (invoked manually, with full context) *flags* imprint candidates in the history entry. At the next session start, reading `.cortex/MEMORY.md` surfaces that flag and the agent proposes `/cortex-imprint` with fresh eyes. Detection happens where context is richest; the decision happens where judgment is freshest — no separate automation needed.
+**Memory as an audited surface.** `.raw/` stays immutable, keeping provenance auditable at every point. Ingestion scans foreign content for hidden Unicode, embedded payloads, and egress commands before it enters the vault. The crystallize-flags → imprint-proposes handoff defaults to *suggest*, putting a human approval step between session output and anything becoming ground truth.
 
-**Memory is attack surface.** A vault that auto-loads files nobody re-reads is exactly where injection payloads persist (see Microsoft's AI Recommendation Poisoning report, Feb 2026). Cortex Forge treats this structurally: `.raw/` is immutable so provenance is always auditable; ingestion scans foreign content for hidden Unicode, embedded payloads, and egress commands before it enters the vault; and the crystallize-flags → imprint-proposes handoff described above always defaults to *suggest* — a human approves before anything becomes ground truth. Convenience never outruns the isolation layer.
-
-**Failed attempts are knowledge.** Session memory that only records what worked condemns the next session to retry what didn't. The hot cache contract records attempted-and-failed approaches, with evidence, as a first-class section.
+**Failed attempts as first-class knowledge.** The hot cache contract records attempted-and-failed approaches, with evidence, as a dedicated section — carrying forward what didn't work alongside what did.
 
 ## Multi-vault
 

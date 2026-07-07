@@ -5,6 +5,7 @@ resource: https://antigravity.google/docs/cli-settings
 created: 2026-06-08
 updated: 2026-06-08
 tags: [antigravity, cli, settings, configuration]
+aliases: []
 confidence: high
 schema_version: "0.3"
 raw: .raw/antigravity-cli/cli-settings.md

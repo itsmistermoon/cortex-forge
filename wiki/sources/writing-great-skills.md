@@ -6,6 +6,7 @@ created: 2026-07-01
 updated: 2026-07-01
 source_author: Matt Pocock
 tags: [skills, agent-design, skill-quality, vocabulary, predictability]
+aliases: []
 confidence: high
 schema_version: "0.3"
 raw: .raw/writing-great-skills.md

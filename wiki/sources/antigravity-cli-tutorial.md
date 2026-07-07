@@ -5,6 +5,7 @@ resource: https://antigravity.google/docs/cli-tutorial
 created: 2026-06-08
 updated: 2026-06-08
 tags: [antigravity, cli, tutorial, onboarding]
+aliases: []
 source_author: Google Antigravity Team
 confidence: high
 schema_version: "0.3"

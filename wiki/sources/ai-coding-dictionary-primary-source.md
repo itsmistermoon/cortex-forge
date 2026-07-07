@@ -5,6 +5,7 @@ resource: https://www.aihero.dev/ai-coding-dictionary/primary-source
 created: 2026-06-10
 updated: 2026-06-10
 tags: [epistemology, context-engineering, provenance]
+aliases: []
 confidence: high
 schema_version: "0.3"
 raw: .raw/ai-coding-dictionary-primary-source.md

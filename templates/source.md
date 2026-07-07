@@ -6,6 +6,7 @@ created: {{date:YYYY-MM-DD}}
 updated: {{date:YYYY-MM-DD}}
 source_author: 
 tags: []  # project/subtopic for nested grouping
+aliases: []
 confidence: high
 schema_version: "0.3"
 raw: .raw/{{slug}}.md

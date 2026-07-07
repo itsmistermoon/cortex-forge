@@ -5,6 +5,7 @@ resource: https://commandcode.ai/docs/hooks/best-practices
 created: 2026-06-08
 updated: 2026-06-08
 tags: [commandcode, hooks, best-practices, security, debugging]
+aliases: []
 source_author: CommandCode
 confidence: high
 schema_version: "0.3"

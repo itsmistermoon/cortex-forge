@@ -5,11 +5,10 @@ resource: https://pi.dev/docs/latest/models
 created: 2026-06-16
 updated: 2026-06-16
 tags: [pi, models, providers, ollama, vllm, lm-studio, openai, anthropic, google, compat]
+aliases: []
 confidence: high
 schema_version: "0.3"
 raw: .raw/pi-models.md
-sources:
-  - .raw/pi-models.md
 ---
 
 # Pi Custom Models

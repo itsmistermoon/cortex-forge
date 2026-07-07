@@ -5,6 +5,7 @@ resource: https://codelabs.developers.google.com/antigravity-cli-hands-on#5
 created: 2026-06-08
 updated: 2026-06-08
 tags: [antigravity, cli, installation, flags, configuration, models]
+aliases: []
 raw: .raw/antigravity-cli-hands-on-codelab.md
 confidence: high
 schema_version: "0.3"

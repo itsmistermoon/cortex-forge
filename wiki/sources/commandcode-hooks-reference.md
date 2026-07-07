@@ -5,6 +5,7 @@ resource: https://commandcode.ai/docs/hooks/reference
 created: 2026-06-12
 updated: 2026-06-12
 tags: [commandcode, hooks, reference, wire-format, transcript-path]
+aliases: []
 source_author: CommandCode
 confidence: high
 schema_version: "0.3"

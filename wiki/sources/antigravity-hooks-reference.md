@@ -6,6 +6,7 @@ created: 2026-06-26
 updated: 2026-06-26
 source_author: Google (Antigravity team)
 tags: [antigravity, hooks, agent-hook-compatibility, pre-invocation, inject-steps]
+aliases: []
 confidence: high
 schema_version: "0.3"
 raw: .raw/antigravity-hooks-reference.md

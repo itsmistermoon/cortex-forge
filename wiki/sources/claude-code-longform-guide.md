@@ -5,6 +5,7 @@ resource: https://x.com/affaan
 created: 2026-06-12
 updated: 2026-06-12
 tags: [claude-code, memory, hooks, evals, subagents, token-efficiency, parallelization]
+aliases: []
 confidence: medium
 schema_version: "0.3"
 raw: .raw/claude-code-longform-guide.md

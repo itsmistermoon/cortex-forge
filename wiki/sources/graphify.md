@@ -5,6 +5,7 @@ resource: https://github.com/safishamsi/graphify
 created: 2026-06-12
 updated: 2026-06-12
 tags: [graphify, knowledge-graph, multi-agent, yc-s26, comparable]
+aliases: []
 source_author: Safi Shamsi / Graphify Labs
 sources:
   - wiki/sources/graphify-readme.md

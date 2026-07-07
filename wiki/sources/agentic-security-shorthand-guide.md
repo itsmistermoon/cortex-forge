@@ -5,6 +5,7 @@ resource: https://x.com/affaan
 created: 2026-06-12
 updated: 2026-06-12
 tags: [security, prompt-injection, memory, hooks, mcp, supply-chain, sandboxing]
+aliases: []
 confidence: medium
 schema_version: "0.3"
 raw: .raw/agentic-security-shorthand-guide.md

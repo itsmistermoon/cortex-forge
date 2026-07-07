@@ -5,6 +5,7 @@ resource: https://github.com/safishamsi/graphify/blob/v8/ARCHITECTURE.md
 created: 2026-06-12
 updated: 2026-06-12
 tags: [graphify, architecture, pipeline]
+aliases: []
 confidence: high
 schema_version: "0.3"
 raw: .raw/graphify-architecture.md

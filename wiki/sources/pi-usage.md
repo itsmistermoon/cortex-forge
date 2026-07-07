@@ -5,11 +5,10 @@ resource: https://pi.dev/docs/latest/usage
 created: 2026-06-16
 updated: 2026-06-16
 tags: [pi, coding-agent, cli, tui, sessions, slash-commands, modes]
+aliases: []
 confidence: high
 schema_version: "0.3"
 raw: .raw/pi-usage.md
-sources:
-  - .raw/pi-usage.md
 ---
 
 # Using Pi

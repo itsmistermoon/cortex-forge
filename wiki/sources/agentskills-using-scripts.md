@@ -6,6 +6,7 @@ created: 2026-07-03
 updated: 2026-07-03
 source_author: agentskills.io
 tags: [skills, agent-design, scripts, agentic-cli-design]
+aliases: []
 confidence: high
 schema_version: "0.3"
 raw: .raw/agentskills-using-scripts.md

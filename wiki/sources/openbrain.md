@@ -5,6 +5,7 @@ resource: https://github.com/RadixSeven/OpenBrain
 created: 2026-06-15
 updated: 2026-06-15
 tags: [memory-systems, mcp, pgvector, embeddings, semantic-search, supabase]
+aliases: []
 source_author: Nate B. Jones (original); RadixSeven (fork with privacy improvements)
 confidence: high
 schema_version: "0.3"

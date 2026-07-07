@@ -5,11 +5,10 @@ resource: https://pi.dev/docs/latest/packages
 created: 2026-06-16
 updated: 2026-06-16
 tags: [pi, packages, npm, git, distribution, security]
+aliases: []
 confidence: high
 schema_version: "0.3"
 raw: .raw/pi-packages.md
-sources:
-  - .raw/pi-packages.md
 ---
 
 # Pi Packages

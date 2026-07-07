@@ -5,11 +5,10 @@ resource: https://pi.dev/docs/latest/extensions
 created: 2026-06-16
 updated: 2026-06-16
 tags: [pi, extensions, typescript, lifecycle, events, tools, custom-ui]
+aliases: []
 confidence: high
 schema_version: "0.3"
 raw: .raw/pi-extensions.md
-sources:
-  - .raw/pi-extensions.md
 ---
 
 # Pi Extensions

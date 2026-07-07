@@ -5,6 +5,7 @@ resource: https://www.youtube.com/watch?v=UHVFcUzAGlM
 created: 2026-06-12
 updated: 2026-06-12
 tags: [youtube, memory-systems, claude-code, hooks, knowledge-base, cross-platform, review]
+aliases: []
 source_author: Simon Scrapes
 confidence: medium
 schema_version: "0.3"

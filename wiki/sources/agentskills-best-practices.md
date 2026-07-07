@@ -6,6 +6,7 @@ created: 2026-07-03
 updated: 2026-07-03
 source_author: agentskills.io
 tags: [skills, agent-design, skill-quality, progressive-disclosure, scripts]
+aliases: []
 confidence: high
 schema_version: "0.3"
 raw: .raw/agentskills-best-practices.md

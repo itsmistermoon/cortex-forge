@@ -5,6 +5,7 @@ resource: https://www.youtube.com/watch?v=ZXYuiEMm21s
 created: 2026-06-08
 updated: 2026-06-08
 tags: [gemini-cli, hooks, skills, lifecycle, configuration]
+aliases: []
 source_author: Google Cloud Live — Jack Weatherspoon (Gemini CLI team)
 confidence: medium
 schema_version: "0.3"

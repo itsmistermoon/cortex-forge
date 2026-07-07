@@ -5,11 +5,10 @@ resource: https://pi.dev/docs/latest/custom-provider
 created: 2026-06-16
 updated: 2026-06-16
 tags: [pi, providers, oauth, streaming, streamSimple, registerProvider]
+aliases: []
 confidence: high
 schema_version: "0.3"
 raw: .raw/pi-custom-provider.md
-sources:
-  - .raw/pi-custom-provider.md
 ---
 
 # Pi Custom Providers

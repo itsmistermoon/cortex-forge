@@ -5,6 +5,7 @@ resource: https://commandcode.ai/docs/resources/security
 created: 2026-06-13
 updated: 2026-06-13
 tags: [commandcode, security, permissions, headless, privacy]
+aliases: []
 confidence: high
 schema_version: "0.3"
 raw: .raw/commandcode-security.md

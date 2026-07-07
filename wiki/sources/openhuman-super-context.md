@@ -6,6 +6,7 @@ created: 2026-06-26
 updated: 2026-06-26
 source_author: senamakel (tinyhumansai)
 tags: [agent-harness, context-injection, session-start, comparable-project]
+aliases: []
 confidence: high
 schema_version: "0.3"
 raw: .raw/openhuman-super-context.md

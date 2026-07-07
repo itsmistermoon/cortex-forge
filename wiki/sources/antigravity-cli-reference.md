@@ -5,6 +5,7 @@ resource: https://antigravity.google/docs/cli-reference
 created: 2026-06-08
 updated: 2026-06-08
 tags: [antigravity, cli, reference]
+aliases: []
 confidence: high
 schema_version: "0.3"
 raw: .raw/antigravity-cli/cli-reference.md

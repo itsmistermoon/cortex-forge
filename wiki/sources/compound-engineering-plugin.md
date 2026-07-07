@@ -6,6 +6,7 @@ created: 2026-07-01
 updated: 2026-07-01
 source_author: Every Inc (Trevin Chow)
 tags: [skills, agent-design, skill-architecture, plugin-design, multi-harness]
+aliases: []
 confidence: high
 schema_version: "0.3"
 raw: .raw/compound-engineering-plugin.md

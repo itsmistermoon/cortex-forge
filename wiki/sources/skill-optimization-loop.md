@@ -6,6 +6,7 @@ created: 2026-07-01
 updated: 2026-07-01
 source_author: Zach Lloyd (Warp)
 tags: [skills, skill-optimization, observer-pattern, computer-use, evals, self-improvement]
+aliases: []
 confidence: high
 schema_version: "0.3"
 raw: .raw/skill-optimization-loop.md

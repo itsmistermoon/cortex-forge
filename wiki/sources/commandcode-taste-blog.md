@@ -5,6 +5,7 @@ resource: https://commandcode.ai/blog/taste-skills-rules
 created: 2026-06-08
 updated: 2026-06-08
 tags: [commandcode, taste, learning, personalization]
+aliases: []
 source_author: CommandCode
 confidence: medium
 schema_version: "0.3"

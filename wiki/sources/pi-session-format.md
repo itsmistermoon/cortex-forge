@@ -5,11 +5,10 @@ resource: https://pi.dev/docs/latest/session-format
 created: 2026-06-16
 updated: 2026-06-16
 tags: [pi, sessions, jsonl, tree, message-types, sessionmanager, versioning]
+aliases: []
 confidence: high
 schema_version: "0.3"
 raw: .raw/pi-session-format.md
-sources:
-  - .raw/pi-session-format.md
 ---
 
 # Pi Session File Format

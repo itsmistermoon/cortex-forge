@@ -5,6 +5,7 @@ resource: https://commandcode.ai/docs/core-concepts/headless
 created: 2026-06-12
 updated: 2026-06-12
 tags: [commandcode, headless, sessions, transcripts, resume]
+aliases: []
 source_author: CommandCode
 confidence: high
 schema_version: "0.3"

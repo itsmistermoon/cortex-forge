@@ -5,6 +5,7 @@ resource: https://antigravity.google/docs/cli-using
 created: 2026-06-08
 updated: 2026-06-08
 tags: [antigravity, cli, settings, keybindings, usage]
+aliases: []
 source_author: Google Antigravity Team
 confidence: high
 schema_version: "0.3"

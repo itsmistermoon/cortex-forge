@@ -5,6 +5,7 @@ resource: https://antigravity.google/docs/cli-best-practices
 created: 2026-06-08
 updated: 2026-06-08
 tags: [antigravity, cli, best-practices]
+aliases: []
 confidence: high
 schema_version: "0.3"
 raw: .raw/antigravity-cli/cli-best-practices.md

@@ -5,6 +5,7 @@ resource: https://github.com/DeusData/codebase-memory-mcp
 created: 2026-06-16
 updated: 2026-06-16
 tags: [mcp, code-intelligence, knowledge-graph, tree-sitter, ai-agents]
+aliases: []
 confidence: high
 schema_version: "0.3"
 raw: .raw/codebase-memory-mcp.md

@@ -5,6 +5,7 @@ resource: https://commandcode.ai/docs/hooks/examples
 created: 2026-06-08
 updated: 2026-06-08
 tags: [commandcode, hooks, examples, enforcement, quality-gate]
+aliases: []
 source_author: CommandCode
 confidence: high
 schema_version: "0.3"

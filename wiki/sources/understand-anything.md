@@ -6,11 +6,9 @@ created: 2026-06-08
 updated: 2026-06-08
 tags: [codebase-analysis, knowledge-graph, multi-agent, ai-tooling, karpathy-wiki]
 aliases: [Understand-Anything, UA, Lum1104/Understand-Anything]
-sources:
-  - .raw/understand-anything.md
 confidence: high
 schema_version: "0.3"
-raw: 
+raw: .raw/understand-anything.md
 ---
 
 # Understand Anything

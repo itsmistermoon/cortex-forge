@@ -5,6 +5,7 @@ resource: https://antigravity.google/docs/hooks
 created: 2026-06-07
 updated: 2026-06-07
 tags: [antigravity, hooks, session-management, configuration]
+aliases: []
 source_author: Google Antigravity Team
 confidence: high
 schema_version: "0.3"

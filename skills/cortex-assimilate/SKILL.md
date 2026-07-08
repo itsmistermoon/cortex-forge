@@ -23,10 +23,11 @@ Paths are relative to this skill's directory.
 
 1. **Resolve vault** — per `references/VAULT-RESOLUTION.md`, then its `locale:` per `references/LOCALE-RESOLUTION.md`. If the first argument matches a registered vault name (e.g., `/cortex-assimilate second-brain <url>`), use that vault and treat the remaining argument as the URL or file path.
 
-2. **Download or read** — input is a URL or a `.raw/` file path:
+2. **Download or read** — input is a URL, a `.raw/` file path, or pasted text:
    - URL → fetch content, run the **SPA check** and the **sanitization check** below, then save to `{vault}/.raw/{slug}.md` (never overwrite if exists).
    - `.raw/` file → read directly.
-   - **Network failure:** if the fetch fails or returns empty content, stop and report the error. Do not create a `.raw/` file or proceed to synthesis.
+   - **Pasted text (no fetch possible)** — user provides the content directly instead of a fetchable URL, typically because the source blocks scraping (e.g. Twitter/X) or sits behind a paywall/login. Treat the pasted text as if it were a downloaded page: run the **sanitization check** below, then save to `{vault}/.raw/{slug}.md`. If the user also gave a source URL, record it verbatim in the source page's `**URL:**` field even though it wasn't fetched from there — it's still the canonical reference.
+   - **Network failure:** if the fetch fails, is blocked, or returns empty content, do not create a `.raw/` file or proceed to synthesis. Instead, tell the user the fetch failed and ask them to paste the content directly (per the pasted-text path above), keeping the original URL as the source reference. Only stop entirely if they decline.
    - **Partial ingestion recovery:** if `.raw/{slug}.md` exists but `wiki/sources/{slug}.md` doesn't, a previous run was interrupted. Ask: "Found an unprocessed `.raw/{slug}.md` from a previous run. Re-synthesize from it?" Yes → skip to step 3; no → stop.
 
    **SPA check** — if the fetched page is a client-rendered shell with no meaningful body text (e.g. `<div id="root">`, `<app-root>`, near-empty HTML), recover the content via `references/SPA-FALLBACK.md`; if that fails, stop and ask the user for the content or a static URL. ⚠ Never save an HTML shell to `.raw/` — no readable content, no synthesis.
@@ -47,6 +48,8 @@ Paths are relative to this skill's directory.
 6. **Backward enrichment** — scan existing wiki pages for candidates that should now reference the new source.
 
    Skip this step if the new source page has no `tags:` or if fewer than 5 wiki pages exist total.
+
+   **Hard cap**: evaluate at most 20 candidates. If more share a tag with the new source, pick the 20 with the strongest overlap (most shared tags, then most recently updated) and note the total count skipped.
 
    1. Read `tags:` from the newly created `wiki/sources/{slug}.md`.
    2. Candidates: pages in `wiki/concepts/`, `wiki/entities/`, or `wiki/projects/` that share at least one tag with the new source and don't already list `wiki/sources/{slug}.md` in `sources:`.

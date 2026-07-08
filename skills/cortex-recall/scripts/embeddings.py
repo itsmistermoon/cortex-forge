@@ -8,6 +8,7 @@ import sys
 import urllib.request
 
 MODEL_NAME = "nomic-embed-text-v1.5"
+MLX_MODEL_NAME = "mlx-community/nomicai-modernbert-embed-base-bf16"
 OLLAMA_URL = "http://localhost:11434/api/embeddings"
 DIMENSIONS = 768
 OLLAMA_EMBED_TIMEOUT = 30  # seconds — real embed calls take longer than the 3s detection ping
@@ -49,7 +50,7 @@ def _try_mlx() -> bool:
         return False
     try:
         from mlx_embeddings import load as mlx_load
-        _mlx_model, _mlx_tokenizer = mlx_load(f"mlx-community/{MODEL_NAME}")
+        _mlx_model, _mlx_tokenizer = mlx_load(MLX_MODEL_NAME)
         return True
     except Exception:
         return False

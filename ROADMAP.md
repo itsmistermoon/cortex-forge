@@ -57,10 +57,11 @@ Reference: `wiki/concepts/skillopt-text-space-optimization.md`
 
 ## Phase 3.6 — Semantic retrieval (sqlite-vec)
 
-**Stack:** `sqlite-vec` + Ollama (default) → mlx-embeddings (Apple Silicon) → sentence-transformers. Model: `nomic-embed-text-v1.5` (768 dims).
+**Stack:** `sqlite-vec` + Ollama (default) → mlx-embeddings (Apple Silicon) → sentence-transformers. Ollama/sentence-transformers use `nomic-embed-text-v1.5`; mlx-embeddings uses `mlx-community/nomicai-modernbert-embed-base-bf16` (same 768 dims, same `search_query:`/`search_document:` prefixes, no `mlx-community/nomic-embed-text-v1.5` port exists).
 
 **Known limitations:**
 - MLX packages blocked on Python 3.14 + transformers 5.x — see `wiki/concepts/embedding-backend-selection.md`
+- Fixed 2026-07-08: `_try_mlx()` in `embeddings.py` referenced `mlx-community/nomic-embed-text-v1.5`, a model that never existed on Hugging Face — silently swallowed by the `try/except` and masked as "MLX unavailable," falling through to sentence-transformers. Replaced with the real `mlx-community/nomicai-modernbert-embed-base-bf16` port. Still gated by the Python 3.14/transformers 5.x blocker above — not yet validated end-to-end.
 - `nomic-embed-text-v2-moe` upgrade gated on ollama/ollama#16076
 
 - [x] `embeddings.py` — backend selector with per-backend error messages (co-located with `cortex-forge-setup`)
@@ -78,6 +79,18 @@ Reference: `wiki/concepts/skillopt-text-space-optimization.md`
 - [ ] History archive (structured layer) — when `CONSOLIDATED.md` exceeds N entries, crystallize parses to JSON `{ts, agent, trigger, tags, files, decisions, discarded, fragile}`; queryable via `/cortex-recall`
 - [ ] Cross-session pattern detection — recurring topics in `.cortex/` that never reach `wiki/`; propose imprint candidates at crystallize time
 - [ ] Progressive loading in `cortex-recall` — navigate wiki by relevance instead of loading full index at startup
+
+### `cortex-prune` — LRU-based archiving
+
+Gap flagged by external review (Gemini): at vault scale (hundreds of pages), `cortex-prune`'s reports risk becoming unmanageable — the "maintenance ratchet" where too many findings cause the user to abandon upkeep entirely. Today's hard caps (20 candidate pairs per Layer 2 check) bound the report size but don't reduce the underlying page count driving it.
+
+**Gate:** don't build until a real vault approaches this scale — premature at today's size, and `cortex-prune`'s existing caps + severity grouping already cover the near-term version of this risk.
+
+**Idea:** pages unread by `/cortex-recall` for 6+ months get silently moved to a `wiki/archive/` (or type-specific `archive/` subfolder), out of Layer 2's default scan scope but not deleted — index and embeddings updated accordingly, physical file preserved. Needs a way to track last-accessed per page (today nothing records recall hits, only misses in `log.md`).
+
+- [ ] Design last-accessed tracking — recall hits are not logged today (only misses, per the L2e entry below); decide whether to log every hit (cost: `log.md` noise) or maintain a lighter per-page `last_accessed:` frontmatter field updated on cite
+- [ ] Archiving mechanism — move + reindex + exclude from default Layer 2 scope, reversible
+- [ ] Validate against a vault large enough to need it
 
 ### `cortex-recall` — offer to persist, rarely
 
@@ -104,6 +117,19 @@ Gap vs. Karpathy's gist, which lists contradictions alongside orphans and stale 
 - [x] Fold contradiction comparison into L2a's per-pair evaluation in `cortex-prune/SKILL.md`
 - [x] Add contradiction findings to the `## Requires confirmation` list (resolution is never auto-applied)
 - [ ] Verify against a vault with at least one known, planted contradiction
+
+### `cortex-prune` — index.md section-vs-type mismatch
+
+Gap found manually in `moon-multivac`: `wiki/index.md` groups entries by section (Proyectos/Entidades/Conceptos/Fuentes), but nothing checks that a page's frontmatter `type:` actually matches the section it's listed under. Found several `type: concept` pages listed under "Proyectos" and "Fuentes" — harmless today (just a navigation quirk), but silently accumulates as the vault grows, and no existing Layer 1 or Layer 2 check would ever surface it (verified against the full detection criteria table and L2a–L2e — none inspect index.md's per-section membership against page type).
+
+**Implementation (not yet designed in detail):**
+- New check, likely Layer 1 (structural, script-based) since it's a cheap file-frontmatter-vs-listing-location comparison, not a judgment call.
+- For each wikilink under a `## {Section}` heading in `index.md`, read the target page's `type:` frontmatter and compare against the expected type for that section (Proyectos→project, Entidades→entity, Conceptos→concept, Fuentes→source).
+- Report mismatches as LOW (cosmetic/navigational, not a data-integrity issue) — proposed action: move the entry to its matching section, never auto-applied (index.md structure edits go through `## Requires confirmation`).
+
+- [ ] Design the exact matching logic (a page can legitimately be cross-referenced under a related section without indicating a mismatch — needs a way to distinguish "wrong section" from "intentional cross-reference," maybe by checking whether the page is ALSO listed in its correct section)
+- [ ] Add to Layer 1 detection criteria table in `cortex-prune/SKILL.md`
+- [ ] Validate against `moon-multivac`'s known cases before rolling out
 
 ### `cortex-recall` — log misses, not queries
 

@@ -146,6 +146,7 @@ Reads `wiki/meta/log.md`, not vault pages — a different data source from L2a�
 | MEDIUM | Frontmatter key missing that its `templates/{type}.md` ships with a non-blank default |
 | LOW | Frontmatter key missing that its `templates/{type}.md` ships blank (e.g. `timestamp:`, `section:`) — optional, informational only |
 | LOW | Top-level `wiki/` directory with no matching `templates/{type}.md` (e.g. legacy `pages/`, `reference/`) — structural, not auto-fixed |
+| LOW | `wiki/index.md` section/listing under a heading that doesn't match the page's `type:` (heuristic A: only flag if the page is absent from its correct section, tolerates intentional cross-references) — console-only, not persisted to `vault-report.json` |
 | LOW | Tag used exactly once with no entity/concept page behind it (e.g. typo, one-off label) — suggest merging into a registered tag from `wiki/meta/tags.md` or removing |
 
 ## Rules

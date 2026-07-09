@@ -19,7 +19,8 @@ DEAD_LINKS=$(mktemp) || { echo "ERROR: mktemp failed — cannot allocate temp fi
 RAW_NOSRC=$(mktemp) || { echo "ERROR: mktemp failed — cannot allocate temp file for raw_without_source" >&2; exit 2; }
 NO_CONF=$(mktemp) || { echo "ERROR: mktemp failed — cannot allocate temp file for missing_confidence" >&2; exit 2; }
 ORPHANS=$(mktemp) || { echo "ERROR: mktemp failed — cannot allocate temp file for orphans" >&2; exit 2; }
-trap 'rm -f "$FINDINGS" "$DEAD_LINKS" "$RAW_NOSRC" "$NO_CONF" "$ORPHANS"' EXIT
+INDEX_MISMATCHES=$(mktemp) || { echo "ERROR: mktemp failed — cannot allocate temp file for index_mismatches" >&2; exit 2; }
+trap 'rm -f "$FINDINGS" "$DEAD_LINKS" "$RAW_NOSRC" "$NO_CONF" "$ORPHANS" "$INDEX_MISMATCHES"' EXIT
 
 f() { echo "[$1] $2" >> "$FINDINGS"; }
 
@@ -212,6 +213,70 @@ if [ -d "$TEMPLATES" ]; then
     echo "$EXPECTED_DIRS" | grep -qx "$dname" \
       || f LOW "Carpeta fuera de estructura: wiki/${dname}/ (sin templates/*.md correspondiente — decisión del usuario)"
   done
+fi
+
+# ── LOW: index.md section vs page type ───────────────────────────────────────
+# Console-only (not persisted to vault-report.json) — same pattern as the
+# directory-structure check above. A page is mismatch only if it appears in
+# a section that doesn't match its frontmatter `type:` AND is absent from
+# its correct section (heuristic A: tolerates intentional cross-references,
+# flags pages that live only in the wrong place).
+if [ -f "$WIKI/index.md" ]; then
+  python3 - "$WIKI" "$INDEX_MISMATCHES" <<'PYEOF'
+import re, sys
+from pathlib import Path
+
+# sys.argv[1] is $WIKI = $VAULT/wiki; rglob starts from there, so
+# relative_to(WIKI) yields "concepts/...", "sources/..." — prefix
+# with "wiki/" to match the [[wiki/...]] shape in index.md.
+wiki = Path(sys.argv[1])
+out = Path(sys.argv[2])
+text = (wiki / "index.md").read_text()
+section_to_type = {
+    "conceptos": "concept", "entities": "entity",
+    "entidades": "entity", "fuentes": "source", "sources": "source",
+    "proyectos": "project", "projects": "project",
+}
+
+current = None
+listings = {}
+for line in text.splitlines():
+    m = re.match(r"^##\s+(\w+)", line)
+    if m:
+        # Any `##` heading (recognized or not) ends the previous section —
+        # otherwise unknown headings like `## Meta` would let their
+        # following wikilinks be misattributed to the prior section.
+        current = section_to_type.get(m.group(1).lower())
+        listings.setdefault(current, set())
+    elif current:
+        m = re.match(r"^\s*-\s*\[\[(wiki/[^|\]]+)", line)
+        if m:
+            listings[current].add(m.group(1))
+
+findings = []
+for p in sorted(wiki.rglob("*.md")):
+    if p.name in ("_index.md", "index.md", "log.md") or "meta" in p.parts:
+        continue
+    try:
+        content = p.read_text()
+    except (OSError, UnicodeDecodeError):
+        continue
+    fm = re.match(r"^---\n(.*?)\n---", content, re.DOTALL)
+    if not fm: continue
+    tm = re.search(r"^type:\s*(\w+)", fm.group(1), re.MULTILINE)
+    if not tm: continue
+    page_type = tm.group(1)
+    rel = re.sub(r"\.md$", "", "wiki/" + str(p.relative_to(wiki)))
+    for section_type, paths in listings.items():
+        if section_type == page_type: continue
+        if rel in paths and rel not in listings.get(page_type, set()):
+            findings.append(f"Section/type mismatch: {rel} listed under '{section_type}' (type is '{page_type}')")
+
+out.write_text("\n".join(findings) + ("\n" if findings else ""))
+PYEOF
+  while IFS= read -r line; do
+    [ -n "$line" ] && f LOW "$line"
+  done < "$INDEX_MISMATCHES"
 fi
 
 # ── Schema validation (delegated) ────────────────────────────────────────────

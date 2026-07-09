@@ -28,7 +28,7 @@ Paths are relative to this skill's directory.
 
 3. **Answer** — read the full page for any result where the chunk alone is insufficient, then synthesize a response with citations to specific pages. If information is missing, point to `/cortex-assimilate` for the missing sources, and append one line to `{vault}/wiki/meta/log.md`: `**[YYYY-MM-DD] recall-miss** | {query}`. Log misses only — a query that gets a real answer leaves no trace here.
 
-4. **Offer to persist, rarely** — only when the answer combines two or more existing pages into an insight not written down anywhere in the vault, or fills a real gap the wiki had no page for, end the response with one line: "This isn't written anywhere in the vault yet — want me to save it? (`/cortex-imprint`)". Skip this for anything answerable by pointing at a single existing page — the offer must stay rare, not a footer on every response. Persisting itself is not this skill's job: acceptance (now or in a later message) invokes `/cortex-imprint`, treating this answer as the source content.
+4. **Offer to persist, rarely** — only when the answer combines two or more existing pages into an insight not written down anywhere in the vault, or fills a real gap the wiki had no page for, end the response with one localized line equivalent to: "This isn't written anywhere in the vault yet — want me to save it? (`/cortex-imprint`)" (translated to the conversation's language, per this skill's own opening rule). Skip this for anything answerable by pointing at a single existing page — the offer must stay rare, not a footer on every response. Persisting itself is not this skill's job: acceptance (now or in a later message) invokes `/cortex-imprint`, treating this answer as the source content.
 
 ## Output format
 

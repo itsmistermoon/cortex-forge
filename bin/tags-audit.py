@@ -55,29 +55,30 @@ def main():
     tag_counts: Counter[str] = Counter()
     tag_pages: dict[str, list[str]] = {}
 
+    page_counts: dict[str, int] = {}
     for type_dir in TYPE_DIRS:
         d = vault / "wiki" / type_dir
         if not d.exists():
+            page_counts[type_dir] = 0
             continue
+        count = 0
         for md in sorted(d.glob("*.md")):
             if md.stem == "_index":
                 continue
+            count += 1
             content = md.read_text(encoding="utf-8", errors="ignore")
             for tag in extract_tags(content):
                 if not tag:
                     continue
                 tag_counts[tag] += 1
                 tag_pages.setdefault(tag, []).append(str(md.relative_to(vault)))
+        page_counts[type_dir] = count
 
     namespace_counts: Counter[str] = Counter()
     for tag, count in tag_counts.items():
         if "/" in tag:
             namespace_counts[tag.split("/", 1)[0]] += count
 
-    page_counts = {}
-    for type_dir in TYPE_DIRS:
-        d = vault / "wiki" / type_dir
-        page_counts[type_dir] = len([p for p in d.glob("*.md") if p.stem != "_index"]) if d.exists() else 0
     total_pages = sum(page_counts.values())
     total_uses = sum(tag_counts.values())
 
@@ -88,7 +89,7 @@ def main():
     lines = [
         "# Tags audit",
         "",
-        f"[//]: # \"Generado por bin/tags-audit.py — standalone, no wired into any skill. Re-run manually.\"",
+        "[//]: # \"Generado por bin/tags-audit.py — standalone, no wired into any skill. Re-run manually.\"",
         "",
         "## Resumen",
         "",
@@ -101,7 +102,7 @@ def main():
         f"| — Proyectos | {page_counts.get('projects', 0)} |",
         f"| Tags únicos | **{len(tag_counts)}** |",
         f"| Usos totales de tags | {total_uses} |",
-        f"| Ratio tags/páginas | {len(tag_counts)/total_pages:.2f}" if total_pages else "| Ratio tags/páginas | N/A |",
+        f"| Ratio tags/páginas | {len(tag_counts)/total_pages:.2f} |" if total_pages else "| Ratio tags/páginas | N/A |",
         "",
         "## Distribución por frecuencia de uso",
         "",
@@ -134,6 +135,7 @@ def main():
 
     if "--write-snapshot" in sys.argv:
         out_path = vault / "wiki" / "meta" / f"tags-audit-{date.today().isoformat()}.md"
+        out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(report, encoding="utf-8")
         print(f"Written (point-in-time snapshot, not auto-maintained): {out_path.relative_to(vault)}")
     else:

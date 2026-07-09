@@ -87,6 +87,8 @@ confidence: high | medium | low
 - `medium` — secondary source: video, opinion article, technical blog, transcript
 - `low` — agent inference without direct source, or second-hand source
 
+**`tags:` validation** — if `{vault}/wiki/meta/tags.md` exists, follow its rules and registered names: assign a tag only if it's already registered or a clear topical fit (record fits as post-run candidates to add); reject anything that contradicts the registry, with a brief inline reason. If the file is missing, skip — the registry is opt-in.
+
 ## Output format
 
 After completing ingestion, your response must confirm:

@@ -16,6 +16,7 @@ Vault "{name}" is already registered. What would you like to do?
   7. Add post-commit reindex  — install the embedding reindex git hook (requires semantic search)
   8. Set as default      — make this vault the default
   9. Remove this vault   — deregister from config.yml
+ 10. Run tags audit      — invoke `bin/tags-audit.py` on this vault and print the report
 ```
 
 For each selected operation, run the corresponding step in sequence. Most steps behave identically to the new-vault wizard; where they don't, the difference is noted below:
@@ -39,5 +40,6 @@ For each selected operation, run the corresponding step in sequence. Most steps 
 - 7 → step 5a (reindex; gate still applies: if vault.db doesn't exist, offer option 5 first)
 - 8 → step 6
 - 9 → if any post-commit hooks are installed for this vault, offer to uninstall them first (see `references/POST-COMMIT-HOOKS.md`'s uninstall procedure); then remove vault from `vaults:`, update default if needed, save config. If combined with other selections, run option 9 last — the other operations may need the vault's entry to still exist.
+- 10 → run `python3 bin/tags-audit.py {vault-path}` from the upstream `moon-cortexforge` repo. Pass `--write-snapshot` only if the user wants a dated snapshot saved under `wiki/meta/`.
 
 After all selected operations complete, follow SKILL.md's ## Output format — regardless of which combination of options ran, including option 9.

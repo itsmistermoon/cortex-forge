@@ -4,7 +4,7 @@ schema_version: "0.3"
 
 # AGENTS.md — cortex-forge
 
-This repo is the source of truth for the Cortex Forge skill suite (`skills/`, `templates/`), distributed via `npx skills add itsmistermoon/cortex-forge`. `wiki/` here holds only the canonical taxonomy as empty scaffolding. Vaults that install this suite carry the real knowledge content, in their own `wiki/` and `.raw/`.
+This repo is the source of truth for the Cortex Forge skill suite (`skills/`, `templates/`), distributed via `npx skills add itsmistermoon/cortex-forge`. This repo is not itself a vault — it has no `wiki/` directory. `scaffolding/wiki/` holds an untracked, local-only reference copy of the taxonomy (not part of the repo's git history). Vaults that install this suite carry the real knowledge content, in their own `wiki/` and `.raw/`.
 
 ## Vocabulary
 
@@ -27,7 +27,7 @@ Beyond this, skills trigger themselves — each one's own `description:` states 
 - **Run `bash bin/check-skill-sync.sh`** before opening a PR that touches `skills/**/SKILL.md` or its co-located `references/`/`scripts/`.
 - **Edit this repo as the single source of truth**, then refresh installs with `npx skills add itsmistermoon/cortex-forge --all -g -y`; `~/.agents/skills/` is a generated target.
 - **Treat `.env` and credential files as off-limits** to reading or modifying.
-- **Treat `wiki/` and `templates/` here as the canonical schema** — every vault that installs this suite inherits their shape.
+- **Treat `templates/` here as the canonical schema** — every vault that installs this suite inherits its shape. (`scaffolding/wiki/` is a local reference copy only, not part of the repo.)
 
 ## Available skills
 
@@ -50,3 +50,5 @@ All 6 live in `skills/` here as their canonical source, and install identically 
 | **project** | `wiki/projects/` | Active project with operational state (repo, status, domains) | `templates/project.md` |
 
 Each page follows: YAML frontmatter + compiled truth + chronological changelog. Type disambiguation and source frontmatter fields: see `skills/cortex-assimilate/SKILL.md`.
+
+`wiki/meta/tags.md` (seeded from `templates/tags.md`) is not a page type — it's the vault's tag rules + registry in one self-referencing document, kept free of hard counts so it never goes stale.

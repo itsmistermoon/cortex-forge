@@ -7,7 +7,7 @@ argument-hint: "Optional sub-task: embeddings | skills | sync | vaults"
 
 Start your response with the flavor line `Setting up vault...`, translated to the language of the user's current message (Spanish: `Configurando vault...`), with nothing before it. Use that same language for every prompt, question, menu, and confirmation this skill produces — persisted vault content (if any) still follows the vault's locale, not the conversation language.
 
-Setup for Cortex Forge. Run from inside a vault directory (one containing `wiki/`, `AGENTS.md`, and `.git/`). Registers the vault in the global config. This skill does not install skill files itself — [skills.sh](https://www.skills.sh/) (`npx skills add`) is the sole installer, for every agent it supports, not a hardcoded pair.
+Setup for Cortex Forge. Run from inside a vault directory (one containing `.git/`, and either an existing `wiki/` + `AGENTS.md`, or willing to scaffold them — see step 1). Registers the vault in the global config. This skill does not install skill files itself — [skills.sh](https://www.skills.sh/) (`npx skills add`) is the sole installer, for every agent it supports, not a hardcoded pair.
 
 ## Available scripts
 
@@ -33,8 +33,9 @@ Always end with the relevant subset of ## Output format.
 ## Steps
 
 1. **Validate vault candidate** — confirm the current directory qualifies to be registered as a vault:
-   - Required: `.git/`, `wiki/`, `AGENTS.md`
-   - If validation fails, report what's missing and stop.
+   - Required: `.git/`.
+   - If `.git/` is missing, report it and stop.
+   - If `wiki/` and/or `AGENTS.md` are missing, don't stop — see `references/NEW-VAULT-SCAFFOLD.md` to disambiguate a new vault from a broken one, and scaffold on confirmation.
    - Derive vault name from `basename` of CWD (e.g., `/Users/jp/second-brain` → `second-brain`).
 
 2. **Read existing config** — from `~/.cortex-forge/config.yml`, if it exists.
@@ -102,6 +103,7 @@ Always end with the relevant subset of ## Output format.
 ## Output format
 
 Confirm:
+- Scaffold (if run): what was created (`wiki/` structure, `AGENTS.md` stub, `wiki/meta/tags.md`) — remind the user to fill in `AGENTS.md`'s "Vault identity" section themselves
 - Registered vaults: list all entries in `vaults:` with their paths and locales, marking the default
 - Skills: all 6 present / missing {list} (with the `npx skills add` command to fix it)
 - Semantic search: active (backend: Ollama/mlx-embeddings/sentence-transformers, N chunks indexed) / not active (declined or skipped — how to enable later)
@@ -114,6 +116,6 @@ For a maintenance-menu run, confirm only the items for operations that actually 
 ## Rules
 
 - Always run from inside the vault directory — never ask for a path manually
-- Never write to `wiki/`, `.raw/`, or `AGENTS.md` — those are vault content, not this skill's to touch. Everything this skill does write (global config, `templates/`, `.cortex/db/`, git hooks) is infrastructure
+- Never write to an *existing* `wiki/`, `.raw/`, or `AGENTS.md` — those are vault content, not this skill's to touch once they exist. The one exception is step 1's new-vault scaffold (`references/NEW-VAULT-SCAFFOLD.md`), which creates them from nothing, only on explicit confirmation, and never overwrites either if already present. Everything else this skill writes (global config, `templates/`, `.cortex/db/`, git hooks) is infrastructure
 - Never hand-roll skill installation or agent-specific symlinks — `npx skills add` is the sole installer, for every agent it supports
 - Post-commit git hooks (prune, reindex — step 5a) are the only hooks this skill installs

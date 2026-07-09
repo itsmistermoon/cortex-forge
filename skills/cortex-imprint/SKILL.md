@@ -22,7 +22,7 @@ Archive a valuable session synthesis as a permanent wiki page.
 
 4. **Create the page** — use the corresponding template at `{vault}/templates/{type}.md`, saved to `wiki/concepts/`, `wiki/entities/`, `wiki/sources/`, or `wiki/projects/` (matching the type). For a project design decision, update the project's existing page instead — add the decision under `## Key decisions` rather than creating a new page.
 
-5. **Link, index, and log** — add `[[wikilinks]]` to related existing pages, update `{vault}/wiki/index.md`, and add an entry to `{vault}/wiki/meta/log.md`: `## [YYYY-MM-DD] imprint | {title}`.
+5. **Link, index, and log** — add `[[wikilinks]]` to related existing pages, update `{vault}/wiki/index.md`, and add an entry to `{vault}/wiki/meta/log.md`: `**[YYYY-MM-DD] imprint** | {title}`.
 
 ## Source hierarchy
 

@@ -96,7 +96,7 @@ Report verdict as MEDIUM. Never auto-apply — always requires user confirmation
 
 Reads `wiki/meta/log.md`, not vault pages — a different data source from L2a–L2d, but still bounded by the same hard cap.
 
-1. Collect `## [YYYY-MM-DD] recall-miss | {query}` entries from the last 30 days (or the most recent 20, whichever is fewer).
+1. Collect `**[YYYY-MM-DD] recall-miss** | {query}` entries from the last 30 days (or the most recent 20, whichever is fewer).
 2. Group by topic similarity — same or near-identical query text, or queries a reasonable reading would consider the same underlying question asked differently.
 3. Report any group with 2+ occurrences as MEDIUM: "`{N}` recall misses on `{topic}` since `{earliest-date}` — propose `/cortex-assimilate` for a source, or confirm a wiki page should exist." Single-occurrence misses are normal noise — discard them.
 
@@ -108,7 +108,7 @@ Reads `wiki/meta/log.md`, not vault pages — a different data source from L2a�
 - Add missing `tags:` to source pages
 - Add `[[wikilink]]` to a body mention identified in check L2b
 - Add entry to `wiki/index.md` for unindexed pages
-- Add `wiki/meta/log.md` entry: `## [YYYY-MM-DD] prune | {N} findings`
+- Add `wiki/meta/log.md` entry: `**[YYYY-MM-DD] prune** | {N} findings`
 
 `wiki/meta/vault-report.json` — written automatically by Layer 1 (step 2); not a correction, needs no confirmation.
 

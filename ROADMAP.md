@@ -136,7 +136,7 @@ Gap found manually in `moon-multivac`: `wiki/index.md` groups entries by section
 Considered logging every query (`log.md` as "record of ingests, queries, lint passes" per the gist) and rejected full logging as noise for a single-user vault — no audit need, no multi-user accountability case. The one real signal is recurring gaps: the same unanswered question surfacing across sessions is a concrete candidate for `/cortex-assimilate`, and today that signal is silently lost the moment step 2's "Not in vault" response is given — nothing records that it happened.
 
 **Implementation:**
-- When `cortex-recall` step 2 finds no relevant pages ("Not in vault"), append one line to `wiki/meta/log.md`: `## [YYYY-MM-DD] recall-miss | {query}`.
+- When `cortex-recall` step 2 finds no relevant pages ("Not in vault"), append one line to `wiki/meta/log.md`: `**[YYYY-MM-DD] recall-miss** | {query}`.
 - No logging on hits — only misses. This keeps `log.md` from filling with routine successful lookups.
 - `cortex-prune` gains a Layer 2 check (or extends L2c) that scans recent `recall-miss` entries for repeated/similar topics and reports them as MEDIUM candidates for `/cortex-assimilate`, the same way it already surfaces `NEEDS_PAGE` sources.
 

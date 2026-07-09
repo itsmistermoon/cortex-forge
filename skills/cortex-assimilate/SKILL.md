@@ -103,4 +103,4 @@ After completing ingestion, your response must confirm:
 - When updating an existing page, rewrite the full body integrating new knowledge with the prior content. Do not append sections at the end without reviewing the existing text. The result must read as a coherent article written at once, not as an original page plus addenda. Violation signal: two blocks in the same page covering the same subtopic from different perspectives without resolving them.
 - Include `[[wikilinks]]` to existing vault pages
 - If there's a contradiction with existing content, mark it as `[!contradiction]`
-- Include the agent in every page changelog: `- YYYY-MM-DD [agent]: description`
+- Add a changelog line matching the template: `- YYYY-MM-DD: description`

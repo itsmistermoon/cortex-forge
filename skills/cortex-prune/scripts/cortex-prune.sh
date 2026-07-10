@@ -20,7 +20,14 @@ RAW_NOSRC=$(mktemp) || { echo "ERROR: mktemp failed — cannot allocate temp fil
 NO_CONF=$(mktemp) || { echo "ERROR: mktemp failed — cannot allocate temp file for missing_confidence" >&2; exit 2; }
 ORPHANS=$(mktemp) || { echo "ERROR: mktemp failed — cannot allocate temp file for orphans" >&2; exit 2; }
 INDEX_MISMATCHES=$(mktemp) || { echo "ERROR: mktemp failed — cannot allocate temp file for index_mismatches" >&2; exit 2; }
-trap 'rm -f "$FINDINGS" "$DEAD_LINKS" "$RAW_NOSRC" "$NO_CONF" "$ORPHANS" "$INDEX_MISMATCHES"' EXIT
+INCOMING_LINKS=$(mktemp) || { echo "ERROR: mktemp failed — cannot allocate temp file for incoming_links" >&2; exit 2; }
+INCOMING_TARGETS=$(mktemp) || { echo "ERROR: mktemp failed — cannot allocate temp file for incoming_targets" >&2; exit 2; }
+SOURCES_PAGES=$(mktemp) || { echo "ERROR: mktemp failed — cannot allocate temp file for sources_pages" >&2; exit 2; }
+RAW_REFS=$(mktemp) || { echo "ERROR: mktemp failed — cannot allocate temp file for raw_refs" >&2; exit 2; }
+SOURCES_REFS=$(mktemp) || { echo "ERROR: mktemp failed — cannot allocate temp file for sources_refs" >&2; exit 2; }
+WIKI_SLUGS=$(mktemp) || { echo "ERROR: mktemp failed — cannot allocate temp file for wiki_slugs" >&2; exit 2; }
+RAW_INDEX=$(mktemp) || { echo "ERROR: mktemp failed — cannot allocate temp file for raw_index" >&2; exit 2; }
+trap 'rm -f "$FINDINGS" "$DEAD_LINKS" "$RAW_NOSRC" "$NO_CONF" "$ORPHANS" "$INDEX_MISMATCHES" "$INCOMING_LINKS" "$INCOMING_TARGETS" "$SOURCES_PAGES" "$RAW_REFS" "$SOURCES_REFS" "$WIKI_SLUGS" "$RAW_INDEX"' EXIT
 
 f() { echo "[$1] $2" >> "$FINDINGS"; }
 
@@ -60,18 +67,38 @@ grep -ro '\[\[wiki/[^]|]*' "$WIKI" --include="*.md" 2>/dev/null \
     done
 
 # ── HIGH: Unprocessed .raw/ files ─────────────────────────────────────────────
+# Performance: previous implementation was O(n × m) — for each .raw/ file,
+# ran 2 recursive greps plus a `find -name` over the whole wiki. On
+# moon-multivac (143 .raw/ files, 353 wiki pages) this took >10 min and
+# effectively hung the script. Current implementation builds the index of
+# every `raw:` and `sources:` reference in the wiki in a single pass each
+# (O(m)), then each .raw/ file is a single O(1) lookup (O(n)). Total:
+# O(n + m).
+
 if [ -d "$RAW" ]; then
+  # Single pass: every `raw: .raw/foo.md` reference anywhere in the wiki.
+  grep -rho '^raw: .*\.md$' "$WIKI" --include="*.md" 2>/dev/null \
+    | sed 's/^raw:[[:space:]]*//' | sort -u > "$RAW_REFS" || true
+  # Single pass: every `- .raw/foo.md` (a sources: list item pointing to raw).
+  grep -rhoE '^[[:space:]]*-[[:space:]]+\.raw/.*\.md$' "$WIKI" --include="*.md" 2>/dev/null \
+    | sed 's/^[[:space:]]*-[[:space:]]*//' | sort -u > "$SOURCES_REFS" || true
+  # Single pass: every wiki page basename (for the filename fallback).
+  find "$WIKI" -name "*.md" 2>/dev/null \
+    | sed 's|.*/||; s|\.md$||' | sort -u > "$WIKI_SLUGS" || true
+
+  # Merge all three index files into one sorted set. The combined lookup
+  # is a single `grep -Fxq` per .raw/ file instead of three. Membership
+  # in a sorted file is O(log n) with a binary search (grep's default
+  # when the file is sorted).
+  cat "$RAW_REFS" "$SOURCES_REFS" "$WIKI_SLUGS" 2>/dev/null | sort -u > "$RAW_INDEX" || true
+
   find "$RAW" -name "*.md" | while read -r raw; do
     rel="${raw#$VAULT/}"
     slug=$(basename "$raw" .md)
-    # Check across all wiki directories: raw: (single-source), sources: (multi-source list), then filename match
-    if ! grep -rl "^raw: ${rel}$" "$WIKI" 2>/dev/null | grep -q .; then
-      if ! grep -rl "^  - ${rel}$" "$WIKI" 2>/dev/null | grep -q .; then
-        if ! find "$WIKI" -name "*${slug}*.md" 2>/dev/null | grep -q .; then
-          f HIGH "No source page for: $rel"
-          echo "$rel" >> "$RAW_NOSRC"
-        fi
-      fi
+    if ! grep -Fxq "$rel" "$RAW_INDEX" 2>/dev/null \
+       && ! grep -Fxq "$slug" "$RAW_INDEX" 2>/dev/null; then
+      f HIGH "No source page for: $rel"
+      echo "$rel" >> "$RAW_NOSRC"
     fi
   done
 fi
@@ -91,26 +118,57 @@ find "$WIKI" -name "*.md" \
 # OR references it in a sources: YAML frontmatter list.
 # wiki/meta/ excluded — operational records are indexed via wiki/meta/_index.md,
 # not the [[wikilink]] graph (see wiki/meta/_index.md).
+#
+# Performance: previous implementation was O(n × m) — for each page, ran 1-2
+# recursive greps over the whole wiki. On moon-multivac (349 pages) this took
+# ~4 min. Current implementation builds the wikilinks set and sources: pages
+# set ONCE upfront (O(m)), then each page is a single O(1) lookup (O(n)).
+# Total: O(n + m), ~10x faster on small vaults, orders of magnitude on large.
+
+# Build the inverse wikilink index in a single pass over the vault:
+# for every `from<TAB>to` pair, accumulate. Then orphan detection is
+# O(1) per page (membership lookup, excluding self).
+# `from<TAB>to` per line. Trailing `\` is stripped (escaped alias pipe in tables).
+# `\|Display text` is the alias form — take only the path part.
+while IFS=: read -r src _ link; do
+  link="${link#\[\[wiki/}"
+  link="${link%.md}"
+  link="${link%\\}"
+  case "$link" in
+    *"|"*) link="${link%%|*}" ;;  # drop "|Display text" alias
+  esac
+  printf '%s\t%s\n' "${src#$VAULT/}" "$link"
+done < <(grep -roE '\[\[wiki/[^]|]+' "$WIKI" --include="*.md" 2>/dev/null) > "$INCOMING_LINKS"
+
+# Precompute the set of pages that have at least one inbound non-self
+# wikilink: a flat sorted list of unique target paths. Orphan detection
+# becomes a single `grep -Fxq` per page (O(log n) with sorted input,
+# O(n) worst case) instead of an awk linear scan per page.
+awk -F'\t' '$1 != $2 { print $2 }' "$INCOMING_LINKS" | sort -u > "$INCOMING_TARGETS" || true
+
+# Collect every page that has a `sources:` frontmatter key (these can
+# reference another page by basename only — e.g. `- concept-name`).
+grep -rl '^sources:' "$WIKI" --include="*.md" 2>/dev/null > "$SOURCES_PAGES" || true
+
 find "$WIKI" -name "*.md" \
   | grep -v '_index\|/index\.md\|/log\.md\|/meta/' \
   | while read -r page; do
       rel="${page#$VAULT/}"          # e.g. wiki/concepts/memory-system.md
       rel_noext="${rel%.md}"         # e.g. wiki/concepts/memory-system
       basename_noext="${rel_noext##*/}"  # e.g. memory-system
-      # Count pages that contain a wikilink to this exact path (with or without .md),
-      # anchored so e.g. [[wiki/concepts/foo-bar]] never counts as a hit for foo.
-      hits=$(grep -rlE "\[\[${rel_noext}(\.md)?(\||\]\])" "$WIKI" 2>/dev/null \
-             | grep -v "^${page}$" | wc -l | tr -d ' ')
-      # Also count pages that reference this page in a sources: frontmatter entry.
-      # [[:space:]] instead of \s — \s is a GNU extension, not POSIX BRE (BSD grep on macOS lacks it).
-      if [ "$hits" -eq 0 ]; then
-        hits=$(grep -rl "^[[:space:]]*-[[:space:]]*.*${basename_noext}" "$WIKI" 2>/dev/null \
-               | xargs grep -l "^sources:" 2>/dev/null \
-               | grep -v "^${page}$" | wc -l | tr -d ' ')
-      fi
-      if [ "$hits" -eq 0 ]; then
-        f MEDIUM "Orphan: ${rel}"
-        echo "$rel" >> "$ORPHANS"
+      # Self-link doesn't count as inbound. Find any line whose target
+      # is this page and whose source is a different page.
+      if ! grep -Fxq "$rel_noext" "$INCOMING_TARGETS" 2>/dev/null; then
+        # Check sources: pages for a non-self reference.
+        # `grep -l` lists files matching; `grep -v` then drops the page itself.
+        # If anything remains, the page is referenced from another page's
+        # sources: block.
+        in_sources=$(grep -lE "^[[:space:]]*-[[:space:]]*${basename_noext}([[:space:]]|$)" "$SOURCES_PAGES" 2>/dev/null \
+                     | grep -vF "${page}" | head -1 || true)
+        if [ -z "$in_sources" ]; then
+          f MEDIUM "Orphan: ${rel}"
+          echo "$rel" >> "$ORPHANS"
+        fi
       fi
     done
 

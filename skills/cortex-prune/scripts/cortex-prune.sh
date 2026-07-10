@@ -27,7 +27,6 @@ RAW_REFS=$(mktemp) || { echo "ERROR: mktemp failed — cannot allocate temp file
 SOURCES_REFS=$(mktemp) || { echo "ERROR: mktemp failed — cannot allocate temp file for sources_refs" >&2; exit 2; }
 WIKI_SLUGS=$(mktemp) || { echo "ERROR: mktemp failed — cannot allocate temp file for wiki_slugs" >&2; exit 2; }
 RAW_INDEX=$(mktemp) || { echo "ERROR: mktemp failed — cannot allocate temp file for raw_index" >&2; exit 2; }
-trap 'rm -f "$FINDINGS" "$DEAD_LINKS" "$RAW_NOSRC" "$NO_CONF" "$ORPHANS" "$INDEX_MISMATCHES" "$INCOMING_LINKS" "$INCOMING_TARGETS" "$SOURCES_PAGES" "$RAW_REFS" "$SOURCES_REFS" "$WIKI_SLUGS" "$RAW_INDEX"' EXIT
 
 f() { echo "[$1] $2" >> "$FINDINGS"; }
 
@@ -130,7 +129,7 @@ find "$WIKI" -name "*.md" \
 # O(1) per page (membership lookup, excluding self).
 # `from<TAB>to` per line. Trailing `\` is stripped (escaped alias pipe in tables).
 # `\|Display text` is the alias form — take only the path part.
-while IFS=: read -r src _ link; do
+while IFS=: read -r src link; do
   link="${link#\[\[wiki/}"
   link="${link%.md}"
   link="${link%\\}"
@@ -146,26 +145,32 @@ done < <(grep -roE '\[\[wiki/[^]|]+' "$WIKI" --include="*.md" 2>/dev/null) > "$I
 # O(n) worst case) instead of an awk linear scan per page.
 awk -F'\t' '$1 != $2 { print $2 }' "$INCOMING_LINKS" | sort -u > "$INCOMING_TARGETS" || true
 
-# Collect every page that has a `sources:` frontmatter key (these can
-# reference another page by basename only — e.g. `- concept-name`).
-grep -rl '^sources:' "$WIKI" --include="*.md" 2>/dev/null > "$SOURCES_PAGES" || true
+# Precompute the set of all references from pages with sources: frontmatter.
+# Extracts both basename-only references (e.g. concept-name) and full path
+# references (e.g. wiki/sources/slug.md, wiki/sources/slug, etc.).
+SOURCES_TARGETS=$(mktemp) || exit 2
+trap 'rm -f "$FINDINGS" "$DEAD_LINKS" "$RAW_NOSRC" "$NO_CONF" "$ORPHANS" "$INDEX_MISMATCHES" "$INCOMING_LINKS" "$INCOMING_TARGETS" "$SOURCES_PAGES" "$RAW_REFS" "$SOURCES_REFS" "$WIKI_SLUGS" "$RAW_INDEX" "$SOURCES_TARGETS"' EXIT
+while IFS= read -r sf; do
+  # basename references (YAML block list: `- concept-name`)
+  grep -oE '^[[:space:]]+-[[:space:]]+[^ ]+$' "$sf" 2>/dev/null \
+    | sed 's/^[[:space:]]*-[[:space:]]*//' | sed 's/\.md$//' >> "$SOURCES_TARGETS"
+  # flow sequence references (YAML flow: `wiki/sources/slug.md,`)
+  grep -oE '[[:space:]]+wiki/[^,]+,?' "$sf" 2>/dev/null \
+    | sed 's/[[:space:]]*//g; s/,//g; s/\.md$//' >> "$SOURCES_TARGETS"
+done < <(grep -rl '^sources:' "$WIKI" --include="*.md" 2>/dev/null)
+sort -u "$SOURCES_TARGETS" -o "$SOURCES_TARGETS"
 
 find "$WIKI" -name "*.md" \
   | grep -v '_index\|/index\.md\|/log\.md\|/meta/' \
   | while read -r page; do
       rel="${page#$VAULT/}"          # e.g. wiki/concepts/memory-system.md
       rel_noext="${rel%.md}"         # e.g. wiki/concepts/memory-system
+      rel_target="${rel_noext#wiki/}"  # e.g. concepts/memory-system — matches INCOMING_TARGETS format
       basename_noext="${rel_noext##*/}"  # e.g. memory-system
-      # Self-link doesn't count as inbound. Find any line whose target
-      # is this page and whose source is a different page.
-      if ! grep -Fxq "$rel_noext" "$INCOMING_TARGETS" 2>/dev/null; then
-        # Check sources: pages for a non-self reference.
-        # `grep -l` lists files matching; `grep -v` then drops the page itself.
-        # If anything remains, the page is referenced from another page's
-        # sources: block.
-        in_sources=$(grep -lE "^[[:space:]]*-[[:space:]]*${basename_noext}([[:space:]]|$)" "$SOURCES_PAGES" 2>/dev/null \
-                     | grep -vF "${page}" | head -1 || true)
-        if [ -z "$in_sources" ]; then
+      if ! grep -Fxq "$rel_target" "$INCOMING_TARGETS" 2>/dev/null; then
+        # Check sources: references — both basename and full path format
+        if ! grep -Fxq "$basename_noext" "$SOURCES_TARGETS" 2>/dev/null \
+           && ! grep -Fxq "$rel_noext" "$SOURCES_TARGETS" 2>/dev/null; then
           f MEDIUM "Orphan: ${rel}"
           echo "$rel" >> "$ORPHANS"
         fi

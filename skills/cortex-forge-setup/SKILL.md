@@ -75,6 +75,9 @@ Always end with the relevant subset of ## Output format.
 
 3b. **Sync infrastructure from upstream** — pull infrastructure files from the upstream repo and apply them to the current vault. See `references/UPSTREAM-SYNC.md` for resolution, sync scope, exclusions, and rate limits.
 
+   - **If this is a new vault (scaffolded in step 1)** → proceed without asking — templates are part of the scaffolding the user already confirmed.
+   - **If this is an existing vault** → ask before updating templates, per UPSTREAM-SYNC.md step 4.
+
 3c. **Offer stale-cache warning threshold (opt-in, global setting)** — this is a single global value in `~/.cortex-forge/config.yml` (top-level, like `imprint_triage`), not per-vault. Read the config first:
     - **If `hot_cache_stale_days:` is already set** → inform the user of the current value and ask if they want to change it, rather than asking as if for the first time.
     - **If not set** → ask: "Warn if this vault's memory hasn't been touched in N days? (default: 15, 0 to disable)"

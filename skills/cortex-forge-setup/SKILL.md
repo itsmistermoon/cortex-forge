@@ -1,6 +1,7 @@
 ---
 name: cortex-forge-setup
-behavior: ["configure"]
+license: MIT
+compatibility: Requires git and npx (Node.js); python3 only for optional semantic search
 description: Register or deregister the current vault in Cortex Forge and verify global skills are installed. Run from inside a vault directory.
 argument-hint: "Optional sub-task: embeddings | skills | sync | vaults"
 ---
@@ -74,6 +75,9 @@ Always end with the relevant subset of ## Output format.
    - If this is the first vault registered, set it as `default`. If a `default` already exists, leave it unchanged.
 
 3b. **Sync infrastructure from upstream** — pull infrastructure files from the upstream repo and apply them to the current vault. See `references/UPSTREAM-SYNC.md` for resolution, sync scope, exclusions, and rate limits.
+
+   - **If this is a new vault (scaffolded in step 1)** → proceed without asking — templates are part of the scaffolding the user already confirmed.
+   - **If this is an existing vault** → ask before updating templates, per UPSTREAM-SYNC.md step 4.
 
 3c. **Offer stale-cache warning threshold (opt-in, global setting)** — this is a single global value in `~/.cortex-forge/config.yml` (top-level, like `imprint_triage`), not per-vault. Read the config first:
     - **If `hot_cache_stale_days:` is already set** → inform the user of the current value and ask if they want to change it, rather than asking as if for the first time.

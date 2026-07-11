@@ -1,7 +1,7 @@
 ---
 name: cortex-recall
-behavior: ["recall"]
-description: Answer questions using the vault's synthesized wiki content as the source of truth — never from training knowledge. Invoke when the user asks "what do I know about X", "what does my vault say about Y", "find my notes on Z", or anything that could be covered by their personal vault (projects, decisions, prior research, terminology, domain-specific topics), even if you think you already know the answer. Returns citations to specific pages.
+license: MIT
+description: Answer questions from the vault wiki as the source of truth — never training knowledge — with page citations. Use on "what do I know about X" or any topic the vault may cover, even if you know it.
 argument-hint: "[vault-name] <query>"
 ---
 

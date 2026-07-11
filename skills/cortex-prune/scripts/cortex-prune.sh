@@ -27,7 +27,6 @@ RAW_REFS=$(mktemp) || { echo "ERROR: mktemp failed — cannot allocate temp file
 SOURCES_REFS=$(mktemp) || { echo "ERROR: mktemp failed — cannot allocate temp file for sources_refs" >&2; exit 2; }
 WIKI_SLUGS=$(mktemp) || { echo "ERROR: mktemp failed — cannot allocate temp file for wiki_slugs" >&2; exit 2; }
 RAW_INDEX=$(mktemp) || { echo "ERROR: mktemp failed — cannot allocate temp file for raw_index" >&2; exit 2; }
-trap 'rm -f "$FINDINGS" "$DEAD_LINKS" "$RAW_NOSRC" "$NO_CONF" "$ORPHANS" "$INDEX_MISMATCHES" "$INCOMING_LINKS" "$INCOMING_TARGETS" "$SOURCES_PAGES" "$RAW_REFS" "$SOURCES_REFS" "$WIKI_SLUGS" "$RAW_INDEX"' EXIT
 
 f() { echo "[$1] $2" >> "$FINDINGS"; }
 
@@ -61,8 +60,8 @@ grep -ro '\[\[wiki/[^]|]*' "$WIKI" --include="*.md" 2>/dev/null \
       # is part of the table escaping, not the link target
       link="${link%\\}"
       if [ ! -f "$VAULT/${link}.md" ]; then
-        f HIGH "Dead link in ${src#$VAULT/}: [[${link}]]"
-        printf '%s\t%s\n' "${src#$VAULT/}" "$link" >> "$DEAD_LINKS"
+        f HIGH "Dead link in ${src#"$VAULT"/}: [[${link}]]"
+        printf '%s\t%s\n' "${src#"$VAULT"/}" "$link" >> "$DEAD_LINKS"
       fi
     done
 
@@ -93,7 +92,7 @@ if [ -d "$RAW" ]; then
   cat "$RAW_REFS" "$SOURCES_REFS" "$WIKI_SLUGS" 2>/dev/null | sort -u > "$RAW_INDEX" || true
 
   find "$RAW" -name "*.md" | while read -r raw; do
-    rel="${raw#$VAULT/}"
+    rel="${raw#"$VAULT"/}"
     slug=$(basename "$raw" .md)
     if ! grep -Fxq "$rel" "$RAW_INDEX" 2>/dev/null \
        && ! grep -Fxq "$slug" "$RAW_INDEX" 2>/dev/null; then
@@ -109,7 +108,7 @@ fi
 find "$WIKI" -name "*.md" \
   | grep -v '_index\|/index\.md\|/log\.md\|/meta/' \
   | while read -r p; do
-      head -1 "$p" | grep -q "^---" || f HIGH "No frontmatter: ${p#$VAULT/}"
+      head -1 "$p" | grep -q "^---" || f HIGH "No frontmatter: ${p#"$VAULT"/}"
     done
 
 # ── MEDIUM: Orphan pages ──────────────────────────────────────────────────────
@@ -130,14 +129,14 @@ find "$WIKI" -name "*.md" \
 # O(1) per page (membership lookup, excluding self).
 # `from<TAB>to` per line. Trailing `\` is stripped (escaped alias pipe in tables).
 # `\|Display text` is the alias form — take only the path part.
-while IFS=: read -r src _ link; do
+while IFS=: read -r src link; do
   link="${link#\[\[wiki/}"
   link="${link%.md}"
   link="${link%\\}"
   case "$link" in
     *"|"*) link="${link%%|*}" ;;  # drop "|Display text" alias
   esac
-  printf '%s\t%s\n' "${src#$VAULT/}" "$link"
+  printf '%s\t%s\n' "${src#"$VAULT"/}" "$link"
 done < <(grep -roE '\[\[wiki/[^]|]+' "$WIKI" --include="*.md" 2>/dev/null) > "$INCOMING_LINKS"
 
 # Precompute the set of pages that have at least one inbound non-self
@@ -146,26 +145,36 @@ done < <(grep -roE '\[\[wiki/[^]|]+' "$WIKI" --include="*.md" 2>/dev/null) > "$I
 # O(n) worst case) instead of an awk linear scan per page.
 awk -F'\t' '$1 != $2 { print $2 }' "$INCOMING_LINKS" | sort -u > "$INCOMING_TARGETS" || true
 
-# Collect every page that has a `sources:` frontmatter key (these can
-# reference another page by basename only — e.g. `- concept-name`).
-grep -rl '^sources:' "$WIKI" --include="*.md" 2>/dev/null > "$SOURCES_PAGES" || true
+# Precompute the set of all references from pages with sources: frontmatter.
+# Extracts both basename-only references (e.g. concept-name) and full path
+# references (e.g. wiki/sources/slug.md, wiki/sources/slug, etc.).
+SOURCES_TARGETS=$(mktemp) || exit 2
+trap 'rm -f "$FINDINGS" "$DEAD_LINKS" "$RAW_NOSRC" "$NO_CONF" "$ORPHANS" "$INDEX_MISMATCHES" "$INCOMING_LINKS" "$INCOMING_TARGETS" "$SOURCES_PAGES" "$RAW_REFS" "$SOURCES_REFS" "$WIKI_SLUGS" "$RAW_INDEX" "$SOURCES_TARGETS"' EXIT
+while IFS= read -r sf; do
+  # Scope extraction to the frontmatter block only (between the two `---`
+  # delimiters) — body prose or lists can otherwise contain `- foo` or
+  # `wiki/...` text that falsely counts as a sources: reference.
+  fm=$(awk '/^---$/{c++; next} c==1' "$sf" 2>/dev/null)
+  # basename references (YAML block list: `- concept-name`)
+  printf '%s\n' "$fm" | grep -oE '^[[:space:]]+-[[:space:]]+[^ ]+$' \
+    | sed 's/^[[:space:]]*-[[:space:]]*//' | sed 's/\.md$//' >> "$SOURCES_TARGETS"
+  # flow sequence references (YAML flow: `wiki/sources/slug.md,`)
+  printf '%s\n' "$fm" | grep -oE '[[:space:]]+wiki/[^,]+,?' \
+    | sed 's/[[:space:]]*//g; s/,//g; s/\.md$//' >> "$SOURCES_TARGETS"
+done < <(grep -rl '^sources:' "$WIKI" --include="*.md" 2>/dev/null)
+sort -u "$SOURCES_TARGETS" -o "$SOURCES_TARGETS"
 
 find "$WIKI" -name "*.md" \
   | grep -v '_index\|/index\.md\|/log\.md\|/meta/' \
   | while read -r page; do
-      rel="${page#$VAULT/}"          # e.g. wiki/concepts/memory-system.md
+      rel="${page#"$VAULT"/}"          # e.g. wiki/concepts/memory-system.md
       rel_noext="${rel%.md}"         # e.g. wiki/concepts/memory-system
+      rel_target="${rel_noext#wiki/}"  # e.g. concepts/memory-system — matches INCOMING_TARGETS format
       basename_noext="${rel_noext##*/}"  # e.g. memory-system
-      # Self-link doesn't count as inbound. Find any line whose target
-      # is this page and whose source is a different page.
-      if ! grep -Fxq "$rel_noext" "$INCOMING_TARGETS" 2>/dev/null; then
-        # Check sources: pages for a non-self reference.
-        # `grep -l` lists files matching; `grep -v` then drops the page itself.
-        # If anything remains, the page is referenced from another page's
-        # sources: block.
-        in_sources=$(grep -lE "^[[:space:]]*-[[:space:]]*${basename_noext}([[:space:]]|$)" "$SOURCES_PAGES" 2>/dev/null \
-                     | grep -vF "${page}" | head -1 || true)
-        if [ -z "$in_sources" ]; then
+      if ! grep -Fxq "$rel_target" "$INCOMING_TARGETS" 2>/dev/null; then
+        # Check sources: references — both basename and full path format
+        if ! grep -Fxq "$basename_noext" "$SOURCES_TARGETS" 2>/dev/null \
+           && ! grep -Fxq "$rel_noext" "$SOURCES_TARGETS" 2>/dev/null; then
           f MEDIUM "Orphan: ${rel}"
           echo "$rel" >> "$ORPHANS"
         fi
@@ -177,7 +186,7 @@ find "$WIKI" -name "*.md" \
 for dir in "$WIKI/concepts" "$WIKI/entities"; do
   [ -d "$dir" ] || continue
   find "$dir" -name "*.md" | grep -v '_index' | while read -r p; do
-    rel="${p#$VAULT/}"
+    rel="${p#"$VAULT"/}"
     grep -q "^sources:" "$p" || f MEDIUM "No sources: $rel"
     grep -q "^confidence:" "$p" || { f MEDIUM "No confidence: $rel"; echo "$rel" >> "$NO_CONF"; }
   done
@@ -186,14 +195,14 @@ done
 # ── MEDIUM: Sources without confidence ────────────────────────────────────────
 [ -d "$WIKI/sources" ] && \
 find "$WIKI/sources" -name "*.md" | grep -v '_index' | while read -r p; do
-  grep -q "^confidence:" "$p" || { f MEDIUM "No confidence: ${p#$VAULT/}"; echo "${p#$VAULT/}" >> "$NO_CONF"; }
+  grep -q "^confidence:" "$p" || { f MEDIUM "No confidence: ${p#"$VAULT"/}"; echo "${p#"$VAULT"/}" >> "$NO_CONF"; }
 done
 
 # ── LOW: Sources without tags ─────────────────────────────────────────────────
 [ -d "$WIKI/sources" ] && \
 find "$WIKI/sources" -name "*.md" | grep -v '_index' | while read -r p; do
   val=$(grep "^tags:" "$p" 2>/dev/null | head -1)
-  { [ -z "$val" ] || [ "$val" = "tags: []" ]; } && f LOW "No tags: ${p#$VAULT/}"
+  { [ -z "$val" ] || [ "$val" = "tags: []" ]; } && f LOW "No tags: ${p#"$VAULT"/}"
 done
 
 # ── Frontmatter vs templates/{type}.md ────────────────────────────────────────
@@ -227,7 +236,7 @@ if [ -d "$TEMPLATES" ]; then
   find "$WIKI" -name "*.md" \
     | grep -v '_index\|/index\.md\|/log\.md\|/meta/' \
     | while read -r p; do
-        rel="${p#$VAULT/}"
+        rel="${p#"$VAULT"/}"
         keys=$(fm_keys "$p")
         [ -z "$keys" ] && continue  # no frontmatter — already flagged above
 
@@ -383,6 +392,6 @@ REPORT_TMP=$(mktemp "$WIKI/meta/.vault-report.json.XXXXXX") || { echo "ERROR: mk
   printf '  }\n'
   printf '}\n'
 } > "$REPORT_TMP" && mv "$REPORT_TMP" "$WIKI/meta/vault-report.json" || { echo "ERROR: failed to write vault-report.json" >&2; rm -f "$REPORT_TMP"; exit 2; }
-echo "Report written: ${WIKI#$VAULT/}/meta/vault-report.json"
+echo "Report written: ${WIKI#"$VAULT"/}/meta/vault-report.json"
 
 [ "$HIGH" -gt 0 ] && exit 1 || exit 0

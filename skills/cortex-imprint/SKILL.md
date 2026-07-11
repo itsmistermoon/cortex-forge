@@ -1,6 +1,6 @@
 ---
 name: cortex-imprint
-behavior: ["synthesize"]
+license: MIT
 disable-model-invocation: true
 description: Archive a valuable session synthesis as a permanent wiki page in the vault.
 argument-hint: "[vault-name]"

@@ -1,7 +1,8 @@
 ---
 name: cortex-assimilate
-behavior: ["ingest", "synthesize"]
-description: Ingest a URL or file into the vault — saves to .raw/, synthesizes wiki pages, updates index. Trigger when the user pastes a URL with no other context, says "ingest this", "process this", "add this to the vault", "research X and build pages", or drops a file into .raw/. Use --research "<query>" to auto-discover and ingest sources from the web.
+license: MIT
+compatibility: Requires rg and jq for the credential sanitization check (fails open without them); python3 only for optional semantic indexing
+description: Ingest a URL, file, or pasted text into the vault — saves to .raw/, synthesizes wiki pages, updates the index. Use on "ingest this", "add to the vault", or a bare URL; --research finds web sources.
 argument-hint: "[vault-name] <url-or-file> | --research \"<query>\" [--rounds N]"
 ---
 
@@ -65,7 +66,7 @@ If the first argument starts with `--research`, discover sources on the web inst
 
 ## Page types
 
-Each type has a template at `templates/{type}.md`.
+Each type has a template at `{vault}/templates/{type}.md`.
 
 - **Source** (`wiki/sources/`) — content created by someone external, with a verifiable URL or raw file. Every processed source gets one.
 - **Concept** (`wiki/concepts/`) — synthesized knowledge with no existence outside the vault, even when derived from sources; an idea you'd look up in a textbook. Create when it has a proper name (principle, pattern, framework, technique), can be applied or referenced in future sessions, and warrants its own article. Skip concrete instances and topics too generic to stand alone.

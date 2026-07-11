@@ -1,7 +1,7 @@
 ---
 name: cortex-crystallize
-behavior: ["snapshot"]
-description: Snapshot session context into .cortex/MEMORY.md — preserves pending tasks, active decisions, and session history so future sessions resume without losing context. Invoke when the user says "save context", "crystallize", "snapshot this", "wrap up", "I'm done for now", or when the session is about to close. Works from any repo, inside or outside the vault.
+license: MIT
+description: Snapshot session context into .cortex/MEMORY.md — pending tasks, decisions, and history — so future sessions resume without losing context. Use on "save context", "crystallize", or "wrap up".
 argument-hint: "[vault-name] [project-name] [next: <focus>]"
 ---
 

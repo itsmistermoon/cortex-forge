@@ -16,7 +16,6 @@ Goal: Hot Cache Protocol working identically across coding agents, via a manual 
 - [x] `agent:` field in snapshot frontmatter — identifies last writer in multi-agent vaults
 - [x] Stale cache detection — `hot_cache_stale_days:` in config (global); checked at MEMORY.md read time per AGENTS.md protocol
 - [x] Compliance guardrails — verifiable contracts in `AGENTS.md`; mandatory output format in `cortex-recall`, `cortex-assimilate`, `cortex-crystallize`
-- [x] Behavior tags in skills — `behavior:` frontmatter; 6 tags: `#ingest #synthesize #recall #prune #snapshot #configure`
 - [x] Context fencing in `cortex-imprint` — source hierarchy (session > `.raw/` > `wiki/` reference only); circular synthesis test; `raw:` provenance field
 - [x] Link-count scan — orphan page detection in `cortex-prune.sh`; `orphan_pages` in `vault-report.json`, surfaced via `AGENTS.md`'s mandatory read protocol
 - [x] Post-commit git hooks (opt-in) — prune refreshes `vault-report.json`; reindex updates `vault.db`, both gated on `wiki/` changes

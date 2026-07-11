@@ -1,7 +1,8 @@
 ---
 name: cortex-prune
-behavior: ["prune", "recall"]
-description: Health check the vault — detects dead links, orphan pages, missing provenance, and unprocessed sources. Invoke when the user asks "is everything organized?", "check if something is broken", "are there orphan pages?", "run a vault health check", or "prune the vault".
+license: MIT
+compatibility: Requires bash with jq, git, and python3 (structural check script)
+description: Vault health check — detects dead links, orphan pages, missing provenance, and unprocessed sources. Use when the user asks if something is broken or organized, or requests a vault check.
 argument-hint: "[vault-name]"
 ---
 

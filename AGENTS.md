@@ -4,7 +4,7 @@ schema_version: "0.3"
 
 # AGENTS.md — cortex-forge
 
-This repo is the source of truth for the Cortex Forge skill suite (`skills/`, `templates/`), distributed via `npx skills add itsmistermoon/cortex-forge`. This repo is not itself a vault — it has no `wiki/` directory. `scaffolding/wiki/` holds an untracked, local-only reference copy of the taxonomy (not part of the repo's git history). Vaults that install this suite carry the real knowledge content, in their own `wiki/` and `.raw/`.
+This repo is the source of truth for the Cortex Forge skill suite (`skills/`, `templates/`), distributed via `npx skills add itsmistermoon/cortex-forge`. This repo is not itself a vault — it has no `wiki/` directory. Vaults that install this suite carry the real knowledge content, in their own `wiki/` and `.raw/`.
 
 ## Vocabulary
 
@@ -41,7 +41,7 @@ Single-context. `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/do
 - **Run `bash bin/check-skill-sync.sh`** before opening a PR that touches `skills/**/SKILL.md` or its co-located `references/`/`scripts/`.
 - **Edit this repo as the single source of truth**, then refresh installs with `npx skills add itsmistermoon/cortex-forge --all -g -y`; `~/.agents/skills/` is a generated target.
 - **Treat `.env` and credential files as off-limits** to reading or modifying.
-- **Treat `templates/` here as the canonical schema** — every vault that installs this suite inherits its shape. (`scaffolding/wiki/` is a local reference copy only, not part of the repo.)
+- **Treat `templates/` here as the canonical schema** — every vault that installs this suite inherits its shape.
 
 ## Available skills
 

@@ -5,17 +5,19 @@ on:
     paths:
       - "skills/**/SKILL.md"
       - "AGENTS.md"
-      - "bin/check-skill-sync.sh"
+      - "scripts/check-skill-sync.sh"
   pull_request:
     paths:
       - "skills/**/SKILL.md"
       - "AGENTS.md"
-      - "bin/check-skill-sync.sh"
+      - "scripts/check-skill-sync.sh"
 
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Check skill consistency
-        run: bash bin/check-skill-sync.sh
+        run: bash scripts/check-skill-sync.sh

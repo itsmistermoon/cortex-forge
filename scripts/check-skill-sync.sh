@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Verifies cross-skill consistency invariants in skills/*.
 # Exit 0 = all checks pass. Exit 1 = one or more failures.
-# Run: bash bin/check-skill-sync.sh [skills-dir]
+# Run: bash scripts/check-skill-sync.sh [skills-dir]
 
 set -euo pipefail
 
@@ -58,16 +58,18 @@ done
 # 3. Skills that write wiki/ must mention wiki/index.md update
 # ---------------------------------------------------------------------------
 check "index-update"
-WRITE_SKILLS=("cortex-assimilate" "cortex-imprint")
-for name in "${WRITE_SKILLS[@]}"; do
-  file="$SKILLS_DIR/$name/SKILL.md"
-  [[ -f "$file" ]] || { fail "$name: SKILL.md not found"; continue; }
+# Discover write-skills structurally instead of a hardcoded list — a skill
+# whose SKILL.md describes creating/saving a new wiki page is scanned
+# automatically, matching the "no enumerated names" approach used elsewhere
+# in this script (see sections 4 and 6).
+while IFS= read -r file; do
+  name="$(basename "$(dirname "$file")")"
   if grep -q 'wiki/index.md' "$file"; then
     ok "$name: mentions wiki/index.md update"
   else
     fail "$name: writes wiki/ but does not mention updating wiki/index.md"
   fi
-done
+done < <(grep -lriE "creat(e|es|ing)? (a |the |new )*page|saved to \`\{?vault\}?/?wiki|writ(e|es|ing) (the |a |new )*page" "$SKILLS_DIR"/*/SKILL.md | sort -u)
 
 # ---------------------------------------------------------------------------
 # 4. vault-report.json schema fields consistent between cortex-prune and AGENTS.md

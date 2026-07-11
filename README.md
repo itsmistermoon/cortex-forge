@@ -14,6 +14,10 @@ The system separates two kinds of memory:
 
 ## Setup
 
+Two ways to install, depending on your agent.
+
+### Option A: skills.sh (any supported agent)
+
 1. Run the [skills.sh](https://www.skills.sh/) installer:
 
 ```bash
@@ -22,14 +26,27 @@ npx skills add itsmistermoon/cortex-forge
 
 2. See the [Supported Agents table](https://github.com/vercel-labs/skills#supported-agents) to pick the exact flag value per agent.
 
-3. Run `/cortex-forge-setup` in your agent — from a fresh git repo or an existing vault. This skill will:
+Skills install unnamespaced: `/cortex-assimilate`, `/cortex-crystallize`, `/cortex-imprint`, `/cortex-recall`, `/cortex-prune`, `/cortex-forge-setup`.
+
+### Option B: Claude Code plugin
+
+This repo is also a self-hosted [Claude Code plugin marketplace](https://code.claude.com/docs/en/plugin-marketplaces) — one repo, one plugin.
+
+```bash
+/plugin marketplace add itsmistermoon/cortex-forge
+/plugin install cortex-forge@cortex-forge
+```
+
+Skills install namespaced: `/cortex-forge:cortex-assimilate`, `/cortex-forge:cortex-crystallize`, etc. To test a local checkout before installing, use `claude --plugin-dir .` from the repo root.
+
+### Then, either way
+
+Run `/cortex-forge-setup` (or `/cortex-forge:cortex-forge-setup`) in your agent — from a fresh git repo or an existing vault. This skill will:
 - Scaffold `wiki/` and a starter `AGENTS.md` if they don't exist yet (asks first — never overwrites an existing vault), detect your locale, and register the vault in `~/.cortex-forge/config.yml`
-- Verify all six skills are actually installed, and tell you to re-run `npx skills add` if any are missing
+- Verify all six skills are actually installed, and tell you to re-run `npx skills add` (or `/plugin update`) if any are missing
 - Offer to set up semantic search, with a dependency check that runs before asking
 - Offer optional extras: syncing infrastructure from upstream, a stale-cache warning threshold, and post-commit git hooks for prune/reindex
 - Ask which vault to set as default if more than one is registered
-
-After setup, all skills are available as `/cortex-assimilate`, `/cortex-crystallize`, `/cortex-imprint`, `/cortex-recall`, `/cortex-prune`, and `/cortex-forge-setup`.
 
 ## Architecture
 
@@ -73,6 +90,14 @@ Detects orphan pages, dead links, contradictory claims, stale information. Forge
 ### `/cortex-forge-setup` — Setup and configuration
 
 Registers the vault and installs global skills. Run from inside a vault directory. Run again from the same vault to deregister.
+
+## CLI tools
+
+Installed via the Claude Code plugin, these are available as bare commands (`bin/` is on the plugin's `PATH`). With the skills.sh install, run them with their path from a checkout instead, e.g. `bash bin/cortex-embed.sh`.
+
+- **`cortex-embed.sh`** — bootstrap the semantic index for a vault
+- **`setup-vault.sh`** — scaffold an Obsidian vault (directories, graph colors by type, theme, community plugins) for a fresh cortex-forge vault
+- **`tags-audit.py`** — audit `tags:` usage across a vault's wiki pages (`tags-audit.py <vault-path> [--write-snapshot]`)
 
 ## Wiki Taxonomy
 

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-marketplace.json",
+  "name": "cortex-forge",
+  "owner": {
+    "name": "itsmistermoon"
+  },
+  "description": "Cortex Forge skill suite — LLM-native personal wiki",
+  "plugins": [
+    {
+      "name": "cortex-forge",
+      "source": ".",
+      "description": "Ingest sources, synthesize wiki pages, and recall knowledge across sessions from a vault that lives anywhere.",
+      "category": "productivity",
+      "keywords": ["knowledge-base", "wiki", "vault", "memory", "second-brain", "rag"]
+    }
+  ]
+}

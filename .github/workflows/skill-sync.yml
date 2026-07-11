@@ -5,12 +5,12 @@ on:
     paths:
       - "skills/**/SKILL.md"
       - "AGENTS.md"
-      - "bin/check-skill-sync.sh"
+      - "scripts/check-skill-sync.sh"
   pull_request:
     paths:
       - "skills/**/SKILL.md"
       - "AGENTS.md"
-      - "bin/check-skill-sync.sh"
+      - "scripts/check-skill-sync.sh"
 
 jobs:
   check:
@@ -18,4 +18,4 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Check skill consistency
-        run: bash bin/check-skill-sync.sh
+        run: bash scripts/check-skill-sync.sh

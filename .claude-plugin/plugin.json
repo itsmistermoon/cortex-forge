@@ -9,5 +9,13 @@
   "homepage": "https://github.com/itsmistermoon/cortex-forge",
   "repository": "https://github.com/itsmistermoon/cortex-forge",
   "license": "MIT",
-  "keywords": ["knowledge-base", "wiki", "vault", "memory", "second-brain", "rag"]
+  "keywords": ["knowledge-base", "wiki", "vault", "memory", "second-brain", "rag"],
+  "skills": [
+    "./skills/cortex-assimilate",
+    "./skills/cortex-crystallize",
+    "./skills/cortex-forge-setup",
+    "./skills/cortex-imprint",
+    "./skills/cortex-prune",
+    "./skills/cortex-recall"
+  ]
 }

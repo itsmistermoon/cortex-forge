@@ -1,19 +1,5 @@
 # Changelog
 
-## [0.8.0] — Tag Governance, Vault Scaffolding & Plugin Distribution — 2026-07-12
-
-Wires the tag-governance infrastructure that shipped inert in prior releases into the 3 skills that actually use it, lets `cortex-forge-setup` scaffold a brand-new vault instead of requiring one to already exist, closes a `cortex-prune` performance cliff that made it unusable on vaults of a few hundred pages, and adds a plugin-marketplace distribution channel alongside the existing `npx skills add`.
-
-- `protocol:` Tag governance wired into 3 skills: `cortex-assimilate` validates proposed tags against `wiki/meta/tags.md` before writing a page; `cortex-prune` Layer 1 flags tags used exactly once with no backing page; `cortex-forge-setup`'s maintenance menu gains an option to run `bin/tags-audit.py`. None auto-mutate — all surface findings for human decision.
-- `feat:` `cortex-forge-setup` can scaffold a brand-new vault's `wiki/` structure and a starter `AGENTS.md` instead of requiring them to pre-exist. `templates/tags.md` added as a 5th template.
-- `protocol:` `cortex-recall` offers to persist genuinely new synthesis and logs recall misses to `wiki/meta/log.md`; `cortex-prune` L2a flags factual contradictions between related pages, and a new L2e surfaces recurring recall misses as `/cortex-assimilate` candidates.
-- `feat:` `cortex-assimilate` accepts pasted text as a source (no fetchable URL) and falls back to it automatically when a fetch fails, for sites that block scraping or sit behind a paywall.
-- `fix:` `cortex-prune`'s orphan-page and unprocessed-`.raw/`-file checks were O(n × m) and never finished on a 353-page vault (10+ min) — rewritten to a single-pass index (~17s). Also fixed a pre-existing parser bug that misattributed wikilinks across an unrecognized `index.md` heading.
-- `fix:` Fixed a latent `embeddings.py` bug: the `mlx-embeddings` backend pointed at a non-existent model, silently masked as "MLX unavailable."
-- `feat:` Packaged the skill suite as a self-hosted Claude Code plugin marketplace (`/plugin marketplace add itsmistermoon/cortex-forge`), alongside the existing `npx skills add` distribution.
-- `protocol:` `wiki/meta/log.md` entries switched from `## [YYYY-MM-DD]` (H2 heading) to `**[YYYY-MM-DD]**` (bold) — the heading cluttered document outlines in Obsidian.
-- `protocol:` `AGENTS.md`'s three "{Crystallize,Assimilate,Recall} protocol — MANDATORY" sections (123 lines) collapsed into one 3-line "Session start" section — each skill already states when to trigger via its own `description:`, so `AGENTS.md` no longer duplicates that.
-
 Protocol-significant changes to cortex-forge are documented here.
 
 **What counts as protocol-significant:**
@@ -30,6 +16,22 @@ Protocol-significant changes to cortex-forge are documented here.
 Format: `[semver] — title — YYYY-MM-DD`
 
 **If an `[Unreleased]` section exists, it must always be the first section in this file, above every `[semver]` header** — Changesets prepends each new version block at the very top of the file (right after the `# Changelog` title) with no awareness of anything hand-written below it. An `[Unreleased]` section left under the latest version gets buried deeper on every subsequent release instead of being picked up, exactly what happened to the `AGENTS.md` protocol-trim entry that sat orphaned until it was folded into 0.8.0. When cutting a release, either move `[Unreleased]` back to the top first, or fold its content into the new version entry if it already shipped.
+
+---
+
+## [0.8.0] — Tag Governance, Vault Scaffolding & Plugin Distribution — 2026-07-12
+
+Wires the tag-governance infrastructure that shipped inert in prior releases into the 3 skills that actually use it, lets `cortex-forge-setup` scaffold a brand-new vault instead of requiring one to already exist, closes a `cortex-prune` performance cliff that made it unusable on vaults of a few hundred pages, and adds a plugin-marketplace distribution channel alongside the existing `npx skills add`.
+
+- `protocol:` Tag governance wired into 3 skills: `cortex-assimilate` validates proposed tags against `wiki/meta/tags.md` before writing a page; `cortex-prune` Layer 1 flags tags used exactly once with no backing page; `cortex-forge-setup`'s maintenance menu gains an option to run `bin/tags-audit.py`. None auto-mutate — all surface findings for human decision.
+- `feat:` `cortex-forge-setup` can scaffold a brand-new vault's `wiki/` structure and a starter `AGENTS.md` instead of requiring them to pre-exist. `templates/tags.md` added as a 5th template.
+- `protocol:` `cortex-recall` offers to persist genuinely new synthesis and logs recall misses to `wiki/meta/log.md`; `cortex-prune` L2a flags factual contradictions between related pages, and a new L2e surfaces recurring recall misses as `/cortex-assimilate` candidates.
+- `feat:` `cortex-assimilate` accepts pasted text as a source (no fetchable URL) and falls back to it automatically when a fetch fails, for sites that block scraping or sit behind a paywall.
+- `fix:` `cortex-prune`'s orphan-page and unprocessed-`.raw/`-file checks were O(n × m) and never finished on a 353-page vault (10+ min) — rewritten to a single-pass index (~17s). Also fixed a pre-existing parser bug that misattributed wikilinks across an unrecognized `index.md` heading.
+- `fix:` Fixed a latent `embeddings.py` bug: the `mlx-embeddings` backend pointed at a non-existent model, silently masked as "MLX unavailable."
+- `feat:` Packaged the skill suite as a self-hosted Claude Code plugin marketplace (`/plugin marketplace add itsmistermoon/cortex-forge`), alongside the existing `npx skills add` distribution.
+- `protocol:` `wiki/meta/log.md` entries switched from `## [YYYY-MM-DD]` (H2 heading) to `**[YYYY-MM-DD]**` (bold) — the heading cluttered document outlines in Obsidian.
+- `protocol:` `AGENTS.md`'s three "{Crystallize,Assimilate,Recall} protocol — MANDATORY" sections (123 lines) collapsed into one 3-line "Session start" section — each skill already states when to trigger via its own `description:`, so `AGENTS.md` no longer duplicates that.
 
 ---
 

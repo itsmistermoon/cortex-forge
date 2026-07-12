@@ -4,6 +4,7 @@ type: source
 resource: 
 created: {{date:YYYY-MM-DD}}
 updated: {{date:YYYY-MM-DD}}
+timestamp: 
 source_author: 
 tags: []  # project/subtopic for nested grouping
 aliases: []

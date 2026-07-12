@@ -1,0 +1,17 @@
+{
+  "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
+  "groupings": [
+    {
+      "title": "Cortex Forge",
+      "description": "LLM-native personal wiki — ingest sources, synthesize wiki pages, and recall knowledge across sessions.",
+      "skills": [
+        "cortex-assimilate",
+        "cortex-crystallize",
+        "cortex-forge-setup",
+        "cortex-imprint",
+        "cortex-prune",
+        "cortex-recall"
+      ]
+    }
+  ]
+}

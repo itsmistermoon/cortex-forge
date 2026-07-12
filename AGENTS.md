@@ -17,7 +17,7 @@ This repo is the source of truth for the Cortex Forge skill suite (`skills/`, `t
 
 If the latest `## History` entry in `MEMORY.md` has a `#### Imprint candidate` line, propose imprinting it into a target vault, e.g. via `/cortex-imprint {vault}`.
 
-Beyond this, skills trigger themselves — each one's own `description:` states when to invoke it, and that's the single place to look.
+Beyond this, skills trigger themselves — each one's own `description:` states when to invoke it, and that's the single place to look, except where an Agent rule below explicitly calls one out (e.g. the skill-design-principles check).
 
 ## Agent skills
 
@@ -39,6 +39,7 @@ Single-context. `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/do
 - **Add a changeset (`npx changeset`) in the same branch** for anything that changes a skill's behavior, matching `.changeset/README.md`'s workflow. For changes with no user-facing effect (docs, CI, internal refactors), run `npx changeset add --empty` instead — `changeset-check.yml` blocks the PR without one or the other.
 - **Open a GitHub Issue first for larger or multi-step work** — a feature spanning several PRs, a design decision worth discussing before writing code. Reference it from every PR in that arc with `Refs #N`, reserving `Closes #N` for the final one — closing on the first PR would end the issue's audit trail before the work does. Mechanical details for interacting with issues: `docs/agents/issue-tracker.md`.
 - **Run `bash scripts/check-skill-sync.sh`** before opening a PR that touches `skills/**/SKILL.md` or its co-located `references/`/`scripts/`.
+- **Check any significant change to an existing skill, or any new skill added to the suite, against `wiki/concepts/skill-design-principles.md` in the `moon-multivac` vault** (`/cortex-recall moon-multivac skill design principles checklist`) before opening a PR — the whiteness test, the 12 principles, and the pre-commit checklist it contains.
 - **Edit this repo as the single source of truth**, then refresh installs with `npx skills add itsmistermoon/cortex-forge --all -g -y`; `~/.agents/skills/` is a generated target.
 - **Treat `.env` and credential files as off-limits** to reading or modifying.
 - **Treat `templates/` here as the canonical schema** — every vault that installs this suite inherits its shape.

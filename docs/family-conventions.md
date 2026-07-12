@@ -20,6 +20,30 @@ A convention that:
 - **`source.md` omits `aliases:`**: unlike concept/entity pages, a source page doesn't get aliases — it's referenced by title, not looked up by alternate names. True in both suites' templates already; recorded here so a future cleanup doesn't "restore" it as a missing field.
 - **Page changelog line has no author tag**: `- {{date:YYYY-MM-DD}}: description`, not `- {{date}} [{agent}]: description`. reflex dropped the agent tag deliberately (commit `14504be`); cortex-forge's template never had one. The focus is the record of what changed, not which agent did it — kept as the shared convention 2026-07-12 even though some already-created pages in both vaults still carry the older `[agent]`-tagged lines from before this was settled.
 
+## Shared frontmatter schema (concept / entity / source)
+
+reflex's page templates were originally created by copying cortex-forge's frontmatter fields (an explicit, one-time data reuse — not a design reference, which stays off-limits per reflex's `AGENTS.md`). As a result the two suites' templates converge almost field-for-field today:
+
+| Field | concept | entity | source | Notes |
+|---|---|---|---|---|
+| `title` | ✓ | ✓ | ✓ | |
+| `type` | ✓ | ✓ | ✓ | `concept\|entity\|source`, plus `project` (cortex-forge only) |
+| `created` | ✓ | ✓ | ✓ | date the page was made in the vault |
+| `updated` | ✓ | ✓ | ✓ | date of last edit |
+| `timestamp` | – | – | ✓ | source only — original publication/content date, see above |
+| `tags` | ✓ | ✓ | ✓ | |
+| `aliases` | ✓ | ✓ | – | source pages are referenced by title, not alternate names |
+| `sources` | ✓ | ✓ | – | source pages don't cite other sources this way |
+| `resource` | – | – | ✓ | URL or path to the external artifact |
+| `source_author` | – | – | ✓ | |
+| `raw` | – | – | ✓ | path to the `.raw/` copy |
+| `confidence` | ✓ | ✓ | ✓ | `high\|medium\|low` |
+| `schema_version` | ✓ | ✓ | ✓ | same field, versioned independently per suite (cortex-forge is at `0.3`, reflex at `0.1`) — don't try to keep the number itself in sync, only the field's meaning |
+
+Body structure (an untitled synthesis section, then a trailing `- {{date:YYYY-MM-DD}}: description` changelog) also matches across both suites' concept/entity/source templates. reflex's `concept.md` adds an extra `## Related` section cortex-forge's doesn't have — a minor body divergence, not worth forcing into alignment.
+
+When editing a template field in one suite, check the table above before assuming it's suite-specific — most frontmatter fields are shared by convergent origin, not coincidence.
+
 ## Explicitly not shared (intentional full/lite divergence)
 
 These were reviewed during the 2026-07-12 audit (#22) and kept suite-specific on purpose — do not "fix" them into alignment:

@@ -43,6 +43,7 @@ Single-context. `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/do
 - **Edit this repo as the single source of truth**, then refresh installs with `npx skills add itsmistermoon/cortex-forge --all -g -y`; `~/.agents/skills/` is a generated target.
 - **Treat `.env` and credential files as off-limits** to reading or modifying.
 - **Treat `templates/` here as the canonical schema** — every vault that installs this suite inherits its shape.
+- **Check `docs/family-conventions.md` before changing a convention shared with reflex** (the sibling lite suite, `moon-reflex`) — log formats, timestamp formats, and similar cross-cutting shape. Update it if the convention diverges or a new one is formalized.
 
 ## Available skills
 

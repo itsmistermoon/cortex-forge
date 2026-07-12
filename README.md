@@ -130,6 +130,18 @@ Three behaviors are mandatory for any agent operating the vault, defined in `AGE
 
 **Failed attempts as first-class knowledge.** The hot cache contract records attempted-and-failed approaches, with evidence, as a dedicated section — carrying forward what didn't work alongside what did.
 
+## Full vs. lite
+
+cortex-forge has a sibling project, **reflex**, built later as a from-scratch reapplication of what cortex-forge's growth taught: minimal dependencies, no scripts, no reference docs, no multi-vault machinery — just skills. Both are "vault" suites; neither depends on the other. Pick per vault, not once for everything you do:
+
+| Axis | cortex-forge | reflex |
+|---|---|---|
+| Vault size / lifespan | Large, multi-session, expected to accumulate substantial knowledge over time | Small or short-lived — a scratch vault, a single project's notes |
+| Feature needs | Provenance tracking, multi-vault resolution, research mode, semantic search, planned MCP integration | Ingest / query / handoff, nothing beyond that |
+| Latency / dependency tolerance | Fine waiting on heavier operations for more capability | Wants near-instant operations with no external dependencies |
+
+Conventions the two suites deliberately share (not features — just shared shape, like log entry formatting) are tracked in [`docs/family-conventions.md`](docs/family-conventions.md).
+
 ## Multi-vault
 
 Skills resolve the target vault from wherever you are — no `cd` required. The global config at `~/.cortex-forge/config.yml` maps names to a path and locale:

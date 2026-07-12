@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.8.0] — Tag Governance, Vault Scaffolding & Plugin Distribution — 2026-07-11
+## [0.8.0] — Tag Governance, Vault Scaffolding & Plugin Distribution — 2026-07-12
 
 Wires the tag-governance infrastructure that shipped inert in prior releases into the 3 skills that actually use it, lets `cortex-forge-setup` scaffold a brand-new vault instead of requiring one to already exist, closes a `cortex-prune` performance cliff that made it unusable on vaults of a few hundred pages, and adds a plugin-marketplace distribution channel alongside the existing `npx skills add`.
 
@@ -12,6 +12,7 @@ Wires the tag-governance infrastructure that shipped inert in prior releases int
 - `fix:` Fixed a latent `embeddings.py` bug: the `mlx-embeddings` backend pointed at a non-existent model, silently masked as "MLX unavailable."
 - `feat:` Packaged the skill suite as a self-hosted Claude Code plugin marketplace (`/plugin marketplace add itsmistermoon/cortex-forge`), alongside the existing `npx skills add` distribution.
 - `protocol:` `wiki/meta/log.md` entries switched from `## [YYYY-MM-DD]` (H2 heading) to `**[YYYY-MM-DD]**` (bold) — the heading cluttered document outlines in Obsidian.
+- `protocol:` `AGENTS.md`'s three "{Crystallize,Assimilate,Recall} protocol — MANDATORY" sections (123 lines) collapsed into one 3-line "Session start" section — each skill already states when to trigger via its own `description:`, so `AGENTS.md` no longer duplicates that.
 
 Protocol-significant changes to cortex-forge are documented here.
 
@@ -29,10 +30,6 @@ Protocol-significant changes to cortex-forge are documented here.
 Format: `[semver] — title — YYYY-MM-DD`
 
 ---
-
-## [Unreleased]
-
-- `protocol:` — 2026-07-06 — `AGENTS.md`'s three "{Crystallize,Assimilate,Recall} protocol — MANDATORY" sections (123 lines) collapsed into one 3-line "Session start" section: read `.cortex/MEMORY.md` (+ `PRAXIS.md` if present) before the first response, propose `/cortex-imprint` if the latest History entry flags one. Each skill already states when to trigger via its own `description:` — `AGENTS.md` no longer duplicates that. Dropped the stale-cache warning and the direct `wiki/meta/vault-report.json` read (both redundant with the `### Pending` item `cortex-crystallize` already writes every run); kept the `PRAXIS.md` read and the Imprint-candidate nudge (no skill owns session-start behavior, so removing them would have silently dropped the feature). `bin/check-skill-sync.sh`'s `vault-report-schema` check now verifies field references against `cortex-crystallize/SKILL.md` instead of `AGENTS.md`, matching the real consumer.
 
 ## [0.7.0] — npx-only Distribution, Security Hardening & Suite Compaction — 2026-07-06
 

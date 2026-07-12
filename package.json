@@ -1,6 +1,6 @@
 {
   "name": "cortex-forge",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "private": true,
   "description": "Cortex Forge skill suite — LLM-native personal wiki, distributed via npx skills add",
   "repository": {

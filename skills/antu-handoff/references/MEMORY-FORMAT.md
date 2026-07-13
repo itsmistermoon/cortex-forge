@@ -7,7 +7,7 @@ Gitignored — local agent artifact, not versioned content.
 
 ## Zone 1 — Current state (MUTABLE)
 
-Updated on every `/antu-crystallize`. Hard limits: **max 5 pending, max 3 active decisions**.
+Updated on every `/antu-handoff`. Hard limits: **max 5 pending, max 3 active decisions**.
 When adding an item, evaluate whether an existing one is obsolete and remove it.
 
 ```markdown

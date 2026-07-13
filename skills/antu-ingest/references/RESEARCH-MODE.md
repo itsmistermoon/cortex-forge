@@ -1,9 +1,9 @@
 # Research mode
 
-Reference for `antu-assimilate`. Read when the first argument starts with `--research`, discovering and ingesting sources on the web instead of processing a single given URL or file.
+Reference for `antu-ingest`. Read when the first argument starts with `--research`, discovering and ingesting sources on the web instead of processing a single given URL or file.
 
 ```text
-/antu-assimilate --research "embeddings for second brains" [--rounds N]
+/antu-ingest --research "embeddings for second brains" [--rounds N]
 ```
 
 **Budget:** 2 rounds, max 12 URLs. Override rounds with `--rounds N`.

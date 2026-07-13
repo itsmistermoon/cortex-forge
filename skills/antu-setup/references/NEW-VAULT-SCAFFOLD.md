@@ -22,8 +22,8 @@ Only what's missing — never overwrite an existing `wiki/` or `AGENTS.md`.
 
 1. **`wiki/` structure**: `mkdir -p wiki/{concepts,entities,sources,projects,meta}`.
 2. **`wiki/meta/tags.md`**: copy from `templates/tags.md` (fetched the same way step 3b fetches other templates — see `references/UPSTREAM-SYNC.md`) if missing.
-3. **`wiki/index.md`**: create with a minimal header (`# {vault-name}`, one line noting it's the master index) and empty `## Concepts` / `## Entities` / `## Sources` / `## Projects` sections — the first `/antu-assimilate` or `/antu-imprint` run populates it further.
-4. **`AGENTS.md`**: write a minimal starter — protocol skeleton only (Crystallize/Assimilate/Recall mandatory-invocation rules, the wiki taxonomy table, the skills list), matching the shape in `templates/concept.md`'s sibling vaults. Leave a clearly marked placeholder section for identity/vocabulary content that only the user can fill in:
+3. **`wiki/index.md`**: create with a minimal header (`# {vault-name}`, one line noting it's the master index) and empty `## Concepts` / `## Entities` / `## Sources` / `## Projects` sections — the first `/antu-ingest` or `/antu-imprint` run populates it further.
+4. **`AGENTS.md`**: write a minimal starter — protocol skeleton only (Handoff/Ingest/Recall mandatory-invocation rules, the wiki taxonomy table, the skills list), matching the shape in `templates/concept.md`'s sibling vaults. Leave a clearly marked placeholder section for identity/vocabulary content that only the user can fill in:
 
    ```markdown
    ## Vault identity

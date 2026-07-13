@@ -21,7 +21,7 @@ Format: `[semver] — title — YYYY-MM-DD`
 
 ## [Unreleased]
 
-- `docs:` Project renamed from Cortex Forge to **Antu** (avoids confusion with Snowflake Cortex and forgecode.dev). Skills renamed accordingly: `cortex-assimilate` → `antu-assimilate`, `cortex-crystallize` → `antu-crystallize`, `cortex-forge-setup` → `antu-setup`, `cortex-imprint` → `antu-imprint`, `cortex-prune` → `antu-prune`, `cortex-recall` → `antu-recall`. The sibling lite suite (formerly reflex) is renamed to **Kuyen**. `.cortex/` (per-vault state) and `~/.cortex-forge/` (global config) are unchanged for now — unifying them to `.hot/` across both suites is tracked separately. The GitHub repo and public skills.sh/plugin marketplace listings are not yet renamed.
+- `docs:` Project renamed from Cortex Forge to **Antu** (avoids confusion with Snowflake Cortex and forgecode.dev). Skills renamed accordingly: `cortex-assimilate` → `antu-ingest`, `cortex-crystallize` → `antu-handoff`, `cortex-forge-setup` → `antu-setup`, `cortex-imprint` → `antu-imprint`, `cortex-prune` → `antu-prune`, `cortex-recall` → `antu-recall`. The sibling lite suite (formerly reflex) is renamed to **Kuyen**. `.cortex/` (per-vault state) and `~/.cortex-forge/` (global config) are unchanged for now — unifying them to `.hot/` across both suites is tracked separately. The GitHub repo and public skills.sh/plugin marketplace listings are not yet renamed.
 
 ---
 

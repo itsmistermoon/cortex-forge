@@ -49,7 +49,7 @@ Always end with the relevant subset of ## Output format.
    ```
    Detected you're writing in {detected-language}. Set this vault's locale to "{code}"?
 
-   This determines the language antu-assimilate, antu-crystallize, and
+   This determines the language antu-ingest, antu-handoff, and
    antu-imprint use when writing new content to the vault (wiki pages,
    session snapshots, permanent knowledge pages).
 
@@ -83,9 +83,9 @@ Always end with the relevant subset of ## Output format.
     - **If `hot_cache_stale_days:` is already set** → inform the user of the current value and ask if they want to change it, rather than asking as if for the first time.
     - **If not set** → ask: "Warn if this vault's memory hasn't been touched in N days? (default: 15, 0 to disable)"
     - Write the chosen value as `hot_cache_stale_days: N` at the top level of `config.yml` (not nested under `vaults:`).
-    - This is read by the `AGENTS.md` Crystallize protocol (step 2) to compare against `MEMORY.md`'s `updated:` frontmatter.
+    - This is read by the `AGENTS.md` Handoff protocol (step 2) to compare against `MEMORY.md`'s `updated:` frontmatter.
 
-4. **Verify global skills are installed** — check each of the 6 skills (`antu-crystallize`, `antu-setup`, `antu-recall`, `antu-assimilate`, `antu-imprint`, `antu-prune`) individually for presence under `~/.agents/skills/` — do not assume presence just because this skill is running.
+4. **Verify global skills are installed** — check each of the 6 skills (`antu-handoff`, `antu-setup`, `antu-recall`, `antu-ingest`, `antu-imprint`, `antu-prune`) individually for presence under `~/.agents/skills/` — do not assume presence just because this skill is running.
    - **All present** → report which 6 skills are present and move on.
    - **Some missing** — do not attempt to install them yourself. Tell the user:
      > Missing skills: {list}. Install them with:
@@ -113,7 +113,7 @@ Confirm:
 - Semantic search: active (backend: Ollama/mlx-embeddings/sentence-transformers, N chunks indexed) / not active (declined or skipped — how to enable later)
 - Stale-cache threshold (if set/changed): `hot_cache_stale_days` value, or "default (15)" if left unset
 - Sync (if run): upstream used, files updated (list), files skipped (count), deletions pending user confirmation
-- Next step: invoke `/antu-crystallize` at the end of any project session
+- Next step: invoke `/antu-handoff` at the end of any project session
 
 For a maintenance-menu run, confirm only the items for operations that actually ran.
 

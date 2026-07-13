@@ -1,6 +1,6 @@
 # SPA fallback
 
-Reference for `antu-assimilate` (step 3, SPA check). Read when a fetched URL returns a client-rendered shell instead of real content.
+Reference for `antu-ingest` (step 3, SPA check). Read when a fetched URL returns a client-rendered shell instead of real content.
 
 ## Detection signals
 

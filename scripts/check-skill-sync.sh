@@ -76,12 +76,12 @@ done < <(grep -lriE "creat(e|es|ing)? (a |the |new )*page|saved to \`\{?vault\}?
 # ---------------------------------------------------------------------------
 check "vault-report-schema"
 PRUNE_SCHEMA="$SKILLS_DIR/antu-prune/references/VAULT-REPORT-SCHEMA.md"
-CRYSTALLIZE_FILE="$SKILLS_DIR/antu-crystallize/SKILL.md"
+HANDOFF_FILE="$SKILLS_DIR/antu-handoff/SKILL.md"
 
 if [[ ! -f "$PRUNE_SCHEMA" ]]; then
   fail "antu-prune/references/VAULT-REPORT-SCHEMA.md not found"
-elif [[ ! -f "$CRYSTALLIZE_FILE" ]]; then
-  fail "antu-crystallize/SKILL.md not found — cannot verify vault-report.json consumer"
+elif [[ ! -f "$HANDOFF_FILE" ]]; then
+  fail "antu-handoff/SKILL.md not found — cannot verify vault-report.json consumer"
 else
   # Discover field names structurally from the "## Field definitions" bullet list
   # (`- \`health.foo\` — ...`) instead of enumerating known names, so a newly
@@ -90,18 +90,18 @@ else
   if [[ -z "$prune_fields" ]]; then
     fail "no vault-report.json fields found in $PRUNE_SCHEMA — schema may have moved again"
   else
-    # Check each field is referenced in antu-crystallize's vault-health triage
+    # Check each field is referenced in antu-handoff's vault-health triage
     # step — the actual consumer since AGENTS.md stopped reading vault-report.json
     # directly (2026-07-06) in favor of the Pending item crystallize already writes.
     all_ok=true
     while IFS= read -r field; do
-      if ! grep -q "$field" "$CRYSTALLIZE_FILE"; then
-        fail "vault-report field '$field' declared in antu-prune schema but not referenced in antu-crystallize/SKILL.md"
+      if ! grep -q "$field" "$HANDOFF_FILE"; then
+        fail "vault-report field '$field' declared in antu-prune schema but not referenced in antu-handoff/SKILL.md"
         all_ok=false
       fi
     done <<< "$prune_fields"
     if $all_ok; then
-      ok "vault-report.json schema fields consistent between antu-prune and antu-crystallize"
+      ok "vault-report.json schema fields consistent between antu-prune and antu-handoff"
     fi
   fi
 fi
@@ -179,10 +179,10 @@ _check_synced() {  # $1: subdir ("scripts" or "references"), $2: filename, $3..$
   done
   [[ -n "$first" ]] && ok "$script identical across: $*"
 }
-_check_synced "scripts" "embeddings.py" antu-setup antu-recall antu-assimilate
-_check_synced "scripts" "antu-index.py" antu-setup antu-assimilate
-_check_synced "references" "LOCALE-RESOLUTION.md" antu-assimilate antu-crystallize antu-imprint
-_check_synced "references" "VAULT-RESOLUTION.md" antu-assimilate antu-crystallize antu-imprint antu-prune antu-recall
+_check_synced "scripts" "embeddings.py" antu-setup antu-recall antu-ingest
+_check_synced "scripts" "antu-index.py" antu-setup antu-ingest
+_check_synced "references" "LOCALE-RESOLUTION.md" antu-ingest antu-handoff antu-imprint
+_check_synced "references" "VAULT-RESOLUTION.md" antu-ingest antu-handoff antu-imprint antu-prune antu-recall
 
 # ---------------------------------------------------------------------------
 # Summary

@@ -49,11 +49,11 @@ Single-context. `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/do
 
 All 6 live in `skills/` here as their canonical source, and install identically via `npx skills add itsmistermoon/cortex-forge` (`--skill X` for a standalone install).
 
-- `antu-assimilate` — Ingest a URL or file into a vault: saves to `.raw/`, synthesizes wiki pages, updates the index
+- `antu-ingest` — Ingest a URL or file into a vault: saves to `.raw/`, synthesizes wiki pages, updates the index
 - `antu-recall` — Answer questions grounded in a vault's synthesized wiki content, with citations to the pages used
 - `antu-imprint` — Archive a valuable session synthesis as a permanent wiki page in a vault
 - `antu-prune` — Health check a vault: detect dead links, orphan pages, missing provenance, unprocessed sources
-- `antu-crystallize` — Snapshot session context into `.cortex/MEMORY.md`; works from any repo, inside or outside a vault
+- `antu-handoff` — Snapshot session context into `.cortex/MEMORY.md`; works from any repo, inside or outside a vault
 - `antu-setup` — Register/deregister a vault in Antu and verify global skills are installed
 
 ## Wiki taxonomy (schema reference for downstream vaults)
@@ -65,6 +65,6 @@ All 6 live in `skills/` here as their canonical source, and install identically 
 | **source** | `wiki/sources/` | External artifact ingested — articles, docs, repos, videos, threads | `templates/source.md` |
 | **project** | `wiki/projects/` | Active project with operational state (repo, status, domains) | `templates/project.md` |
 
-Each page follows: YAML frontmatter + compiled truth + chronological changelog. Type disambiguation and source frontmatter fields: see `skills/antu-assimilate/SKILL.md`.
+Each page follows: YAML frontmatter + compiled truth + chronological changelog. Type disambiguation and source frontmatter fields: see `skills/antu-ingest/SKILL.md`.
 
 `wiki/meta/tags.md` (seeded from `templates/tags.md`) is not a page type — it's the vault's tag rules + registry in one self-referencing document, kept free of hard counts so it never goes stale.

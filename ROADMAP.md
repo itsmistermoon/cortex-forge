@@ -5,7 +5,7 @@
 Goal: Hot Cache Protocol working identically across coding agents, via a manual `AGENTS.md` protocol.
 
 - [x] Skills installed and manual AGENTS.md protocol validated end-to-end on multiple agents
-- [ ] Validate end-to-end on any newly supported agent: ingest source → recall → crystallize in an organic session
+- [ ] Validate end-to-end on any newly supported agent: ingest source → recall → handoff in an organic session
 
 ## Phase 2 — Protocol hardening ✓
 
@@ -15,13 +15,13 @@ Goal: Hot Cache Protocol working identically across coding agents, via a manual 
 - [x] Schema versioning — `schema_version: "0.3"` in `AGENTS.md` and all templates
 - [x] `agent:` field in snapshot frontmatter — identifies last writer in multi-agent vaults
 - [x] Stale cache detection — `hot_cache_stale_days:` in config (global); checked at MEMORY.md read time per AGENTS.md protocol
-- [x] Compliance guardrails — verifiable contracts in `AGENTS.md`; mandatory output format in `antu-recall`, `antu-assimilate`, `antu-crystallize`
+- [x] Compliance guardrails — verifiable contracts in `AGENTS.md`; mandatory output format in `antu-recall`, `antu-ingest`, `antu-handoff`
 - [x] Context fencing in `antu-imprint` — source hierarchy (session > `.raw/` > `wiki/` reference only); circular synthesis test; `raw:` provenance field
 - [x] Link-count scan — orphan page detection in `antu-prune.sh`; `orphan_pages` in `vault-report.json`, surfaced via `AGENTS.md`'s mandatory read protocol
 - [x] Post-commit git hooks (opt-in) — prune refreshes `vault-report.json`; reindex updates `vault.db`, both gated on `wiki/` changes
-- [x] "Attempted and failed" section in crystallize template
-- [x] Sanitization in `antu-assimilate` — `bin/antu-sanitize.sh`; scans invisible Unicode, HTML comments, base64, egress commands
-- [x] Imprint candidate flagging — `antu-crystallize` writes `#### Imprint candidate` to History when warranted; `AGENTS.md` protocol surfaces it and proposes `/antu-imprint` at next session start
+- [x] "Attempted and failed" section in handoff template
+- [x] Sanitization in `antu-ingest` — `bin/antu-sanitize.sh`; scans invisible Unicode, HTML comments, base64, egress commands
+- [x] Imprint candidate flagging — `antu-handoff` writes `#### Imprint candidate` to History when warranted; `AGENTS.md` protocol surfaces it and proposes `/antu-imprint` at next session start
 
 ## Phase 3 — Adoptability
 
@@ -45,8 +45,8 @@ Vault maintenance: orphan pages, broken wikilinks, stale hot cache.
 ### `prune-antu` (new)
 Self-optimization: reads transcripts where skills failed → proposes targeted edits to `SKILL.md` → validation gate accepts only edits that improve the held-out set.
 
-Skills suitable (verifiable outputs): `antu-recall`, `antu-assimilate`.
-Skills not suitable (subjective): `antu-crystallize`, `antu-imprint`.
+Skills suitable (verifiable outputs): `antu-recall`, `antu-ingest`.
+Skills not suitable (subjective): `antu-handoff`, `antu-imprint`.
 
 Reference: `wiki/concepts/skillopt-text-space-optimization.md`
 
@@ -69,14 +69,14 @@ Reference: `wiki/concepts/skillopt-text-space-optimization.md`
 - [x] `antu-recall` updated — invokes `antu-search.py` if `vault.db` exists; fallback to index read
 - [x] Post-commit reindex hook — re-indexes only `wiki/` files touched in each commit
 - [x] `.cortex/` fully gitignored
-- [ ] Validate in second vault: initial index + test query + incremental reindex after `antu-assimilate`
+- [ ] Validate in second vault: initial index + test query + incremental reindex after `antu-ingest`
 - [ ] MCP server — `vault_ingest`, `vault_query`, `vault_imprint`, `session_snapshot`, `vault_prune` — **gate: Stage 1 validated in second vault**. **Distribution:** unlike the skills (installed via `npx skills add`, a static-file installer), an MCP server is a persistent process — the natural fit is publishing it as its own npm package and installing with `npx github:itsmistermoon/antu-mcp` (or `claude mcp add` once published), not through the vault's skills tarball. The [official MCP Registry](https://modelcontextprotocol.io/registry) is still in preview (breaking changes possible before GA) — track it, but don't block the server's launch on it; npm/GitHub distribution works today independent of registry maturity.
 
 ## Phase 4 — Accumulated intelligence
 
 - [x] History archive (simple layer) — entries >15 days → `.cortex/CONSOLIDATED.md` (append-only, not injected at startup)
-- [ ] History archive (structured layer) — when `CONSOLIDATED.md` exceeds N entries, crystallize parses to JSON `{ts, agent, trigger, tags, files, decisions, discarded, fragile}`; queryable via `/antu-recall`
-- [ ] Cross-session pattern detection — recurring topics in `.cortex/` that never reach `wiki/`; propose imprint candidates at crystallize time
+- [ ] History archive (structured layer) — when `CONSOLIDATED.md` exceeds N entries, handoff parses to JSON `{ts, agent, trigger, tags, files, decisions, discarded, fragile}`; queryable via `/antu-recall`
+- [ ] Cross-session pattern detection — recurring topics in `.cortex/` that never reach `wiki/`; propose imprint candidates at handoff time
 - [ ] Progressive loading in `antu-recall` — navigate wiki by relevance instead of loading full index at startup
 
 ### `antu-prune` — LRU-based archiving
@@ -132,12 +132,12 @@ Gap found manually in `moon-multivac`: `wiki/index.md` groups entries by section
 
 ### `antu-recall` — log misses, not queries
 
-Considered logging every query (`log.md` as "record of ingests, queries, lint passes" per the gist) and rejected full logging as noise for a single-user vault — no audit need, no multi-user accountability case. The one real signal is recurring gaps: the same unanswered question surfacing across sessions is a concrete candidate for `/antu-assimilate`, and today that signal is silently lost the moment step 2's "Not in vault" response is given — nothing records that it happened.
+Considered logging every query (`log.md` as "record of ingests, queries, lint passes" per the gist) and rejected full logging as noise for a single-user vault — no audit need, no multi-user accountability case. The one real signal is recurring gaps: the same unanswered question surfacing across sessions is a concrete candidate for `/antu-ingest`, and today that signal is silently lost the moment step 2's "Not in vault" response is given — nothing records that it happened.
 
 **Implementation:**
 - When `antu-recall` step 2 finds no relevant pages ("Not in vault"), append one line to `wiki/meta/log.md`: `**[YYYY-MM-DD] recall-miss** | {query}`.
 - No logging on hits — only misses. This keeps `log.md` from filling with routine successful lookups.
-- `antu-prune` gains a Layer 2 check (or extends L2c) that scans recent `recall-miss` entries for repeated/similar topics and reports them as MEDIUM candidates for `/antu-assimilate`, the same way it already surfaces `NEEDS_PAGE` sources.
+- `antu-prune` gains a Layer 2 check (or extends L2c) that scans recent `recall-miss` entries for repeated/similar topics and reports them as MEDIUM candidates for `/antu-ingest`, the same way it already surfaces `NEEDS_PAGE` sources.
 
 - [x] Add miss-logging to `antu-recall/SKILL.md` (landed in step 3, where the "Not in vault" case is actually decided)
 - [x] Add a recall-miss pattern check to `antu-prune` (landed as L2e, its own check rather than an L2c extension — L2c reads vault pages, L2e reads `wiki/meta/log.md`, different enough to keep separate)

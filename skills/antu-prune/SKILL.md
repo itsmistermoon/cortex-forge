@@ -99,7 +99,7 @@ Reads `wiki/meta/log.md`, not vault pages — a different data source from L2a�
 
 1. Collect `**[YYYY-MM-DD] recall-miss** | {query}` entries from the last 30 days (or the most recent 20, whichever is fewer).
 2. Group by topic similarity — same or near-identical query text, or queries a reasonable reading would consider the same underlying question asked differently.
-3. Report any group with 2+ occurrences as MEDIUM: "`{N}` recall misses on `{topic}` since `{earliest-date}` — propose `/antu-assimilate` for a source, or confirm a wiki page should exist." Single-occurrence misses are normal noise — discard them.
+3. Report any group with 2+ occurrences as MEDIUM: "`{N}` recall misses on `{topic}` since `{earliest-date}` — propose `/antu-ingest` for a source, or confirm a wiki page should exist." Single-occurrence misses are normal noise — discard them.
 
 ---
 
@@ -119,10 +119,10 @@ Reads `wiki/meta/log.md`, not vault pages — a different data source from L2a�
 - Create missing concept/entity pages (check L2c verdict: NEEDS_PAGE)
 - Merge pages (check L2d verdict: MERGE or RESTRUCTURE)
 - Resolve a contradiction (check L2a verdict: CONTRADICTION) — present both excerpts, let the user decide which stands, both, or neither
-- Act on a recurring recall-miss group (check L2e) — propose `/antu-assimilate` or a new page, per the user's call
+- Act on a recurring recall-miss group (check L2e) — propose `/antu-ingest` or a new page, per the user's call
 - Delete orphan pages
 - Fix a dead `[[wikilink]]` — search the vault for a page with a matching slug or title; propose retargeting there, or propose removal if none found
-- Synthesize an unprocessed `.raw/` file — propose invoking `/antu-assimilate {vault} .raw/{slug}.md` within this session
+- Synthesize an unprocessed `.raw/` file — propose invoking `/antu-ingest {vault} .raw/{slug}.md` within this session
 - Reconstruct missing frontmatter — read the page's body and draft a best-effort frontmatter block (type, tags, sources) for review
 - Add `sources:` to a concept/entity — propose candidate sources drawn from the page's existing `[[wikilinks]]` and body mentions
 - Resolve a duplicate frontmatter key — show both values, ask which to keep (never guess the "right" one)

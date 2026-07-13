@@ -1,14 +1,14 @@
 ---
-name: antu-assimilate
+name: antu-ingest
 license: MIT
 compatibility: Requires rg and jq for the credential sanitization check (fails open without them); python3 only for optional semantic indexing
 description: Ingest a URL, file, or pasted text into the vault — saves to .raw/, synthesizes wiki pages, updates the index. Use on "ingest this", "add to the vault", or a bare URL; --research finds web sources.
 argument-hint: "[vault-name] <url-or-file> | --research \"<query>\" [--rounds N]"
 ---
 
-# antu-assimilate
+# antu-ingest
 
-Start your response with the flavor line `Assimilating source...`, translated to the language of the user's current message (Spanish: `Asimilando fuente...`), with nothing before it. Use that same language for every prompt, question, menu, and confirmation this skill produces — persisted vault content (if any) still follows the vault's locale, not the conversation language.
+Start your response with the flavor line `Ingesting source...`, translated to the language of the user's current message (Spanish: `Ingiriendo fuente...`), with nothing before it. Use that same language for every prompt, question, menu, and confirmation this skill produces — persisted vault content (if any) still follows the vault's locale, not the conversation language.
 
 Ingest a new source and synthesize wiki pages from it.
 
@@ -22,7 +22,7 @@ Paths are relative to this skill's directory.
 
 ## Steps
 
-1. **Resolve vault** — per `references/VAULT-RESOLUTION.md`, then its `locale:` per `references/LOCALE-RESOLUTION.md`. If the first argument matches a registered vault name (e.g., `/antu-assimilate second-brain <url>`), use that vault and treat the remaining argument as the URL or file path.
+1. **Resolve vault** — per `references/VAULT-RESOLUTION.md`, then its `locale:` per `references/LOCALE-RESOLUTION.md`. If the first argument matches a registered vault name (e.g., `/antu-ingest second-brain <url>`), use that vault and treat the remaining argument as the URL or file path.
 
 2. **Download or read** — input is a URL, a `.raw/` file path, or pasted text:
    - URL → fetch content, run the **SPA check** and the **sanitization check** below, then save to `{vault}/.raw/{slug}.md` (never overwrite if exists).

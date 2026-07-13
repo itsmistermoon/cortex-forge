@@ -1,12 +1,12 @@
 #!/bin/bash
 # antu-sanitize.sh — Scan content for injection, exfiltration, and credential vectors.
-# Usage: bash antu-sanitize.sh <file> (co-located with the antu-assimilate skill)
+# Usage: bash antu-sanitize.sh <file> (co-located with the antu-ingest skill)
 # Outputs JSON with findings array. Exit 0 always (fail-open).
-# Designed to be called by antu-assimilate before saving to .raw/.
+# Designed to be called by antu-ingest before saving to .raw/.
 #
 # SECURITY INVARIANT: credential-pattern matches are redacted IN THE FILE ITSELF
 # before this script returns — not merely reported. This is a mechanism, not an
-# instruction: antu-assimilate (or a user insisting the real value is needed)
+# instruction: antu-ingest (or a user insisting the real value is needed)
 # has no way to opt out, because by the time the caller sees the findings, the
 # secret is already gone from disk. Never add a flag to disable this.
 
@@ -44,7 +44,7 @@ _finding '(curl|wget|fetch|http.?get)\s+https?://' "egress_command" "Egress comm
 _finding 'ANTHROPIC_BASE_URL' "anthropic_base_url" "ANTHROPIC_BASE_URL — possible injection target"
 
 # ── Credentials — detected AND redacted in place, never just reported ────────
-# Patterns mirror antu-crystallize/SKILL.md's own redaction rule (sk-*, Bearer *,
+# Patterns mirror antu-handoff/SKILL.md's own redaction rule (sk-*, Bearer *,
 # ghp_*, ?token=*) plus AWS access key IDs (AKIA...) and basic-auth-style
 # user:pass in URLs/flags — all common in scraped tech content.
 REDACTED=0

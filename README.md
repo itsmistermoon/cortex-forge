@@ -26,7 +26,7 @@ npx skills add itsmistermoon/cortex-forge
 
 2. See the [Supported Agents table](https://github.com/vercel-labs/skills#supported-agents) to pick the exact flag value per agent.
 
-Skills install unnamespaced: `/antu-assimilate`, `/antu-crystallize`, `/antu-imprint`, `/antu-recall`, `/antu-prune`, `/antu-setup`.
+Skills install unnamespaced: `/antu-ingest`, `/antu-handoff`, `/antu-imprint`, `/antu-recall`, `/antu-prune`, `/antu-setup`.
 
 ### Option B: Claude Code plugin
 
@@ -37,7 +37,7 @@ This repo is also a self-hosted [Claude Code plugin marketplace](https://code.cl
 /plugin install antu@antu
 ```
 
-Skills install namespaced: `/antu:antu-assimilate`, `/antu:antu-crystallize`, etc. To test a local checkout before installing, use `claude --plugin-dir .` from the repo root.
+Skills install namespaced: `/antu:antu-ingest`, `/antu:antu-handoff`, etc. To test a local checkout before installing, use `claude --plugin-dir .` from the repo root.
 
 ### Then, either way
 
@@ -57,7 +57,7 @@ Six layers, each with a distinct role:
 | **Raw** | `.raw/` | Primary sources — immutable originals | Read-only |
 | **Wiki** | `wiki/` | Secondary sources — synthesized knowledge | Agent writes and maintains |
 | **Hot** | `.cortex/` | Per-project session cache | Read on session start |
-| **Instructions** | `AGENTS.md` | Agent protocols (crystallize, assimilate, recall) | Read on session start |
+| **Instructions** | `AGENTS.md` | Agent protocols (handoff, ingest, recall) | Read on session start |
 | **Meta** | `wiki/meta/` | Vault metadata and guides | Agent maintains |
 | **Skills** | `skills/` | Invocable agent skills | Extend, don't modify |
 
@@ -65,15 +65,15 @@ Six layers, each with a distinct role:
 
 Six skills that map to how knowledge actually moves through a system.
 
-### `/antu-assimilate` — Ingest
+### `/antu-ingest` — Ingest
 
 Sources land in `.raw/`: articles, PDFs, transcripts, URLs. The agent processes them and produces structured wiki pages — the step that turns perceived input into stored, queryable knowledge.
 
 After synthesizing new pages, it scans existing wiki pages and selects those who are candidates for backward enrichment — existing concept pages, entity entries, and comparison tables that should now mention the new source but don't. An agent evaluates each candidate before any change is made.
 
-### `/antu-crystallize` — Session context
+### `/antu-handoff` — Session context
 
-`.cortex/MEMORY.md` extends working memory indefinitely across two zones: a mutable `Current state` (max 5 pending items, max 3 active decisions) and an append-only `History`. The agent reads it on session start per `AGENTS.md` instructions; you invoke `/antu-crystallize` at milestones and before closing a session, carrying context forward into the next one. Works from any repo, not just the vault.
+`.cortex/MEMORY.md` extends working memory indefinitely across two zones: a mutable `Current state` (max 5 pending items, max 3 active decisions) and an append-only `History`. The agent reads it on session start per `AGENTS.md` instructions; you invoke `/antu-handoff` at milestones and before closing a session, carrying context forward into the next one. Works from any repo, not just the vault.
 
 ### `/antu-imprint` — Permanent archive
 
@@ -81,7 +81,7 @@ What was worth keeping from the session becomes a stable wiki page. A memory tra
 
 ### `/antu-recall` — Query
 
-The agent searches the vault, retrieves relevant pages, and synthesizes a response with citations, drawn from what's been assimilated or imprinted into it.
+The agent searches the vault, retrieves relevant pages, and synthesizes a response with citations, drawn from what's been ingested or imprinted into it.
 
 ### `/antu-prune` — Vault hygiene
 
@@ -114,9 +114,9 @@ Each page follows: YAML frontmatter + compiled truth + chronological changelog.
 
 Three behaviors are mandatory for any agent operating the vault, defined in `AGENTS.md`:
 
-**Crystallize** — before responding to the user, read `.cortex/MEMORY.md` and `AGENTS.md`. After milestones, invoke `/antu-crystallize` to snapshot current state and append a history entry.
+**Handoff** — before responding to the user, read `.cortex/MEMORY.md` and `AGENTS.md`. After milestones, invoke `/antu-handoff` to snapshot current state and append a history entry.
 
-**Assimilate** — when the user provides a URL, file, or uses words like "ingest" or "process", invoke `/antu-assimilate` as the first action.
+**Ingest** — when the user provides a URL, file, or uses words like "ingest" or "process", invoke `/antu-ingest` as the first action.
 
 **Recall** — when the user asks about any topic that may exist in the vault, invoke `/antu-recall` as the first action. The skill returns synthesized knowledge with citations; treat that as the authoritative answer over active context, `grep`, or training knowledge on vault topics.
 
@@ -124,9 +124,9 @@ Three behaviors are mandatory for any agent operating the vault, defined in `AGE
 
 **One consumption channel, identical everywhere.** `AGENTS.md` mandates reading `.cortex/MEMORY.md` (hard size caps) before the first response, on every agent, with no hook wiring required. The guarantee comes from the protocol itself — unconditional, explicit, and simple enough to follow the same way across any coding agent.
 
-**State and lessons as separate artifacts.** Session-end snapshots capture *state* — pending work, decisions, fragile context. Lessons get a dedicated path: at session end, `/antu-crystallize` flags imprint candidates in the history entry, invoked manually with full context; at the next session start, reading `.cortex/MEMORY.md` surfaces that flag and the agent proposes `/antu-imprint` with fresh eyes. Detection happens where context is richest; the decision happens where judgment is freshest.
+**State and lessons as separate artifacts.** Session-end snapshots capture *state* — pending work, decisions, fragile context. Lessons get a dedicated path: at session end, `/antu-handoff` flags imprint candidates in the history entry, invoked manually with full context; at the next session start, reading `.cortex/MEMORY.md` surfaces that flag and the agent proposes `/antu-imprint` with fresh eyes. Detection happens where context is richest; the decision happens where judgment is freshest.
 
-**Memory as an audited surface.** `.raw/` stays immutable, keeping provenance auditable at every point. Ingestion scans foreign content for hidden Unicode, embedded payloads, and egress commands before it enters the vault. The crystallize-flags → imprint-proposes handoff defaults to *suggest*, putting a human approval step between session output and anything becoming ground truth.
+**Memory as an audited surface.** `.raw/` stays immutable, keeping provenance auditable at every point. Ingestion scans foreign content for hidden Unicode, embedded payloads, and egress commands before it enters the vault. The handoff-flags → imprint-proposes step defaults to *suggest*, putting a human approval step between session output and anything becoming ground truth.
 
 **Failed attempts as first-class knowledge.** The hot cache contract records attempted-and-failed approaches, with evidence, as a dedicated section — carrying forward what didn't work alongside what did.
 
@@ -161,8 +161,8 @@ Skills resolve the vault automatically: if you're inside a registered vault → 
 
 | Skill | Explicit vault arg |
 |---|---|
-| `/antu-assimilate` | ✅ `/antu-assimilate <vault-name> <url-or-file>` |
+| `/antu-ingest` | ✅ `/antu-ingest <vault-name> <url-or-file>` |
 | `/antu-recall` | ✅ `/antu-recall <vault-name> <query>` |
-| `/antu-crystallize` | ✅ `/antu-crystallize <vault-name> [project-name] [next: <focus>]` |
+| `/antu-handoff` | ✅ `/antu-handoff <vault-name> [project-name] [next: <focus>]` |
 | `/antu-imprint` | ✅ `/antu-imprint <vault-name>` |
 | `/antu-prune` | ✅ `/antu-prune <vault-name>` — asks for confirmation before proceeding |

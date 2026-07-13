@@ -1,11 +1,11 @@
 ---
-name: antu-crystallize
+name: antu-handoff
 license: MIT
-description: Snapshot session context into .cortex/MEMORY.md — pending tasks, decisions, and history — so future sessions resume without losing context. Use on "save context", "crystallize", or "wrap up".
+description: Snapshot session context into .cortex/MEMORY.md — pending tasks, decisions, and history — so future sessions resume without losing context. Use on "save context", "handoff", or "wrap up".
 argument-hint: "[vault-name] [project-name] [next: <focus>]"
 ---
 
-Start your response with the flavor line `Crystallizing memory...`, translated to the language of the user's current message (Spanish: `Cristalizando memoria...`), with nothing before it. Use that same language for every prompt, question, menu, and confirmation this skill produces — persisted vault content (if any) still follows the vault's locale, not the conversation language.
+Start your response with the flavor line `Handing off session...`, translated to the language of the user's current message (Spanish: `Traspasando sesión...`), with nothing before it. Use that same language for every prompt, question, menu, and confirmation this skill produces — persisted vault content (if any) still follows the vault's locale, not the conversation language.
 
 Save a session snapshot to `.cortex/MEMORY.md` in the active repo (the nearest `.git`), so any agent can resume without losing context.
 
@@ -25,7 +25,7 @@ Save a session snapshot to `.cortex/MEMORY.md` in the active repo (the nearest `
 
 3. **Consider PRAXIS.md updates** — a deliberate judgment call, not an automatic log entry: does this session surface durable operational knowledge (an environment workaround, operator preference, vault-specific convention, recurring failure pattern, or similar) the next agent needs to avoid re-discovering? Classify per the gate in `references/PRAXIS-FORMAT.md`. **Done when:** every candidate insight has been written to the correct zone or explicitly evaluated and rejected — not silently forgotten.
 4. **Write the snapshot** — update Current state and append the History entry in `.cortex/MEMORY.md`, per `references/MEMORY-FORMAT.md`; never modify previous History entries.
-   - If an argument with `next: <focus>` was provided (e.g., `/antu-crystallize next: PostToolUse hook`), mention relevant skills inline and tailor `### Pending` toward the declared next focus.
+   - If an argument with `next: <focus>` was provided (e.g., `/antu-handoff next: PostToolUse hook`), mention relevant skills inline and tailor `### Pending` toward the declared next focus.
    - **Vault health triage** — if `wiki/meta/vault-report.json` exists and any of `health.dead_links`, `health.raw_without_source_page`, `health.orphan_pages`, or `health.missing_confidence` is non-empty, add a dated entry to `### Pending` (if full, this takes priority over the least-recent item): `- [ ] Vault health: {N} finding(s) unresolved ({types}) — see wiki/meta/vault-report.json`. If a Pending item for vault health already exists, update its count instead of duplicating; if the report has zero findings and a prior item exists, remove it. Never optional to report — call it out explicitly in the confirmation whenever the report has non-empty findings, don't fold it silently into a generic summary.
 
 ## Cross-vault update

@@ -11,8 +11,8 @@
   "license": "MIT",
   "keywords": ["knowledge-base", "wiki", "vault", "memory", "second-brain", "rag"],
   "skills": [
-    "./skills/antu-assimilate",
-    "./skills/antu-crystallize",
+    "./skills/antu-ingest",
+    "./skills/antu-handoff",
     "./skills/antu-setup",
     "./skills/antu-imprint",
     "./skills/antu-prune",

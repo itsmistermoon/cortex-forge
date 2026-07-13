@@ -5,8 +5,8 @@
       "title": "Antu",
       "description": "LLM-native personal wiki — ingest sources, synthesize wiki pages, and recall knowledge across sessions.",
       "skills": [
-        "antu-assimilate",
-        "antu-crystallize",
+        "antu-ingest",
+        "antu-handoff",
         "antu-setup",
         "antu-imprint",
         "antu-prune",

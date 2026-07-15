@@ -8,7 +8,7 @@
 2. **A tag must apply to several pages, not one or two.** If it's specific to a single page, it isn't a tag — it's body text or a `[[wikilink]]`.
 3. **Format: lowercase, no accents, hyphen-separated.**
 
-**Nested tags (optional):** a tag can take the form `topic/subtopic` when the parent is already a real topic with several pages of its own — e.g. `cortex-forge/architecture` for pages about that project's specific architecture, within the broader `cortex-forge` topic. Don't overuse this: it only makes sense when the parent would already exist on its own, not as an invented container to group a couple of loose tags.
+**Nested tags (optional):** a tag can take the form `topic/subtopic` when the parent is already a real topic with several pages of its own — e.g. `antu/architecture` for pages about that project's specific architecture, within the broader `antu` topic. Don't overuse this: it only makes sense when the parent would already exist on its own, not as an invented container to group a couple of loose tags.
 
 ---
 

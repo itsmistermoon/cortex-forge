@@ -1,10 +1,10 @@
-# cortex-forge
+# Antu
 
-![cortex-forge](cortex-forge-promo.png)
+![Antu](cortex-forge-promo.png)
 
 ## What it is
 
-Cortex Forge is a set of skills you can use to turn raw sources into synthesized, queryable knowledge. Agents operate the vault: they ingest, recall, and maintain. You define what matters and when to persist it.
+Antu is a set of skills you can use to turn raw sources into synthesized, queryable knowledge. Agents operate the vault: they ingest, recall, and maintain. You define what matters and when to persist it.
 
 The system separates two kinds of memory:
 - **Operational memory** — what's happening now and what was decided. Lives in `.cortex/MEMORY.md` (session cache), read by the agent at every session start per `AGENTS.md` instructions. Small, fast, always loaded.
@@ -26,7 +26,7 @@ npx skills add itsmistermoon/cortex-forge
 
 2. See the [Supported Agents table](https://github.com/vercel-labs/skills#supported-agents) to pick the exact flag value per agent.
 
-Skills install unnamespaced: `/cortex-assimilate`, `/cortex-crystallize`, `/cortex-imprint`, `/cortex-recall`, `/cortex-prune`, `/cortex-forge-setup`.
+Skills install unnamespaced: `/antu-ingest`, `/antu-handoff`, `/antu-imprint`, `/antu-recall`, `/antu-prune`, `/antu-setup`.
 
 ### Option B: Claude Code plugin
 
@@ -34,14 +34,14 @@ This repo is also a self-hosted [Claude Code plugin marketplace](https://code.cl
 
 ```bash
 /plugin marketplace add itsmistermoon/cortex-forge
-/plugin install cortex-forge@cortex-forge
+/plugin install antu@antu
 ```
 
-Skills install namespaced: `/cortex-forge:cortex-assimilate`, `/cortex-forge:cortex-crystallize`, etc. To test a local checkout before installing, use `claude --plugin-dir .` from the repo root.
+Skills install namespaced: `/antu:antu-ingest`, `/antu:antu-handoff`, etc. To test a local checkout before installing, use `claude --plugin-dir .` from the repo root.
 
 ### Then, either way
 
-Run `/cortex-forge-setup` (or `/cortex-forge:cortex-forge-setup`) in your agent — from a fresh git repo or an existing vault. This skill will:
+Run `/antu-setup` (or `/antu:antu-setup`) in your agent — from a fresh git repo or an existing vault. This skill will:
 - Scaffold `wiki/` and a starter `AGENTS.md` if they don't exist yet (asks first — never overwrites an existing vault), detect your locale, and register the vault in `~/.cortex-forge/config.yml`
 - Verify all six skills are actually installed, and tell you to re-run `npx skills add` (or `/plugin update`) if any are missing
 - Offer to set up semantic search, with a dependency check that runs before asking
@@ -57,7 +57,7 @@ Six layers, each with a distinct role:
 | **Raw** | `.raw/` | Primary sources — immutable originals | Read-only |
 | **Wiki** | `wiki/` | Secondary sources — synthesized knowledge | Agent writes and maintains |
 | **Hot** | `.cortex/` | Per-project session cache | Read on session start |
-| **Instructions** | `AGENTS.md` | Agent protocols (crystallize, assimilate, recall) | Read on session start |
+| **Instructions** | `AGENTS.md` | Agent protocols (handoff, ingest, recall) | Read on session start |
 | **Meta** | `wiki/meta/` | Vault metadata and guides | Agent maintains |
 | **Skills** | `skills/` | Invocable agent skills | Extend, don't modify |
 
@@ -65,38 +65,38 @@ Six layers, each with a distinct role:
 
 Six skills that map to how knowledge actually moves through a system.
 
-### `/cortex-assimilate` — Ingest
+### `/antu-ingest` — Ingest
 
 Sources land in `.raw/`: articles, PDFs, transcripts, URLs. The agent processes them and produces structured wiki pages — the step that turns perceived input into stored, queryable knowledge.
 
 After synthesizing new pages, it scans existing wiki pages and selects those who are candidates for backward enrichment — existing concept pages, entity entries, and comparison tables that should now mention the new source but don't. An agent evaluates each candidate before any change is made.
 
-### `/cortex-crystallize` — Session context
+### `/antu-handoff` — Session context
 
-`.cortex/MEMORY.md` extends working memory indefinitely across two zones: a mutable `Current state` (max 5 pending items, max 3 active decisions) and an append-only `History`. The agent reads it on session start per `AGENTS.md` instructions; you invoke `/cortex-crystallize` at milestones and before closing a session, carrying context forward into the next one. Works from any repo, not just the vault.
+`.cortex/MEMORY.md` extends working memory indefinitely across two zones: a mutable `Current state` (max 5 pending items, max 3 active decisions) and an append-only `History`. The agent reads it on session start per `AGENTS.md` instructions; you invoke `/antu-handoff` at milestones and before closing a session, carrying context forward into the next one. Works from any repo, not just the vault.
 
-### `/cortex-imprint` — Permanent archive
+### `/antu-imprint` — Permanent archive
 
 What was worth keeping from the session becomes a stable wiki page. A memory trace is what remains after an experience ends. The session closes; the knowledge stays encoded in the vault.
 
-### `/cortex-recall` — Query
+### `/antu-recall` — Query
 
-The agent searches the vault, retrieves relevant pages, and synthesizes a response with citations, drawn from what's been assimilated or imprinted into it.
+The agent searches the vault, retrieves relevant pages, and synthesizes a response with citations, drawn from what's been ingested or imprinted into it.
 
-### `/cortex-prune` — Vault hygiene
+### `/antu-prune` — Vault hygiene
 
 Detects orphan pages, dead links, contradictory claims, stale information. Forgetting functions as maintenance: prune removes what weakens the network deliberately, so what remains stays reliable.
 
-### `/cortex-forge-setup` — Setup and configuration
+### `/antu-setup` — Setup and configuration
 
 Registers the vault and installs global skills. Run from inside a vault directory. Run again from the same vault to deregister.
 
 ## CLI tools
 
-Installed via the Claude Code plugin, these are available as bare commands (`bin/` is on the plugin's `PATH`). With the skills.sh install, run them with their path from a checkout instead, e.g. `bash bin/cortex-embed.sh`.
+Installed via the Claude Code plugin, these are available as bare commands (`bin/` is on the plugin's `PATH`). With the skills.sh install, run them with their path from a checkout instead, e.g. `bash bin/antu-embed.sh`.
 
-- **`cortex-embed.sh`** — bootstrap the semantic index for a vault
-- **`setup-vault.sh`** — scaffold an Obsidian vault (directories, graph colors by type, theme, community plugins) for a fresh cortex-forge vault
+- **`antu-embed.sh`** — bootstrap the semantic index for a vault
+- **`setup-vault.sh`** — scaffold an Obsidian vault (directories, graph colors by type, theme, community plugins) for a fresh Antu vault
 - **`tags-audit.py`** — audit `tags:` usage across a vault's wiki pages (`tags-audit.py <vault-path> [--write-snapshot]`)
 
 ## Wiki Taxonomy
@@ -114,27 +114,27 @@ Each page follows: YAML frontmatter + compiled truth + chronological changelog.
 
 Three behaviors are mandatory for any agent operating the vault, defined in `AGENTS.md`:
 
-**Crystallize** — before responding to the user, read `.cortex/MEMORY.md` and `AGENTS.md`. After milestones, invoke `/cortex-crystallize` to snapshot current state and append a history entry.
+**Handoff** — before responding to the user, read `.cortex/MEMORY.md` and `AGENTS.md`. After milestones, invoke `/antu-handoff` to snapshot current state and append a history entry.
 
-**Assimilate** — when the user provides a URL, file, or uses words like "ingest" or "process", invoke `/cortex-assimilate` as the first action.
+**Ingest** — when the user provides a URL, file, or uses words like "ingest" or "process", invoke `/antu-ingest` as the first action.
 
-**Recall** — when the user asks about any topic that may exist in the vault, invoke `/cortex-recall` as the first action. The skill returns synthesized knowledge with citations; treat that as the authoritative answer over active context, `grep`, or training knowledge on vault topics.
+**Recall** — when the user asks about any topic that may exist in the vault, invoke `/antu-recall` as the first action. The skill returns synthesized knowledge with citations; treat that as the authoritative answer over active context, `grep`, or training knowledge on vault topics.
 
 ## Design principles
 
 **One consumption channel, identical everywhere.** `AGENTS.md` mandates reading `.cortex/MEMORY.md` (hard size caps) before the first response, on every agent, with no hook wiring required. The guarantee comes from the protocol itself — unconditional, explicit, and simple enough to follow the same way across any coding agent.
 
-**State and lessons as separate artifacts.** Session-end snapshots capture *state* — pending work, decisions, fragile context. Lessons get a dedicated path: at session end, `/cortex-crystallize` flags imprint candidates in the history entry, invoked manually with full context; at the next session start, reading `.cortex/MEMORY.md` surfaces that flag and the agent proposes `/cortex-imprint` with fresh eyes. Detection happens where context is richest; the decision happens where judgment is freshest.
+**State and lessons as separate artifacts.** Session-end snapshots capture *state* — pending work, decisions, fragile context. Lessons get a dedicated path: at session end, `/antu-handoff` flags imprint candidates in the history entry, invoked manually with full context; at the next session start, reading `.cortex/MEMORY.md` surfaces that flag and the agent proposes `/antu-imprint` with fresh eyes. Detection happens where context is richest; the decision happens where judgment is freshest.
 
-**Memory as an audited surface.** `.raw/` stays immutable, keeping provenance auditable at every point. Ingestion scans foreign content for hidden Unicode, embedded payloads, and egress commands before it enters the vault. The crystallize-flags → imprint-proposes handoff defaults to *suggest*, putting a human approval step between session output and anything becoming ground truth.
+**Memory as an audited surface.** `.raw/` stays immutable, keeping provenance auditable at every point. Ingestion scans foreign content for hidden Unicode, embedded payloads, and egress commands before it enters the vault. The handoff-flags → imprint-proposes step defaults to *suggest*, putting a human approval step between session output and anything becoming ground truth.
 
 **Failed attempts as first-class knowledge.** The hot cache contract records attempted-and-failed approaches, with evidence, as a dedicated section — carrying forward what didn't work alongside what did.
 
 ## Full vs. lite
 
-cortex-forge has a sibling project, **reflex**, built later as a from-scratch reapplication of what cortex-forge's growth taught: minimal dependencies, no scripts, no reference docs, no multi-vault machinery — just skills. Both are "vault" suites; neither depends on the other. Pick per vault, not once for everything you do:
+Antu has a sibling project, **Kuyen**, built later as a from-scratch reapplication of what Antu's growth taught: minimal dependencies, no scripts, no reference docs, no multi-vault machinery — just skills. Both are "vault" suites; neither depends on the other. Pick per vault, not once for everything you do:
 
-| Axis | cortex-forge | reflex |
+| Axis | Antu | Kuyen |
 |---|---|---|
 | Vault size / lifespan | Large, multi-session, expected to accumulate substantial knowledge over time | Small or short-lived — a scratch vault, a single project's notes |
 | Feature needs | Provenance tracking, multi-vault resolution, research mode, semantic search, planned MCP integration | Ingest / query / handoff, nothing beyond that |
@@ -161,8 +161,8 @@ Skills resolve the vault automatically: if you're inside a registered vault → 
 
 | Skill | Explicit vault arg |
 |---|---|
-| `/cortex-assimilate` | ✅ `/cortex-assimilate <vault-name> <url-or-file>` |
-| `/cortex-recall` | ✅ `/cortex-recall <vault-name> <query>` |
-| `/cortex-crystallize` | ✅ `/cortex-crystallize <vault-name> [project-name] [next: <focus>]` |
-| `/cortex-imprint` | ✅ `/cortex-imprint <vault-name>` |
-| `/cortex-prune` | ✅ `/cortex-prune <vault-name>` — asks for confirmation before proceeding |
+| `/antu-ingest` | ✅ `/antu-ingest <vault-name> <url-or-file>` |
+| `/antu-recall` | ✅ `/antu-recall <vault-name> <query>` |
+| `/antu-handoff` | ✅ `/antu-handoff <vault-name> [project-name] [next: <focus>]` |
+| `/antu-imprint` | ✅ `/antu-imprint <vault-name>` |
+| `/antu-prune` | ✅ `/antu-prune <vault-name>` — asks for confirmation before proceeding |

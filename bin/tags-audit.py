@@ -4,7 +4,7 @@ Standalone tag-usage audit — NOT wired into any skill.
 
 Scans wiki/{concepts,entities,sources,projects}/*.md for `tags:` frontmatter,
 counts occurrences (exact tag and top-level namespace for hierarchical tags
-like `cortex-forge/skills`), and prints a report to stdout by default.
+like `antu/skills`), and prints a report to stdout by default.
 
 wiki/meta/tags.md is a hand/agent-maintained lean registry (name + one-line
 description, no counts — see wiki/meta/tags-convention.md) and is never

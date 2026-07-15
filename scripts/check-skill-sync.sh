@@ -72,16 +72,16 @@ while IFS= read -r file; do
 done < <(grep -lriE "creat(e|es|ing)? (a |the |new )*page|saved to \`\{?vault\}?/?wiki|writ(e|es|ing) (the |a |new )*page" "$SKILLS_DIR"/*/SKILL.md | sort -u)
 
 # ---------------------------------------------------------------------------
-# 4. vault-report.json schema fields consistent between cortex-prune and AGENTS.md
+# 4. vault-report.json schema fields consistent between antu-prune and AGENTS.md
 # ---------------------------------------------------------------------------
 check "vault-report-schema"
-PRUNE_SCHEMA="$SKILLS_DIR/cortex-prune/references/VAULT-REPORT-SCHEMA.md"
-CRYSTALLIZE_FILE="$SKILLS_DIR/cortex-crystallize/SKILL.md"
+PRUNE_SCHEMA="$SKILLS_DIR/antu-prune/references/VAULT-REPORT-SCHEMA.md"
+HANDOFF_FILE="$SKILLS_DIR/antu-handoff/SKILL.md"
 
 if [[ ! -f "$PRUNE_SCHEMA" ]]; then
-  fail "cortex-prune/references/VAULT-REPORT-SCHEMA.md not found"
-elif [[ ! -f "$CRYSTALLIZE_FILE" ]]; then
-  fail "cortex-crystallize/SKILL.md not found — cannot verify vault-report.json consumer"
+  fail "antu-prune/references/VAULT-REPORT-SCHEMA.md not found"
+elif [[ ! -f "$HANDOFF_FILE" ]]; then
+  fail "antu-handoff/SKILL.md not found — cannot verify vault-report.json consumer"
 else
   # Discover field names structurally from the "## Field definitions" bullet list
   # (`- \`health.foo\` — ...`) instead of enumerating known names, so a newly
@@ -90,18 +90,18 @@ else
   if [[ -z "$prune_fields" ]]; then
     fail "no vault-report.json fields found in $PRUNE_SCHEMA — schema may have moved again"
   else
-    # Check each field is referenced in cortex-crystallize's vault-health triage
+    # Check each field is referenced in antu-handoff's vault-health triage
     # step — the actual consumer since AGENTS.md stopped reading vault-report.json
     # directly (2026-07-06) in favor of the Pending item crystallize already writes.
     all_ok=true
     while IFS= read -r field; do
-      if ! grep -q "$field" "$CRYSTALLIZE_FILE"; then
-        fail "vault-report field '$field' declared in cortex-prune schema but not referenced in cortex-crystallize/SKILL.md"
+      if ! grep -q "$field" "$HANDOFF_FILE"; then
+        fail "vault-report field '$field' declared in antu-prune schema but not referenced in antu-handoff/SKILL.md"
         all_ok=false
       fi
     done <<< "$prune_fields"
     if $all_ok; then
-      ok "vault-report.json schema fields consistent between cortex-prune and cortex-crystallize"
+      ok "vault-report.json schema fields consistent between antu-prune and antu-handoff"
     fi
   fi
 fi
@@ -125,8 +125,8 @@ done
 # ---------------------------------------------------------------------------
 # 6. Every script listed in "## Available scripts" actually exists (same dir)
 # ---------------------------------------------------------------------------
-# Catches exactly the 2026-07-03 regression: cortex-prune.sh was relocated but
-# cortex-validate-schema.sh (which it calls as a sibling) was left in bin/,
+# Catches exactly the 2026-07-03 regression: antu-prune.sh was relocated but
+# antu-validate-schema.sh (which it calls as a sibling) was left in bin/,
 # silently disabling schema-drift checks for every install. Scans the
 # "## Available scripts" section structurally rather than grepping for the
 # word "co-located" — that phrasing was intentionally removed everywhere in
@@ -154,7 +154,7 @@ done
 # ---------------------------------------------------------------------------
 # 7. Intentionally-duplicated files stay in sync across skills
 # ---------------------------------------------------------------------------
-# embeddings.py and cortex-index.py are deliberately co-located in more than
+# embeddings.py and antu-index.py are deliberately co-located in more than
 # one skill (each skill must be independently installable and must never
 # execute a script found inside the vault — see wiki/concepts/agent-hook-compatibility.md
 # and the 2026-07-03 E006 fix). LOCALE-RESOLUTION.md is duplicated for the
@@ -179,10 +179,10 @@ _check_synced() {  # $1: subdir ("scripts" or "references"), $2: filename, $3..$
   done
   [[ -n "$first" ]] && ok "$script identical across: $*"
 }
-_check_synced "scripts" "embeddings.py" cortex-forge-setup cortex-recall cortex-assimilate
-_check_synced "scripts" "cortex-index.py" cortex-forge-setup cortex-assimilate
-_check_synced "references" "LOCALE-RESOLUTION.md" cortex-assimilate cortex-crystallize cortex-imprint
-_check_synced "references" "VAULT-RESOLUTION.md" cortex-assimilate cortex-crystallize cortex-imprint cortex-prune cortex-recall
+_check_synced "scripts" "embeddings.py" antu-setup antu-recall antu-ingest
+_check_synced "scripts" "antu-index.py" antu-setup antu-ingest
+_check_synced "references" "LOCALE-RESOLUTION.md" antu-ingest antu-handoff antu-imprint
+_check_synced "references" "VAULT-RESOLUTION.md" antu-ingest antu-handoff antu-imprint antu-prune antu-recall
 
 # ---------------------------------------------------------------------------
 # Summary

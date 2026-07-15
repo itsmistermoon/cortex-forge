@@ -5,7 +5,7 @@ on:
     branches:
       - main
 
-# No publish step — cortex-forge distributes exclusively via `npx skills add
+# No publish step — Antu distributes exclusively via `npx skills add
 # itsmistermoon/cortex-forge` (skills.sh), never the npm registry. This
 # workflow only opens/updates the "Version Packages" PR that consolidates
 # pending changesets into CHANGELOG.md and bumps package.json; cutting the

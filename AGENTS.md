@@ -2,24 +2,28 @@
 schema_version: "0.3"
 ---
 
-# AGENTS.md — cortex-forge
+# AGENTS.md — Antu
 
-This repo is the source of truth for the Cortex Forge skill suite (`skills/`, `templates/`), distributed via `npx skills add itsmistermoon/cortex-forge`. This repo is not itself a vault — it has no `wiki/` directory. Vaults that install this suite carry the real knowledge content, in their own `wiki/` and `.raw/`.
+This repo is the source of truth for the Antu skill suite (`skills/`, `templates/`), distributed via `npx skills add itsmistermoon/cortex-forge`. This repo is not itself a vault — it has no `wiki/` directory. Vaults that install this suite carry the real knowledge content, in their own `wiki/` and `.raw/`.
 
 ## Vocabulary
 
 - **hot cache**: session memory for work on this repo, held in `.cortex/`
-- **vault**: a knowledge base that installs and runs the Cortex Forge suite
+- **vault**: a knowledge base that installs and runs the Antu suite
 
 ## Session start
 
 **Before your first response, in any session that starts in this repo, you MUST read `.cortex/MEMORY.md` in full** — and `.cortex/PRAXIS.md` too, if it exists. Treat this with the same weight as your own persistent instructions file.
 
-If the latest `## History` entry in `MEMORY.md` has a `#### Imprint candidate` line, propose imprinting it into a target vault, e.g. via `/cortex-imprint {vault}`.
+If the latest `## History` entry in `MEMORY.md` has a `#### Imprint candidate` line, propose imprinting it into a target vault, e.g. via `/antu-imprint {vault}`.
 
 Beyond this, skills trigger themselves — each one's own `description:` states when to invoke it, and that's the single place to look, except where an Agent rule below explicitly calls one out (e.g. the skill-design-principles check).
 
 ## Agent skills
+
+### Development methodology
+
+Sigue `METHODOLOGY.md` en la raíz de este repo. Si no existe en este entorno, avisar al usuario y usar el flujo nativo del repo en su lugar.
 
 ### Issue tracker
 
@@ -43,18 +47,18 @@ Single-context. `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/do
 - **Edit this repo as the single source of truth**, then refresh installs with `npx skills add itsmistermoon/cortex-forge --all -g -y`; `~/.agents/skills/` is a generated target.
 - **Treat `.env` and credential files as off-limits** to reading or modifying.
 - **Treat `templates/` here as the canonical schema** — every vault that installs this suite inherits its shape.
-- **Check `docs/family-conventions.md` before changing a convention shared with reflex** (the sibling lite suite, `moon-reflex`) — log formats, timestamp formats, and similar cross-cutting shape. Update it if the convention diverges or a new one is formalized.
+- **Check `docs/family-conventions.md` before changing a convention shared with Kuyen** (the sibling lite suite, `moon-kuyen`) — log formats, timestamp formats, and similar cross-cutting shape. Update it if the convention diverges or a new one is formalized.
 
 ## Available skills
 
 All 6 live in `skills/` here as their canonical source, and install identically via `npx skills add itsmistermoon/cortex-forge` (`--skill X` for a standalone install).
 
-- `cortex-assimilate` — Ingest a URL or file into a vault: saves to `.raw/`, synthesizes wiki pages, updates the index
-- `cortex-recall` — Answer questions grounded in a vault's synthesized wiki content, with citations to the pages used
-- `cortex-imprint` — Archive a valuable session synthesis as a permanent wiki page in a vault
-- `cortex-prune` — Health check a vault: detect dead links, orphan pages, missing provenance, unprocessed sources
-- `cortex-crystallize` — Snapshot session context into `.cortex/MEMORY.md`; works from any repo, inside or outside a vault
-- `cortex-forge-setup` — Register/deregister a vault in Cortex Forge and verify global skills are installed
+- `antu-ingest` — Ingest a URL or file into a vault: saves to `.raw/`, synthesizes wiki pages, updates the index
+- `antu-recall` — Answer questions grounded in a vault's synthesized wiki content, with citations to the pages used
+- `antu-imprint` — Archive a valuable session synthesis as a permanent wiki page in a vault
+- `antu-prune` — Health check a vault: detect dead links, orphan pages, missing provenance, unprocessed sources
+- `antu-handoff` — Snapshot session context into `.cortex/MEMORY.md`; works from any repo, inside or outside a vault
+- `antu-setup` — Register/deregister a vault in Antu and verify global skills are installed
 
 ## Wiki taxonomy (schema reference for downstream vaults)
 
@@ -65,6 +69,6 @@ All 6 live in `skills/` here as their canonical source, and install identically 
 | **source** | `wiki/sources/` | External artifact ingested — articles, docs, repos, videos, threads | `templates/source.md` |
 | **project** | `wiki/projects/` | Active project with operational state (repo, status, domains) | `templates/project.md` |
 
-Each page follows: YAML frontmatter + compiled truth + chronological changelog. Type disambiguation and source frontmatter fields: see `skills/cortex-assimilate/SKILL.md`.
+Each page follows: YAML frontmatter + compiled truth + chronological changelog. Type disambiguation and source frontmatter fields: see `skills/antu-ingest/SKILL.md`.
 
 `wiki/meta/tags.md` (seeded from `templates/tags.md`) is not a page type — it's the vault's tag rules + registry in one self-referencing document, kept free of hard counts so it never goes stale.

@@ -2,15 +2,15 @@
   "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
   "groupings": [
     {
-      "title": "Cortex Forge",
+      "title": "Antu",
       "description": "LLM-native personal wiki — ingest sources, synthesize wiki pages, and recall knowledge across sessions.",
       "skills": [
-        "cortex-assimilate",
-        "cortex-crystallize",
-        "cortex-forge-setup",
-        "cortex-imprint",
-        "cortex-prune",
-        "cortex-recall"
+        "antu-ingest",
+        "antu-handoff",
+        "antu-setup",
+        "antu-imprint",
+        "antu-prune",
+        "antu-recall"
       ]
     }
   ]

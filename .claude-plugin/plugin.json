@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
-  "name": "cortex-forge",
-  "displayName": "Cortex Forge",
+  "name": "antu",
+  "displayName": "Antu",
   "description": "LLM-native personal wiki — ingest sources, synthesize wiki pages, and recall knowledge across sessions from a vault that lives anywhere.",
   "author": {
     "name": "itsmistermoon"
@@ -11,11 +11,11 @@
   "license": "MIT",
   "keywords": ["knowledge-base", "wiki", "vault", "memory", "second-brain", "rag"],
   "skills": [
-    "./skills/cortex-assimilate",
-    "./skills/cortex-crystallize",
-    "./skills/cortex-forge-setup",
-    "./skills/cortex-imprint",
-    "./skills/cortex-prune",
-    "./skills/cortex-recall"
+    "./skills/antu-ingest",
+    "./skills/antu-handoff",
+    "./skills/antu-setup",
+    "./skills/antu-imprint",
+    "./skills/antu-prune",
+    "./skills/antu-recall"
   ]
 }

@@ -13,7 +13,7 @@ This repo is the source of truth for the Antu skill suite (`skills/`, `templates
 
 ## Session start
 
-**Before your first response, in any session that starts in this repo, you MUST read `.hot/HANDOFF.md` in full** — and `.hot/PRAXIS.md` too, if it exists. Treat this with the same weight as your own persistent instructions file.
+**Before your first response, in any session that starts in this repo, you MUST read `.hot/HANDOFF.md` in full** — and `.hot/PLAYBOOK.md` too, if it exists. Treat this with the same weight as your own persistent instructions file.
 
 If the latest `## History` entry in `HANDOFF.md` has a `#### Imprint candidate` line, propose imprinting it into a target vault, e.g. via `/antu-imprint {vault}`.
 

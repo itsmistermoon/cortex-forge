@@ -21,6 +21,7 @@ Format: `[semver] — title — YYYY-MM-DD`
 
 ## [Unreleased]
 
+- `protocol:` `PRAXIS.md` renamed to `PLAYBOOK.md` (ADR 0001, decision 10). `skills/antu-handoff/references/PRAXIS-FORMAT.md` renamed to `PLAYBOOK-FORMAT.md`; `SKILL.md` and `AGENTS.md` references updated accordingly. Existing `.cortex/PRAXIS.md` files migrate to `.cortex/PLAYBOOK.md` with content preserved as-is.
 - `docs:` Project renamed from Cortex Forge to **Antu** (avoids confusion with Snowflake Cortex and forgecode.dev). Skills renamed accordingly: `cortex-assimilate` → `antu-ingest`, `cortex-crystallize` → `antu-handoff`, `cortex-forge-setup` → `antu-setup`, `cortex-imprint` → `antu-imprint`, `cortex-prune` → `antu-prune`, `cortex-recall` → `antu-recall`. The sibling lite suite (formerly reflex) is renamed to **Kuyen**. `.cortex/` (per-vault state) and `~/.cortex-forge/` (global config) are unchanged for now — unifying them to `.hot/` across both suites is tracked separately. The GitHub repo and public skills.sh/plugin marketplace listings are not yet renamed.
 
 ---

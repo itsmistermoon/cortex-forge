@@ -1,6 +1,6 @@
-# PRAXIS.md — format reference
+# PLAYBOOK.md — format reference
 
-File: `.hot/PRAXIS.md` in the active repo root.
+File: `.hot/PLAYBOOK.md` in the active repo root.
 Gitignored — local agent artifact, not versioned content.
 
 ---
@@ -17,7 +17,7 @@ schema_version: "0.1"
 updated: YYYY-MM-DD
 ---
 
-# PRAXIS — {vault-name}
+# PLAYBOOK — {vault-name}
 
 ## Permanent
 
@@ -46,4 +46,4 @@ Write here for a single-session observation not yet confirmed: an untested worka
 
 - **`## Permanent`** — can be removed if the convention no longer applies; whoever deletes, explains.
 - **`## Working context`** — pruning is automatic, the agent does not ask.
-- **Not a session log**: neither section is a session log — that is what `HANDOFF.md` is for. PRAXIS captures learning that outlasts the session.
+- **Not a session log**: neither section is a session log — that is what `HANDOFF.md` is for. PLAYBOOK captures learning that outlasts the session.

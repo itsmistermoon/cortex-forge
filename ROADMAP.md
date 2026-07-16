@@ -10,7 +10,7 @@ Goal: Hot Cache Protocol working identically across coding agents, via a manual 
 ## Phase 2 — Protocol hardening ✓
 
 - [x] `.hot/` — single mutable zone for session state
-- [x] `HANDOFF.md` / `PRAXIS.md` split — session state vs. accumulated conventions (15-day TTL)
+- [x] `HANDOFF.md` / `PLAYBOOK.md` split — session state vs. accumulated conventions (`## Working context` on a 15-day TTL; `## Permanent` has no TTL)
 - [x] Multi-vault — `~/.cortex-forge/config.yml` with `vaults:` + `default:`; CWD-first resolution
 - [x] Schema versioning — `schema_version: "0.3"` in `AGENTS.md` and all templates
 - [x] `agent:` field in snapshot frontmatter — identifies last writer in multi-agent vaults

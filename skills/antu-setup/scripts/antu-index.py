@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 antu-index: Incremental wiki indexer with semantic embeddings.
-Usage: python {vault}/.cortex/db/antu-index.py [vault_path]
+Usage: python {vault}/.hot/db/antu-index.py [vault_path]
 """
 import hashlib
 import json
@@ -15,7 +15,7 @@ from pathlib import Path
 def _resolve_embeddings_dir() -> Path:
     """Find the directory containing embeddings.py — always a sibling of this
     script (co-located with the skill, or copied alongside it into a vault's
-    .cortex/db/ or ~/.cortex-forge/bin/ — either way, always a sibling)."""
+    .hot/db/ or ~/.cortex-forge/bin/ — either way, always a sibling)."""
     here = Path(__file__).parent
     if (here / "embeddings.py").exists():
         return here
@@ -205,7 +205,7 @@ def calibrate(conn: sqlite3.Connection, vault: Path, config_path: Path) -> None:
     """
     Sample intra-file pairs (similar) and inter-file pairs (dissimilar).
     Re-embeds text directly to avoid sqlite-vec blob format issues.
-    Sets threshold at p75 of dissimilar distances, saves to .cortex/db/config.json.
+    Sets threshold at p75 of dissimilar distances, saves to .hot/db/config.json.
     """
     import random
 
@@ -273,10 +273,10 @@ def calibrate(conn: sqlite3.Connection, vault: Path, config_path: Path) -> None:
 def main():
     vault = get_vault(sys.argv)
     wiki_dir = vault / "wiki"
-    cortex_dir = vault / ".cortex" / "db"
-    cortex_dir.mkdir(parents=True, exist_ok=True)
-    db_path = cortex_dir / "vault.db"
-    config_path = cortex_dir / "config.json"
+    hot_dir = vault / ".hot" / "db"
+    hot_dir.mkdir(parents=True, exist_ok=True)
+    db_path = hot_dir / "vault.db"
+    config_path = hot_dir / "config.json"
 
     emb.load_embedding_model()
     conn = init_db(db_path)

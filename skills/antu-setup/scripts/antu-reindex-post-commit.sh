@@ -5,7 +5,7 @@
 set -euo pipefail
 
 VAULT_ROOT="$(git rev-parse --show-toplevel)"
-DB="$VAULT_ROOT/.cortex/db/vault.db"
+DB="$VAULT_ROOT/.hot/db/vault.db"
 # Runs the stable runtime copy at ~/.cortex-forge/bin/ — never a script from
 # inside the vault. The vault is a data source (vault.db), never a code source.
 INDEXER="${HOME}/.cortex-forge/bin/antu-index.py"

@@ -1,6 +1,6 @@
-# MEMORY.md — format reference
+# HANDOFF.md — format reference
 
-File: `.cortex/MEMORY.md` in the active repo root.
+File: `.hot/HANDOFF.md` in the active repo root.
 Gitignored — local agent artifact, not versioned content.
 
 ---
@@ -12,11 +12,12 @@ When adding an item, evaluate whether an existing one is obsolete and remove it.
 
 ```markdown
 ---
+suite: antu
 agent: {agent-id}
 updated: {YYYY-MM-DD}
 ---
 
-# {project} — memory
+# {project} — handoff
 
 ## Current state
 
@@ -27,6 +28,8 @@ updated: {YYYY-MM-DD}
 - {decision and rationale — to avoid re-litigating it}
 ```
 
+`suite: antu` identifies Antu as the last writer — read by `/antu-handoff` itself (see `SKILL.md` step 2) to detect a foreign-suite (Kuyen) file before rotating it. Always write it, every invocation.
+
 `agent:` identifies who last wrote Current state. Update it on every invocation.
 
 `### Pending`: only what requires action in a future session — if a next agent doesn't need to act on it, it belongs in History instead. If a specific skill would help resume, mention it inline in the relevant item rather than a dedicated section.
@@ -35,7 +38,7 @@ updated: {YYYY-MM-DD}
 
 ## Zone 2 — History (APPEND-ONLY)
 
-Never modify previous entries. Append at the end. `CONSOLIDATED.md` is never read automatically — consult it directly only when a session needs older history.
+Never modify previous entries. Append at the end. `HISTORY.md` is never read automatically — consult it directly only when a session needs older history.
 
 ```markdown
 ## History

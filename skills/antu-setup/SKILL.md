@@ -14,7 +14,7 @@ Setup for Antu. Run from inside a vault directory (one containing `.git/`, and e
 
 Paths are relative to this skill's directory.
 
-- **`scripts/antu-index.py`** — Builds/refreshes `.cortex/db/vault.db` when semantic search is enabled (step 5); also copied to `~/.cortex-forge/bin/` for the post-commit reindex hook (step 5a)
+- **`scripts/antu-index.py`** — Builds/refreshes `.hot/db/vault.db` when semantic search is enabled (step 5); also copied to `~/.cortex-forge/bin/` for the post-commit reindex hook (step 5a)
 - **`scripts/embeddings.py`** — Shared embedding backend, imported by `antu-index.py`; not invoked directly
 - **`scripts/antu-reindex-post-commit.sh`** — Copied to `~/.cortex-forge/bin/hooks/` and wired into `{vault}/.git/hooks/post-commit` (step 5a)
 
@@ -83,7 +83,7 @@ Always end with the relevant subset of ## Output format.
     - **If `hot_cache_stale_days:` is already set** → inform the user of the current value and ask if they want to change it, rather than asking as if for the first time.
     - **If not set** → ask: "Warn if this vault's memory hasn't been touched in N days? (default: 15, 0 to disable)"
     - Write the chosen value as `hot_cache_stale_days: N` at the top level of `config.yml` (not nested under `vaults:`).
-    - This is read by the `AGENTS.md` Handoff protocol (step 2) to compare against `MEMORY.md`'s `updated:` frontmatter.
+    - This is read by the `AGENTS.md` Handoff protocol (step 2) to compare against `HANDOFF.md`'s `updated:` frontmatter.
 
 4. **Verify global skills are installed** — check each of the 6 skills (`antu-handoff`, `antu-setup`, `antu-recall`, `antu-ingest`, `antu-imprint`, `antu-prune`) individually for presence under `~/.agents/skills/` — do not assume presence just because this skill is running.
    - **All present** → report which 6 skills are present and move on.
@@ -120,6 +120,6 @@ For a maintenance-menu run, confirm only the items for operations that actually 
 ## Rules
 
 - Always run from inside the vault directory — never ask for a path manually
-- Never write to an *existing* `wiki/`, `.raw/`, or `AGENTS.md` — those are vault content, not this skill's to touch once they exist. The one exception is step 1's new-vault scaffold (`references/NEW-VAULT-SCAFFOLD.md`), which creates them from nothing, only on explicit confirmation, and never overwrites either if already present. Everything else this skill writes (global config, `templates/`, `.cortex/db/`, git hooks) is infrastructure
+- Never write to an *existing* `wiki/`, `.raw/`, or `AGENTS.md` — those are vault content, not this skill's to touch once they exist. The one exception is step 1's new-vault scaffold (`references/NEW-VAULT-SCAFFOLD.md`), which creates them from nothing, only on explicit confirmation, and never overwrites either if already present. Everything else this skill writes (global config, `templates/`, `.hot/db/`, git hooks) is infrastructure
 - Never hand-roll skill installation or agent-specific symlinks — `npx skills add` is the sole installer, for every agent it supports
 - Post-commit git hooks (prune, reindex — step 5a) are the only hooks this skill installs

@@ -8,14 +8,14 @@ This repo is the source of truth for the Antu skill suite (`skills/`, `templates
 
 ## Vocabulary
 
-- **hot cache**: session memory for work on this repo, held in `.cortex/`
+- **hot cache**: session memory for work on this repo, held in `.hot/`
 - **vault**: a knowledge base that installs and runs the Antu suite
 
 ## Session start
 
-**Before your first response, in any session that starts in this repo, you MUST read `.cortex/MEMORY.md` in full** — and `.cortex/PRAXIS.md` too, if it exists. Treat this with the same weight as your own persistent instructions file.
+**Before your first response, in any session that starts in this repo, you MUST read `.hot/HANDOFF.md` in full** — and `.hot/PRAXIS.md` too, if it exists. Treat this with the same weight as your own persistent instructions file.
 
-If the latest `## History` entry in `MEMORY.md` has a `#### Imprint candidate` line, propose imprinting it into a target vault, e.g. via `/antu-imprint {vault}`.
+If the latest `## History` entry in `HANDOFF.md` has a `#### Imprint candidate` line, propose imprinting it into a target vault, e.g. via `/antu-imprint {vault}`.
 
 Beyond this, skills trigger themselves — each one's own `description:` states when to invoke it, and that's the single place to look, except where an Agent rule below explicitly calls one out (e.g. the skill-design-principles check).
 
@@ -57,7 +57,7 @@ All 6 live in `skills/` here as their canonical source, and install identically 
 - `antu-recall` — Answer questions grounded in a vault's synthesized wiki content, with citations to the pages used
 - `antu-imprint` — Archive a valuable session synthesis as a permanent wiki page in a vault
 - `antu-prune` — Health check a vault: detect dead links, orphan pages, missing provenance, unprocessed sources
-- `antu-handoff` — Snapshot session context into `.cortex/MEMORY.md`; works from any repo, inside or outside a vault
+- `antu-handoff` — Snapshot session context into `.hot/HANDOFF.md`; works from any repo, inside or outside a vault
 - `antu-setup` — Register/deregister a vault in Antu and verify global skills are installed
 
 ## Wiki taxonomy (schema reference for downstream vaults)

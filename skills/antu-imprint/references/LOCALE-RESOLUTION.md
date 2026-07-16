@@ -9,7 +9,7 @@ Skills that generate content stored in the vault must write it in the vault's ow
 Read `locale:` from the vault's entry in `~/.cortex-forge/config.yml`. Use it for all agent-generated content.
 
 If absent, apply in order:
-1. `.cortex/MEMORY.md` title line — look for `— locale: {lang}` in the first heading
+1. `.hot/HANDOFF.md` title line — look for `— locale: {lang}` in the first heading
 2. Default: `en`
 
 Use the first value found. Stop at the first match — do not continue down the chain.

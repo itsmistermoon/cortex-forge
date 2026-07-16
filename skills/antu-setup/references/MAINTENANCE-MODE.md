@@ -11,7 +11,7 @@ Vault "{name}" is already registered. What would you like to do?
   2. Sync from upstream  — pull updated templates from the upstream repo
   3. Set stale-cache threshold — configure hot_cache_stale_days (global, applies to all vaults)
   4. Check skills        — verify all 6 are installed; points to `npx skills add` if not (that's the only installer now)
-  5. Initialize semantic search — build .cortex/db/vault.db for the first time (checks what's available, then offers accordingly)
+  5. Initialize semantic search — build .hot/db/vault.db for the first time (checks what's available, then offers accordingly)
   6. Add post-commit prune    — install the vault-report refresh git hook
   7. Add post-commit reindex  — install the embedding reindex git hook (requires semantic search)
   8. Set as default      — make this vault the default
@@ -35,7 +35,7 @@ For each selected operation, run the corresponding step in sequence. Most steps 
 - 2 → step 3b
 - 3 → step 3c
 - 4 → step 4
-- 5 → step 5, same tailored dependency-check-then-offer procedure as the new-vault wizard. Skip indexing if `.cortex/db/vault.db` already exists (ask user if they want to re-index instead).
+- 5 → step 5, same tailored dependency-check-then-offer procedure as the new-vault wizard. Skip indexing if `.hot/db/vault.db` already exists (ask user if they want to re-index instead).
 - 6 → step 5a (prune)
 - 7 → step 5a (reindex; gate still applies: if vault.db doesn't exist, offer option 5 first)
 - 8 → step 6

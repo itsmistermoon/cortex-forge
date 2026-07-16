@@ -37,7 +37,7 @@ Backgrounded; logs a summary line to `.git/antu-prune.log` each run.
 Ask: "Re-index vault embeddings automatically after each commit? (recommended if semantic search is enabled)"
 
 If yes:
-1. If `.cortex/db/vault.db` doesn't exist, run step 5's dependency-check-then-offer procedure first (don't skip silently) — the case when reached directly via maintenance menu option 7.
+1. If `.hot/db/vault.db` doesn't exist, run step 5's dependency-check-then-offer procedure first (don't skip silently) — the case when reached directly via maintenance menu option 7.
 2. Copy `scripts/antu-reindex-post-commit.sh`, `scripts/antu-index.py`, `scripts/embeddings.py` to `~/.cortex-forge/bin/` (and `bin/hooks/` for the first) if missing or different.
 3. Install:
 

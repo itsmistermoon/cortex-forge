@@ -8,7 +8,7 @@ Reference for `antu-setup` (step 3b, maintenance menu option 2). Pulls updated t
 |---|---|
 | Upstream | `upstream:` in `~/.cortex-forge/config.yml` (default `itsmistermoon/cortex-forge`), ref `upstream_ref:` (default `main`) |
 | Synced | `templates/*.md` only |
-| Never touched | `wiki/`, `.raw/`, `.cortex/`, `AGENTS.md` |
+| Never touched | `wiki/`, `.raw/`, `.hot/`, `AGENTS.md` |
 
 ## Procedure
 

@@ -1,13 +1,13 @@
 ---
 name: antu-handoff
 license: MIT
-description: Snapshot session context into .cortex/MEMORY.md — pending tasks, decisions, and history — so future sessions resume without losing context. Use on "save context", "handoff", or "wrap up".
+description: Snapshot session context into .hot/HANDOFF.md — pending tasks, decisions, and history — so future sessions resume without losing context. Use on "save context", "handoff", or "wrap up".
 argument-hint: "[vault-name] [project-name] [next: <focus>]"
 ---
 
 Start your response with the flavor line `Handing off session...`, translated to the language of the user's current message (Spanish: `Traspasando sesión...`), with nothing before it. Use that same language for every prompt, question, menu, and confirmation this skill produces — persisted vault content (if any) still follows the vault's locale, not the conversation language.
 
-Save a session snapshot to `.cortex/MEMORY.md` in the active repo (the nearest `.git`), so any agent can resume without losing context.
+Save a session snapshot to `.hot/HANDOFF.md` in the active repo (the nearest `.git`), so any agent can resume without losing context.
 
 ## Steps
 
@@ -17,14 +17,18 @@ Save a session snapshot to `.cortex/MEMORY.md` in the active repo (the nearest `
 
    Determine mode: `wiki/` + `AGENTS.md` present → standard mode; otherwise → cross-vault mode.
 
-2. **Prepare state** — create `.cortex/` if it doesn't exist and add it to `.gitignore`. Read `.cortex/MEMORY.md` in full if it exists; on malformed YAML frontmatter, don't stop — read the body as plain text, note the issue in the next `#### Fragile context` entry, and overwrite the frontmatter in step 4.
+2. **Prepare state** — create `.hot/` if it doesn't exist and add it to `.gitignore`. Read `.hot/HANDOFF.md` in full if it exists.
 
-   If `.cortex/PRAXIS.md` exists, remove dated subsections (`### YYYY-MM-DD`) under `## Working context` older than 15 days (never touch `## Permanent`); skip silently if nothing qualifies.
+   Check its frontmatter `suite:` marker:
+   - **`suite: kuyen`, or no marker at all** (this also covers malformed/missing frontmatter — no separate fragile-context path for it anymore): the file wasn't written by Antu last. Archive its entire prior content as one dated entry — verbatim — into `.hot/HISTORY.md` (if it doesn't exist, create it with a one-line header — `# {vault-name} — consolidated history`), then start `HANDOFF.md` fresh in step 4. Note in the final confirmation: "previous HANDOFF.md was Kuyen's (free text) — archived in full, no pending/decisions recovered automatically; check HISTORY.md manually if needed." Skip the per-entry rotation below — there's nothing left in `HANDOFF.md` to rotate.
+   - **`suite: antu`**: proceed with normal per-entry rotation below.
 
-   Rotate `## History` entries older than 15 days out of `.cortex/MEMORY.md`: append each verbatim, oldest-first, to `.cortex/CONSOLIDATED.md` (if it doesn't exist, create it with a one-line header — `# {vault-name} — consolidated history`), then remove it from `MEMORY.md`. Never reorder entries in either file. **Done when:** every History entry older than 15 days has been moved — zero left behind in `MEMORY.md`.
+   If `.hot/PRAXIS.md` exists, remove dated subsections (`### YYYY-MM-DD`) under `## Working context` older than 15 days (never touch `## Permanent`); skip silently if nothing qualifies.
+
+   Rotate `## History` entries older than 15 days out of `.hot/HANDOFF.md`: append each verbatim, oldest-first, to `.hot/HISTORY.md` (if it doesn't exist, create it with a one-line header — `# {vault-name} — consolidated history`), then remove it from `HANDOFF.md`. Never reorder entries in either file. **Done when:** every History entry older than 15 days has been moved — zero left behind in `HANDOFF.md`.
 
 3. **Consider PRAXIS.md updates** — a deliberate judgment call, not an automatic log entry: does this session surface durable operational knowledge (an environment workaround, operator preference, vault-specific convention, recurring failure pattern, or similar) the next agent needs to avoid re-discovering? Classify per the gate in `references/PRAXIS-FORMAT.md`. **Done when:** every candidate insight has been written to the correct zone or explicitly evaluated and rejected — not silently forgotten.
-4. **Write the snapshot** — update Current state and append the History entry in `.cortex/MEMORY.md`, per `references/MEMORY-FORMAT.md`; never modify previous History entries.
+4. **Write the snapshot** — update Current state and append the History entry in `.hot/HANDOFF.md`, per `references/HANDOFF-FORMAT.md` (always write `suite: antu` in the frontmatter); never modify previous History entries.
    - If an argument with `next: <focus>` was provided (e.g., `/antu-handoff next: PostToolUse hook`), mention relevant skills inline and tailor `### Pending` toward the declared next focus.
    - **Vault health triage** — if `wiki/meta/vault-report.json` exists and any of `health.dead_links`, `health.raw_without_source_page`, `health.orphan_pages`, or `health.missing_confidence` is non-empty, add a dated entry to `### Pending` (if full, this takes priority over the least-recent item): `- [ ] Vault health: {N} finding(s) unresolved ({types}) — see wiki/meta/vault-report.json`. If a Pending item for vault health already exists, update its count instead of duplicating; if the report has zero findings and a prior item exists, remove it. Never optional to report — call it out explicitly in the confirmation whenever the report has non-empty findings, don't fold it silently into a generic summary.
 
@@ -49,4 +53,5 @@ After completing the snapshot, confirm:
 1. What changed in `### Pending` (items added, removed, or kept)
 2. What was appended to `## History` (one-line summary of the new entry)
 3. If cross-vault mode ran: which vault page was updated
-4. **State whether the session is safe to end** — say so explicitly: "Safe to end — everything durable from this session is captured" or "Not fully captured: {what's missing and why}" (e.g. malformed frontmatter noted in step 2, a fragile-context item that couldn't be resolved, an ambiguous PRAXIS candidate left unwritten). Do not omit this line even when nothing is wrong — silence should never be read as an implicit "all good."
+4. If step 2 archived a foreign-suite `HANDOFF.md` whole (no `suite: antu` marker found), the note from step 2 — pending items in it weren't recovered automatically
+5. **State whether the session is safe to end** — say so explicitly: "Safe to end — everything durable from this session is captured" or "Not fully captured: {what's missing and why}" (e.g. a fragile-context item that couldn't be resolved, an ambiguous PRAXIS candidate left unwritten). Do not omit this line even when nothing is wrong — silence should never be read as an implicit "all good."

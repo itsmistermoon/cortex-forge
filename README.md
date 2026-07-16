@@ -7,7 +7,7 @@
 Antu is a set of skills you can use to turn raw sources into synthesized, queryable knowledge. Agents operate the vault: they ingest, recall, and maintain. You define what matters and when to persist it.
 
 The system separates two kinds of memory:
-- **Operational memory** — what's happening now and what was decided. Lives in `.cortex/MEMORY.md` (session cache), read by the agent at every session start per `AGENTS.md` instructions. Small, fast, always loaded.
+- **Operational memory** — what's happening now and what was decided. Lives in `.hot/HANDOFF.md` (session cache), read by the agent at every session start per `AGENTS.md` instructions. Small, fast, always loaded.
 - **Knowledge base** — what the vault knows about the world. Lives in `wiki/` (synthesized pages). Large, deep, consulted on demand.
 
 **The skills work from anywhere.** Installed globally, they let you recall knowledge, ingest sources, or snapshot context from any project, in any session, into a vault that lives somewhere else entirely — the vault is a target, addressed by name, not a place you need to be.
@@ -56,7 +56,7 @@ Six layers, each with a distinct role:
 |-------|------|---------|------|
 | **Raw** | `.raw/` | Primary sources — immutable originals | Read-only |
 | **Wiki** | `wiki/` | Secondary sources — synthesized knowledge | Agent writes and maintains |
-| **Hot** | `.cortex/` | Per-project session cache | Read on session start |
+| **Hot** | `.hot/` | Per-project session cache | Read on session start |
 | **Instructions** | `AGENTS.md` | Agent protocols (handoff, ingest, recall) | Read on session start |
 | **Meta** | `wiki/meta/` | Vault metadata and guides | Agent maintains |
 | **Skills** | `skills/` | Invocable agent skills | Extend, don't modify |
@@ -73,7 +73,7 @@ After synthesizing new pages, it scans existing wiki pages and selects those who
 
 ### `/antu-handoff` — Session context
 
-`.cortex/MEMORY.md` extends working memory indefinitely across two zones: a mutable `Current state` (max 5 pending items, max 3 active decisions) and an append-only `History`. The agent reads it on session start per `AGENTS.md` instructions; you invoke `/antu-handoff` at milestones and before closing a session, carrying context forward into the next one. Works from any repo, not just the vault.
+`.hot/HANDOFF.md` extends working memory indefinitely across two zones: a mutable `Current state` (max 5 pending items, max 3 active decisions) and an append-only `History`. The agent reads it on session start per `AGENTS.md` instructions; you invoke `/antu-handoff` at milestones and before closing a session, carrying context forward into the next one. Works from any repo, not just the vault.
 
 ### `/antu-imprint` — Permanent archive
 
@@ -114,7 +114,7 @@ Each page follows: YAML frontmatter + compiled truth + chronological changelog.
 
 Three behaviors are mandatory for any agent operating the vault, defined in `AGENTS.md`:
 
-**Handoff** — before responding to the user, read `.cortex/MEMORY.md` and `AGENTS.md`. After milestones, invoke `/antu-handoff` to snapshot current state and append a history entry.
+**Handoff** — before responding to the user, read `.hot/HANDOFF.md` and `AGENTS.md`. After milestones, invoke `/antu-handoff` to snapshot current state and append a history entry.
 
 **Ingest** — when the user provides a URL, file, or uses words like "ingest" or "process", invoke `/antu-ingest` as the first action.
 
@@ -122,9 +122,9 @@ Three behaviors are mandatory for any agent operating the vault, defined in `AGE
 
 ## Design principles
 
-**One consumption channel, identical everywhere.** `AGENTS.md` mandates reading `.cortex/MEMORY.md` (hard size caps) before the first response, on every agent, with no hook wiring required. The guarantee comes from the protocol itself — unconditional, explicit, and simple enough to follow the same way across any coding agent.
+**One consumption channel, identical everywhere.** `AGENTS.md` mandates reading `.hot/HANDOFF.md` (hard size caps) before the first response, on every agent, with no hook wiring required. The guarantee comes from the protocol itself — unconditional, explicit, and simple enough to follow the same way across any coding agent.
 
-**State and lessons as separate artifacts.** Session-end snapshots capture *state* — pending work, decisions, fragile context. Lessons get a dedicated path: at session end, `/antu-handoff` flags imprint candidates in the history entry, invoked manually with full context; at the next session start, reading `.cortex/MEMORY.md` surfaces that flag and the agent proposes `/antu-imprint` with fresh eyes. Detection happens where context is richest; the decision happens where judgment is freshest.
+**State and lessons as separate artifacts.** Session-end snapshots capture *state* — pending work, decisions, fragile context. Lessons get a dedicated path: at session end, `/antu-handoff` flags imprint candidates in the history entry, invoked manually with full context; at the next session start, reading `.hot/HANDOFF.md` surfaces that flag and the agent proposes `/antu-imprint` with fresh eyes. Detection happens where context is richest; the decision happens where judgment is freshest.
 
 **Memory as an audited surface.** `.raw/` stays immutable, keeping provenance auditable at every point. Ingestion scans foreign content for hidden Unicode, embedded payloads, and egress commands before it enters the vault. The handoff-flags → imprint-proposes step defaults to *suggest*, putting a human approval step between session output and anything becoming ground truth.
 

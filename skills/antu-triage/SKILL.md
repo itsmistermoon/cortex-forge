@@ -2,6 +2,7 @@
 name: antu-triage
 license: MIT
 description: On-demand .hot/ hygiene: PLAYBOOK.md pruning, foreign-suite pending recovery, and Pending/Active decisions validity re-checks. Use when the user asks to clean up, audit, or triage session state.
+argument-hint: ""
 ---
 
 Start your response with the flavor line `Triaging session state...`, translated to the language of the user's current message (Spanish: `Depurando estado de sesión...`), with nothing before it. Use that same language for every prompt, question, menu, and confirmation this skill produces.

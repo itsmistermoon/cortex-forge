@@ -63,7 +63,7 @@ Six layers, each with a distinct role:
 
 ## The Skills
 
-Six skills that map to how knowledge actually moves through a system.
+Seven skills that map to how knowledge actually moves through a system.
 
 ### `/antu-ingest` — Ingest
 

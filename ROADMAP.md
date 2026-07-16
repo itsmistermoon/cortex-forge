@@ -9,12 +9,12 @@ Goal: Hot Cache Protocol working identically across coding agents, via a manual 
 
 ## Phase 2 — Protocol hardening ✓
 
-- [x] `.cortex/` — single mutable zone for session state
-- [x] `MEMORY.md` / `PRAXIS.md` split — session state vs. accumulated conventions (15-day TTL)
+- [x] `.hot/` — single mutable zone for session state
+- [x] `HANDOFF.md` / `PRAXIS.md` split — session state vs. accumulated conventions (15-day TTL)
 - [x] Multi-vault — `~/.cortex-forge/config.yml` with `vaults:` + `default:`; CWD-first resolution
 - [x] Schema versioning — `schema_version: "0.3"` in `AGENTS.md` and all templates
 - [x] `agent:` field in snapshot frontmatter — identifies last writer in multi-agent vaults
-- [x] Stale cache detection — `hot_cache_stale_days:` in config (global); checked at MEMORY.md read time per AGENTS.md protocol
+- [x] Stale cache detection — `hot_cache_stale_days:` in config (global); checked at HANDOFF.md read time per AGENTS.md protocol
 - [x] Compliance guardrails — verifiable contracts in `AGENTS.md`; mandatory output format in `antu-recall`, `antu-ingest`, `antu-handoff`
 - [x] Context fencing in `antu-imprint` — source hierarchy (session > `.raw/` > `wiki/` reference only); circular synthesis test; `raw:` provenance field
 - [x] Link-count scan — orphan page detection in `antu-prune.sh`; `orphan_pages` in `vault-report.json`, surfaced via `AGENTS.md`'s mandatory read protocol
@@ -68,15 +68,15 @@ Reference: `wiki/concepts/skillopt-text-space-optimization.md`
 - [x] `antu-search.py` — KNN two-step; `--top-k`, `--threshold`, `--json` flags (co-located with `antu-setup`)
 - [x] `antu-recall` updated — invokes `antu-search.py` if `vault.db` exists; fallback to index read
 - [x] Post-commit reindex hook — re-indexes only `wiki/` files touched in each commit
-- [x] `.cortex/` fully gitignored
+- [x] `.hot/` fully gitignored
 - [ ] Validate in second vault: initial index + test query + incremental reindex after `antu-ingest`
 - [ ] MCP server — `vault_ingest`, `vault_query`, `vault_imprint`, `session_snapshot`, `vault_prune` — **gate: Stage 1 validated in second vault**. **Distribution:** unlike the skills (installed via `npx skills add`, a static-file installer), an MCP server is a persistent process — the natural fit is publishing it as its own npm package and installing with `npx github:itsmistermoon/antu-mcp` (or `claude mcp add` once published), not through the vault's skills tarball. The [official MCP Registry](https://modelcontextprotocol.io/registry) is still in preview (breaking changes possible before GA) — track it, but don't block the server's launch on it; npm/GitHub distribution works today independent of registry maturity.
 
 ## Phase 4 — Accumulated intelligence
 
-- [x] History archive (simple layer) — entries >15 days → `.cortex/CONSOLIDATED.md` (append-only, not injected at startup)
-- [ ] History archive (structured layer) — when `CONSOLIDATED.md` exceeds N entries, handoff parses to JSON `{ts, agent, trigger, tags, files, decisions, discarded, fragile}`; queryable via `/antu-recall`
-- [ ] Cross-session pattern detection — recurring topics in `.cortex/` that never reach `wiki/`; propose imprint candidates at handoff time
+- [x] History archive (simple layer) — entries >15 days → `.hot/HISTORY.md` (append-only, not injected at startup)
+- [ ] History archive (structured layer) — when `HISTORY.md` exceeds N entries, handoff parses to JSON `{ts, agent, trigger, tags, files, decisions, discarded, fragile}`; queryable via `/antu-recall`
+- [ ] Cross-session pattern detection — recurring topics in `.hot/` that never reach `wiki/`; propose imprint candidates at handoff time
 - [ ] Progressive loading in `antu-recall` — navigate wiki by relevance instead of loading full index at startup
 
 ### `antu-prune` — LRU-based archiving

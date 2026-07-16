@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 antu-search: Semantic search over the vault index.
-Usage: python {vault}/.cortex/db/antu-search.py "query" [--top-k N] [--vault PATH]
-Installed to {vault}/.cortex/db/ by antu-setup. Source co-located with the
+Usage: python {vault}/.hot/db/antu-search.py "query" [--top-k N] [--vault PATH]
+Installed to {vault}/.hot/db/ by antu-setup. Source co-located with the
 antu-recall skill (skills/antu-recall/scripts/).
 """
 import argparse
@@ -15,7 +15,7 @@ from pathlib import Path
 def _resolve_embeddings_dir() -> Path:
     """Find the directory containing embeddings.py — always a sibling of this
     script (co-located with the skill, or copied alongside it into a vault's
-    .cortex/db/ or ~/.cortex-forge/bin/ — either way, always a sibling)."""
+    .hot/db/ or ~/.cortex-forge/bin/ — either way, always a sibling)."""
     here = Path(__file__).parent
     if (here / "embeddings.py").exists():
         return here
@@ -32,18 +32,14 @@ DEFAULT_THRESHOLD = 0.5
 
 def find_vault(start: Path) -> Path:
     for candidate in [start, *start.parents]:
-        # Canonical path (post-migration): .cortex/db/vault.db
-        if (candidate / ".cortex" / "db" / "vault.db").exists():
-            return candidate
-        # Legacy path (pre-migration): .cortex/vault.db
-        if (candidate / ".cortex" / "vault.db").exists():
+        if (candidate / ".hot" / "db" / "vault.db").exists():
             return candidate
     print("ERROR: vault.db not found. Run antu-index first.", file=sys.stderr)
     sys.exit(1)
 
 
-def load_threshold(cortex_dir: Path) -> float:
-    config_path = cortex_dir / "config.json"
+def load_threshold(hot_dir: Path) -> float:
+    config_path = hot_dir / "config.json"
     if config_path.exists():
         cfg = json.loads(config_path.read_text())
         return cfg.get("distance_threshold", DEFAULT_THRESHOLD)
@@ -121,13 +117,12 @@ def main():
     args = parser.parse_args()
 
     vault = Path(args.vault).resolve() if args.vault else find_vault(Path.cwd())
-    cortex_dir = vault / ".cortex"
-    # Canonical path; fall back to legacy .cortex/vault.db for older vaults
-    db_path = (cortex_dir / "db" / "vault.db") if (cortex_dir / "db" / "vault.db").exists() else (cortex_dir / "vault.db")
+    hot_dir = vault / ".hot" / "db"
+    db_path = hot_dir / "vault.db"
     if not db_path.exists():
         print("ERROR: vault.db not found. Run antu-index first.", file=sys.stderr)
         sys.exit(1)
-    threshold = args.threshold if args.threshold is not None else load_threshold(cortex_dir / "db" if (cortex_dir / "db").exists() else cortex_dir)
+    threshold = args.threshold if args.threshold is not None else load_threshold(hot_dir)
 
     emb.load_embedding_model()
     try:

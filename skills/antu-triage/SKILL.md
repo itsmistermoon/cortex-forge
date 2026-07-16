@@ -1,7 +1,7 @@
 ---
 name: antu-triage
 license: MIT
-description: On-demand .hot/ hygiene: PLAYBOOK.md pruning, foreign-suite pending recovery, and Pending/Active decisions validity re-checks. Use when the user asks to clean up, audit, or triage session state.
+description: On-demand .hot/ hygiene; PLAYBOOK.md pruning, foreign-suite pending recovery, and Pending/Active decisions validity re-checks. Use when the user asks to clean up, audit, or triage session state.
 argument-hint: ""
 ---
 
@@ -23,18 +23,7 @@ Deep hygiene pass over `.hot/` in the active repo (the nearest `.git`) — judgm
 
 6. **Deep HISTORY.md cleanup** — scan for near-duplicate archived blocks (overlapping date range, overlapping "What was done" bullets — likely a rotation artifact or repeated re-statement of the same fact). Propose consolidating each pair into one entry. Never auto-apply — merging history is lossy. **Done when:** every archived block has been compared against the others for near-duplication — none left unchecked.
 
-7. **Report** all findings from steps 2–6, grouped by step, each with: what was found, proposed action. Ask whether to proceed with each requires-confirmation item below.
-
-## Auto-correctable (no confirmation needed)
-
-- PLAYBOOK.md `## Working context` entries older than 15 days (step 2) — mechanical TTL rule, no judgment once the date threshold is crossed
-
-## Requires confirmation (never auto-apply)
-
-- Promote or add a `## Permanent` PLAYBOOK.md entry (step 3)
-- Restore a recovered pending/fragile-context item into `HANDOFF.md` (step 4)
-- Remove a stale `### Pending` or `### Active decisions` entry (step 5)
-- Consolidate near-duplicate `HISTORY.md` blocks (step 6)
+7. **Report** all findings from steps 2–6, grouped by step, each with: what was found, proposed action. Ask whether to proceed with each proposal from steps 3–6 — step 2 already ran without asking, since it's a mechanical TTL rule with no judgment call.
 
 ## Trigger
 

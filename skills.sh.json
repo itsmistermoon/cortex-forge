@@ -10,7 +10,8 @@
         "antu-setup",
         "antu-imprint",
         "antu-prune",
-        "antu-recall"
+        "antu-recall",
+        "antu-triage"
       ]
     }
   ]

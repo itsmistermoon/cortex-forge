@@ -51,13 +51,14 @@ Single-context. `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/do
 
 ## Available skills
 
-All 6 live in `skills/` here as their canonical source, and install identically via `npx skills add itsmistermoon/cortex-forge` (`--skill X` for a standalone install).
+All 7 live in `skills/` here as their canonical source, and install identically via `npx skills add itsmistermoon/cortex-forge` (`--skill X` for a standalone install).
 
 - `antu-ingest` — Ingest a URL or file into a vault: saves to `.raw/`, synthesizes wiki pages, updates the index
 - `antu-recall` — Answer questions grounded in a vault's synthesized wiki content, with citations to the pages used
 - `antu-imprint` — Archive a valuable session synthesis as a permanent wiki page in a vault
 - `antu-prune` — Health check a vault: detect dead links, orphan pages, missing provenance, unprocessed sources
 - `antu-handoff` — Snapshot session context into `.hot/HANDOFF.md`; works from any repo, inside or outside a vault
+- `antu-triage` — On-demand `.hot/` hygiene: retrospective PLAYBOOK.md pruning, cross-suite pending recovery, Pending/Active decisions validity re-checks
 - `antu-setup` — Register/deregister a vault in Antu and verify global skills are installed
 
 ## Wiki taxonomy (schema reference for downstream vaults)

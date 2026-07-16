@@ -26,7 +26,7 @@ npx skills add itsmistermoon/cortex-forge
 
 2. See the [Supported Agents table](https://github.com/vercel-labs/skills#supported-agents) to pick the exact flag value per agent.
 
-Skills install unnamespaced: `/antu-ingest`, `/antu-handoff`, `/antu-imprint`, `/antu-recall`, `/antu-prune`, `/antu-setup`.
+Skills install unnamespaced: `/antu-ingest`, `/antu-handoff`, `/antu-imprint`, `/antu-recall`, `/antu-prune`, `/antu-triage`, `/antu-setup`.
 
 ### Option B: Claude Code plugin
 
@@ -43,7 +43,7 @@ Skills install namespaced: `/antu:antu-ingest`, `/antu:antu-handoff`, etc. To te
 
 Run `/antu-setup` (or `/antu:antu-setup`) in your agent — from a fresh git repo or an existing vault. This skill will:
 - Scaffold `wiki/` and a starter `AGENTS.md` if they don't exist yet (asks first — never overwrites an existing vault), detect your locale, and register the vault in `~/.cortex-forge/config.yml`
-- Verify all six skills are actually installed, and tell you to re-run `npx skills add` (or `/plugin update`) if any are missing
+- Verify all seven skills are actually installed, and tell you to re-run `npx skills add` (or `/plugin update`) if any are missing
 - Offer to set up semantic search, with a dependency check that runs before asking
 - Offer optional extras: syncing infrastructure from upstream, a stale-cache warning threshold, and post-commit git hooks for prune/reindex
 - Ask which vault to set as default if more than one is registered
@@ -86,6 +86,10 @@ The agent searches the vault, retrieves relevant pages, and synthesizes a respon
 ### `/antu-prune` — Vault hygiene
 
 Detects orphan pages, dead links, contradictory claims, stale information. Forgetting functions as maintenance: prune removes what weakens the network deliberately, so what remains stays reliable.
+
+### `/antu-triage` — Session-state hygiene
+
+On-demand deep clean of `.hot/` (the active repo's session state, not the vault): retrospective `PLAYBOOK.md` pruning, recovering pending/fragile-context items after a foreign-suite (Kuyen) write, and validity re-checks on existing `### Pending`/`### Active decisions` entries. Mirrors `/antu-prune`'s pattern — a separate hygiene skill, not folded into `/antu-handoff`'s per-session mechanics.
 
 ### `/antu-setup` — Setup and configuration
 
@@ -166,3 +170,4 @@ Skills resolve the vault automatically: if you're inside a registered vault → 
 | `/antu-handoff` | ✅ `/antu-handoff <vault-name> [project-name] [next: <focus>]` |
 | `/antu-imprint` | ✅ `/antu-imprint <vault-name>` |
 | `/antu-prune` | ✅ `/antu-prune <vault-name>` — asks for confirmation before proceeding |
+| `/antu-triage` | ⛔ — resolves the active repo (nearest `.git`), not a vault |

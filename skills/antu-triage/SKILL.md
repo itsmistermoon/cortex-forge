@@ -6,7 +6,7 @@ description: On-demand .hot/ hygiene — retrospective PLAYBOOK.md pruning, reco
 
 Start your response with the flavor line `Triaging session state...`, translated to the language of the user's current message (Spanish: `Depurando estado de sesión...`), with nothing before it. Use that same language for every prompt, question, menu, and confirmation this skill produces.
 
-Deep hygiene pass over `.hot/` in the active repo (the nearest `.git`) — the heavier, judgment-based counterpart to `antu-handoff`'s per-session mechanics. Mirrors the `antu-prune` pattern: a separate, on-demand skill rather than folded into the skill that runs every session close.
+Deep hygiene pass over `.hot/` in the active repo (the nearest `.git`) — judgment-based work that can lag behind the session it concerns, so it runs as its own on-demand pass rather than during a session close.
 
 ## Steps
 
@@ -14,9 +14,9 @@ Deep hygiene pass over `.hot/` in the active repo (the nearest `.git`) — the h
 
 2. **PLAYBOOK.md stale-entry pruning** — if `.hot/PLAYBOOK.md` exists, remove dated subsections (`### YYYY-MM-DD`) under `## Working context` older than 15 days, per `references/PLAYBOOK-FORMAT.md` (never touch `## Permanent`). Skip silently if nothing qualifies. **Done when:** every Working-context entry older than 15 days is gone.
 
-3. **Retrospective PLAYBOOK-candidate re-evaluation** — read the full `## History` in `.hot/HISTORY.md` (not just a recent window) and apply the gate in `references/PLAYBOOK-FORMAT.md` across that whole span: did a pattern recur across multiple past sessions — the same workaround reapplied, the same convention rediscovered — that no single session's fresh-context judgment call (the one `antu-handoff` makes per-session) would have caught? Propose each candidate with the sessions it recurred in as evidence. Never auto-write — always requires confirmation.
+3. **Retrospective PLAYBOOK-candidate re-evaluation** — read the full `## History` in `.hot/HISTORY.md` (not just a recent window) and apply the gate in `references/PLAYBOOK-FORMAT.md` across that whole span: did a pattern recur across multiple past sessions — the same workaround reapplied, the same convention rediscovered — that no single session's fresh-context judgment call would have caught? Propose each candidate with the sessions it recurred in as evidence. Never auto-write — always requires confirmation.
 
-4. **Recover pending/fragile-context after a foreign-suite write** — scan `.hot/HISTORY.md` for whole-block archived entries carrying the cross-suite courtesy notice (`antu-handoff` writes this when it finds `suite: kuyen` or no marker: "previous HANDOFF.md was Kuyen's (free text) — archived in full, no pending/decisions recovered automatically"). For each, read the archived block and extract anything that reads like an unresolved pending item or context a next session would need. Propose restoring it into `.hot/HANDOFF.md`'s `### Pending`, respecting the 5-item cap in `references/HANDOFF-FORMAT.md`. Never auto-apply.
+4. **Recover pending/fragile-context after a foreign-suite write** — scan `.hot/HISTORY.md` for whole-block archived entries carrying this courtesy notice: "previous HANDOFF.md was Kuyen's (free text) — archived in full, no pending/decisions recovered automatically". For each, read the archived block and extract anything that reads like an unresolved pending item or context a next session would need. Propose restoring it into `.hot/HANDOFF.md`'s `### Pending`, respecting the 5-item cap in `references/HANDOFF-FORMAT.md`. Never auto-apply.
 
 5. **Validity re-check on existing Pending/Active decisions** — for each item in `.hot/HANDOFF.md`'s `### Pending` and `### Active decisions`, cross-reference later `## History` entries and current repo state (e.g. does a referenced file/path still exist, does a later entry mention it was resolved) to judge whether it's stale. Propose removing stale items; leave live ones untouched.
 

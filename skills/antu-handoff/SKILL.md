@@ -53,5 +53,5 @@ After completing the snapshot, confirm:
 1. What changed in `### Pending` (items added, removed, or kept)
 2. What was appended to `## History` (one-line summary of the new entry)
 3. If cross-vault mode ran: which vault page was updated
-4. If step 2 archived a foreign-suite `HANDOFF.md` whole (no `suite: antu` marker found), the note from step 2 — pending items in it weren't recovered automatically
+4. If step 2 archived a foreign-suite `HANDOFF.md` whole (no `suite: antu` marker found), repeat that note here — pending items in it weren't recovered automatically
 5. **State whether the session is safe to end** — say so explicitly: "Safe to end — everything durable from this session is captured" or "Not fully captured: {what's missing and why}" (e.g. a fragile-context item that couldn't be resolved, an ambiguous PRAXIS candidate left unwritten). Do not omit this line even when nothing is wrong — silence should never be read as an implicit "all good."

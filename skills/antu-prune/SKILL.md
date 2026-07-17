@@ -24,7 +24,7 @@ Paths are relative to this skill's directory.
 
    **Confirmation gate:** if the vault was resolved from an explicit argument (not from CWD), confirm with the user before proceeding: "About to prune `{vault-name}` at `{path}`. Continue?" — do not proceed until confirmed.
 
-2. **Layer 1 — Structural check**: Run `bash scripts/antu-prune.sh {vault}`. If the script is missing, the skill installation is incomplete — reinstall with `npx skills add itsmistermoon/cortex-forge --skill antu-prune` (or `/antu-setup`, sub-task `skills`).
+2. **Layer 1 — Structural check**: Run `bash scripts/antu-prune.sh {vault}`. If the script is missing, the skill installation is incomplete — run `/antu-setup`, sub-task `skills`, to reinstall.
 
 3. **Layer 2 — Semantic analysis**: Run the semantic checks below (L2a–L2e) — read the actual pages, never reason about relationships from memory alone.
 

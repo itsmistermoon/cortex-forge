@@ -208,6 +208,30 @@ for shared_doc in VAULT-RESOLUTION.md LOCALE-RESOLUTION.md HANDOFF-FORMAT.md PLA
 done
 
 # ---------------------------------------------------------------------------
+# 9. Distribution manifests agree on the skill roster
+# ---------------------------------------------------------------------------
+# skills.sh.json (npx skills add) and .claude-plugin/plugin.json (Claude Code
+# plugin marketplace) each list every skill in this suite independently —
+# nothing enforced they stay in sync, and antu-triage was missing from
+# plugin.json for a while as a result. Compare both against the actual
+# skills/*/ directories on disk, the real source of truth.
+check "skill-list-manifests-agree"
+REPO_ROOT="$(dirname "$SKILLS_DIR")"
+_on_disk=$(basename -a "$SKILLS_DIR"/*/ | sort)
+_skills_sh=$(jq -r '.groupings[].skills[]' "$REPO_ROOT/skills.sh.json" | sort)
+_plugin=$(jq -r '.skills[]' "$REPO_ROOT/.claude-plugin/plugin.json" | sed 's#^\./skills/##' | sort)
+if [[ "$_on_disk" == "$_skills_sh" ]]; then
+  ok "skills.sh.json matches skills/*/ on disk"
+else
+  fail "skills.sh.json roster differs from skills/*/ on disk — diff:$(diff <(echo "$_on_disk") <(echo "$_skills_sh") | tr '\n' ' ')"
+fi
+if [[ "$_on_disk" == "$_plugin" ]]; then
+  ok ".claude-plugin/plugin.json matches skills/*/ on disk"
+else
+  fail ".claude-plugin/plugin.json roster differs from skills/*/ on disk — diff:$(diff <(echo "$_on_disk") <(echo "$_plugin") | tr '\n' ' ')"
+fi
+
+# ---------------------------------------------------------------------------
 # Summary
 # ---------------------------------------------------------------------------
 echo ""

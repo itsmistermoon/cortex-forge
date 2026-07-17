@@ -16,6 +16,7 @@
     "./skills/antu-setup",
     "./skills/antu-imprint",
     "./skills/antu-prune",
-    "./skills/antu-recall"
+    "./skills/antu-recall",
+    "./skills/antu-triage"
   ]
 }

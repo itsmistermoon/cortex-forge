@@ -20,7 +20,7 @@ Paths are relative to this skill's directory.
 
 ## Steps
 
-1. **Resolve vault** — per `references/VAULT-RESOLUTION.md`. If the first argument matches a registered vault name (e.g., `/antu-prune personal`), use that vault.
+1. **Resolve vault** — per `~/.cortex-forge/references/VAULT-RESOLUTION.md` (synced by `/antu-setup` — if missing, run `/antu-setup` first). If the first argument matches a registered vault name (e.g., `/antu-prune personal`), use that vault.
 
    **Confirmation gate:** if the vault was resolved from an explicit argument (not from CWD), confirm with the user before proceeding: "About to prune `{vault-name}` at `{path}`. Continue?" — do not proceed until confirmed.
 

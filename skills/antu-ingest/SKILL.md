@@ -23,7 +23,7 @@ Paths are relative to this skill's directory.
 
 ## Steps
 
-1. **Resolve vault** — per `references/VAULT-RESOLUTION.md`, then its `locale:` per `references/LOCALE-RESOLUTION.md`. If the first argument matches a registered vault name (e.g., `/antu-ingest second-brain <url>`), use that vault and treat the remaining argument as the URL or file path.
+1. **Resolve vault** — per `~/.cortex-forge/references/VAULT-RESOLUTION.md`, then its `locale:` per `~/.cortex-forge/references/LOCALE-RESOLUTION.md` (both synced by `/antu-setup` — if either is missing, run `/antu-setup` first). If the first argument matches a registered vault name (e.g., `/antu-ingest second-brain <url>`), use that vault and treat the remaining argument as the URL or file path.
 
 2. **Download or read** — input is a URL, a `.raw/` file path, or pasted text:
    - URL → fetch content, run the **SPA check** and the **sanitization check** below, then save to `{vault}/.raw/{slug}.md` (never overwrite if exists).

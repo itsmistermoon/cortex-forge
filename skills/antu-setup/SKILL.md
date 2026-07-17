@@ -76,7 +76,7 @@ Always end with the relevant subset of ## Output format.
    - Preserve all existing vault entries — never overwrite other vaults — and all other top-level keys (`upstream:`, `upstream_ref:`, `imprint_triage:`, `hot_cache_stale_days:`, etc.) unchanged. Read the full file, merge in the new vault entry, and write back the whole document — never reconstruct it from only the fields this step cares about.
    - If this is the first vault registered, set it as `default`. If a `default` already exists, leave it unchanged.
 
-3b. **Sync infrastructure from upstream** — pull infrastructure files from the upstream repo and apply them to the current vault. See `references/UPSTREAM-SYNC.md` for resolution, sync scope, exclusions, and rate limits.
+3b. **Sync infrastructure from upstream** — pull infrastructure files from the upstream repo: vault templates into the current vault, and shared skill references into `~/.cortex-forge/references/` (global, once per machine). See `references/UPSTREAM-SYNC.md` for resolution, sync scope, exclusions, and rate limits.
 
    - **If this is a new vault (scaffolded in step 1)** → proceed without asking — templates are part of the scaffolding the user already confirmed.
    - **If this is an existing vault** → ask before updating templates, per UPSTREAM-SYNC.md step 4.

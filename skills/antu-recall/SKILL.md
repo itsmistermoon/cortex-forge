@@ -21,7 +21,7 @@ Paths are relative to this skill's directory.
 
 ## Steps
 
-1. **Resolve vault** — per `references/VAULT-RESOLUTION.md`. If the first argument matches a registered vault name (e.g., `/antu-recall second-brain <query>`), use that vault; treat the remaining text as the query.
+1. **Resolve vault** — per `~/.cortex-forge/references/VAULT-RESOLUTION.md` (synced by `/antu-setup` — if missing, run `/antu-setup` first). If the first argument matches a registered vault name (e.g., `/antu-recall second-brain <query>`), use that vault; treat the remaining text as the query.
 
 2. **Identify relevant pages** — prefer semantic search if the index is available:
    - If `{vault}/.hot/db/vault.db` (canonical) or `{vault}/.hot/vault.db` (legacy) exists: run `scripts/antu-search.py --vault {vault} "{query}" --top-k 8 --json`, and use the returned chunks (path + heading + content) as the primary source set.

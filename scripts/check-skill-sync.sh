@@ -152,17 +152,16 @@ for skill_dir in "$SKILLS_DIR"/*/; do
 done
 
 # ---------------------------------------------------------------------------
-# 7. Intentionally-duplicated files stay in sync across skills
+# 7. Intentionally-duplicated scripts stay in sync across skills
 # ---------------------------------------------------------------------------
 # embeddings.py and antu-index.py are deliberately co-located in more than
 # one skill (each skill must be independently installable and must never
 # execute a script found inside the vault — see wiki/concepts/agent-hook-compatibility.md
-# and the 2026-07-03 E006 fix). LOCALE-RESOLUTION.md is duplicated for the
-# same independent-installability reason (fixed 2026-07-03 — it previously
-# lived one level up at skills/, outside every skill dir, so it was never
-# actually installed by `npx skills add --skill X`). That duplication only
-# stays safe if the copies never silently diverge — this check makes drift
-# a CI failure instead of a silent bug.
+# and the 2026-07-03 E006 fix: a shared bin/ was rejected there because
+# executing code from a shared/vault-adjacent location was the actual
+# security problem, not just an installability inconvenience). That
+# duplication only stays safe if the copies never silently diverge — this
+# check makes drift a CI failure instead of a silent bug.
 check "duplicated-script-sync"
 _check_synced() {  # $1: subdir ("scripts" or "references"), $2: filename, $3..$N: skill names that must match
   local subdir="$1" script="$2"; shift 2
@@ -181,8 +180,32 @@ _check_synced() {  # $1: subdir ("scripts" or "references"), $2: filename, $3..$
 }
 _check_synced "scripts" "embeddings.py" antu-setup antu-recall antu-ingest
 _check_synced "scripts" "antu-index.py" antu-setup antu-ingest
-_check_synced "references" "LOCALE-RESOLUTION.md" antu-ingest antu-handoff antu-imprint
-_check_synced "references" "VAULT-RESOLUTION.md" antu-ingest antu-handoff antu-imprint antu-prune antu-recall
+
+# ---------------------------------------------------------------------------
+# 8. Shared reference docs live only at references/, never re-duplicated
+# ---------------------------------------------------------------------------
+# VAULT-RESOLUTION.md, LOCALE-RESOLUTION.md, HANDOFF-FORMAT.md, and
+# PLAYBOOK-FORMAT.md used to be duplicated per-skill (same reason as
+# duplicated-script-sync above), but that only applied to the installability
+# concern, not the E006 security concern — these are inert docs, nothing
+# executes them. Moved to a single canonical copy at references/ (repo root),
+# synced by antu-setup into ~/.cortex-forge/references/ (see
+# skills/antu-setup/references/UPSTREAM-SYNC.md). This check guards against
+# a skill silently re-introducing a local copy that could drift.
+check "no-reintroduced-reference-duplicates"
+for shared_doc in VAULT-RESOLUTION.md LOCALE-RESOLUTION.md HANDOFF-FORMAT.md PLAYBOOK-FORMAT.md; do
+  found=""
+  for skill_dir in "$SKILLS_DIR"/*/; do
+    name=$(basename "$skill_dir")
+    f="$skill_dir/references/$shared_doc"
+    [[ -f "$f" ]] && found="$found $name"
+  done
+  if [[ -n "$found" ]]; then
+    fail "$shared_doc: re-duplicated locally in:$found — should be removed and referenced from ~/.cortex-forge/references/ instead"
+  else
+    ok "$shared_doc: no local copies re-introduced"
+  fi
+done
 
 # ---------------------------------------------------------------------------
 # Summary

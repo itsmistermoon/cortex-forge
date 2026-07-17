@@ -16,4 +16,4 @@ Apply in order:
 
 ## Validate vault structure
 
-After resolving the vault path, confirm it is a valid Antu vault: the path must contain both `wiki/` and `AGENTS.md`. If either is missing, stop and tell the user the resolved path does not look like a Antu vault — do not proceed to read `AGENTS.md` fields or attempt any vault operation.
+After resolving the vault path, confirm it is a valid Antu vault: the path must contain both `wiki/` and `AGENTS.md`. If either is missing, stop and tell the user the resolved path does not look like an Antu vault — do not proceed to read `AGENTS.md` fields or attempt any vault operation.

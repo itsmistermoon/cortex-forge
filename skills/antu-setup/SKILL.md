@@ -78,8 +78,8 @@ Always end with the relevant subset of ## Output format.
 
 3b. **Sync infrastructure from upstream** — pull infrastructure files from the upstream repo: vault templates into the current vault, and shared skill references into `~/.cortex-forge/references/` (global, once per machine). See `references/UPSTREAM-SYNC.md` for resolution, sync scope, exclusions, and rate limits.
 
-   - **If this is a new vault (scaffolded in step 1)** → proceed without asking — templates are part of the scaffolding the user already confirmed.
-   - **If this is an existing vault** → ask before updating templates, per UPSTREAM-SYNC.md step 4.
+   - **Vault templates** — if this is a new vault (scaffolded in step 1), proceed without asking (templates are part of the scaffolding the user already confirmed); if existing, ask before updating, per UPSTREAM-SYNC.md step 4.
+   - **Global shared references** (`~/.cortex-forge/references/`) — always ask before writing, new vault or not. Confirming local vault scaffolding is not consent to write machine-global files that affect every other vault. See UPSTREAM-SYNC.md step 4.
 
 3c. **Offer stale-cache warning threshold (opt-in, global setting)** — this is a single global value in `~/.cortex-forge/config.yml` (top-level, like `imprint_triage`), not per-vault. Read the config first:
     - **If `hot_cache_stale_days:` is already set** → inform the user of the current value and ask if they want to change it, rather than asking as if for the first time.

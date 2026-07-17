@@ -16,9 +16,12 @@ Reference for `antu-setup` (step 3b, maintenance menu option 2). Pulls updated t
 
 1. One API call: `GET https://api.github.com/repos/{upstream}/git/trees/{upstream_ref}?recursive=1`, filtered to scope (both `templates/` and `references/` prefixes — one call covers both).
 2. Fetch each matching file's raw content, diff against local (`templates/*.md` against `{vault}/templates/`, `references/*.md` against `~/.cortex-forge/references/`). Skip identical files silently.
-3. Collect all differing/missing files into one list, grouped by destination — never write per-diff.
-4. Empty list → report "templates and shared references up to date", stop this procedure (return to whichever step called it — the new-vault wizard continues to its next step, a maintenance-menu run continues to any other selected option). Otherwise show the list and ask once: "Update {N} file(s) from {upstream}?" Write only on confirmation; on decline, write nothing. Create `~/.cortex-forge/references/` if it doesn't exist yet.
-5. Files present locally but gone upstream: report and ask per-file (or once for all) before deleting.
+3. Collect differing/missing files into two lists, one per destination — never write per-diff.
+4. Confirmation is per destination, not combined — writing to the vault and writing machine-global files are different-consent decisions:
+   - **Templates list** (`{vault}/templates/`): empty → report "templates up to date". New vault (scaffolded in step 1) → write without asking, part of the scaffolding already confirmed. Existing vault → ask once: "Update {N} template(s) from {upstream}?"; write only on confirmation.
+   - **References list** (`~/.cortex-forge/references/`): empty → report "shared references up to date". Always ask once, new vault or not: "Update {N} shared reference file(s) from {upstream}? These are global and affect every vault on this machine, not just this one." Write only on confirmation; create `~/.cortex-forge/references/` if it doesn't exist yet.
+   - After both are resolved, return to whichever step called this procedure (the new-vault wizard continues to its next step, a maintenance-menu run continues to any other selected option).
+5. Files present locally but gone upstream: report and ask per-file (or once for all) before deleting, per destination.
 
 ## Rate limits
 

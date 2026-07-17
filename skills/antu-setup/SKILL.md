@@ -17,6 +17,7 @@ Paths are relative to this skill's directory.
 - **`scripts/antu-index.py`** — Builds/refreshes `.hot/db/vault.db` when semantic search is enabled (step 5); also copied to `~/.cortex-forge/bin/` for the post-commit reindex hook (step 5a)
 - **`scripts/embeddings.py`** — Shared embedding backend, imported by `antu-index.py`; not invoked directly
 - **`scripts/antu-reindex-post-commit.sh`** — Copied to `~/.cortex-forge/bin/hooks/` and wired into `{vault}/.git/hooks/post-commit` (step 5a)
+- **`scripts/tags-audit.py`** — Runs a tags audit on a vault (maintenance menu option 10); optionally writes a dated snapshot under `wiki/meta/`
 
 ## Sub-tasks
 
@@ -85,8 +86,8 @@ Always end with the relevant subset of ## Output format.
     - Write the chosen value as `hot_cache_stale_days: N` at the top level of `config.yml` (not nested under `vaults:`).
     - This is read by the `AGENTS.md` Handoff protocol (step 2) to compare against `HANDOFF.md`'s `updated:` frontmatter.
 
-4. **Verify global skills are installed** — check each of the 6 skills (`antu-handoff`, `antu-setup`, `antu-recall`, `antu-ingest`, `antu-imprint`, `antu-prune`) individually for presence under `~/.agents/skills/` — do not assume presence just because this skill is running.
-   - **All present** → report which 6 skills are present and move on.
+4. **Verify global skills are installed** — check each of the 7 skills (`antu-handoff`, `antu-setup`, `antu-recall`, `antu-ingest`, `antu-imprint`, `antu-prune`, `antu-triage`) individually for presence under `~/.agents/skills/` — do not assume presence just because this skill is running.
+   - **All present** → report which 7 skills are present and move on.
    - **Some missing** — do not attempt to install them yourself. Tell the user:
      > Missing skills: {list}. Install them with:
      > ```
@@ -109,7 +110,7 @@ Always end with the relevant subset of ## Output format.
 Confirm:
 - Scaffold (if run): what was created (`wiki/` structure, `AGENTS.md` stub, `wiki/meta/tags.md`) — remind the user to fill in `AGENTS.md`'s "Vault identity" section themselves
 - Registered vaults: list all entries in `vaults:` with their paths and locales, marking the default
-- Skills: all 6 present / missing {list} (with the `npx skills add` command to fix it)
+- Skills: all 7 present / missing {list} (with the `npx skills add` command to fix it)
 - Semantic search: active (backend: Ollama/mlx-embeddings/sentence-transformers, N chunks indexed) / not active (declined or skipped — how to enable later)
 - Stale-cache threshold (if set/changed): `hot_cache_stale_days` value, or "default (15)" if left unset
 - Sync (if run): upstream used, files updated (list), files skipped (count), deletions pending user confirmation

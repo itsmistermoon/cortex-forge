@@ -43,7 +43,7 @@ Paths are relative to this skill's directory.
 
 3. **Synthesize** — evaluate the source against the type criteria in `## Page types` below and create pages for every qualifying type. **Done when:** every content type (concept, entity, project) that meets its creation criteria has a page — zero qualifying types skipped. If a topic is borderline, evaluate it rather than skipping.
 
-4. Update `{vault}/wiki/index.md` with new pages.
+4. **Update index and log** — update `{vault}/wiki/index.md` with new pages, and add an entry to `{vault}/wiki/meta/log.md` per page created or updated: `**[YYYY-MM-DD] ingest** | {title}`.
 
 5. **Project linking** — check `{vault}/wiki/projects/` for active projects whose `domains:` match the source; propose the update before writing.
 

@@ -36,7 +36,7 @@ The synthesis must derive from one of these, in order:
 
 ## Provenance
 
-Create the page using the corresponding template (step 4) — all frontmatter fields come from the template. Populate `sources:` with `conversation {YYYY-MM-DD}`, plus `.raw/{slug}.md` if a primary source was involved (preferred over `wiki/sources/{slug}.md`). Populate `raw:` only when the imprint directly synthesizes a specific primary source.
+Create the page using the corresponding template (step 4) — all frontmatter fields come from the template. `sources:` holds only `wiki/...` page links, matching `antu-ingest` and `antu-prune`'s schema — leave it empty if the synthesis has no such backing page, never populate it with `.raw/` paths or `conversation {date}`. Populate `raw:` with `.raw/{slug}.md` when the imprint directly synthesizes a specific primary source not yet ingested as a wiki page; leave both `sources:` and `raw:` empty when the content originates purely from session reasoning or decisions with no artifact behind it.
 
 **`confidence` criteria:**
 - `high` — conclusion derived from a primary source or exhaustive evidence-based analysis

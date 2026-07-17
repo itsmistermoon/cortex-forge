@@ -3,6 +3,7 @@ name: antu-setup
 license: MIT
 compatibility: Requires git and npx (Node.js); python3 only for optional semantic search
 description: Register or deregister the current vault in Antu and verify global skills are installed. Run from inside a vault directory.
+disable-model-invocation: true
 argument-hint: "Optional sub-task: embeddings | skills | sync | vaults"
 ---
 

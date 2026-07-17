@@ -1,7 +1,8 @@
 ---
 name: antu-recall
 license: MIT
-description: Answer questions from the vault wiki as the source of truth — never training knowledge — with page citations. Use on "what do I know about X" or any topic the vault may cover, even if you know it.
+description: Answer questions from the vault wiki as the source of truth — never training knowledge — with page citations.
+disable-model-invocation: true
 argument-hint: "[vault-name] <query>"
 ---
 

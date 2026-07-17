@@ -1,7 +1,8 @@
 ---
 name: antu-triage
 license: MIT
-description: On-demand .hot/ hygiene — PLAYBOOK.md pruning, foreign-suite pending recovery, and Pending/Active decisions validity re-checks. Use when the user asks to clean up, audit, or triage session state.
+description: On-demand .hot/ hygiene — PLAYBOOK.md pruning, foreign-suite pending recovery, and Pending/Active decisions validity re-checks.
+disable-model-invocation: true
 argument-hint: ""
 ---
 

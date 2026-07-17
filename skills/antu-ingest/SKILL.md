@@ -2,7 +2,8 @@
 name: antu-ingest
 license: MIT
 compatibility: Requires rg and jq for the credential sanitization check (fails open without them); python3 only for optional semantic indexing
-description: Ingest a URL, file, or pasted text into the vault — saves to .raw/, synthesizes wiki pages, updates the index. Use on "ingest this", "add to the vault", or a bare URL; --research finds web sources.
+description: Ingest a URL, file, or pasted text into the vault — saves to .raw/, synthesizes wiki pages, updates the index; --research finds web sources.
+disable-model-invocation: true
 argument-hint: "[vault-name] <url-or-file> | --research \"<query>\" [--rounds N]"
 ---
 

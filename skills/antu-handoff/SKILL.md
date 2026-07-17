@@ -1,7 +1,8 @@
 ---
 name: antu-handoff
 license: MIT
-description: Snapshot session context into .hot/HANDOFF.md — pending tasks, decisions, and history — so future sessions resume without losing context. Use on "save context", "handoff", or "wrap up".
+description: Snapshot session context into .hot/HANDOFF.md — pending tasks, decisions, and history — so future sessions resume without losing context.
+disable-model-invocation: true
 argument-hint: "[vault-name] [project-name] [next: <focus>]"
 ---
 

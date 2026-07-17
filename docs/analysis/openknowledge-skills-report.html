@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpenKnowledge vs Antu/Kuyen — Análisis de skills</title>
+<style>
+  :root {
+    --bg: #0e1117; --panel: #161b26; --panel2: #1c2333; --border: #2a3348;
+    --text: #dbe2f0; --muted: #8b96ad; --accent: #5eb0ff; --ok: #7ee2a8;
+    --antu: #ffb86b; --kuyen: #d7a6ff; --warn: #ff7d90; --chip: #232c40;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font: 15px/1.6 -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 22px 80px; }
+  header h1 { font-size: 27px; letter-spacing: -.5px; }
+  header p.sub { color: var(--muted); margin-top: 6px; max-width: 860px; }
+  .statgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap: 12px; margin: 22px 0 8px; }
+  .stat { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+  .stat .n { font-size: 26px; font-weight: 700; }
+  .stat .l { color: var(--muted); font-size: 12.5px; }
+  .stat.ok .n { color: var(--ok); } .stat.antu .n { color: var(--antu); } .stat.kuyen .n { color: var(--kuyen); }
+
+  nav.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 26px 0 20px; position: sticky; top: 0; background: var(--bg); padding: 10px 0; z-index: 5; border-bottom: 1px solid var(--border); }
+  nav.tabs button { background: var(--panel); color: var(--muted); border: 1px solid var(--border); border-radius: 20px; padding: 7px 15px; cursor: pointer; font-size: 13.5px; font-weight: 600; }
+  nav.tabs button.active { background: var(--accent); color: #08101e; border-color: var(--accent); }
+  section.tab { display: none; } section.tab.active { display: block; animation: fade .18s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px);} to { opacity: 1; transform: none; } }
+
+  h2 { font-size: 20px; margin: 8px 0 14px; }
+  h3 { font-size: 16px; margin: 22px 0 10px; color: var(--accent); }
+  p + p { margin-top: 10px; }
+  .note { background: var(--panel); border-left: 3px solid var(--accent); border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 14px 0; color: var(--text); }
+  .note.w { border-left-color: var(--warn); }
+  code { background: var(--chip); padding: 1.5px 6px; border-radius: 5px; font-size: 13px; font-family: "SF Mono", Menlo, monospace; }
+
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .filters button { background: var(--chip); color: var(--muted); border: 1px solid var(--border); border-radius: 16px; padding: 5px 13px; cursor: pointer; font-size: 12.5px; }
+  .filters button.on { color: #fff; border-color: var(--accent); background: #24406b; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px,1fr)); gap: 14px; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 15px 17px; cursor: pointer; transition: border-color .15s; }
+  .card:hover { border-color: var(--accent); }
+  .card h4 { font-size: 14.5px; font-family: "SF Mono", Menlo, monospace; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .badge { font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 10px; letter-spacing: .3px; }
+  .b-okcore { background: #14352a; color: var(--ok); } .b-okpack { background: #0f2e3d; color: #6fd3e8; }
+  .b-antu { background: #3b2a12; color: var(--antu); } .b-kuyen { background: #31204a; color: var(--kuyen); }
+  .b-model { background: #1e2c4d; color: #9fc3ff; } .b-user { background: #3a2233; color: #ff9ec6; }
+  .card .role { color: var(--muted); font-size: 13px; margin: 7px 0 0; }
+  .card .detail { display: none; margin-top: 10px; border-top: 1px dashed var(--border); padding-top: 10px; font-size: 13px; }
+  .card.open .detail { display: block; }
+  .card .detail b { color: var(--accent); }
+  .card .meta { display: flex; gap: 14px; margin-top: 9px; color: var(--muted); font-size: 11.5px; }
+  .tags { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 5px; }
+  .tag { background: var(--chip); color: var(--muted); font-size: 10.5px; padding: 2px 8px; border-radius: 9px; }
+
+  table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 13.5px; }
+  th, td { border: 1px solid var(--border); padding: 9px 12px; text-align: left; vertical-align: top; }
+  th { background: var(--panel2); font-size: 12.5px; text-transform: uppercase; letter-spacing: .4px; color: var(--muted); }
+  td.y { color: var(--ok); } td.n { color: var(--warn); } td.p { color: var(--antu); }
+
+  .barrow { display: grid; grid-template-columns: 210px 1fr 90px; gap: 10px; align-items: center; margin: 7px 0; font-size: 13px; }
+  .bartrack { background: var(--chip); border-radius: 6px; height: 16px; overflow: hidden; }
+  .barfill { height: 100%; border-radius: 6px; transition: width .6s ease; }
+  .svgbox { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 10px; overflow-x: auto; margin: 12px 0; }
+  svg text { font-family: "SF Mono", Menlo, monospace; }
+  .legend { display: flex; gap: 18px; flex-wrap: wrap; color: var(--muted); font-size: 12px; margin: 6px 4px; }
+  .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; }
+  .cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; } @media (max-width: 860px){ .cols2 { grid-template-columns: 1fr; } }
+  .quote { font-family: "SF Mono", Menlo, monospace; font-size: 12px; background: var(--panel2); border-radius: 8px; padding: 10px 13px; margin: 8px 0; color: #b9c6e0; white-space: pre-wrap; }
+  ul.tight { margin: 8px 0 8px 20px; } ul.tight li { margin: 5px 0; }
+  .verdict { background: linear-gradient(135deg, #16233c, #1b1930); border: 1px solid #35507e; border-radius: 14px; padding: 18px 22px; margin: 18px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>OpenKnowledge (Inkeep) — análisis de skills y comparación con Antu/Kuyen</h1>
+  <p class="sub">Análisis de las 12 skills (4 núcleo + 8 packs) y 16 references de <code>inkeep/open-knowledge</code>
+  (<code>packages/server/assets/skills</code>), contrastadas con las 7 skills de Antu y las 4 de Kuyen. Generado el 2026-07-17.</p>
+  <div class="statgrid">
+    <div class="stat ok"><div class="n">12 + 16</div><div class="l">Skills OK + references (~19.900 palabras)</div></div>
+    <div class="stat antu"><div class="n">7</div><div class="l">Skills Antu (~7.700 palabras + 13 refs + 10 scripts)</div></div>
+    <div class="stat kuyen"><div class="n">4</div><div class="l">Skills Kuyen (~1.600 palabras, cero scripts/refs)</div></div>
+    <div class="stat"><div class="n">100% / 0%</div><div class="l">OK model-invoked vs Antu/Kuyen (todas user-only)</div></div>
+  </div>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button data-t="panorama" class="active">Panorama</button>
+  <button data-t="explorer">Explorador de skills</button>
+  <button data-t="relaciones">Arquitectura y relaciones</button>
+  <button data-t="estilo">Estilo de redacción</button>
+  <button data-t="cobertura">Cobertura de tareas</button>
+  <button data-t="duplicados">Duplicados y especialización</button>
+  <button data-t="comparacion">Comparación final</button>
+  <button data-t="hallazgos">Hallazgos extra</button>
+</nav>
+
+<!-- ══════════ PANORAMA ══════════ -->
+<section class="tab active" id="panorama">
+  <h2>Qué es la suite de skills de OpenKnowledge</h2>
+  <p>OpenKnowledge es una plataforma de colaboración markdown-CRDT: convierte un directorio de <code>.md</code>/<code>.mdx</code>
+  en una base de conocimiento multi-escritor en tiempo real, expuesta vía un <b>servidor MCP con 20 herramientas</b>
+  (<code>exec</code>, <code>search</code>, <code>write</code>, <code>edit</code>, <code>lint</code>, <code>workflow</code>…).
+  Sus skills no son la funcionalidad — son el <b>contrato de uso</b> que gobierna cómo un agente debe usar esas herramientas.</p>
+
+  <h3>Arquitectura en tres niveles + dos utilitarias</h3>
+  <ul class="tight">
+    <li><b>Nivel descubrimiento</b> — <code>open-knowledge-discovery</code>: qué es OK, cómo instalarlo (<code>ok init</code>), compartirlo, abrir archivos sueltos. Su description prohíbe explícitamente usarla para leer/escribir ("Do NOT load to perform reads/writes") y delega al nivel siguiente.</li>
+    <li><b>Nivel plataforma</b> — <code>open-knowledge</code> (la skill "project"): el contrato de runtime autoritativo. Instalada por <code>ok init</code> como skill project-local. Es un router: 133 líneas de MUSTs + tabla de 20 herramientas + 14 references de profundidad cargadas bajo demanda.</li>
+    <li><b>Nivel packs</b> — 8 skills instaladas por <code>ok seed --pack X</code>, una por "forma de vault" (wiki de código, CRM personal, base de conocimiento, notas planas, ciclo de vida de software, worldbuilding, pipeline de escritura, formato OKF). Todas repiten el mismo pie: <i>"Complements the platform skill; does not replace it"</i> — se apilan sobre el contrato, nunca lo sustituyen.</li>
+    <li><b>Utilitarias</b> — <code>bug-report</code> (diagnóstico vía CLI) y <code>write-skill</code> (meta-skill: cómo escribir skills, con evaluación RED/GREEN y pressure-testing).</li>
+  </ul>
+
+  <h3>Las cinco decisiones de diseño que definen la suite</h3>
+  <ul class="tight">
+    <li><b>Model-invoked por diseño.</b> Ninguna skill es user-only: todas confían en que su <code>description</code> (377–691 caracteres, optimizada como gatillo) dispare la carga automática. Tienen un reference completo (<code>description-optimization.md</code>) dedicado a esta ingeniería.</li>
+    <li><b>La lógica vive en el servidor, no en el prompt.</b> Lint, auditoría de links, guías de workflow, plantillas: todo son herramientas MCP. Las skills solo enseñan cuándo y cómo llamarlas.</li>
+    <li><b>Regla STOP como columna vertebral:</b> prohibido usar herramientas nativas (<code>Read</code>/<code>Grep</code>/<code>Edit</code>/<code>rm</code>) sobre markdown del proyecto — todo pasa por MCP para no romper el CRDT ni perder atribución. La regla anticipa y cierra una por una las racionalizaciones del modelo.</li>
+    <li><b>Divulgación progresiva estricta:</b> el núcleo lleva los MUSTs, los references llevan la profundidad ("Core carries the MUSTs… this file carries the detail"), un solo nivel.</li>
+    <li><b>Grounding en circuito cerrado:</b> toda afirmación cita una fuente que vive <i>dentro</i> de la KB (las URLs externas se ingieren primero); una URL suelta es un TODO, no una cita.</li>
+  </ul>
+
+  <div class="note">TL;DR comparativo: OpenKnowledge es un <b>contrato para operar un servidor</b> (skills = política sobre herramientas MCP);
+  Antu es una <b>metodología autocontenida</b> (skills = pipelines con scripts locales); Kuyen es la misma metodología <b>destilada a puro juicio</b> (skills = prosa sin dependencias). Los tres convergieron de forma independiente en varias convenciones — la más notable, el <code>log.md</code> append-only con entradas datadas.</div>
+</section>
+
+<!-- ══════════ EXPLORADOR ══════════ -->
+<section class="tab" id="explorer">
+  <h2>Explorador de skills (27)</h2>
+  <p style="color:var(--muted); font-size:13px;">Filtra por suite o tipo de tarea; haz clic en una tarjeta para expandir el detalle.</p>
+  <div class="filters" id="suiteFilters">
+    <button data-f="all" class="on">Todas</button>
+    <button data-f="ok-core">OK núcleo</button>
+    <button data-f="ok-pack">OK packs</button>
+    <button data-f="antu">Antu</button>
+    <button data-f="kuyen">Kuyen</button>
+  </div>
+  <div class="filters" id="taskFilters">
+    <button data-f="all" class="on">Cualquier tarea</button>
+    <button data-f="lectura">Lectura</button>
+    <button data-f="escritura">Escritura</button>
+    <button data-f="mantenimiento">Mantenimiento</button>
+    <button data-f="configuracion">Configuración</button>
+    <button data-f="sesion">Estado de sesión</button>
+    <button data-f="meta">Meta / diagnóstico</button>
+  </div>
+  <div class="cards" id="cardGrid"></div>
+</section>
+
+<!-- ══════════ RELACIONES ══════════ -->
+<section class="tab" id="relaciones">
+  <h2>Arquitectura y relaciones</h2>
+
+  <h3>OpenKnowledge — hub &amp; spoke sobre el servidor MCP</h3>
+  <div class="legend">
+    <span><span class="dot" style="background:var(--ok)"></span>Skill núcleo</span>
+    <span><span class="dot" style="background:#6fd3e8"></span>Pack</span>
+    <span><span class="dot" style="background:#4a5878"></span>Infraestructura (no skill)</span>
+    <span>— línea sólida: delegación explícita · punteada: "complementa"</span>
+  </div>
+  <div class="svgbox">
+  <svg viewBox="0 0 1080 470" width="1080" height="470">
+    <defs><marker id="arr" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9" fill="none" stroke="#5a6a8c" stroke-width="1.5"/></marker></defs>
+    <!-- edges -->
+    <line x1="180" y1="105" x2="420" y2="205" stroke="#5a6a8c" stroke-width="1.6" marker-end="url(#arr)"/>
+    <text x="222" y="140" fill="#8b96ad" font-size="11">delega el runtime a</text>
+    <line x1="660" y1="215" x2="852" y2="112" stroke="#5a6a8c" stroke-width="1.6" marker-end="url(#arr)"/>
+    <text x="700" y="152" fill="#8b96ad" font-size="11">"STOP: invoca" (autoría de skills)</text>
+    <line x1="540" y1="265" x2="540" y2="330" stroke="#5a6a8c" stroke-width="1.6" marker-end="url(#arr)"/>
+    <text x="552" y="303" fill="#8b96ad" font-size="11">20 tools MCP + workflow() guides</text>
+    <!-- packs -->
+    <g stroke="#3d6a7a" stroke-width="1.3" stroke-dasharray="5 4">
+      <line x1="120" y1="330" x2="440" y2="248"/><line x1="245" y1="378" x2="452" y2="256"/>
+      <line x1="372" y1="415" x2="492" y2="266"/><line x1="540" y1="428" x2="540" y2="268"/>
+      <line x1="705" y1="415" x2="588" y2="266"/><line x1="832" y1="378" x2="626" y2="256"/>
+      <line x1="958" y1="330" x2="640" y2="248"/><line x1="990" y1="248" x2="662" y2="235"/>
+    </g>
+    <text x="330" y="300" fill="#3d8a9e" font-size="11" font-style="italic">«complementa; no reemplaza» ×8</text>
+    <!-- nodes -->
+    <g>
+      <rect x="60" y="60" width="240" height="60" rx="12" fill="#14352a" stroke="#2f6b4f"/>
+      <text x="180" y="86" text-anchor="middle" fill="#7ee2a8" font-size="13" font-weight="bold">open-knowledge-discovery</text>
+      <text x="180" y="104" text-anchor="middle" fill="#8b96ad" font-size="10.5">instalación · ok init · sin lect/escr</text>
+
+      <rect x="420" y="182" width="240" height="86" rx="12" fill="#14352a" stroke="#4fae7e" stroke-width="2"/>
+      <text x="540" y="208" text-anchor="middle" fill="#7ee2a8" font-size="13.5" font-weight="bold">open-knowledge</text>
+      <text x="540" y="226" text-anchor="middle" fill="#b9c6e0" font-size="10.5">contrato runtime (project-local)</text>
+      <text x="540" y="242" text-anchor="middle" fill="#8b96ad" font-size="10.5">STOP · grounding · linking · 14 references</text>
+
+      <rect x="760" y="60" width="240" height="60" rx="12" fill="#14352a" stroke="#2f6b4f"/>
+      <text x="880" y="86" text-anchor="middle" fill="#7ee2a8" font-size="13" font-weight="bold">open-knowledge-write-skill</text>
+      <text x="880" y="104" text-anchor="middle" fill="#8b96ad" font-size="10.5">meta-skill · RED/GREEN · 2 references</text>
+
+      <rect x="60" y="165" width="200" height="52" rx="12" fill="#14352a" stroke="#2f6b4f"/>
+      <text x="160" y="188" text-anchor="middle" fill="#7ee2a8" font-size="12.5" font-weight="bold">bug-report</text>
+      <text x="160" y="205" text-anchor="middle" fill="#8b96ad" font-size="10.5">diagnóstico vía CLI (aislada)</text>
+
+      <rect x="415" y="330" width="250" height="52" rx="12" fill="#232c40" stroke="#4a5878"/>
+      <text x="540" y="353" text-anchor="middle" fill="#9fb0d0" font-size="12.5" font-weight="bold">Servidor MCP OpenKnowledge</text>
+      <text x="540" y="370" text-anchor="middle" fill="#8b96ad" font-size="10.5">exec · search · write · edit · lint · workflow…</text>
+    </g>
+    <!-- pack nodes -->
+    <g font-size="11" font-weight="bold">
+      <rect x="30" y="310" width="180" height="40" rx="10" fill="#0f2e3d" stroke="#2a5a6e"/><text x="120" y="334" text-anchor="middle" fill="#6fd3e8">codebase-wiki</text>
+      <rect x="155" y="358" width="180" height="40" rx="10" fill="#0f2e3d" stroke="#2a5a6e"/><text x="245" y="382" text-anchor="middle" fill="#6fd3e8">entity-vault</text>
+      <rect x="282" y="395" width="180" height="40" rx="10" fill="#0f2e3d" stroke="#2a5a6e"/><text x="372" y="419" text-anchor="middle" fill="#6fd3e8">knowledge-base</text>
+      <rect x="450" y="408" width="180" height="40" rx="10" fill="#0f2e3d" stroke="#2a5a6e"/><text x="540" y="432" text-anchor="middle" fill="#6fd3e8">okf</text>
+      <rect x="615" y="395" width="180" height="40" rx="10" fill="#0f2e3d" stroke="#2a5a6e"/><text x="705" y="419" text-anchor="middle" fill="#6fd3e8">plain-notes</text>
+      <rect x="742" y="358" width="180" height="40" rx="10" fill="#0f2e3d" stroke="#2a5a6e"/><text x="832" y="382" text-anchor="middle" fill="#6fd3e8">software-lifecycle</text>
+      <rect x="868" y="310" width="180" height="40" rx="10" fill="#0f2e3d" stroke="#2a5a6e"/><text x="958" y="334" text-anchor="middle" fill="#6fd3e8">worldbuilding</text>
+      <rect x="895" y="228" width="180" height="40" rx="10" fill="#0f2e3d" stroke="#2a5a6e"/><text x="985" y="252" text-anchor="middle" fill="#6fd3e8">writing-pipeline</text>
+    </g>
+  </svg>
+  </div>
+  <p>Claves de la topología OK: (1) <b>jerarquía con delegación explícita por nombre</b> — discovery manda al agente a la skill project-local, la plataforma manda con un "STOP and invoke" a write-skill; (2) <b>anti-solapamiento diseñado</b>: las descriptions incluyen anti-gatillos ("Do NOT load to…") para que dos skills no compitan por la misma situación; (3) los packs <b>nunca se llaman entre sí</b> — cada vault instala uno solo, y todos se apoyan en el mismo contrato de plataforma; (4) la dependencia dura no es entre skills sino <b>de todas las skills hacia el servidor MCP</b> (ninguna es autosustentable sin él, salvo discovery y bug-report que operan por CLI).</p>
+
+  <h3>Antu/Kuyen — pares en pipeline, coordinados por el usuario</h3>
+  <div class="legend">
+    <span><span class="dot" style="background:var(--antu)"></span>Antu</span>
+    <span><span class="dot" style="background:var(--kuyen)"></span>Kuyen</span>
+    <span>— sólida: una skill propone invocar a la otra · punteada: comparten artefacto/estado</span>
+  </div>
+  <div class="svgbox">
+  <svg viewBox="0 0 1080 440" width="1080" height="440">
+    <defs><marker id="arr2" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9" fill="none" stroke="#8a6b3a" stroke-width="1.5"/></marker></defs>
+    <!-- setup verifies all -->
+    <g stroke="#5c4a28" stroke-width="1.2" stroke-dasharray="3 4">
+      <line x1="140" y1="90" x2="330" y2="70"/><line x1="140" y1="100" x2="330" y2="150"/>
+      <line x1="140" y1="110" x2="330" y2="240"/><line x1="140" y1="120" x2="330" y2="330"/>
+    </g>
+    <text x="160" y="66" fill="#8b96ad" font-size="10.5">verifica instalación ×6</text>
+    <!-- flows -->
+    <g stroke="#8a6b3a" stroke-width="1.6" fill="none">
+      <line x1="470" y1="70" x2="470" y2="128" marker-end="url(#arr2)"/>
+      <line x1="470" y1="185" x2="470" y2="218" marker-end="url(#arr2)"/>
+      <path d="M 545 250 C 640 250 640 160 545 158" marker-end="url(#arr2)"/>
+      <path d="M 542 342 C 700 348 700 68 548 55" marker-end="url(#arr2)"/>
+      <line x1="820" y1="118" x2="820" y2="165" marker-end="url(#arr2)"/>
+    </g>
+    <text x="478" y="105" fill="#8b96ad" font-size="10.5">fuentes faltantes → /antu-ingest</text>
+    <text x="478" y="208" fill="#8b96ad" font-size="10.5">oferta rara de persistir</text>
+    <text x="628" y="196" fill="#8b96ad" font-size="10.5">raw sin procesar</text>
+    <text x="700" y="330" fill="#8b96ad" font-size="10.5">L2e: recall-misses recurrentes</text>
+    <text x="828" y="147" fill="#8b96ad" font-size="10.5">nudge (pendings)</text>
+    <!-- shared state -->
+    <g stroke="#6a5a8c" stroke-width="1.2" stroke-dasharray="4 4">
+      <line x1="905" y1="95" x2="965" y2="95"/><line x1="905" y1="190" x2="965" y2="190"/>
+    </g>
+    <text x="872" y="82" fill="#b9a6e0" font-size="10.5" text-anchor="middle"></text>
+    <!-- antu nodes -->
+    <g font-size="12.5" font-weight="bold">
+      <rect x="40" y="72" width="200" height="52" rx="11" fill="#3b2a12" stroke="#7a5a28"/><text x="140" y="95" text-anchor="middle" fill="#ffb86b">antu-setup</text><text x="140" y="112" text-anchor="middle" fill="#8b96ad" font-size="10">config · locale · embeddings · hooks</text>
+      <rect x="370" y="30" width="200" height="42" rx="11" fill="#3b2a12" stroke="#7a5a28"/><text x="470" y="56" text-anchor="middle" fill="#ffb86b">antu-recall</text>
+      <rect x="370" y="128" width="200" height="56" rx="11" fill="#3b2a12" stroke="#7a5a28"/><text x="470" y="151" text-anchor="middle" fill="#ffb86b">antu-ingest</text><text x="470" y="170" text-anchor="middle" fill="#8b96ad" font-size="10">.raw/ → síntesis wiki · --research</text>
+      <rect x="370" y="218" width="200" height="42" rx="11" fill="#3b2a12" stroke="#7a5a28"/><text x="470" y="244" text-anchor="middle" fill="#ffb86b">antu-imprint</text>
+      <rect x="370" y="310" width="200" height="56" rx="11" fill="#3b2a12" stroke="#7a5a28"/><text x="470" y="333" text-anchor="middle" fill="#ffb86b">antu-prune</text><text x="470" y="352" text-anchor="middle" fill="#8b96ad" font-size="10">salud del vault · 3 capas</text>
+      <rect x="720" y="62" width="200" height="56" rx="11" fill="#3b2a12" stroke="#7a5a28"/><text x="820" y="85" text-anchor="middle" fill="#ffb86b">antu-handoff</text><text x="820" y="104" text-anchor="middle" fill="#8b96ad" font-size="10">.hot/HANDOFF.md · rotación 15d</text>
+      <rect x="720" y="165" width="200" height="56" rx="11" fill="#3b2a12" stroke="#7a5a28"/><text x="820" y="188" text-anchor="middle" fill="#ffb86b">antu-triage</text><text x="820" y="207" text-anchor="middle" fill="#8b96ad" font-size="10">higiene .hot/ · PLAYBOOK · pendings</text>
+    </g>
+    <!-- kuyen -->
+    <g font-size="12" font-weight="bold">
+      <rect x="965" y="40" width="105" height="38" rx="10" fill="#31204a" stroke="#5c3d8a"/><text x="1017" y="63" text-anchor="middle" fill="#d7a6ff">k-handoff</text>
+      <rect x="965" y="120" width="105" height="38" rx="10" fill="#31204a" stroke="#5c3d8a"/><text x="1017" y="143" text-anchor="middle" fill="#d7a6ff">k-ingest</text>
+      <rect x="965" y="200" width="105" height="38" rx="10" fill="#31204a" stroke="#5c3d8a"/><text x="1017" y="223" text-anchor="middle" fill="#d7a6ff">k-query</text>
+      <rect x="965" y="280" width="105" height="38" rx="10" fill="#31204a" stroke="#5c3d8a"/><text x="1017" y="303" text-anchor="middle" fill="#d7a6ff">k-lint</text>
+    </g>
+    <line x1="920" y1="80" x2="965" y2="62" stroke="#6a5a8c" stroke-width="1.3" stroke-dasharray="4 4"/>
+    <text x="912" y="48" fill="#b9a6e0" font-size="10.5">marcadores suite: antu/kuyen en HANDOFF.md</text>
+    <!-- shared artifacts -->
+    <rect x="60" y="380" width="960" height="42" rx="10" fill="#161b26" stroke="#2a3348"/>
+    <text x="540" y="406" text-anchor="middle" fill="#8b96ad" font-size="11.5">Artefactos compartidos: wiki/ · .raw/ · .hot/{HANDOFF,HISTORY,PLAYBOOK}.md · wiki/meta/{log.md, vault-report.json, tags.md} · ~/.cortex-forge/config.yml</text>
+  </svg>
+  </div>
+  <p>En Antu no hay hub: son <b>pares que comparten artefactos</b> (el vault, <code>.hot/</code>, el config global) y se recomiendan mutuamente
+  (recall → imprint/ingest, prune → ingest, handoff → triage), pero <b>ninguna invoca a otra automáticamente</b> — siempre proponen y el usuario dispara el slash command. La interoperabilidad más sofisticada es <i>entre suites</i>: los marcadores <code>suite: antu</code> / <code>suite: kuyen</code> en <code>HANDOFF.md</code> hacen que cada handoff detecte y archive con cortesía el estado del otro, y <code>antu-triage</code> sabe recuperar pendientes desde bloques archivados de Kuyen.</p>
+</section>
+
+<!-- ══════════ ESTILO ══════════ -->
+<section class="tab" id="estilo">
+  <h2>Estilo de redacción</h2>
+
+  <h3>Rigidez de la prosa (estimación cualitativa por skill, 0 = prosa libre, 100 = contrato estricto)</h3>
+  <div id="rigidityBars"></div>
+
+  <h3 style="margin-top:28px;">OpenKnowledge: lenguaje de contrato con gradiente deliberado</h3>
+  <ul class="tight">
+    <li><b>Registro RFC:</b> "Every rule below is a MUST unless marked otherwise". MUST/SHOULD/NEVER/STOP en mayúsculas; la skill de plataforma concentra la rigidez (8 MUST, 6 NEVER, 6 STOP en 133 líneas).</li>
+    <li><b>Comandos exactos, no instrucciones generales:</b> formas de llamada literales con shapes JSON — <code>write({ document: { path, template } })</code>, <code>edit({ skill: { name, file, find, replace } })</code> — más comandos bash textuales y formatos de entrada de log con plantilla exacta.</li>
+    <li><b>Ingeniería anti-resquicio:</b> la regla STOP enumera y cierra racionalizaciones una a una ("Not seeing <code>exec</code> is NOT the escape hatch", "Absence from the visible list means 'I have not discovered it yet'"), y define la única válvula de escape con precondiciones verificables y una frase obligatoria ("OpenKnowledge MCP unavailable:").</li>
+    <li><b>Tablas Don't/Do</b> de anti-patrones, con versión resumida en el núcleo y completa en reference.</li>
+    <li><b>El gradiente es una decisión consciente:</b> write-skill lo formaliza como "degrees of freedom" (alto = prosa libre para juicio, bajo = script fijo para tareas frágiles). Y se nota: la plataforma es contrato duro; <code>plain-notes</code> termina en "write freely".</li>
+    <li><b>Prosa densísima</b> en la plataforma: paréntesis anidados, incisos, negritas estructurales — optimizada para densidad de información por token, no para lectura humana cómoda.</li>
+  </ul>
+  <div class="quote">«Route every in-scope markdown read and write through OK's MCP tools — never your host's native file tools. […] The ban covers every common rationalization:»</div>
+
+  <h3>Antu: procedimiento numerado con criterios de término</h3>
+  <ul class="tight">
+    <li><b>Esqueleto fijo por skill:</b> flavor line localizada → Available scripts → Steps numerados → Output format → Rules. Segunda persona imperativa.</li>
+    <li><b>Criterios verificables:</b> "Done when:" (parcial: handoff, ingest, triage), gates de confirmación explícitos, caps duros numéricos (máx. 20 candidatos, cap de 5 pendientes, 15 días de rotación), severidades HIGH/MEDIUM/LOW.</li>
+    <li><b>Fail-loud codificado:</b> el fail-open de la sanitización exige avisar ("do not proceed silently"); handoff obliga a declarar "Safe to end" incluso cuando todo está bien ("silence should never be read as an implicit all good").</li>
+    <li><b>Anti-resquicio al estilo OK</b> en puntos críticos: "Never reconstruct a credential… not even on explicit user insistence"; recall descalifica el conocimiento paramétrico "even if you believe you already know the answer".</li>
+    <li><b>Comandos exactos</b> cuando hay script (<code>bash scripts/antu-prune.sh {vault}</code>), instrucciones parametrizadas cuando hay juicio.</li>
+  </ul>
+
+  <h3>Kuyen: la misma disciplina, destilada</h3>
+  <ul class="tight">
+    <li>Pasos numerados donde <b>cada paso cierra con "Done when…"</b> — la convención que en Antu es parcial, en Kuyen es sistemática (14 "Done when" en 4 skills vs 8 en 7 skills de Antu).</li>
+    <li>Cero comandos, cero scripts, cero references: pura instrucción de juicio ("Use judgment on what counts as 'the same thing'; don't chase superficial overlap").</li>
+    <li>Prosa más narrativa y corta (~400 palabras/skill vs ~1.100 de Antu y ~1.500 del núcleo OK).</li>
+  </ul>
+
+  <h3>Las descriptions delatan el modelo de invocación</h3>
+  <p>Las descriptions de OK son <b>gatillos largos</b> (377–691 caracteres) escritos "en las palabras del usuario", con anti-gatillos incluidos — porque de ellas depende que la skill se cargue sola. Las de Antu/Kuyen son más cortas y descriptivas: con <code>disable-model-invocation: true</code> en todas, la description es documentación para el humano que teclea el slash command, no una superficie de disparo. Antu invierte lo que OK gasta en descriptions en otra cosa: <code>argument-hint</code>, flavor lines localizadas y resolución multi-vault por argumento.</p>
+</section>
+
+<!-- ══════════ COBERTURA ══════════ -->
+<section class="tab" id="cobertura">
+  <h2>Cobertura de tareas</h2>
+  <table>
+    <tr><th style="width:180px;">Tipo de tarea</th><th>OpenKnowledge</th><th>Antu</th><th>Kuyen</th></tr>
+    <tr>
+      <td><b>Lectura / consulta</b></td>
+      <td class="y">Reglas de <code>exec</code>/<code>search</code> en la plataforma + <code>corpus-qa.md</code> (preguntas directas con citas). Sin skill dedicada: es política transversal.</td>
+      <td class="y"><code>antu-recall</code> — skill dedicada; búsqueda semántica opcional (embeddings), log de misses, prohibición de conocimiento paramétrico.</td>
+      <td class="y"><code>kuyen-query</code> — igual filosofía, búsqueda por lectura directa.</td>
+    </tr>
+    <tr>
+      <td><b>Escritura desde fuente externa</b></td>
+      <td class="y"><code>workflow(ingest)</code> como herramienta MCP + grounding de circuito cerrado; el pack knowledge-base le pone layout (external-sources/).</td>
+      <td class="y"><code>antu-ingest</code> — .raw/ inmutable + síntesis multi-tipo + sanitización de credenciales + modo --research + enriquecimiento retroactivo.</td>
+      <td class="y"><code>kuyen-ingest</code> — versión mínima, sin sanitización ni research.</td>
+    </tr>
+    <tr>
+      <td><b>Escritura desde la sesión</b></td>
+      <td class="p">Parcial: <code>workflow(research/consolidate)</code> + la oferta de persistir de corpus-qa. No hay verbo dedicado a "archivar esta síntesis".</td>
+      <td class="y"><code>antu-imprint</code> — skill dedicada con jerarquía de fuentes y test de síntesis circular.</td>
+      <td class="y">Fusionado en <code>kuyen-ingest</code> (acepta respuestas sintetizadas como entrada).</td>
+    </tr>
+    <tr>
+      <td><b>Mantenimiento / salud</b></td>
+      <td class="y">Herramientas del servidor: <code>lint</code> (con fix), <code>links</code> (dead/orphans/hubs), <code>conflicts</code>, <code>brokenLinks</code> en cada write. Mayormente mecánico, server-side.</td>
+      <td class="y"><code>antu-prune</code> — 3 capas: script estructural + análisis semántico por agente (contradicciones, merges con patrón de debate, misses recurrentes) + drift .raw/↔wiki.</td>
+      <td class="y"><code>kuyen-lint</code> — estructura + contradicciones + duplicación, todo por juicio.</td>
+    </tr>
+    <tr>
+      <td><b>Configuración / instalación</b></td>
+      <td class="y"><code>discovery</code> + <code>references/setup.md</code> (escalera de conexión MCP). El trabajo pesado lo hace el CLI (<code>ok init</code>/<code>seed</code>).</td>
+      <td class="y"><code>antu-setup</code> — registro multi-vault, locale, embeddings, hooks git, sync upstream, menú de mantención.</td>
+      <td class="n">Sin setup — deliberado (cero configuración).</td>
+    </tr>
+    <tr>
+      <td><b>Estado de sesión / handoff</b></td>
+      <td class="n">No existe. La memoria es el CRDT + shadow repo + <code>log.md</code>; asume colaboración viva, no sesiones seriadas.</td>
+      <td class="y"><code>antu-handoff</code> + <code>antu-triage</code> — HANDOFF/HISTORY/PLAYBOOK con rotación, nudges y recuperación entre suites.</td>
+      <td class="y"><code>kuyen-handoff</code> — compactación simple con archivo previo a HISTORY.</td>
+    </tr>
+    <tr>
+      <td><b>Meta / diagnóstico</b></td>
+      <td class="y"><code>write-skill</code> (autoría de skills con evaluación RED/GREEN y pressure-testing) + <code>bug-report</code> (bundle diagnóstico redactado).</td>
+      <td class="n">Sin equivalente — candidatas obvias a robar.</td>
+      <td class="n">Sin equivalente.</td>
+    </tr>
+    <tr>
+      <td><b>Formas de dominio</b></td>
+      <td class="y">8 packs (código, CRM, KB, notas, software, ficción, escritura, OKF) — cada uno una postura distinta sobre el mismo motor.</td>
+      <td class="p">Un solo esquema de vault (sources/concepts/entities/projects) parametrizado por templates.</td>
+      <td class="p">Esquema fijo mínimo (concepts/entities/sources).</td>
+    </tr>
+  </table>
+  <div class="note">La brecha simétrica: OK no modela la <b>sesión</b> (sin handoff — su sustrato CRDT lo vuelve menos urgente) y Antu/Kuyen no modelan los <b>meta-niveles</b> (sin skill que escriba skills, sin diagnóstico empaquetado, sin packs de dominio).</div>
+</section>
+
+<!-- ══════════ DUPLICADOS ══════════ -->
+<section class="tab" id="duplicados">
+  <h2>Duplicados y especialización</h2>
+
+  <h3>En OpenKnowledge: cero duplicados funcionales, mucha repetición deliberada de plantilla</h3>
+  <ul class="tight">
+    <li><b>No hay dos skills para la misma tarea.</b> El par más cercano es <code>knowledge-base</code> vs <code>okf</code> (ambos "KB genérica"), pero se especializan en ejes distintos: kb = disciplina de evidencia en 3 capas con los workflow tools; okf = conformidad con el formato OKF de Google (portabilidad).</li>
+    <li><b>El anti-solapamiento está institucionalizado:</b> write-skill lo impone como gate de la Etapa 1 ("If an existing skill covers most of it, STOP and recommend reuse — a near-duplicate with overlapping triggers mis-fires and dilutes both"). O sea: tienen una regla escrita contra los duplicados, aplicada por su propia meta-skill.</li>
+    <li><b>discovery vs project</b> se solaparían naturalmente (ambas "sobre OpenKnowledge") — lo resuelven con anti-gatillos cruzados en las descriptions y párrafos "Working inside a project — use the project-local skill, not this one".</li>
+    <li><b>Repetición de plantilla, no de función:</b> 8 packs comparten el mismo esqueleto y frases idénticas ("Complements the platform skill; does not replace it", "Templates carry only structure; meaning lives here, not in the document body"). Es boilerplate asumido como costo de distribución — el mismo trade-off que Antu con <code>VAULT-RESOLUTION.md</code> copiado en 6 skills.</li>
+    <li><b>La especialización "uno preserva, otro sintetiza" existe pero no como skills:</b> son los <i>kinds</i> del workflow tool — <code>ingest</code> (verbatim) → <code>research</code> (provisional) → <code>consolidate</code> (canónico con cadena <code>supersedes:</code>) — con transiciones que el usuario debe conducir ("Don't chain silently").</li>
+    <li><b>Matiz semántico de log.md entre packs:</b> knowledge-base pide una entrada por turno, codebase-wiki una por corrida, okf una por cambio — misma convención, cadencias distintas por dominio. Variación intencional, pero es el tipo de deriva que en tu ADR 0001 unificaste a propósito.</li>
+  </ul>
+
+  <h3>En Antu/Kuyen: especialización por origen del contenido y por objeto de mantención</h3>
+  <ul class="tight">
+    <li><b><code>antu-ingest</code> vs <code>antu-imprint</code></b> — la pareja "uno escribe desde fuentes externas, otro sintetiza la sesión". La frontera es el origen: URL/archivo con <code>.raw/</code> vs conversación con test de síntesis circular. Kuyen demuestra que la fusión es viable (<code>kuyen-ingest</code> acepta ambos), al costo de perder la jerarquía de fuentes y la sanitización.</li>
+    <li><b><code>antu-prune</code> vs <code>antu-triage</code></b> — misma tarea (mantención) sobre objetos distintos: contenido del vault vs estado de sesión en <code>.hot/</code>. Sin solapamiento real; se tocan solo en el nudge de handoff.</li>
+    <li><b>Antu vs Kuyen completo</b> — el "duplicado" es la suite entera, y es explícitamente deliberado: full vs lite por vault, documentado en el README de Kuyen con tabla de decisión y convenciones compartidas rastreadas en <code>docs/family-conventions.md</code>. OK no tiene un equivalente de esto (no hay "OK lite").</li>
+  </ul>
+</section>
+
+<!-- ══════════ COMPARACIÓN ══════════ -->
+<section class="tab" id="comparacion">
+  <h2>Comparación final: OpenKnowledge vs Antu/Kuyen</h2>
+  <table>
+    <tr><th style="width:170px;">Eje</th><th>OpenKnowledge</th><th>Antu</th><th>Kuyen</th></tr>
+    <tr><td><b>Sustrato</b></td><td>Servidor MCP + CRDT + preview en vivo; skills = política sobre herramientas.</td><td>Filesystem + git + scripts bash/python locales; skills = pipelines completos.</td><td>Filesystem puro; skills = juicio guiado.</td></tr>
+    <tr><td><b>Invocación</b></td><td>100% model-invoked; descriptions como gatillos diseñados (hasta 691 chars, con anti-gatillos).</td><td colspan="2">100% user-only (<code>disable-model-invocation: true</code>); el usuario es el router.</td></tr>
+    <tr><td><b>Autosuficiencia</b></td><td>Ninguna skill funciona sin el servidor MCP (salvo discovery/bug-report vía CLI).</td><td>Autosustentables; dependencias opt-in (rg/jq fail-open, python solo para semántica).</td><td>Totalmente autosustentables, cero dependencias.</td></tr>
+    <tr><td><b>Topología</b></td><td>Hub &amp; spoke: plataforma al centro, packs encima, delegación explícita por nombre.</td><td colspan="2">Pares que comparten artefactos y se recomiendan; coordinación cross-suite vía marcadores <code>suite:</code>.</td></tr>
+    <tr><td><b>Colaboración</b></td><td>Multi-escritor en tiempo real, atribución por agente, resolución de conflictos.</td><td colspan="2">Sesiones seriadas de un agente a la vez; la continuidad es el handoff.</td></tr>
+    <tr><td><b>Grounding</b></td><td>Circuito cerrado: toda cita apunta a un doc local; URL suelta = TODO. Cadenas <code>supersedes:</code>.</td><td><code>.raw/</code> inmutable + <code>confidence:</code> + <code>sources:</code> + test de síntesis circular.</td><td><code>.raw/</code> + referencia por path; sin confidence.</td></tr>
+    <tr><td><b>Mantenimiento</b></td><td>Mecánico y server-side (lint --fix, links, conflicts). Sin capa semántica de contradicciones (solo el pack worldbuilding la roza, como recurso narrativo).</td><td>Híbrido: script (capa 1) + semántica por agente (contradicciones, debate de merges, drift) — más profundo que OK en juicio.</td><td>Todo juicio, mismo alcance semántico que Antu capa 2.</td></tr>
+    <tr><td><b>Búsqueda</b></td><td>BM25 + recencia server-side (<code>search</code>).</td><td>Embeddings semánticos locales opcionales (Ollama/mlx/sentence-transformers) con reindex por hook post-commit.</td><td>Lectura directa de archivos.</td></tr>
+    <tr><td><b>Seguridad</b></td><td>Redacción automática en bug-report; advertencia sobre scripts en trust domain ajeno.</td><td><code>antu-sanitize.sh</code> (inyección/exfiltración/credenciales) + "never reconstruct… not even on explicit user request".</td><td>Redacción por instrucción en handoff.</td></tr>
+    <tr><td><b>Localización</b></td><td class="n">No existe.</td><td colspan="2" class="y">Flavor lines en el idioma de la conversación + <code>locale:</code> por vault para contenido persistido.</td></tr>
+    <tr><td><b>Versionado de skills</b></td><td class="y">Versionadas (0.34.0), estado en <code>~/.ok/skill-state.yml</code>, historia + rollback para skills de proyecto.</td><td colspan="2" class="p">Distribución vía skills.sh sin versión visible en la skill.</td></tr>
+    <tr><td><b>Meta-nivel</b></td><td class="y">write-skill (con RED/GREEN + pressure-testing) y bug-report.</td><td colspan="2" class="n">Sin equivalentes.</td></tr>
+  </table>
+
+  <div class="verdict">
+    <b>Lectura de fondo.</b> No compiten en el mismo plano: OK vende un <b>motor</b> (CRDT + MCP) y usa las skills para que el agente no lo rompa; Antu/Kuyen venden un <b>método</b> y usan las skills como único ejecutor. Por eso OK puede permitirse skills model-invoked con descriptions agresivas (el costo de un misfire es bajo: el servidor valida todo), mientras Antu elige user-only (sin servidor que valide, el usuario es el gate). La consecuencia inversa: OK necesita ~20.000 palabras de contrato para contener al modelo; Kuyen logra la misma disciplina de grounding en 1.600 palabras porque renuncia a la infraestructura que hay que proteger. Antu queda exactamente al medio — y su par full/lite (Antu/Kuyen con marcadores de suite cruzados) es un patrón de diseño que OK no tiene.
+  </div>
+</section>
+
+<!-- ══════════ HALLAZGOS ══════════ -->
+<section class="tab" id="hallazgos">
+  <h2>Hallazgos extra — lo que se te podría estar escapando</h2>
+
+  <h3>Convergencias independientes (validan tus decisiones)</h3>
+  <ul class="tight">
+    <li><b><code>log.md</code> append-only datado</b> — los tres sistemas llegaron solos a la misma convención (OK lo llama "log discipline (MUST)"; okf lo hereda del estándar de Google). Tu decisión de ADR 0001 está corroborada por convergencia externa.</li>
+    <li><b>"Templates llevan estructura; el significado vive en la skill"</b> — OK lo repite en 6 packs; es exactamente tu separación templates/ vs SKILL.md.</li>
+    <li><b>"Ofrecer persistir, rara vez"</b> — corpus-qa de OK y tu antu-recall/kuyen-query tienen la misma regla con casi la misma redacción (solo cuando combina 2+ fuentes o llena un vacío real; nunca como footer permanente).</li>
+    <li><b>Boilerplate duplicado como costo de distribución</b> — OK copia frases idénticas en 8 packs; tú copias VAULT-RESOLUTION.md en 6 skills. Nadie resolvió la des-duplicación de guía compartida entre skills instalables.</li>
+  </ul>
+
+  <h3>Ideas robables de OK</h3>
+  <ul class="tight">
+    <li><b>Pressure-testing formalizado</b> (write-skill, etapas 4/6): baseline RED sin la skill capturando las racionalizaciones textuales del modelo, luego GREEN con 2–3 presiones combinadas (tiempo, autoridad, costo hundido). Tus reglas anti-resquicio ("not even on explicit user insistence") nacieron de intuición; OK tiene el método para fabricarlas sistemáticamente. Candidata directa a incorporarse a tu metodología de desarrollo de skills.</li>
+    <li><b>Una meta-skill de autoría</b> — no tienes equivalente de write-skill: algo que gobierne cómo se escriben/mejoran las skills antu/kuyen (gate anti-duplicados incluido).</li>
+    <li><b>"Degrees of freedom" explícitos</b> — clasificar cada skill (o cada paso) por cuánta libertad admite: prosa libre / pasos parametrizados / script fijo. Tú ya lo haces de facto (prune capa 1 = script fijo, capa 2 = juicio); nombrarlo permitiría auditarlo.</li>
+    <li><b>Persistencia incremental como MUST</b> — "la KB es tu checkpoint": en tareas largas, escribir cada unidad al terminarla en vez de un write final. Aplica directo a antu-ingest --research y a --rounds.</li>
+    <li><b>Descriptions con anti-gatillos</b> — si algún día habilitas model-invocation en skills antu, el patrón "Use when… / Do NOT load to…" de OK es el estado del arte para que dos skills vecinas no compitan.</li>
+    <li><b>Versionado + estado de instalación</b> — <code>skill-state.yml</code> permite diagnosticar "qué versión de la skill tiene este usuario"; tu antu-setup verifica presencia pero no versión.</li>
+  </ul>
+
+  <h3>Debilidades de OK que tú ya resolviste</h3>
+  <ul class="tight">
+    <li><b>Sin memoria de sesión</b> — OK no tiene handoff: apuesta todo al CRDT + shadow repo. Para flujos de agente serial (tu caso de uso), tu tríada HANDOFF/HISTORY/PLAYBOOK con rotación y triage es estrictamente más capaz.</li>
+    <li><b>Sin análisis semántico de salud</b> — el lint de OK es mecánico; no detecta contradicciones factuales entre docs ni propone merges con debate. Tu prune capa 2 (y kuyen-lint) no tienen equivalente allá.</li>
+    <li><b>Acoplamiento total al servidor</b> — si el MCP no está, la suite entera degrada a una válvula de escape. Tu diseño fail-open con dependencias opt-in es más robusto para entornos heterogéneos.</li>
+    <li><b>Sin localización</b> — monolingüe inglés; tu manejo conversación-vs-locale-del-vault no aparece en ningún lado de OK.</li>
+    <li><b>Sin sanitización de ingesta</b> — OK ingiere fuentes verbatim sin chequeo de credenciales/inyección; tu antu-sanitize.sh cubre un riesgo que ellos no miran.</li>
+  </ul>
+
+  <h3>Riesgos de OK como referencia</h3>
+  <div class="note w">La skill de plataforma de OK está al límite del presupuesto de contexto razonable (~2.600 palabras el núcleo, ~9.000 más en references) y su densidad — paréntesis anidados, incisos encadenados — apuesta a que el modelo lo procese todo. Es el extremo opuesto de la apuesta de Kuyen. Si tomas ideas de OK, toma los <i>mecanismos</i> (pressure-testing, anti-gatillos, degrees of freedom), no el volumen: su necesidad de 20.000 palabras nace de proteger un CRDT multi-escritor que tú no tienes.</div>
+</section>
+
+</div>
+
+<script>
+const SKILLS = [
+  // ═══ OK núcleo ═══
+  { id:"ok-discovery", name:"open-knowledge-discovery", suite:"ok-core", inv:"model", loc:"134 líneas", deps:"CLI `ok` (sin MCP)",
+    role:"Qué es OK, instalación (ok init), compartir proyectos, abrir archivos sueltos, OK Desktop.",
+    tasks:["configuracion"],
+    detail:"<b>Relación:</b> delega todo el trabajo de lectura/escritura a la skill project-local que instala <code>ok init</code>; si detecta que falta, manda a re-ejecutar init. <b>Anti-gatillo en la description:</b> 'Do NOT load to perform OpenKnowledge reads/writes'. <b>Estilo:</b> prosa explicativa con árboles de decisión por superficie (browser embebido vs CLI puro) y prohibiciones puntuales ('Never run ok init just to view a file')." },
+  { id:"ok-project", name:"open-knowledge (plataforma)", suite:"ok-core", inv:"model", loc:"133 líneas + 14 references (~450)", deps:"Servidor MCP (20 tools)",
+    role:"El contrato de runtime autoritativo: gobierna toda lectura/escritura de markdown en el proyecto.",
+    tasks:["lectura","escritura","mantenimiento"],
+    detail:"<b>Hub de la suite.</b> Estructura: TL;DR del 90% → índice de 20 tools → regla STOP (nativas prohibidas sobre markdown in-scope, con válvula de escape de precondiciones estrictas) → grounding de circuito cerrado → linking → folders/templates → tabla de anti-patrones → workflow tools. Deriva profundidad a 14 references de un nivel ('load a reference when its task comes up'). Delega la autoría de skills a write-skill con un 'STOP and invoke'. <b>Estilo:</b> máxima rigidez de la suite — 'Every rule below is a MUST unless marked otherwise'." },
+  { id:"ok-bug", name:"open-knowledge-bug-report", suite:"ok-core", inv:"model", loc:"73 líneas", deps:"CLI `ok` ≥ 0.7.0",
+    role:"Captura un bundle diagnóstico (ok bug-report), lo analiza y reporta con pasos accionables.",
+    tasks:["meta","mantenimiento"],
+    detail:"<b>La más autosustentable:</b> no toca MCP ni otras skills. Workflow de agente en 8 pasos con comandos exactos (unzip, grep '\"level\":50'). Auto-redacción de credenciales documentada (paths, PATs, tokens AWS/Anthropic/OpenAI) con auditoría en MANIFEST.json. Incluye fallback si la versión del CLI es vieja." },
+  { id:"ok-write", name:"open-knowledge-write-skill", suite:"ok-core", inv:"model", loc:"176 líneas + 2 references", deps:"Verbos MCP write/edit/install",
+    role:"Meta-skill: autoría de skills en 8 etapas, desde captura de intención hasta instalación.",
+    tasks:["meta","escritura"],
+    detail:"<b>Lo más sofisticado del repo:</b> gate anti-duplicados en etapa 1 ('STOP and recommend reuse'); resolución de scope explícita (project vs global); clasificación por 'degrees of freedom' (prosa libre / pasos / script fijo); baseline RED capturando racionalizaciones textuales del modelo; eval GREEN con pressure-testing (2–3 presiones combinadas); optimización de description como etapa propia ('triggers, not a summary'); paso deliberado Draft → Installed. Es invocada desde la plataforma con un STOP." },
+  // ═══ OK packs ═══
+  { id:"p-cw", name:"pack: codebase-wiki", suite:"ok-pack", inv:"model", loc:"84 líneas", deps:"Plataforma + workflow(wiki)",
+    role:"Wiki de un codebase generada por agente (estilo DeepWiki, viviendo en el repo).",
+    tasks:["escritura","mantenimiento"],
+    detail:"Doble toolset explícito: código fuente con herramientas nativas, wiki con MCP. Dos 'knobs' en lenguaje natural (audience/depth) persistidos en frontmatter. Disciplinas MUST de frescura (<code>source_commit</code> re-estampado tras cada corrida) y de log (una entrada por corrida). El procedimiento real vive en <code>workflow({kind:'wiki'})</code> — la skill es el mapa, no el territorio." },
+  { id:"p-ev", name:"pack: entity-vault", suite:"ok-pack", inv:"model", loc:"55 líneas", deps:"Plataforma; gbrain CLI opcional",
+    role:"CRM personal de entidades tipadas (personas/empresas/reuniones/conceptos), GBrain-compatible.",
+    tasks:["escritura"],
+    detail:"Regla load-bearing: dossier = verdad compilada (reescribible) + timeline append-only bajo separador '--- timeline ---' con bullets datados parseables. Integración bring-your-own con grabadores de reuniones (Granola, Fireflies…) con clave de dedup <code>source+source_meeting_id</code>. Notable: documenta deltas de linking específicos del consumidor externo (GBrain rechaza paths con / inicial). El pariente más cercano a tu vault de entidades." },
+  { id:"p-kb", name:"pack: knowledge-base", suite:"ok-pack", inv:"model", loc:"67 líneas", deps:"Plataforma + workflow(ingest/research/consolidate)",
+    role:"KB con evidencia en 3 capas: external-sources → research → articles.",
+    tasks:["escritura","mantenimiento"],
+    detail:"El pack más cercano a la filosofía Antu: fuentes preservadas verbatim e inmutables (≈ tu .raw/), análisis provisional que cita local, artículos canónicos con cadena <code>supersedes:</code>. Status flow provisional→canonical. Log discipline MUST con entradas datadas y links markdown (para que registren en el grafo de backlinks)." },
+  { id:"p-okf", name:"pack: okf", suite:"ok-pack", inv:"model", loc:"53 líneas", deps:"Plataforma",
+    role:"KB conformante con el Open Knowledge Format (OKF) v0.1 de Google desde el primer commit.",
+    tasks:["escritura"],
+    detail:"Contrato mínimo: todo doc no-reservado lleva <code>type:</code> no vacío (taxonomía libre); <code>index.md</code> y <code>log.md</code> reservados y sin frontmatter. Conformidad 'pre-poblada, no forzada' — nada se linta. Curiosidad: la propia skill lleva <code>type: Document</code> con un comentario explicando que sin él violaría su propio contrato al instalarse dentro del corpus." },
+  { id:"p-pn", name:"pack: plain-notes", suite:"ok-pack", inv:"model", loc:"28 líneas", deps:"Plataforma",
+    role:"notes/ plano + daily/ journal — 'I just want to write'.",
+    tasks:["escritura"],
+    detail:"El extremo de libertad del gradiente: 'no posture imposed, just write and link'. Única disciplina: linkear liberal (stubear páginas mencionadas), enlazar cada daily con el de ayer, y llenar los campos mood/top3/gratitude. Termina en 'write freely'." },
+  { id:"p-sl", name:"pack: software-lifecycle", suite:"ok-pack", inv:"model", loc:"44 líneas", deps:"Plataforma",
+    role:"Ciclo documental de ingeniería: proposals → decisions (ADRs) → specs → postmortems + guides.",
+    tasks:["escritura","mantenimiento"],
+    detail:"Adopta estándares externos por carpeta (MADR/Nygard para ADRs, spec-kit de GitHub, forma Google SRE para postmortems, Diátaxis para guías). Lo distintivo: <b>comportamientos proactivos de agente</b> en cursiva por carpeta — revivir drafts >14 días, escanear candidatos a Supersedes:, stubear guías desde action items de postmortems. Es tu flujo ADR de moon-antu, empaquetado." },
+  { id:"p-wb", name:"pack: worldbuilding", suite:"ok-pack", inv:"model", loc:"34 líneas", deps:"Plataforma",
+    role:"Enciclopedia de ficción: characters/settings/themes/factions/lore.",
+    tasks:["escritura","mantenimiento"],
+    detail:"'The graph is the product'. Comportamientos: auto-stub al mencionar, hilar el grafo, y un matiz fino de dominio — las contradicciones se <b>señalan pero no se corrigen</b>, porque en ficción una contradicción es material narrativo. Contraste directo con tu prune, que las escala al usuario como conflicto factual." },
+  { id:"p-wp", name:"pack: writing-pipeline", suite:"ok-pack", inv:"model", loc:"31 líneas", deps:"Plataforma",
+    role:"Pipeline de escritura corta: ideas → drafts → published.",
+    tasks:["escritura","mantenimiento"],
+    detail:"Revisiones de idle con umbrales (ideas >30 días, drafts >14), published/ inmutable (revisar = copiar a draft nuevo), y auto-llenado de canonical_url al pegar un link de Substack/Ghost. Nota de diseño: sin carpetas de revisiones nombradas — 'CRDT history covers revisions', el motor reemplaza convención." },
+  // ═══ Antu ═══
+  { id:"a-setup", name:"antu-setup", suite:"antu", inv:"user", loc:"126 líneas + 5 refs + 3 scripts", deps:"git, npx; python3 opcional",
+    role:"Registra/desregistra vaults, config global, locale, embeddings, hooks git, sync upstream.",
+    tasks:["configuracion"],
+    detail:"Doble modo: alta completa (pasos 1–6) o menú de mantención si el vault ya existe. Verifica la instalación de las otras 6 skills sin instalarlas (skills.sh es el único instalador). Detección de dependencias <i>antes</i> de ofrecer semantic search ('never ask a generic enable? without having checked first'). Preservación estricta del config ('never reconstruct it from only the fields this step cares about')." },
+  { id:"a-ingest", name:"antu-ingest", suite:"antu", inv:"user", loc:"110 líneas + 4 refs + 3 scripts", deps:"rg/jq (fail-open), python3 opcional",
+    role:"URL/archivo/texto → .raw/ inmutable → síntesis multi-tipo en wiki → index → re-index semántico.",
+    tasks:["escritura"],
+    detail:"La más rica en salvaguardas: sanitización de credenciales con regla irreversible ('never reconstruct… not even on explicit user insistence'), SPA check, recuperación de ingestas parciales, enriquecimiento retroactivo con cap de 20 candidatos, modo --research. Regla de reescritura cohesiva con señal de violación definida ('dos bloques cubriendo el mismo subtópico sin resolverse'). Equivalente OK: workflow(ingest) + pack knowledge-base, repartido entre servidor y skill." },
+  { id:"a-recall", name:"antu-recall", suite:"antu", inv:"user", loc:"51 líneas + 1 ref + 2 scripts", deps:"python3 opcional (semántica)",
+    role:"Responde desde el vault como fuente de verdad — nunca conocimiento de entrenamiento — con citas.",
+    tasks:["lectura"],
+    detail:"Semántica si hay índice, fallback explícito a index.md ('NOT a protocol violation'). Log de recall-misses que alimenta prune L2e — un lazo de retroalimentación que OK no tiene. Citas con confidence leído del frontmatter, con estados de error definidos (unset/read-error). Oferta de persistir 'rara' que delega en imprint. Equivalente OK: corpus-qa.md (política transversal, no skill)." },
+  { id:"a-imprint", name:"antu-imprint", suite:"antu", inv:"user", loc:"50 líneas + 2 refs", deps:"—",
+    role:"Archiva una síntesis de sesión como página permanente del wiki.",
+    tasks:["escritura"],
+    detail:"Su pieza central no tiene equivalente en OK: la jerarquía de fuentes (sesión > .raw/ > wiki solo-referencia) y el <b>test de síntesis circular</b> ('¿podría justificar esto citando solo páginas wiki? → detente: amplifica drift en vez de anclar conocimiento'). Criterios verificables de auto-contención (acrónimos expandidos, sin deícticos sin antecedente). Kuyen lo fusionó dentro de kuyen-ingest." },
+  { id:"a-prune", name:"antu-prune", suite:"antu", inv:"user", loc:"163 líneas + 2 refs + 2 scripts", deps:"jq, git, python3",
+    role:"Salud del vault en 3 capas: estructural (script), semántica (agente), drift (.raw/ vs wiki).",
+    tasks:["mantenimiento"],
+    detail:"La más larga de Antu. Capa 1 = script único escritor de vault-report.json; capa 2 = 5 chequeos semánticos (relaciones sin link, menciones sin wikilink, fuentes sin concepto, patrón de debate para merges, recall-misses recurrentes) con caps de 20 y regla anti-script ('read the actual pages — never reason from memory'); capa 3 = drift por mtime. Frontera estricta auto-corregible vs requiere-confirmación (13 ítems listados). OK cubre lo mecánico con lint/links server-side pero no tiene la capa semántica." },
+  { id:"a-handoff", name:"antu-handoff", suite:"antu", inv:"user", loc:"60 líneas + 4 refs", deps:"git",
+    role:"Snapshot de sesión a .hot/HANDOFF.md; rotación >15 días a HISTORY.md; gate de PLAYBOOK.",
+    tasks:["sesion"],
+    detail:"Detección del agente invocador por auto-conocimiento + env + árbol de procesos. <b>Interop entre suites:</b> lee el marcador suite: y archiva con cortesía los HANDOFF de Kuyen (con nota que triage sabe encontrar). Triage de salud del vault leyendo vault-report.json (artefacto de prune). Cierre obligatorio 'Safe to end / Not fully captured' — el fail-loud más explícito de la suite. Sin equivalente en OK." },
+  { id:"a-triage", name:"antu-triage", suite:"antu", inv:"user", loc:"27 líneas + 2 refs", deps:"git",
+    role:"Higiene on-demand de .hot/: poda de PLAYBOOK, recuperación foreign-suite, validez de pendings.",
+    tasks:["sesion","mantenimiento"],
+    detail:"La más nueva (ADR 0001, decisiones 5–7). Separación limpia de responsabilidades con handoff: lo mecánico-con-juicio-retrasado va aquí, no en el cierre de sesión. Cada paso lleva 'Done when' exhaustivo ('none silently skipped'). HISTORY.md append-only: los duplicados no se editan, se superseden con nota." },
+  // ═══ Kuyen ═══
+  { id:"k-ingest", name:"kuyen-ingest", suite:"kuyen", inv:"user", loc:"24 líneas + 3 templates", deps:"—",
+    role:"Fuente (URL/archivo/respuesta sintetizada) → .raw/ → página Concept/Entity/Source → index → log.",
+    tasks:["escritura"],
+    detail:"Fusiona antu-ingest + antu-imprint: acepta respuestas de kuyen-query como entrada, con la regla fina de que un origen puramente conversacional nunca clasifica como Source (ese tipo modela un artefacto externo). Vault fijo en ~/vault, sin sanitización ni research mode. Cada paso cierra con 'Done when'." },
+  { id:"k-query", name:"kuyen-query", suite:"kuyen", inv:"user", loc:"14 líneas", deps:"—",
+    role:"Responde solo desde el wiki, citando cada página usada; sin conocimiento de entrenamiento.",
+    tasks:["lectura"],
+    detail:"antu-recall destilado: sin scripts, sin log de misses, sin confidence. Conserva intacta la regla de la oferta rara de persistir (delegando en kuyen-ingest) y el 'Nothing in the wiki covers this' explícito." },
+  { id:"k-lint", name:"kuyen-lint", suite:"kuyen", inv:"user", loc:"14 líneas", deps:"—",
+    role:"Salud del wiki: links rotos, provenance, huérfanas, duplicación, contradicciones — solo propone.",
+    tasks:["mantenimiento"],
+    detail:"antu-prune sin la capa de script: los mismos chequeos semánticos por puro juicio, con reglas de precedencia elegantes (un par que es a la vez contradicción y duplicado se reporta una vez, como duplicado). 'No all-good padding'. Los fixes confirmados se loguean igual que ingest — el log como ledger completo." },
+  { id:"k-handoff", name:"kuyen-handoff", suite:"kuyen", inv:"user", loc:"13 líneas", deps:"git",
+    role:"Compacta la conversación a .hot/HANDOFF.md, archivando el previo en HISTORY.md.",
+    tasks:["sesion"],
+    detail:"Tres pasos. Escribe 'suite: kuyen' como primera línea y detecta el marcador de Antu en el archivo previo — la mitad kuyen del protocolo de interop entre suites. Sin PLAYBOOK, sin rotación por fecha (archiva entero), sin triage: la sesión se compacta y punto." },
+];
+
+const RIGIDITY = [
+  ["open-knowledge (plataforma)", 97, "var(--ok)"],
+  ["antu-prune", 90, "var(--antu)"],
+  ["antu-ingest", 88, "var(--antu)"],
+  ["ok write-skill", 85, "var(--ok)"],
+  ["antu-handoff / triage", 84, "var(--antu)"],
+  ["ok pack knowledge-base", 78, "var(--ok)"],
+  ["antu-setup / recall / imprint", 76, "var(--antu)"],
+  ["ok pack codebase-wiki", 75, "var(--ok)"],
+  ["kuyen (las 4)", 68, "var(--kuyen)"],
+  ["ok bug-report / discovery", 60, "var(--ok)"],
+  ["ok packs de dominio (5 restantes)", 45, "var(--ok)"],
+  ["ok pack plain-notes", 15, "var(--ok)"],
+];
+
+const grid = document.getElementById("cardGrid");
+const badgeCls = { "ok-core":"b-okcore", "ok-pack":"b-okpack", "antu":"b-antu", "kuyen":"b-kuyen" };
+const badgeTxt = { "ok-core":"OK NÚCLEO", "ok-pack":"OK PACK", "antu":"ANTU", "kuyen":"KUYEN" };
+const taskTxt = { lectura:"lectura", escritura:"escritura", mantenimiento:"mantenimiento", configuracion:"configuración", sesion:"sesión", meta:"meta" };
+
+function render() {
+  grid.innerHTML = "";
+  SKILLS.forEach(s => {
+    const el = document.createElement("div");
+    el.className = "card";
+    el.dataset.suite = s.suite;
+    el.dataset.tasks = s.tasks.join(",");
+    el.innerHTML = `
+      <h4>${s.name}
+        <span class="badge ${badgeCls[s.suite]}">${badgeTxt[s.suite]}</span>
+        <span class="badge ${s.inv === "model" ? "b-model" : "b-user"}">${s.inv === "model" ? "MODEL-INVOKED" : "USER-ONLY"}</span>
+      </h4>
+      <p class="role">${s.role}</p>
+      <div class="tags">${s.tasks.map(t => `<span class="tag">${taskTxt[t]}</span>`).join("")}</div>
+      <div class="detail">${s.detail}
+        <div class="meta"><span>📄 ${s.loc}</span><span>🔗 ${s.deps}</span></div>
+      </div>`;
+    el.addEventListener("click", () => el.classList.toggle("open"));
+    grid.appendChild(el);
+  });
+}
+render();
+
+let fSuite = "all", fTask = "all";
+function applyFilters() {
+  document.querySelectorAll("#cardGrid .card").forEach(c => {
+    const okS = fSuite === "all" || c.dataset.suite === fSuite;
+    const okT = fTask === "all" || c.dataset.tasks.split(",").includes(fTask);
+    c.style.display = (okS && okT) ? "" : "none";
+  });
+}
+document.querySelectorAll("#suiteFilters button").forEach(b => b.addEventListener("click", () => {
+  fSuite = b.dataset.f;
+  document.querySelectorAll("#suiteFilters button").forEach(x => x.classList.toggle("on", x === b));
+  applyFilters();
+}));
+document.querySelectorAll("#taskFilters button").forEach(b => b.addEventListener("click", () => {
+  fTask = b.dataset.f;
+  document.querySelectorAll("#taskFilters button").forEach(x => x.classList.toggle("on", x === b));
+  applyFilters();
+}));
+
+const rb = document.getElementById("rigidityBars");
+RIGIDITY.forEach(([label, v, color]) => {
+  const row = document.createElement("div");
+  row.className = "barrow";
+  row.innerHTML = `<span>${label}</span><div class="bartrack"><div class="barfill" style="width:0; background:${color}"></div></div><span style="color:var(--muted)">${v}/100</span>`;
+  rb.appendChild(row);
+  requestAnimationFrame(() => setTimeout(() => row.querySelector(".barfill").style.width = v + "%", 60));
+});
+
+document.querySelectorAll("#tabs button").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll("#tabs button").forEach(x => x.classList.toggle("active", x === b));
+  document.querySelectorAll("section.tab").forEach(s => s.classList.toggle("active", s.id === b.dataset.t));
+  window.scrollTo({ top: 0 });
+}));
+</script>
+</body>
+</html>

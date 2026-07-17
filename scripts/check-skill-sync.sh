@@ -5,6 +5,21 @@
 
 set -euo pipefail
 
+# ---------------------------------------------------------------------------
+# Dependency preflight — fail loud with an install hint, not a raw
+# "command not found" mid-check.
+# ---------------------------------------------------------------------------
+for dep in jq diff; do
+  if ! command -v "$dep" >/dev/null 2>&1; then
+    echo "check-skill-sync.sh: missing dependency '$dep'." >&2
+    case "$dep" in
+      jq) echo "  Install: brew install jq   (macOS)  |  apt-get install -y jq   (Debian/Ubuntu)" >&2 ;;
+      diff) echo "  Install: part of diffutils — apt-get install -y diffutils   (Debian/Ubuntu; preinstalled on macOS)" >&2 ;;
+    esac
+    exit 2
+  fi
+done
+
 SKILLS_DIR="${1:-$(dirname "$0")/../skills}"
 SKILLS_DIR="$(cd "$SKILLS_DIR" && pwd)"
 

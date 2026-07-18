@@ -72,16 +72,16 @@ while IFS= read -r file; do
 done < <(grep -lriE "creat(e|es|ing)? (a |the |new )*page|saved to \`\{?vault\}?/?wiki|writ(e|es|ing) (the |a |new )*page" "$SKILLS_DIR"/*/SKILL.md | sort -u)
 
 # ---------------------------------------------------------------------------
-# 4. vault-report.json schema fields consistent between antu-prune and AGENTS.md
+# 4. vault-report.json schema fields consistent between wiki-prune and AGENTS.md
 # ---------------------------------------------------------------------------
 check "vault-report-schema"
-PRUNE_SCHEMA="$SKILLS_DIR/antu-prune/references/VAULT-REPORT-SCHEMA.md"
-HANDOFF_FILE="$SKILLS_DIR/antu-handoff/SKILL.md"
+PRUNE_SCHEMA="$SKILLS_DIR/wiki-prune/references/VAULT-REPORT-SCHEMA.md"
+HANDOFF_FILE="$SKILLS_DIR/hot-handoff/SKILL.md"
 
 if [[ ! -f "$PRUNE_SCHEMA" ]]; then
-  fail "antu-prune/references/VAULT-REPORT-SCHEMA.md not found"
+  fail "wiki-prune/references/VAULT-REPORT-SCHEMA.md not found"
 elif [[ ! -f "$HANDOFF_FILE" ]]; then
-  fail "antu-handoff/SKILL.md not found — cannot verify vault-report.json consumer"
+  fail "hot-handoff/SKILL.md not found — cannot verify vault-report.json consumer"
 else
   # Discover field names structurally from the "## Field definitions" bullet list
   # (`- \`health.foo\` — ...`) instead of enumerating known names, so a newly
@@ -90,18 +90,18 @@ else
   if [[ -z "$prune_fields" ]]; then
     fail "no vault-report.json fields found in $PRUNE_SCHEMA — schema may have moved again"
   else
-    # Check each field is referenced in antu-handoff's vault-health triage
+    # Check each field is referenced in hot-handoff's vault-health triage
     # step — the actual consumer since AGENTS.md stopped reading vault-report.json
     # directly (2026-07-06) in favor of the Pending item crystallize already writes.
     all_ok=true
     while IFS= read -r field; do
       if ! grep -q "$field" "$HANDOFF_FILE"; then
-        fail "vault-report field '$field' declared in antu-prune schema but not referenced in antu-handoff/SKILL.md"
+        fail "vault-report field '$field' declared in wiki-prune schema but not referenced in hot-handoff/SKILL.md"
         all_ok=false
       fi
     done <<< "$prune_fields"
     if $all_ok; then
-      ok "vault-report.json schema fields consistent between antu-prune and antu-handoff"
+      ok "vault-report.json schema fields consistent between wiki-prune and hot-handoff"
     fi
   fi
 fi
@@ -125,8 +125,8 @@ done
 # ---------------------------------------------------------------------------
 # 6. Every script listed in "## Available scripts" actually exists (same dir)
 # ---------------------------------------------------------------------------
-# Catches exactly the 2026-07-03 regression: antu-prune.sh was relocated but
-# antu-validate-schema.sh (which it calls as a sibling) was left in bin/,
+# Catches exactly the 2026-07-03 regression: prune.sh was relocated but
+# validate-schema.sh (which it calls as a sibling) was left in bin/,
 # silently disabling schema-drift checks for every install. Scans the
 # "## Available scripts" section structurally rather than grepping for the
 # word "co-located" — that phrasing was intentionally removed everywhere in
@@ -154,7 +154,7 @@ done
 # ---------------------------------------------------------------------------
 # 7. Intentionally-duplicated files stay in sync across skills
 # ---------------------------------------------------------------------------
-# embeddings.py and antu-index.py are deliberately co-located in more than
+# embeddings.py and index.py are deliberately co-located in more than
 # one skill (each skill must be independently installable and must never
 # execute a script found inside the vault — see wiki/concepts/agent-hook-compatibility.md
 # and the 2026-07-03 E006 fix). LOCALE-RESOLUTION.md is duplicated for the
@@ -179,10 +179,10 @@ _check_synced() {  # $1: subdir ("scripts" or "references"), $2: filename, $3..$
   done
   [[ -n "$first" ]] && ok "$script identical across: $*"
 }
-_check_synced "scripts" "embeddings.py" antu-setup antu-recall antu-ingest
-_check_synced "scripts" "antu-index.py" antu-setup antu-ingest
-_check_synced "references" "LOCALE-RESOLUTION.md" antu-ingest antu-handoff antu-imprint
-_check_synced "references" "VAULT-RESOLUTION.md" antu-ingest antu-handoff antu-imprint antu-prune antu-recall
+_check_synced "scripts" "embeddings.py" wiki-setup wiki-recall wiki-ingest
+_check_synced "scripts" "index.py" wiki-setup wiki-ingest
+_check_synced "references" "LOCALE-RESOLUTION.md" wiki-ingest hot-handoff wiki-imprint
+_check_synced "references" "VAULT-RESOLUTION.md" wiki-ingest hot-handoff wiki-imprint wiki-prune wiki-recall
 
 # ---------------------------------------------------------------------------
 # Summary

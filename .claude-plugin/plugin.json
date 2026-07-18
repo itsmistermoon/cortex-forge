@@ -11,11 +11,12 @@
   "license": "MIT",
   "keywords": ["knowledge-base", "wiki", "vault", "memory", "second-brain", "rag"],
   "skills": [
-    "./skills/antu-ingest",
-    "./skills/antu-handoff",
-    "./skills/antu-setup",
-    "./skills/antu-imprint",
-    "./skills/antu-prune",
-    "./skills/antu-recall"
+    "./skills/hot-handoff",
+    "./skills/hot-triage",
+    "./skills/wiki-ingest",
+    "./skills/wiki-recall",
+    "./skills/wiki-imprint",
+    "./skills/wiki-prune",
+    "./skills/wiki-setup"
   ]
 }

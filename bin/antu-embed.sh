@@ -7,15 +7,15 @@
 set -euo pipefail
 
 CONFIG="$HOME/.cortex-forge/config.yml"
-[ -f "$CONFIG" ] || { echo "ERROR: $CONFIG not found — run /antu-setup first." >&2; exit 1; }
+[ -f "$CONFIG" ] || { echo "ERROR: $CONFIG not found — run /wiki-setup first." >&2; exit 1; }
 
-# embeddings.py/antu-index.py are co-located with the antu-setup skill,
+# embeddings.py/index.py are co-located with the wiki-setup skill,
 # not in bin/ — resolve the skill dir: sibling of this script's repo (dev checkout),
 # else scan config for a vault named 'antu' (self-hosting checkout).
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILL_DIR=""
-if [[ -f "$(dirname "$SCRIPT_DIR")/skills/antu-setup/embeddings.py" ]]; then
-  SKILL_DIR="$(dirname "$SCRIPT_DIR")/skills/antu-setup"
+if [[ -f "$(dirname "$SCRIPT_DIR")/skills/wiki-setup/embeddings.py" ]]; then
+  SKILL_DIR="$(dirname "$SCRIPT_DIR")/skills/wiki-setup"
 else
   # Fallback: scan config for a vault named 'antu'
   while IFS= read -r line; do
@@ -23,8 +23,8 @@ else
     if [[ "$trimmed" == antu:* ]]; then
       candidate="${trimmed#*:}"
       candidate="${candidate#"${candidate%%[![:space:]]*}"}"
-      if [[ -f "$candidate/skills/antu-setup/embeddings.py" ]]; then
-        SKILL_DIR="$candidate/skills/antu-setup"
+      if [[ -f "$candidate/skills/wiki-setup/embeddings.py" ]]; then
+        SKILL_DIR="$candidate/skills/wiki-setup"
         break
       fi
     fi
@@ -32,11 +32,11 @@ else
 fi
 
 if [[ -z "$SKILL_DIR" ]]; then
-  echo "ERROR: Cannot locate skills/antu-setup/embeddings.py. Check ~/.cortex-forge/config.yml." >&2
+  echo "ERROR: Cannot locate skills/wiki-setup/embeddings.py. Check ~/.cortex-forge/config.yml." >&2
   exit 1
 fi
 
-INDEXER="$SKILL_DIR/antu-index.py"
+INDEXER="$SKILL_DIR/index.py"
 
 # Resolve target vault path
 resolve_vault() {

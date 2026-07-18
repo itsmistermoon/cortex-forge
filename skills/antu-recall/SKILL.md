@@ -1,13 +1,14 @@
 ---
 name: antu-recall
 license: MIT
-description: Answer questions from the vault wiki as the source of truth — never training knowledge — with page citations. Use on "what do I know about X" or any topic the vault may cover, even if you know it.
+description: Answer questions from the vault wiki as the source of truth — never training knowledge — with page citations.
+disable-model-invocation: true
 argument-hint: "[vault-name] <query>"
 ---
 
 # antu-recall
 
-Start your response with the flavor line `Recalling memory...`, translated to the language of the user's current message (Spanish: `Recuperando memoria...`), with nothing before it. Use that same language for every prompt, question, menu, and confirmation this skill produces — persisted vault content (if any) still follows the vault's locale, not the conversation language.
+Start your response with the flavor line `Recalling memory...`, translated to the language of the user's current message (Spanish: `Recuperando memoria...`), with nothing before it. Use that same language for every prompt, question, menu, and confirmation this skill produces.
 
 Answer a question using the vault's wiki content as the source.
 
@@ -20,7 +21,7 @@ Paths are relative to this skill's directory.
 
 ## Steps
 
-1. **Resolve vault** — per `references/VAULT-RESOLUTION.md`. If the first argument matches a registered vault name (e.g., `/antu-recall second-brain <query>`), use that vault; treat the remaining text as the query.
+1. **Resolve vault** — per `~/.cortex-forge/references/VAULT-RESOLUTION.md` (synced by `/antu-setup` — if missing, run `/antu-setup` first). If the first argument matches a registered vault name (e.g., `/antu-recall second-brain <query>`), use that vault; treat the remaining text as the query.
 
 2. **Identify relevant pages** — prefer semantic search if the index is available:
    - If `{vault}/.hot/db/vault.db` (canonical) or `{vault}/.hot/vault.db` (legacy) exists: run `scripts/antu-search.py --vault {vault} "{query}" --top-k 8 --json`, and use the returned chunks (path + heading + content) as the primary source set.
@@ -28,7 +29,7 @@ Paths are relative to this skill's directory.
 
 3. **Answer** — read the full page for any result where the chunk alone is insufficient, then synthesize a response with citations to specific pages. If information is missing, point to `/antu-ingest` for the missing sources, and append one line to `{vault}/wiki/meta/log.md`: `**[YYYY-MM-DD] recall-miss** | {query}`. Log misses only — a query that gets a real answer leaves no trace here.
 
-4. **Offer to persist, rarely** — only when the answer combines two or more existing pages into an insight not written down anywhere in the vault, or fills a real gap the wiki had no page for, end the response with one localized line equivalent to: "This isn't written anywhere in the vault yet — want me to save it? (`/antu-imprint`)" (translated to the conversation's language, per this skill's own opening rule). Skip this for anything answerable by pointing at a single existing page — the offer must stay rare, not a footer on every response. Persisting itself is not this skill's job: acceptance (now or in a later message) invokes `/antu-imprint`, treating this answer as the source content.
+4. **Offer to persist, rarely** — only when the answer combines two or more existing pages into an insight not written down anywhere in the vault, or fills a real gap the wiki had no page for, end the response with one line: "This isn't written anywhere in the vault yet — want me to save it? (`/antu-imprint`)". Skip this for anything answerable by pointing at a single existing page — the offer must stay rare, not a footer on every response. `antu-imprint` is user-invoked only: acceptance means telling the user to run it (now or later) — it will treat this answer as the source content.
 
 ## Output format
 
@@ -47,4 +48,3 @@ Every response must include:
 ## Rules
 
 - If there are contradictions between pages, flag them
-- If the topic is not in the wiki, say so explicitly — only then may you supplement with parametric knowledge, clearly labeled as such

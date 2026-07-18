@@ -2,7 +2,8 @@
 name: antu-prune
 license: MIT
 compatibility: Requires bash with jq, git, and python3 (structural check script)
-description: Vault health check — detects dead links, orphan pages, missing provenance, and unprocessed sources. Use when the user asks if something is broken or organized, or requests a vault check.
+description: Vault health check — detects dead links, orphan pages, missing provenance, and unprocessed sources.
+disable-model-invocation: true
 argument-hint: "[vault-name]"
 ---
 
@@ -19,11 +20,11 @@ Paths are relative to this skill's directory.
 
 ## Steps
 
-1. **Resolve vault** — per `references/VAULT-RESOLUTION.md`. If the first argument matches a registered vault name (e.g., `/antu-prune personal`), use that vault.
+1. **Resolve vault** — per `~/.cortex-forge/references/VAULT-RESOLUTION.md` (synced by `/antu-setup` — if missing, run `/antu-setup` first). If the first argument matches a registered vault name (e.g., `/antu-prune personal`), use that vault.
 
    **Confirmation gate:** if the vault was resolved from an explicit argument (not from CWD), confirm with the user before proceeding: "About to prune `{vault-name}` at `{path}`. Continue?" — do not proceed until confirmed.
 
-2. **Layer 1 — Structural check**: Run `bash scripts/antu-prune.sh {vault}`. If the script is missing, the skill installation is incomplete — reinstall with `npx skills add itsmistermoon/cortex-forge --skill antu-prune` (or `/antu-setup`, sub-task `skills`).
+2. **Layer 1 — Structural check**: Run `bash scripts/antu-prune.sh {vault}`. If the script is missing, the skill installation is incomplete — run `/antu-setup`, sub-task `skills`, to reinstall.
 
 3. **Layer 2 — Semantic analysis**: Run the semantic checks below (L2a–L2e) — read the actual pages, never reason about relationships from memory alone.
 

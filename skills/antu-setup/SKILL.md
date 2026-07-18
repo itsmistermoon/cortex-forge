@@ -3,6 +3,7 @@ name: antu-setup
 license: MIT
 compatibility: Requires git and npx (Node.js); python3 only for optional semantic search
 description: Register or deregister the current vault in Antu and verify global skills are installed. Run from inside a vault directory.
+disable-model-invocation: true
 argument-hint: "Optional sub-task: embeddings | skills | sync | vaults"
 ---
 
@@ -17,6 +18,7 @@ Paths are relative to this skill's directory.
 - **`scripts/antu-index.py`** — Builds/refreshes `.hot/db/vault.db` when semantic search is enabled (step 5); also copied to `~/.cortex-forge/bin/` for the post-commit reindex hook (step 5a)
 - **`scripts/embeddings.py`** — Shared embedding backend, imported by `antu-index.py`; not invoked directly
 - **`scripts/antu-reindex-post-commit.sh`** — Copied to `~/.cortex-forge/bin/hooks/` and wired into `{vault}/.git/hooks/post-commit` (step 5a)
+- **`scripts/tags-audit.py`** — Runs a tags audit on a vault (maintenance menu option 10); optionally writes a dated snapshot under `wiki/meta/`
 
 ## Sub-tasks
 
@@ -74,10 +76,10 @@ Always end with the relevant subset of ## Output format.
    - Preserve all existing vault entries — never overwrite other vaults — and all other top-level keys (`upstream:`, `upstream_ref:`, `imprint_triage:`, `hot_cache_stale_days:`, etc.) unchanged. Read the full file, merge in the new vault entry, and write back the whole document — never reconstruct it from only the fields this step cares about.
    - If this is the first vault registered, set it as `default`. If a `default` already exists, leave it unchanged.
 
-3b. **Sync infrastructure from upstream** — pull infrastructure files from the upstream repo and apply them to the current vault. See `references/UPSTREAM-SYNC.md` for resolution, sync scope, exclusions, and rate limits.
+3b. **Sync infrastructure from upstream** — pull infrastructure files from the upstream repo: vault templates into the current vault, and shared skill references into `~/.cortex-forge/references/` (global, once per machine). See `references/UPSTREAM-SYNC.md` for resolution, sync scope, exclusions, and rate limits.
 
-   - **If this is a new vault (scaffolded in step 1)** → proceed without asking — templates are part of the scaffolding the user already confirmed.
-   - **If this is an existing vault** → ask before updating templates, per UPSTREAM-SYNC.md step 4.
+   - **Vault templates** — if this is a new vault (scaffolded in step 1), proceed without asking (templates are part of the scaffolding the user already confirmed); if existing, ask before updating, per UPSTREAM-SYNC.md step 4.
+   - **Global shared references** (`~/.cortex-forge/references/`) — always ask before writing, new vault or not. Confirming local vault scaffolding is not consent to write machine-global files that affect every other vault. See UPSTREAM-SYNC.md step 4.
 
 3c. **Offer stale-cache warning threshold (opt-in, global setting)** — this is a single global value in `~/.cortex-forge/config.yml` (top-level, like `imprint_triage`), not per-vault. Read the config first:
     - **If `hot_cache_stale_days:` is already set** → inform the user of the current value and ask if they want to change it, rather than asking as if for the first time.
@@ -85,8 +87,8 @@ Always end with the relevant subset of ## Output format.
     - Write the chosen value as `hot_cache_stale_days: N` at the top level of `config.yml` (not nested under `vaults:`).
     - This is read by the `AGENTS.md` Handoff protocol (step 2) to compare against `HANDOFF.md`'s `updated:` frontmatter.
 
-4. **Verify global skills are installed** — check each of the 6 skills (`antu-handoff`, `antu-setup`, `antu-recall`, `antu-ingest`, `antu-imprint`, `antu-prune`) individually for presence under `~/.agents/skills/` — do not assume presence just because this skill is running.
-   - **All present** → report which 6 skills are present and move on.
+4. **Verify global skills are installed** — check each of the 7 skills (`antu-handoff`, `antu-setup`, `antu-recall`, `antu-ingest`, `antu-imprint`, `antu-prune`, `antu-triage`) individually for presence under `~/.agents/skills/` — do not assume presence just because this skill is running.
+   - **All present** → report which 7 skills are present and move on.
    - **Some missing** — do not attempt to install them yourself. Tell the user:
      > Missing skills: {list}. Install them with:
      > ```
@@ -109,7 +111,7 @@ Always end with the relevant subset of ## Output format.
 Confirm:
 - Scaffold (if run): what was created (`wiki/` structure, `AGENTS.md` stub, `wiki/meta/tags.md`) — remind the user to fill in `AGENTS.md`'s "Vault identity" section themselves
 - Registered vaults: list all entries in `vaults:` with their paths and locales, marking the default
-- Skills: all 6 present / missing {list} (with the `npx skills add` command to fix it)
+- Skills: all 7 present / missing {list} (with the `npx skills add` command to fix it)
 - Semantic search: active (backend: Ollama/mlx-embeddings/sentence-transformers, N chunks indexed) / not active (declined or skipped — how to enable later)
 - Stale-cache threshold (if set/changed): `hot_cache_stale_days` value, or "default (15)" if left unset
 - Sync (if run): upstream used, files updated (list), files skipped (count), deletions pending user confirmation

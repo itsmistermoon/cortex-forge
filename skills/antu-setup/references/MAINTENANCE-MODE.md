@@ -10,13 +10,13 @@ Vault "{name}" is already registered. What would you like to do?
   1. Change locale       — update the vault's locale in config.yml
   2. Sync from upstream  — pull updated templates from the upstream repo
   3. Set stale-cache threshold — configure hot_cache_stale_days (global, applies to all vaults)
-  4. Check skills        — verify all 6 are installed; points to `npx skills add` if not (that's the only installer now)
+  4. Check skills        — verify all 7 are installed; points to `npx skills add` if not (that's the only installer now)
   5. Initialize semantic search — build .hot/db/vault.db for the first time (checks what's available, then offers accordingly)
   6. Add post-commit prune    — install the vault-report refresh git hook
   7. Add post-commit reindex  — install the embedding reindex git hook (requires semantic search)
   8. Set as default      — make this vault the default
   9. Remove this vault   — deregister from config.yml
- 10. Run tags audit      — invoke `bin/tags-audit.py` on this vault and print the report
+ 10. Run tags audit      — invoke `scripts/tags-audit.py` on this vault and print the report
 ```
 
 For each selected operation, run the corresponding step in sequence. Most steps behave identically to the new-vault wizard; where they don't, the difference is noted below:
@@ -40,6 +40,6 @@ For each selected operation, run the corresponding step in sequence. Most steps 
 - 7 → step 5a (reindex; gate still applies: if vault.db doesn't exist, offer option 5 first)
 - 8 → step 6
 - 9 → if any post-commit hooks are installed for this vault, offer to uninstall them first (see `references/POST-COMMIT-HOOKS.md`'s uninstall procedure); then remove vault from `vaults:`, update default if needed, save config. If combined with other selections, run option 9 last — the other operations may need the vault's entry to still exist.
-- 10 → run `python3 bin/tags-audit.py {vault-path}` from the upstream `moon-antu` repo. Pass `--write-snapshot` only if the user wants a dated snapshot saved under `wiki/meta/`.
+- 10 → run `python3 scripts/tags-audit.py {vault-path}` (paths relative to this skill's directory, per `SKILL.md`'s `## Available scripts`). Pass `--write-snapshot` only if the user wants a dated snapshot saved under `wiki/meta/`.
 
 After all selected operations complete, follow SKILL.md's ## Output format — regardless of which combination of options ran, including option 9.

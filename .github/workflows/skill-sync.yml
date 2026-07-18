@@ -4,13 +4,25 @@ on:
   push:
     paths:
       - "skills/**/SKILL.md"
+      - "skills/**/references/**"
+      - "skills/**/scripts/**"
+      - "references/**"
       - "AGENTS.md"
       - "scripts/check-skill-sync.sh"
+      - "skills.sh.json"
+      - ".claude-plugin/plugin.json"
+      - ".github/workflows/skill-sync.yml"
   pull_request:
     paths:
       - "skills/**/SKILL.md"
+      - "skills/**/references/**"
+      - "skills/**/scripts/**"
+      - "references/**"
       - "AGENTS.md"
       - "scripts/check-skill-sync.sh"
+      - "skills.sh.json"
+      - ".claude-plugin/plugin.json"
+      - ".github/workflows/skill-sync.yml"
 
 jobs:
   check:

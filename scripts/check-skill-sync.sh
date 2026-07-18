@@ -5,6 +5,21 @@
 
 set -euo pipefail
 
+# ---------------------------------------------------------------------------
+# Dependency preflight — fail loud with an install hint, not a raw
+# "command not found" mid-check.
+# ---------------------------------------------------------------------------
+for dep in jq diff; do
+  if ! command -v "$dep" >/dev/null 2>&1; then
+    echo "check-skill-sync.sh: missing dependency '$dep'." >&2
+    case "$dep" in
+      jq) echo "  Install: brew install jq   (macOS)  |  apt-get install -y jq   (Debian/Ubuntu)" >&2 ;;
+      diff) echo "  Install: part of diffutils — apt-get install -y diffutils   (Debian/Ubuntu; preinstalled on macOS)" >&2 ;;
+    esac
+    exit 2
+  fi
+done
+
 SKILLS_DIR="${1:-$(dirname "$0")/../skills}"
 SKILLS_DIR="$(cd "$SKILLS_DIR" && pwd)"
 
@@ -152,17 +167,16 @@ for skill_dir in "$SKILLS_DIR"/*/; do
 done
 
 # ---------------------------------------------------------------------------
-# 7. Intentionally-duplicated files stay in sync across skills
+# 7. Intentionally-duplicated scripts stay in sync across skills
 # ---------------------------------------------------------------------------
 # embeddings.py and antu-index.py are deliberately co-located in more than
 # one skill (each skill must be independently installable and must never
 # execute a script found inside the vault — see wiki/concepts/agent-hook-compatibility.md
-# and the 2026-07-03 E006 fix). LOCALE-RESOLUTION.md is duplicated for the
-# same independent-installability reason (fixed 2026-07-03 — it previously
-# lived one level up at skills/, outside every skill dir, so it was never
-# actually installed by `npx skills add --skill X`). That duplication only
-# stays safe if the copies never silently diverge — this check makes drift
-# a CI failure instead of a silent bug.
+# and the 2026-07-03 E006 fix: a shared bin/ was rejected there because
+# executing code from a shared/vault-adjacent location was the actual
+# security problem, not just an installability inconvenience). That
+# duplication only stays safe if the copies never silently diverge — this
+# check makes drift a CI failure instead of a silent bug.
 check "duplicated-script-sync"
 _check_synced() {  # $1: subdir ("scripts" or "references"), $2: filename, $3..$N: skill names that must match
   local subdir="$1" script="$2"; shift 2
@@ -181,8 +195,56 @@ _check_synced() {  # $1: subdir ("scripts" or "references"), $2: filename, $3..$
 }
 _check_synced "scripts" "embeddings.py" antu-setup antu-recall antu-ingest
 _check_synced "scripts" "antu-index.py" antu-setup antu-ingest
-_check_synced "references" "LOCALE-RESOLUTION.md" antu-ingest antu-handoff antu-imprint
-_check_synced "references" "VAULT-RESOLUTION.md" antu-ingest antu-handoff antu-imprint antu-prune antu-recall
+
+# ---------------------------------------------------------------------------
+# 8. Shared reference docs live only at references/, never re-duplicated
+# ---------------------------------------------------------------------------
+# VAULT-RESOLUTION.md, LOCALE-RESOLUTION.md, HANDOFF-FORMAT.md, and
+# PLAYBOOK-FORMAT.md used to be duplicated per-skill (same reason as
+# duplicated-script-sync above), but that only applied to the installability
+# concern, not the E006 security concern — these are inert docs, nothing
+# executes them. Moved to a single canonical copy at references/ (repo root),
+# synced by antu-setup into ~/.cortex-forge/references/ (see
+# skills/antu-setup/references/UPSTREAM-SYNC.md). This check guards against
+# a skill silently re-introducing a local copy that could drift.
+check "no-reintroduced-reference-duplicates"
+for shared_doc in VAULT-RESOLUTION.md LOCALE-RESOLUTION.md HANDOFF-FORMAT.md PLAYBOOK-FORMAT.md; do
+  found=""
+  for skill_dir in "$SKILLS_DIR"/*/; do
+    name=$(basename "$skill_dir")
+    f="$skill_dir/references/$shared_doc"
+    [[ -f "$f" ]] && found="$found $name"
+  done
+  if [[ -n "$found" ]]; then
+    fail "$shared_doc: re-duplicated locally in:$found — should be removed and referenced from ~/.cortex-forge/references/ instead"
+  else
+    ok "$shared_doc: no local copies re-introduced"
+  fi
+done
+
+# ---------------------------------------------------------------------------
+# 9. Distribution manifests agree on the skill roster
+# ---------------------------------------------------------------------------
+# skills.sh.json (npx skills add) and .claude-plugin/plugin.json (Claude Code
+# plugin marketplace) each list every skill in this suite independently —
+# nothing enforced they stay in sync, and antu-triage was missing from
+# plugin.json for a while as a result. Compare both against the actual
+# skills/*/ directories on disk, the real source of truth.
+check "skill-list-manifests-agree"
+REPO_ROOT="$(dirname "$SKILLS_DIR")"
+_on_disk=$(basename -a "$SKILLS_DIR"/*/ | sort)
+_skills_sh=$(jq -r '.groupings[].skills[]' "$REPO_ROOT/skills.sh.json" | sort)
+_plugin=$(jq -r '.skills[]' "$REPO_ROOT/.claude-plugin/plugin.json" | sed 's#^\./skills/##' | sort)
+if [[ "$_on_disk" == "$_skills_sh" ]]; then
+  ok "skills.sh.json matches skills/*/ on disk"
+else
+  fail "skills.sh.json roster differs from skills/*/ on disk — diff:$(diff <(echo "$_on_disk") <(echo "$_skills_sh") | tr '\n' ' ')"
+fi
+if [[ "$_on_disk" == "$_plugin" ]]; then
+  ok ".claude-plugin/plugin.json matches skills/*/ on disk"
+else
+  fail ".claude-plugin/plugin.json roster differs from skills/*/ on disk — diff:$(diff <(echo "$_on_disk") <(echo "$_plugin") | tr '\n' ' ')"
+fi
 
 # ---------------------------------------------------------------------------
 # Summary

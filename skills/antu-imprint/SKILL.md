@@ -14,7 +14,7 @@ Archive a valuable session synthesis as a permanent wiki page.
 
 ## Steps
 
-1. **Resolve vault** — per `references/VAULT-RESOLUTION.md`, then its `locale:` per `references/LOCALE-RESOLUTION.md`. If the first argument matches a registered vault name (e.g., `/antu-imprint personal`), use that vault.
+1. **Resolve vault** — per `~/.cortex-forge/references/VAULT-RESOLUTION.md`, then its `locale:` per `~/.cortex-forge/references/LOCALE-RESOLUTION.md` (both synced by `/antu-setup` — if either is missing, run `/antu-setup` first). If the first argument matches a registered vault name (e.g., `/antu-imprint personal`), use that vault.
 
 2. **Identify the synthesis** — review the current conversation and identify the main synthesis produced. Apply the source hierarchy (see ## Source hierarchy below) to determine what the synthesis derives from — and whether a `.raw/` primary source needs to be read before writing.
 
@@ -36,7 +36,7 @@ The synthesis must derive from one of these, in order:
 
 ## Provenance
 
-Create the page using the corresponding template (step 4) — all frontmatter fields come from the template. Populate `sources:` with `conversation {YYYY-MM-DD}`, plus `.raw/{slug}.md` if a primary source was involved (preferred over `wiki/sources/{slug}.md`). Populate `raw:` only when the imprint directly synthesizes a specific primary source.
+Create the page using the corresponding template (step 4) — all frontmatter fields come from the template. `sources:` holds only `wiki/...` page links, matching `antu-ingest` and `antu-prune`'s schema — leave it empty if the synthesis has no such backing page, never populate it with `.raw/` paths or `conversation {date}`. Populate `raw:` with `.raw/{slug}.md` when the imprint directly synthesizes a specific primary source not yet ingested as a wiki page; leave both `sources:` and `raw:` empty when the content originates purely from session reasoning or decisions with no artifact behind it.
 
 **`confidence` criteria:**
 - `high` — conclusion derived from a primary source or exhaustive evidence-based analysis

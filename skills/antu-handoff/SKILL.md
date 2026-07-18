@@ -1,7 +1,8 @@
 ---
 name: antu-handoff
 license: MIT
-description: Snapshot session context into .hot/HANDOFF.md — pending tasks, decisions, and history — so future sessions resume without losing context. Use on "save context", "handoff", or "wrap up".
+description: Snapshot session context into .hot/HANDOFF.md — pending tasks, decisions, and history — so future sessions resume without losing context.
+disable-model-invocation: true
 argument-hint: "[vault-name] [project-name] [next: <focus>]"
 ---
 
@@ -13,7 +14,7 @@ Save a session snapshot to `.hot/HANDOFF.md` in the active repo (the nearest `.g
 
 1. **Resolve context** — detect the active repo (nearest `.git` from CWD; ask if none) and the invoking agent: identify via self-knowledge first, corroborate with agent-identifying `env` vars if present (don't rely on a fixed hardcoded list — new agents appear continuously), and if still undetermined walk the process tree from `$PPID` upward (`ps -o comm= -p <pid>`) for a known CLI binary name. Append the model in parentheses if known (e.g. `{agent-name} ({model-id})`); otherwise use `Unknown agent`. Use this identity as `{Agent}` in the history header and the `agent:` frontmatter field.
 
-   Resolve the vault per `references/VAULT-RESOLUTION.md`, then its `locale:` per `references/LOCALE-RESOLUTION.md`. If the first argument matches a registered vault name, use that vault and treat the remaining argument as a project-name override.
+   Resolve the vault per `~/.cortex-forge/references/VAULT-RESOLUTION.md`, then its `locale:` per `~/.cortex-forge/references/LOCALE-RESOLUTION.md` (both synced by `/antu-setup` — if either is missing, run `/antu-setup` first). If the first argument matches a registered vault name, use that vault and treat the remaining argument as a project-name override.
 
    Determine mode: `wiki/` + `AGENTS.md` present → standard mode; otherwise → cross-vault mode.
 
@@ -25,8 +26,8 @@ Save a session snapshot to `.hot/HANDOFF.md` in the active repo (the nearest `.g
 
    Rotate `## History` entries older than 15 days out of `.hot/HANDOFF.md`: append each verbatim, oldest-first, to `.hot/HISTORY.md` (if it doesn't exist, create it with a one-line header — `# {vault-name} — consolidated history`), then remove it from `HANDOFF.md`. Never reorder entries in either file. **Done when:** every History entry older than 15 days has been moved — zero left behind in `HANDOFF.md`.
 
-3. **Consider PLAYBOOK.md updates** — a deliberate judgment call, not an automatic log entry: does this session surface durable operational knowledge (an environment workaround, operator preference, vault-specific convention, recurring failure pattern, or similar) the next agent needs to avoid re-discovering? Classify per the gate in `references/PLAYBOOK-FORMAT.md`. **Done when:** every candidate insight has been written to the correct zone or explicitly evaluated and rejected — not silently forgotten.
-4. **Write the snapshot** — update Current state and append the History entry in `.hot/HANDOFF.md`, per `references/HANDOFF-FORMAT.md` (always write `suite: antu` in the frontmatter); never modify previous History entries.
+3. **Consider PLAYBOOK.md updates** — a deliberate judgment call, not an automatic log entry: does this session surface durable operational knowledge (an environment workaround, operator preference, vault-specific convention, recurring failure pattern, or similar) the next agent needs to avoid re-discovering? Classify per the gate in `~/.cortex-forge/references/PLAYBOOK-FORMAT.md`. **Done when:** every candidate insight has been written to the correct zone or explicitly evaluated and rejected — not silently forgotten.
+4. **Write the snapshot** — update Current state and append the History entry in `.hot/HANDOFF.md`, per `~/.cortex-forge/references/HANDOFF-FORMAT.md` (always write `suite: antu` in the frontmatter); never modify previous History entries.
    - If an argument with `next: <focus>` was provided (e.g., `/antu-handoff next: PostToolUse hook`), mention relevant skills inline and tailor `### Pending` toward the declared next focus.
    - **Vault health triage** — if `wiki/meta/vault-report.json` exists and any of `health.dead_links`, `health.raw_without_source_page`, `health.orphan_pages`, or `health.missing_confidence` is non-empty, add a dated entry to `### Pending` (if full, this takes priority over the least-recent item): `- [ ] Vault health: {N} finding(s) unresolved ({types}) — see wiki/meta/vault-report.json`. If a Pending item for vault health already exists, update its count instead of duplicating; if the report has zero findings and a prior item exists, remove it. Never optional to report — call it out explicitly in the confirmation whenever the report has non-empty findings, don't fold it silently into a generic summary.
    - **`antu-triage` nudge** — add a `### Pending` suggestion (same cap rules as above) in either of these cases:

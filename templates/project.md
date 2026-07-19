@@ -1,13 +1,13 @@
 ---
 title: {{title}}
 type: project
+description: {{one-line summary}}
 created: {{date:YYYY-MM-DD}}
 updated: {{date:YYYY-MM-DD}}
 tags: []  # project/subtopic for nested grouping
 status: active
 repo: 
 domains: []
-sources: []
 confidence: high
 schema_version: "0.3"
 ---
@@ -39,6 +39,8 @@ schema_version: "0.3"
 ## Recurring issues
 
 - 
+
+# Citations
 
 ---
 

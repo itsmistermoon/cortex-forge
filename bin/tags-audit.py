@@ -6,12 +6,12 @@ Scans wiki/{concepts,entities,sources,projects}/*.md for `tags:` frontmatter,
 counts occurrences (exact tag and top-level namespace for hierarchical tags
 like `antu/skills`), and prints a report to stdout by default.
 
-wiki/meta/tags.md is a hand/agent-maintained lean registry (name + one-line
-description, no counts — see wiki/meta/tags-convention.md) and is never
+meta/tags.md is a hand/agent-maintained lean registry (name + one-line
+description, no counts — see meta/tags-convention.md) and is never
 written by this script, since counts go stale the moment a new page is
 ingested. Pass --write-snapshot to save a dated point-in-time report instead
 of printing to stdout, for an occasional deep audit like the one that
-produced wiki/meta/tags-convention-archive.md.
+produced meta/tags-convention-archive.md.
 
 Usage: python3 bin/tags-audit.py <vault-path> [--write-snapshot]
 """
@@ -134,7 +134,7 @@ def main():
     report = "\n".join(lines) + "\n"
 
     if "--write-snapshot" in sys.argv:
-        out_path = vault / "wiki" / "meta" / f"tags-audit-{date.today().isoformat()}.md"
+        out_path = vault / "meta" / f"tags-audit-{date.today().isoformat()}.md"
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(report, encoding="utf-8")
         print(f"Written (point-in-time snapshot, not auto-maintained): {out_path.relative_to(vault)}")

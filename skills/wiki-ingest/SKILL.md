@@ -43,7 +43,7 @@ Paths are relative to this skill's directory.
 
 3. **Synthesize** — evaluate the source against the type criteria in `## Page types` below and create pages for every qualifying type. **Done when:** every content type (concept, entity, project) that meets its creation criteria has a page — zero qualifying types skipped. If a topic is borderline, evaluate it rather than skipping.
 
-4. **Update index and log** — update `{vault}/wiki/index.md` with new pages, and add an entry to `{vault}/wiki/meta/log.md` per page created or updated: `**[YYYY-MM-DD] ingest** | {title}`.
+4. **Update index and log** — update `{vault}/wiki/index.md` with new pages, and add an entry to `{vault}/wiki/log.md` per page created or updated: `**[YYYY-MM-DD] ingest** | {title}`.
 
 5. **Project linking** — check `{vault}/wiki/projects/` for active projects whose `domains:` match the source; propose the update before writing.
 
@@ -54,7 +54,7 @@ Paths are relative to this skill's directory.
    **Hard cap**: evaluate at most 20 candidates. If more share a tag with the new source, pick the 20 with the strongest overlap (most shared tags, then most recently updated) and note the total count skipped.
 
    1. Read `tags:` from the newly created `wiki/sources/{slug}.md`.
-   2. Candidates: pages in `wiki/concepts/`, `wiki/entities/`, or `wiki/projects/` that share at least one tag with the new source and don't already list `wiki/sources/{slug}.md` in `sources:`.
+   2. Candidates: pages in `wiki/concepts/`, `wiki/entities/`, or `wiki/projects/` that share at least one tag with the new source and don't already cite `wiki/sources/{slug}.md` in `# Citations`.
    3. Evaluate each candidate: does the new source add substantive information this page should reference — a notable comparable, an entry for an existing comparison or list, a contradiction or refinement of a claim? Classify as **ENRICHABLE** (specific addition stated) or **FALSE_POSITIVE** (tag overlap is incidental or thematic only).
    4. For each ENRICHABLE candidate, state exactly what to add and where — e.g., "Add OpenWiki to the comparison table in §Key mechanisms."
    5. Report all ENRICHABLE candidates to the user. Do not apply any changes without explicit confirmation per candidate.
@@ -78,18 +78,15 @@ Each type has a template at `{vault}/templates/{type}.md`.
 
 Always populate in every page created or updated:
 
-```yaml
-sources:
-  - wiki/sources/{source-slug}.md
-confidence: high | medium | low
-```
+- `confidence: high | medium | low` in frontmatter.
+- A `# Citations` section at the foot of the body listing every backing source, one per line, sequentially numbered: `[N] [{source title}](/wiki/sources/{source-slug}.md)` (bundle-relative absolute path).
 
 **`confidence` criteria:**
 - `high` — primary source: book, paper, official documentation, source code
 - `medium` — secondary source: video, opinion article, technical blog, transcript
 - `low` — agent inference without direct source, or second-hand source
 
-**`tags:` validation** — if `{vault}/wiki/meta/tags.md` exists, follow its rules and registered names: assign a tag only if it's already registered or a clear topical fit (record fits as post-run candidates to add); reject anything that contradicts the registry, with a brief inline reason. If the file is missing, skip — the registry is opt-in.
+**`tags:` validation** — if `{vault}/meta/tags.md` exists, follow its rules and registered names: assign a tag only if it's already registered or a clear topical fit (record fits as post-run candidates to add); reject anything that contradicts the registry, with a brief inline reason. If the file is missing, skip — the registry is opt-in.
 
 ## Output format
 
@@ -105,6 +102,6 @@ After completing ingestion, your response must confirm:
 - Use templates as structural guides — don't compare with existing pages to decide what to write
 - If a page already exists for the topic (any type), update it instead of creating a duplicate
 - When updating an existing page, rewrite the full body integrating new knowledge with the prior content. Do not append sections at the end without reviewing the existing text. The result must read as a coherent article written at once, not as an original page plus addenda. Violation signal: two blocks in the same page covering the same subtopic from different perspectives without resolving them.
-- Include `[[wikilinks]]` to existing vault pages
+- Include markdown links (bundle-relative absolute paths, e.g. `[{title}](/wiki/entities/{slug}.md)`) to existing vault pages
 - If there's a contradiction with existing content, mark it as `[!contradiction]`
 - Add a changelog line matching the template: `- YYYY-MM-DD: description`

@@ -70,6 +70,8 @@ All 7 live in `skills/` here as their canonical source, and install identically 
 | **source** | `wiki/sources/` | External artifact ingested — articles, docs, repos, videos, threads | `templates/source.md` |
 | **project** | `wiki/projects/` | Active project with operational state (repo, status, domains) | `templates/project.md` |
 
-Each page follows: YAML frontmatter + compiled truth + chronological changelog. Type disambiguation and source frontmatter fields: see `skills/wiki-ingest/SKILL.md`.
+Each page follows: YAML frontmatter + compiled truth + a `# Citations` section (concept/entity/project only) + chronological changelog. Type disambiguation and source frontmatter fields: see `skills/wiki-ingest/SKILL.md`.
 
-`wiki/meta/tags.md` (seeded from `templates/tags.md`) is not a page type — it's the vault's tag rules + registry in one self-referencing document, kept free of hard counts so it never goes stale.
+`wiki/` is [OKF](https://github.com/GoogleCloudPlatform/knowledge-catalog/tree/main/okf)-compatible (ADR 0005): pages cross-reference each other with bundle-relative absolute markdown links (`[title](/wiki/entities/x.md)`), never `[[wikilinks]]`; `wiki/index.md` declares `okf_version: "0.1"` in frontmatter.
+
+`meta/tags.md` (seeded from `templates/tags.md`) is not a page type — it's the vault's tag rules + registry in one self-referencing document, kept free of hard counts so it never goes stale. `meta/` is a sibling of `wiki/`, not nested inside it — it holds operational/registry material (`tags.md`, `vault-report.json`), not curated knowledge, so it stays outside the OKF bundle.

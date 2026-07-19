@@ -15,7 +15,7 @@ echo "Setting up Second Brain vault at: $VAULT"
 # ── 1. Create directories ─────────────────────────────────────────────────────
 mkdir -p "$OBSIDIAN/snippets"
 mkdir -p "$VAULT/.raw"
-mkdir -p "$VAULT/wiki/concepts" "$VAULT/wiki/entities" "$VAULT/wiki/sources" "$VAULT/wiki/meta"
+mkdir -p "$VAULT/wiki/concepts" "$VAULT/wiki/entities" "$VAULT/wiki/sources" "$VAULT/meta"
 mkdir -p "$VAULT/wiki/pages"
 mkdir -p "$VAULT/templates"
 mkdir -p "$VAULT/bin"
@@ -48,7 +48,7 @@ cat > "$OBSIDIAN/graph.json" << 'EOF'
       "label": "Fuentes"
     },
     {
-      "query": "path:wiki/meta",
+      "query": "path:meta",
       "color": { "a": 1, "rgb": 5676246 },
       "label": "Meta"
     }
@@ -115,7 +115,7 @@ echo "  .raw/          — Source documents (immutable)"
 echo "  wiki/concepts/ — Conceptual knowledge"
 echo "  wiki/entities/ — People, tools, services"
 echo "  wiki/sources/  — External references"
-echo "  wiki/meta/     — Vault metadata"
+echo "  meta/          — Vault metadata"
 echo "  wiki/pages/    — General wiki pages"
 echo "  templates/     — Obsidian templates per type"
 echo "  bin/           — Utility scripts"

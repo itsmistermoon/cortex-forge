@@ -5,7 +5,7 @@ __pycache__/
 .raw/*.vtt
 .raw/*.html
 .obsidian/
-wiki/meta/vault-report.json
+meta/vault-report.json
 .serena/
 .hot/
 .firecrawl/

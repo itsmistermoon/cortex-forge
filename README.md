@@ -60,7 +60,7 @@ Six layers, each with a distinct role:
 | **Wiki** | `wiki/` | Secondary sources — synthesized knowledge | Agent writes and maintains |
 | **Hot** | `.hot/` | Per-project session cache | Read on session start |
 | **Instructions** | `AGENTS.md` | Agent protocols (handoff, ingest, recall) | Read on session start |
-| **Meta** | `wiki/meta/` | Vault metadata and guides | Agent maintains |
+| **Meta** | `meta/` | Vault metadata and guides (sibling of `wiki/`, not part of the OKF bundle) | Agent maintains |
 | **Skills** | `skills/` | Invocable agent skills | Extend, don't modify |
 
 ## The Skills
@@ -89,6 +89,8 @@ The agent searches the vault, retrieves relevant pages, and synthesizes a respon
 
 Detects orphan pages, dead links, contradictory claims, stale information. Forgetting functions as maintenance: prune removes what weakens the network deliberately, so what remains stays reliable.
 
+`wiki/` is [OKF](https://github.com/GoogleCloudPlatform/knowledge-catalog/tree/main/okf)-compatible (see `docs/adr/0005-okf-adoption.md`): pages cross-reference each other with markdown links, not `[[wikilinks]]`, and cite their sources in a `# Citations` section instead of `sources:` frontmatter.
+
 ### `/hot-triage` — Session-state hygiene
 
 On-demand deep clean of `.hot/` (the active repo's session state, not the vault): retrospective `PLAYBOOK.md` pruning, recovering pending/fragile-context items after a foreign-suite (Kuyen) write, and validity re-checks on existing `### Pending`/`### Active decisions` entries. Mirrors `/wiki-lint`'s pattern — a separate hygiene skill, not folded into `/hot-handoff`'s per-session mechanics.
@@ -114,7 +116,7 @@ Installed via the Claude Code plugin, these are available as bare commands (`bin
 | Source | `wiki/sources/` | External artifact ingested — articles, docs, repos, videos, threads |
 | Project | `wiki/projects/` | Active project with operational state (repo, status, domains) |
 
-Each page follows: YAML frontmatter + compiled truth + chronological changelog.
+Each page follows: YAML frontmatter + compiled truth + a `# Citations` section (concept/entity/project only) + chronological changelog.
 
 ## Protocols
 

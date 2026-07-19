@@ -20,9 +20,9 @@ On "No" — stop and tell the user to resolve the discrepancy themselves (restor
 
 Only what's missing — never overwrite an existing `wiki/` or `AGENTS.md`.
 
-1. **`wiki/` structure**: `mkdir -p wiki/{concepts,entities,sources,projects,meta}`.
-2. **`wiki/meta/tags.md`**: copy from `templates/tags.md` (fetched the same way step 3b fetches other templates — see `references/UPSTREAM-SYNC.md`) if missing.
-3. **`wiki/index.md`**: create with a minimal header (`# {vault-name}`, one line noting it's the master index) and empty `## Concepts` / `## Entities` / `## Sources` / `## Projects` sections — the first `/wiki-ingest` or `/wiki-imprint` run populates it further.
+1. **`wiki/` structure**: `mkdir -p wiki/{concepts,entities,sources,projects} meta`. `meta/` is a sibling of `wiki/`, not nested inside it (ADR 0005, decision 4).
+2. **`meta/tags.md`**: copy from `templates/tags.md` (fetched the same way step 3b fetches other templates — see `references/UPSTREAM-SYNC.md`) if missing.
+3. **`wiki/index.md`**: create with frontmatter declaring `okf_version: "0.1"` (the only frontmatter `index.md` is permitted, per OKF §11), followed by a minimal header (`# {vault-name}`, one line noting it's the master index) and empty `## Concepts` / `## Entities` / `## Sources` / `## Projects` sections — the first `/wiki-ingest` or `/wiki-imprint` run populates it further.
 4. **`AGENTS.md`**: write a minimal starter — protocol skeleton only (Handoff/Ingest/Recall mandatory-invocation rules, the wiki taxonomy table, the skills list), matching the shape in `templates/concept.md`'s sibling vaults. Leave a clearly marked placeholder section for identity/vocabulary content that only the user can fill in:
 
    ```markdown

@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted — resolved via `/wayfinder` (grilling + domain-modeling), 2026-07-19. Not yet implemented.
+Accepted — resolved via `/wayfinder` (grilling + domain-modeling), 2026-07-19. Implementation plan steps 1–4 (templates, skills, `AGENTS.md`, changeset) landed 2026-07-19. Step 5 — migrating already-installed vault content (decision 8) — remains a separate, future task, not started, requiring explicit user authorization.
 
 ## Context
 

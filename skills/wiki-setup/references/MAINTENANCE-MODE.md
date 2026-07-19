@@ -40,6 +40,6 @@ For each selected operation, run the corresponding step in sequence. Most steps 
 - 7 → step 5a (reindex; gate still applies: if vault.db doesn't exist, offer option 5 first)
 - 8 → step 6
 - 9 → if any post-commit hooks are installed for this vault, offer to uninstall them first (see `references/POST-COMMIT-HOOKS.md`'s uninstall procedure); then remove vault from `vaults:`, update default if needed, save config. If combined with other selections, run option 9 last — the other operations may need the vault's entry to still exist.
-- 10 → run `python3 scripts/tags-audit.py {vault-path}` (paths relative to this skill's directory, per `SKILL.md`'s `## Available scripts`). Pass `--write-snapshot` only if the user wants a dated snapshot saved under `wiki/meta/`.
+- 10 → run `python3 scripts/tags-audit.py {vault-path}` (paths relative to this skill's directory, per `SKILL.md`'s `## Available scripts`). Pass `--write-snapshot` only if the user wants a dated snapshot saved under `meta/`.
 
 After all selected operations complete, follow SKILL.md's ## Output format — regardless of which combination of options ran, including option 9.

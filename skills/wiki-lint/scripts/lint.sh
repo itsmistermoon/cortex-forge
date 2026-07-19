@@ -24,9 +24,9 @@ INCOMING_LINKS=$(mktemp) || { echo "ERROR: mktemp failed — cannot allocate tem
 INCOMING_TARGETS=$(mktemp) || { echo "ERROR: mktemp failed — cannot allocate temp file for incoming_targets" >&2; exit 2; }
 SOURCES_PAGES=$(mktemp) || { echo "ERROR: mktemp failed — cannot allocate temp file for sources_pages" >&2; exit 2; }
 RAW_REFS=$(mktemp) || { echo "ERROR: mktemp failed — cannot allocate temp file for raw_refs" >&2; exit 2; }
-SOURCES_REFS=$(mktemp) || { echo "ERROR: mktemp failed — cannot allocate temp file for sources_refs" >&2; exit 2; }
 WIKI_SLUGS=$(mktemp) || { echo "ERROR: mktemp failed — cannot allocate temp file for wiki_slugs" >&2; exit 2; }
 RAW_INDEX=$(mktemp) || { echo "ERROR: mktemp failed — cannot allocate temp file for raw_index" >&2; exit 2; }
+trap 'rm -f "$FINDINGS" "$DEAD_LINKS" "$RAW_NOSRC" "$NO_CONF" "$ORPHANS" "$INDEX_MISMATCHES" "$INCOMING_LINKS" "$INCOMING_TARGETS" "$SOURCES_PAGES" "$RAW_REFS" "$WIKI_SLUGS" "$RAW_INDEX"' EXIT
 
 f() { echo "[$1] $2" >> "$FINDINGS"; }
 
@@ -45,22 +45,19 @@ json_dead_links_array() {  # $1: file with from<TAB>target per line → JSON arr
     a=$1; b=$2
     gsub(/\\/,"\\\\",a); gsub(/"/,"\\\"",a)
     gsub(/\\/,"\\\\",b); gsub(/"/,"\\\"",b)
-    printf "%s{\"from\": \"%s\", \"broken_target\": \"[[%s]]\"}", (NR>1?", ":""), a, b
+    printf "%s{\"from\": \"%s\", \"broken_target\": \"/%s\"}", (NR>1?", ":""), a, b
   } END{printf "]"}'
 }
 
-# ── HIGH: Dead wikilinks ──────────────────────────────────────────────────────
-grep -ro '\[\[wiki/[^]|]*' "$WIKI" --include="*.md" 2>/dev/null \
-  | sed 's/\[\[//' | sort -u \
-  | while IFS=: read -r src link; do
-      # strip trailing .md if present — wikilinks may or may not include extension
-      link="${link%.md}"
-      # strip trailing backslash — happens when the wikilink uses an escaped alias
-      # pipe inside a markdown table cell, e.g. [[path\|Display text]]; the backslash
-      # is part of the table escaping, not the link target
-      link="${link%\\}"
-      if [ ! -f "$VAULT/${link}.md" ]; then
-        f HIGH "Dead link in ${src#"$VAULT"/}: [[${link}]]"
+# ── HIGH: Dead markdown links ──────────────────────────────────────────────────
+# Antu emits only bundle-relative absolute links: [title](/wiki/...) — see
+# ADR 0005. Match the link target only, independent of the link text.
+grep -roE '\]\(/wiki/[^)]+\)' "$WIKI" --include="*.md" 2>/dev/null \
+  | while IFS=: read -r src match; do
+      link="${match#](/}"
+      link="${link%)}"
+      if [ ! -f "$VAULT/${link}" ]; then
+        f HIGH "Dead link in ${src#"$VAULT"/}: (/${link})"
         printf '%s\t%s\n' "${src#"$VAULT"/}" "$link" >> "$DEAD_LINKS"
       fi
     done
@@ -70,26 +67,22 @@ grep -ro '\[\[wiki/[^]|]*' "$WIKI" --include="*.md" 2>/dev/null \
 # ran 2 recursive greps plus a `find -name` over the whole wiki. On
 # moon-multivac (143 .raw/ files, 353 wiki pages) this took >10 min and
 # effectively hung the script. Current implementation builds the index of
-# every `raw:` and `sources:` reference in the wiki in a single pass each
-# (O(m)), then each .raw/ file is a single O(1) lookup (O(n)). Total:
-# O(n + m).
+# every `raw:` reference in the wiki in a single pass (O(m)), then each
+# .raw/ file is a single O(1) lookup (O(n)). Total: O(n + m).
 
 if [ -d "$RAW" ]; then
   # Single pass: every `raw: .raw/foo.md` reference anywhere in the wiki.
   grep -rho '^raw: .*\.md$' "$WIKI" --include="*.md" 2>/dev/null \
     | sed 's/^raw:[[:space:]]*//' | sort -u > "$RAW_REFS" || true
-  # Single pass: every `- .raw/foo.md` (a sources: list item pointing to raw).
-  grep -rhoE '^[[:space:]]*-[[:space:]]+\.raw/.*\.md$' "$WIKI" --include="*.md" 2>/dev/null \
-    | sed 's/^[[:space:]]*-[[:space:]]*//' | sort -u > "$SOURCES_REFS" || true
   # Single pass: every wiki page basename (for the filename fallback).
   find "$WIKI" -name "*.md" 2>/dev/null \
     | sed 's|.*/||; s|\.md$||' | sort -u > "$WIKI_SLUGS" || true
 
-  # Merge all three index files into one sorted set. The combined lookup
-  # is a single `grep -Fxq` per .raw/ file instead of three. Membership
-  # in a sorted file is O(log n) with a binary search (grep's default
-  # when the file is sorted).
-  cat "$RAW_REFS" "$SOURCES_REFS" "$WIKI_SLUGS" 2>/dev/null | sort -u > "$RAW_INDEX" || true
+  # Merge both index files into one sorted set. The combined lookup is a
+  # single `grep -Fxq` per .raw/ file instead of two. Membership in a
+  # sorted file is O(log n) with a binary search (grep's default when
+  # the file is sorted).
+  cat "$RAW_REFS" "$WIKI_SLUGS" 2>/dev/null | sort -u > "$RAW_INDEX" || true
 
   find "$RAW" -name "*.md" | while read -r raw; do
     rel="${raw#"$VAULT"/}"
@@ -103,91 +96,61 @@ if [ -d "$RAW" ]; then
 fi
 
 # ── HIGH: Pages without frontmatter ──────────────────────────────────────────
-# index.md, log.md, and everything under wiki/meta/ (operational records, not
-# knowledge — see wiki/meta/_index.md) are intentionally frontmatter-less.
+# index.md and log.md are intentionally frontmatter-less (OKF §6/§7).
 find "$WIKI" -name "*.md" \
-  | grep -v '_index\|/index\.md\|/log\.md\|/meta/' \
+  | grep -v '_index\|/index\.md\|/log\.md' \
   | while read -r p; do
       head -1 "$p" | grep -q "^---" || f HIGH "No frontmatter: ${p#"$VAULT"/}"
     done
 
 # ── MEDIUM: Orphan pages ──────────────────────────────────────────────────────
 # Match by full vault-relative path to avoid basename collisions.
-# A page is an orphan if no other wiki page links to it via [[wiki/...]] wikilink
-# OR references it in a sources: YAML frontmatter list.
-# wiki/meta/ excluded — operational records are indexed via wiki/meta/_index.md,
-# not the [[wikilink]] graph (see wiki/meta/_index.md).
+# A page is an orphan if no other wiki page links to it — via a body
+# cross-link or a # Citations entry. Both use the same bundle-relative
+# markdown link syntax [title](/wiki/...) per ADR 0005, so a single
+# inbound-link index (already built above for dead-link detection) covers
+# both cases; no separate sources: frontmatter pass is needed anymore.
 #
 # Performance: previous implementation was O(n × m) — for each page, ran 1-2
 # recursive greps over the whole wiki. On moon-multivac (349 pages) this took
-# ~4 min. Current implementation builds the wikilinks set and sources: pages
-# set ONCE upfront (O(m)), then each page is a single O(1) lookup (O(n)).
-# Total: O(n + m), ~10x faster on small vaults, orders of magnitude on large.
+# ~4 min. Current implementation builds the inbound-link set ONCE upfront
+# (O(m)), then each page is a single O(1) lookup (O(n)). Total: O(n + m),
+# ~10x faster on small vaults, orders of magnitude on large.
 
-# Build the inverse wikilink index in a single pass over the vault:
-# for every `from<TAB>to` pair, accumulate. Then orphan detection is
-# O(1) per page (membership lookup, excluding self).
-# `from<TAB>to` per line. Trailing `\` is stripped (escaped alias pipe in tables).
-# `\|Display text` is the alias form — take only the path part.
-while IFS=: read -r src link; do
-  link="${link#\[\[wiki/}"
+# Build the inverse link index in a single pass over the vault: for every
+# `from<TAB>to` pair, accumulate. Then orphan detection is O(1) per page
+# (membership lookup, excluding self).
+while IFS=: read -r src match; do
+  link="${match#](/}"
+  link="${link%)}"
   link="${link%.md}"
-  link="${link%\\}"
-  case "$link" in
-    *"|"*) link="${link%%|*}" ;;  # drop "|Display text" alias
-  esac
   printf '%s\t%s\n' "${src#"$VAULT"/}" "$link"
-done < <(grep -roE '\[\[wiki/[^]|]+' "$WIKI" --include="*.md" 2>/dev/null) > "$INCOMING_LINKS"
+done < <(grep -roE '\]\(/wiki/[^)]+\)' "$WIKI" --include="*.md" 2>/dev/null) > "$INCOMING_LINKS"
 
-# Precompute the set of pages that have at least one inbound non-self
-# wikilink: a flat sorted list of unique target paths. Orphan detection
-# becomes a single `grep -Fxq` per page (O(log n) with sorted input,
-# O(n) worst case) instead of an awk linear scan per page.
+# Precompute the set of pages that have at least one inbound non-self link:
+# a flat sorted list of unique target paths. Orphan detection becomes a
+# single `grep -Fxq` per page (O(log n) with sorted input, O(n) worst case)
+# instead of an awk linear scan per page.
 awk -F'\t' '$1 != $2 { print $2 }' "$INCOMING_LINKS" | sort -u > "$INCOMING_TARGETS" || true
 
-# Precompute the set of all references from pages with sources: frontmatter.
-# Extracts both basename-only references (e.g. concept-name) and full path
-# references (e.g. wiki/sources/slug.md, wiki/sources/slug, etc.).
-SOURCES_TARGETS=$(mktemp) || exit 2
-trap 'rm -f "$FINDINGS" "$DEAD_LINKS" "$RAW_NOSRC" "$NO_CONF" "$ORPHANS" "$INDEX_MISMATCHES" "$INCOMING_LINKS" "$INCOMING_TARGETS" "$SOURCES_PAGES" "$RAW_REFS" "$SOURCES_REFS" "$WIKI_SLUGS" "$RAW_INDEX" "$SOURCES_TARGETS"' EXIT
-while IFS= read -r sf; do
-  # Scope extraction to the frontmatter block only (between the two `---`
-  # delimiters) — body prose or lists can otherwise contain `- foo` or
-  # `wiki/...` text that falsely counts as a sources: reference.
-  fm=$(awk '/^---$/{c++; next} c==1' "$sf" 2>/dev/null)
-  # basename references (YAML block list: `- concept-name`)
-  printf '%s\n' "$fm" | grep -oE '^[[:space:]]+-[[:space:]]+[^ ]+$' \
-    | sed 's/^[[:space:]]*-[[:space:]]*//' | sed 's/\.md$//' >> "$SOURCES_TARGETS"
-  # flow sequence references (YAML flow: `wiki/sources/slug.md,`)
-  printf '%s\n' "$fm" | grep -oE '[[:space:]]+wiki/[^,]+,?' \
-    | sed 's/[[:space:]]*//g; s/,//g; s/\.md$//' >> "$SOURCES_TARGETS"
-done < <(grep -rl '^sources:' "$WIKI" --include="*.md" 2>/dev/null)
-sort -u "$SOURCES_TARGETS" -o "$SOURCES_TARGETS"
-
 find "$WIKI" -name "*.md" \
-  | grep -v '_index\|/index\.md\|/log\.md\|/meta/' \
+  | grep -v '_index\|/index\.md\|/log\.md' \
   | while read -r page; do
-      rel="${page#"$VAULT"/}"          # e.g. wiki/concepts/memory-system.md
-      rel_noext="${rel%.md}"         # e.g. wiki/concepts/memory-system
-      rel_target="${rel_noext#wiki/}"  # e.g. concepts/memory-system — matches INCOMING_TARGETS format
-      basename_noext="${rel_noext##*/}"  # e.g. memory-system
-      if ! grep -Fxq "$rel_target" "$INCOMING_TARGETS" 2>/dev/null; then
-        # Check sources: references — both basename and full path format
-        if ! grep -Fxq "$basename_noext" "$SOURCES_TARGETS" 2>/dev/null \
-           && ! grep -Fxq "$rel_noext" "$SOURCES_TARGETS" 2>/dev/null; then
-          f MEDIUM "Orphan: ${rel}"
-          echo "$rel" >> "$ORPHANS"
-        fi
+      rel="${page#"$VAULT"/}"    # e.g. wiki/concepts/memory-system.md
+      rel_noext="${rel%.md}"     # e.g. wiki/concepts/memory-system — matches INCOMING_TARGETS format
+      if ! grep -Fxq "$rel_noext" "$INCOMING_TARGETS" 2>/dev/null; then
+        f MEDIUM "Orphan: ${rel}"
+        echo "$rel" >> "$ORPHANS"
       fi
     done
 
 # ── MEDIUM: Missing provenance — concepts + entities ──────────────────────────
-# Source pages usan `source:` (URL) y `raw:`, no `sources:` wiki
+# Source pages usan `resource:` (URL) y `raw:`, no `# Citations`
 for dir in "$WIKI/concepts" "$WIKI/entities"; do
   [ -d "$dir" ] || continue
   find "$dir" -name "*.md" | grep -v '_index' | while read -r p; do
     rel="${p#"$VAULT"/}"
-    grep -q "^sources:" "$p" || f MEDIUM "No sources: $rel"
+    grep -q "^# Citations" "$p" || f MEDIUM "No # Citations: $rel"
     grep -q "^confidence:" "$p" || { f MEDIUM "No confidence: $rel"; echo "$rel" >> "$NO_CONF"; }
   done
 done
@@ -234,7 +197,7 @@ tmpl_val_nonempty() {  # $1: template file, $2: key -> "1" if template ships a n
 
 if [ -d "$TEMPLATES" ]; then
   find "$WIKI" -name "*.md" \
-    | grep -v '_index\|/index\.md\|/log\.md\|/meta/' \
+    | grep -v '_index\|/index\.md\|/log\.md' \
     | while read -r p; do
         rel="${p#"$VAULT"/}"
         keys=$(fm_keys "$p")
@@ -276,7 +239,6 @@ if [ -d "$TEMPLATES" ]; then
     | awk '{ if ($0 ~ /y$/) { sub(/y$/,"ies"); print } else print $0 "s" }')
   find "$WIKI" -mindepth 1 -maxdepth 1 -type d ! -name ".*" | while read -r d; do
     dname=$(basename "$d")
-    [ "$dname" = "meta" ] && continue
     echo "$EXPECTED_DIRS" | grep -qx "$dname" \
       || f LOW "Carpeta fuera de estructura: wiki/${dname}/ (sin templates/*.md correspondiente — decisión del usuario)"
   done
@@ -295,7 +257,7 @@ from pathlib import Path
 
 # sys.argv[1] is $WIKI = $VAULT/wiki; rglob starts from there, so
 # relative_to(WIKI) yields "concepts/...", "sources/..." — prefix
-# with "wiki/" to match the [[wiki/...]] shape in index.md.
+# with "wiki/" to match the [title](/wiki/...) shape in index.md.
 wiki = Path(sys.argv[1])
 out = Path(sys.argv[2])
 text = (wiki / "index.md").read_text()
@@ -311,18 +273,19 @@ for line in text.splitlines():
     m = re.match(r"^##\s+(\w+)", line)
     if m:
         # Any `##` heading (recognized or not) ends the previous section —
-        # otherwise unknown headings like `## Meta` would let their
-        # following wikilinks be misattributed to the prior section.
+        # otherwise unknown headings would let their following links be
+        # misattributed to the prior section.
         current = section_to_type.get(m.group(1).lower())
         listings.setdefault(current, set())
     elif current:
-        m = re.match(r"^\s*-\s*\[\[(wiki/[^|\]]+)", line)
+        m = re.match(r"^\s*-\s*\[[^\]]*\]\((/?wiki/[^)]+)\)", line)
         if m:
-            listings[current].add(m.group(1))
+            target = re.sub(r"\.md$", "", m.group(1).lstrip("/"))
+            listings[current].add(target)
 
 findings = []
 for p in sorted(wiki.rglob("*.md")):
-    if p.name in ("_index.md", "index.md", "log.md") or "meta" in p.parts:
+    if p.name in ("_index.md", "index.md", "log.md"):
         continue
     try:
         content = p.read_text()
@@ -345,6 +308,29 @@ PYEOF
     [ -n "$line" ] && f LOW "$line"
   done < "$INDEX_MISMATCHES"
 fi
+
+# ── MEDIUM: Malformed or non-sequential # Citations ───────────────────────────
+# Each non-blank line under a `# Citations` heading must read
+# "[N] [title](/wiki/...)" with N sequential starting at 1 (ADR 0005).
+find "$WIKI" -name "*.md" \
+  | grep -v '/index\.md\|/log\.md' \
+  | while read -r p; do
+      grep -q '^# Citations' "$p" || continue
+      rel="${p#"$VAULT"/}"
+      awk -v rel="$rel" '
+        /^# Citations/ { incite=1; n=0; next }
+        incite && /^#/ { incite=0 }
+        incite && NF {
+          n++
+          pat = "^\\[" n "\\] \\[[^]]+\\]\\(/wiki/[^)]+\\.md\\)[ \t]*$"
+          if ($0 !~ pat) {
+            printf "%s\t%s\n", rel, $0
+          }
+        }
+      ' "$p"
+    done | while IFS=$'\t' read -r rel line; do
+      [ -n "$rel" ] && f MEDIUM "Malformed # Citations entry in ${rel}: expected sequential [N] [title](/wiki/...), got: ${line}"
+    done
 
 # ── Schema validation (delegated) ────────────────────────────────────────────
 VALIDATE_SCRIPT="$(dirname "$0")/validate-schema.sh"
@@ -379,8 +365,9 @@ echo "HIGH: $HIGH  MEDIUM: $MED  LOW: $LOW"
 # Canonical schema defined in skills/wiki-lint/references/VAULT-REPORT-SCHEMA.md
 # Written atomically (temp file in the same dir + rename) so a kill/crash
 # mid-write never leaves a truncated/corrupt vault-report.json behind.
-mkdir -p "$WIKI/meta"
-REPORT_TMP=$(mktemp "$WIKI/meta/.vault-report.json.XXXXXX") || { echo "ERROR: mktemp failed — cannot write vault-report.json" >&2; exit 2; }
+# meta/ is a sibling of wiki/, not nested inside it (ADR 0005, decision 4).
+mkdir -p "$VAULT/meta"
+REPORT_TMP=$(mktemp "$VAULT/meta/.vault-report.json.XXXXXX") || { echo "ERROR: mktemp failed — cannot write vault-report.json" >&2; exit 2; }
 {
   printf '{\n'
   printf '  "generated": "%s",\n' "$(date +%Y-%m-%d)"
@@ -391,7 +378,7 @@ REPORT_TMP=$(mktemp "$WIKI/meta/.vault-report.json.XXXXXX") || { echo "ERROR: mk
   printf '    "orphan_pages": %s\n' "$(json_str_array "$ORPHANS")"
   printf '  }\n'
   printf '}\n'
-} > "$REPORT_TMP" && mv "$REPORT_TMP" "$WIKI/meta/vault-report.json" || { echo "ERROR: failed to write vault-report.json" >&2; rm -f "$REPORT_TMP"; exit 2; }
-echo "Report written: ${WIKI#"$VAULT"/}/meta/vault-report.json"
+} > "$REPORT_TMP" && mv "$REPORT_TMP" "$VAULT/meta/vault-report.json" || { echo "ERROR: failed to write vault-report.json" >&2; rm -f "$REPORT_TMP"; exit 2; }
+echo "Report written: meta/vault-report.json"
 
 [ "$HIGH" -gt 0 ] && exit 1 || exit 0

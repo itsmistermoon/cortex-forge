@@ -1,6 +1,7 @@
 ---
 title: {{title}}
 type: source
+description: {{one-line summary}}
 resource: 
 created: {{date:YYYY-MM-DD}}
 updated: {{date:YYYY-MM-DD}}

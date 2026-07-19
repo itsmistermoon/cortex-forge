@@ -18,7 +18,7 @@ Paths are relative to this skill's directory.
 - **`scripts/index.py`** — Builds/refreshes `.hot/db/vault.db` when semantic search is enabled (step 5); also copied to `~/.almagest/bin/` for the post-commit reindex hook (step 5a)
 - **`scripts/embeddings.py`** — Shared embedding backend, imported by `index.py`; not invoked directly
 - **`scripts/reindex-post-commit.sh`** — Copied to `~/.almagest/bin/hooks/` and wired into `{vault}/.git/hooks/post-commit` (step 5a)
-- **`scripts/tags-audit.py`** — Runs a tags audit on a vault (maintenance menu option 10); optionally writes a dated snapshot under `wiki/meta/`
+- **`scripts/tags-audit.py`** — Runs a tags audit on a vault (maintenance menu option 10); optionally writes a dated snapshot under `meta/`
 
 ## Sub-tasks
 
@@ -109,7 +109,7 @@ Always end with the relevant subset of ## Output format.
 ## Output format
 
 Confirm:
-- Scaffold (if run): what was created (`wiki/` structure, `AGENTS.md` stub, `wiki/meta/tags.md`) — remind the user to fill in `AGENTS.md`'s "Vault identity" section themselves
+- Scaffold (if run): what was created (`wiki/` structure, `AGENTS.md` stub, `meta/tags.md`) — remind the user to fill in `AGENTS.md`'s "Vault identity" section themselves
 - Registered vaults: list all entries in `vaults:` with their paths and locales, marking the default
 - Skills: all 7 present / missing {list} (with the `npx skills add` command to fix it)
 - Semantic search: active (backend: Ollama/mlx-embeddings/sentence-transformers, N chunks indexed) / not active (declined or skipped — how to enable later)

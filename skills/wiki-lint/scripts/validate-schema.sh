@@ -25,10 +25,10 @@ f() { echo "[$1] $2" >> "$_tmpfile"; }
 # ── Schema definitions ────────────────────────────────────────────────────────
 # Canonical types: source | concept | entity | project
 # reference and series are retired — migrate to concept and source respectively.
-fields_source="title type resource created updated tags confidence schema_version raw"
-fields_concept="title type created updated tags aliases sources confidence schema_version"
-fields_entity="title type created updated tags aliases sources confidence schema_version"
-fields_project="title type created updated tags status repo domains sources confidence schema_version"
+fields_source="title type description resource created updated tags confidence schema_version raw"
+fields_concept="title type description created updated tags aliases confidence schema_version"
+fields_entity="title type description created updated tags aliases confidence schema_version"
+fields_project="title type description created updated tags status repo domains confidence schema_version"
 
 # ── Per-file check ────────────────────────────────────────────────────────────
 check_fields() {

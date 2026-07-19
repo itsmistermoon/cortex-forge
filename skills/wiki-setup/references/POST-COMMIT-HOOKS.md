@@ -20,7 +20,7 @@ If yes: copy `../wiki-lint/scripts/lint.sh` (relative to this skill) to `~/.alma
 if [ -f ~/.almagest/bin/lint.sh ]; then
   (
     bash ~/.almagest/bin/lint.sh >/dev/null 2>&1 || true
-    R="wiki/meta/vault-report.json"
+    R="meta/vault-report.json"
     if [ -f "$R" ] && command -v jq >/dev/null 2>&1; then
       n=$(jq '[.health[] | length] | add' "$R" 2>/dev/null || echo "?")
       echo "$(date '+%F %T') wiki-lint: report refreshed, findings=$n" >> .git/wiki-lint.log

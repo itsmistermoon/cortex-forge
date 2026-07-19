@@ -4,7 +4,7 @@ schema_version: "0.3"
 
 # AGENTS.md — Antu
 
-This repo is the source of truth for the Antu skill suite (`skills/`, `templates/`), distributed via `npx skills add itsmistermoon/cortex-forge`. This repo is not itself a vault — it has no `wiki/` directory. Vaults that install this suite carry the real knowledge content, in their own `wiki/` and `.raw/`.
+This repo is the source of truth for the Antu skill suite (`skills/`, `templates/`), distributed via `npx skills add itsmistermoon/almagest-antu`. This repo is not itself a vault — it has no `wiki/` directory. Vaults that install this suite carry the real knowledge content, in their own `wiki/` and `.raw/`.
 
 ## Vocabulary
 
@@ -27,7 +27,7 @@ Sigue `METHODOLOGY.md` en la raíz de este repo. Si no existe en este entorno, a
 
 ### Issue tracker
 
-GitHub Issues in `itsmistermoon/cortex-forge`. PRs are not a triage surface. See `docs/agents/issue-tracker.md`.
+GitHub Issues in `itsmistermoon/almagest-antu`. PRs are not a triage surface. See `docs/agents/issue-tracker.md`.
 
 ### Triage labels
 
@@ -44,19 +44,19 @@ Single-context. `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/do
 - **Open a GitHub Issue first for larger or multi-step work** — a feature spanning several PRs, a design decision worth discussing before writing code. Reference it from every PR in that arc with `Refs #N`, reserving `Closes #N` for the final one — closing on the first PR would end the issue's audit trail before the work does. Mechanical details for interacting with issues: `docs/agents/issue-tracker.md`.
 - **Run `bash scripts/check-skill-sync.sh`** before opening a PR that touches `skills/**/SKILL.md` or its co-located `references/`/`scripts/`.
 - **Check any significant change to an existing skill, or any new skill added to the suite, against `wiki/concepts/skill-design-principles.md` in the `moon-multivac` vault** (`/cortex-recall moon-multivac skill design principles checklist`) before opening a PR — the whiteness test, the 12 principles, and the pre-commit checklist it contains.
-- **Edit this repo as the single source of truth**, then refresh installs with `npx skills add itsmistermoon/cortex-forge --all -g -y`; `~/.agents/skills/` is a generated target.
+- **Edit this repo as the single source of truth**, then refresh installs with `npx skills add itsmistermoon/almagest-antu --all -g -y`; `~/.agents/skills/` is a generated target.
 - **Treat `.env` and credential files as off-limits** to reading or modifying.
 - **Treat `templates/` here as the canonical schema** — every vault that installs this suite inherits its shape.
-- **Check `docs/family-conventions.md` before changing a convention shared with Kuyen** (the sibling lite suite, `moon-kuyen`) — log formats, timestamp formats, and similar cross-cutting shape. Update it if the convention diverges or a new one is formalized.
+- **Check Almagest's [`docs/family-conventions.md`](https://github.com/itsmistermoon/almagest/blob/main/docs/family-conventions.md) before changing a convention shared with Kuyen** (the sibling lite suite, `almagest-kuyen`) — log formats, timestamp formats, and similar cross-cutting shape. It lives in the umbrella repo (locally `../` when this repo sits inside the `moon-almagest/` checkout); update it there if the convention diverges or a new one is formalized.
 
 ## Available skills
 
-All 7 live in `skills/` here as their canonical source, and install identically via `npx skills add itsmistermoon/cortex-forge` (`--skill X` for a standalone install).
+All 7 live in `skills/` here as their canonical source, and install identically via `npx skills add itsmistermoon/almagest-antu` (`--skill X` for a standalone install).
 
 - `wiki-ingest` — Ingest a URL or file into a vault: saves to `.raw/`, synthesizes wiki pages, updates the index
-- `wiki-recall` — Answer questions grounded in a vault's synthesized wiki content, with citations to the pages used
+- `wiki-query` — Answer questions grounded in a vault's synthesized wiki content, with citations to the pages used
 - `wiki-imprint` — Archive a valuable session synthesis as a permanent wiki page in a vault
-- `wiki-prune` — Health check a vault: detect dead links, orphan pages, missing provenance, unprocessed sources
+- `wiki-lint` — Health check a vault: detect dead links, orphan pages, missing provenance, unprocessed sources
 - `hot-handoff` — Snapshot session context into `.hot/HANDOFF.md`; works from any repo, inside or outside a vault
 - `hot-triage` — On-demand `.hot/` hygiene: retrospective PLAYBOOK.md pruning, cross-suite pending recovery, Pending/Active decisions validity re-checks
 - `wiki-setup` — Register/deregister a vault in Antu and verify global skills are installed

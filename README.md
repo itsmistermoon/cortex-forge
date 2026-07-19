@@ -1,10 +1,12 @@
 # Antu
 
-![Antu](cortex-forge-promo.png)
+![Antu](almagest-antu-promo.png)
+
+Antu is the full suite of the [Almagest](https://github.com/itsmistermoon/almagest) family — its lite sibling is [Kuyen](https://github.com/itsmistermoon/almagest-kuyen). See the Almagest README for how to choose between them.
 
 ## What it is
 
-Antu is a set of skills you can use to turn raw sources into synthesized, queryable knowledge. Agents operate the vault: they ingest, recall, and maintain. You define what matters and when to persist it.
+Antu is a set of skills you can use to turn raw sources into synthesized, queryable knowledge. Agents operate the vault: they ingest, query, and maintain. You define what matters and when to persist it.
 
 The system separates two kinds of memory:
 - **Operational memory** — what's happening now and what was decided. Lives in `.hot/HANDOFF.md` (session cache), read by the agent at every session start per `AGENTS.md` instructions. Small, fast, always loaded.
@@ -21,19 +23,19 @@ Two ways to install, depending on your agent.
 1. Run the [skills.sh](https://www.skills.sh/) installer:
 
 ```bash
-npx skills add itsmistermoon/cortex-forge
+npx skills add itsmistermoon/almagest-antu
 ```
 
 2. See the [Supported Agents table](https://github.com/vercel-labs/skills#supported-agents) to pick the exact flag value per agent.
 
-Skills install unnamespaced: `/wiki-ingest`, `/hot-handoff`, `/wiki-imprint`, `/wiki-recall`, `/wiki-prune`, `/hot-triage`, `/wiki-setup`.
+Skills install unnamespaced: `/wiki-ingest`, `/hot-handoff`, `/wiki-imprint`, `/wiki-query`, `/wiki-lint`, `/hot-triage`, `/wiki-setup`.
 
 ### Option B: Claude Code plugin
 
 This repo is also a self-hosted [Claude Code plugin marketplace](https://code.claude.com/docs/en/plugin-marketplaces) — one repo, one plugin.
 
 ```bash
-/plugin marketplace add itsmistermoon/cortex-forge
+/plugin marketplace add itsmistermoon/almagest-antu
 /plugin install antu@antu
 ```
 
@@ -42,7 +44,7 @@ Skills install namespaced: `/antu:wiki-ingest`, `/antu:hot-handoff`, etc. To tes
 ### Then, either way
 
 Run `/wiki-setup` (or `/antu:wiki-setup`) in your agent — from a fresh git repo or an existing vault. This skill will:
-- Scaffold `wiki/` and a starter `AGENTS.md` if they don't exist yet (asks first — never overwrites an existing vault), detect your locale, and register the vault in `~/.cortex-forge/config.yml`
+- Scaffold `wiki/` and a starter `AGENTS.md` if they don't exist yet (asks first — never overwrites an existing vault), detect your locale, and register the vault in `~/.almagest/config.yml`
 - Verify all seven skills are actually installed, and tell you to re-run `npx skills add` (or `/plugin update`) if any are missing
 - Offer to set up semantic search, with a dependency check that runs before asking
 - Offer optional extras: syncing infrastructure from upstream, a stale-cache warning threshold, and post-commit git hooks for prune/reindex
@@ -79,17 +81,17 @@ After synthesizing new pages, it scans existing wiki pages and selects those who
 
 What was worth keeping from the session becomes a stable wiki page. A memory trace is what remains after an experience ends. The session closes; the knowledge stays encoded in the vault.
 
-### `/wiki-recall` — Query
+### `/wiki-query` — Query
 
 The agent searches the vault, retrieves relevant pages, and synthesizes a response with citations, drawn from what's been ingested or imprinted into it.
 
-### `/wiki-prune` — Vault hygiene
+### `/wiki-lint` — Vault hygiene
 
 Detects orphan pages, dead links, contradictory claims, stale information. Forgetting functions as maintenance: prune removes what weakens the network deliberately, so what remains stays reliable.
 
 ### `/hot-triage` — Session-state hygiene
 
-On-demand deep clean of `.hot/` (the active repo's session state, not the vault): retrospective `PLAYBOOK.md` pruning, recovering pending/fragile-context items after a foreign-suite (Kuyen) write, and validity re-checks on existing `### Pending`/`### Active decisions` entries. Mirrors `/wiki-prune`'s pattern — a separate hygiene skill, not folded into `/hot-handoff`'s per-session mechanics.
+On-demand deep clean of `.hot/` (the active repo's session state, not the vault): retrospective `PLAYBOOK.md` pruning, recovering pending/fragile-context items after a foreign-suite (Kuyen) write, and validity re-checks on existing `### Pending`/`### Active decisions` entries. Mirrors `/wiki-lint`'s pattern — a separate hygiene skill, not folded into `/hot-handoff`'s per-session mechanics.
 
 ### `/wiki-setup` — Setup and configuration
 
@@ -122,7 +124,7 @@ Three behaviors are mandatory for any agent operating the vault, defined in `AGE
 
 **Ingest** — when the user provides a URL, file, or uses words like "ingest" or "process", invoke `/wiki-ingest` as the first action.
 
-**Recall** — when the user asks about any topic that may exist in the vault, invoke `/wiki-recall` as the first action. The skill returns synthesized knowledge with citations; treat that as the authoritative answer over active context, `grep`, or training knowledge on vault topics.
+**Recall** — when the user asks about any topic that may exist in the vault, invoke `/wiki-query` as the first action. The skill returns synthesized knowledge with citations; treat that as the authoritative answer over active context, `grep`, or training knowledge on vault topics.
 
 ## Design principles
 
@@ -136,19 +138,11 @@ Three behaviors are mandatory for any agent operating the vault, defined in `AGE
 
 ## Full vs. lite
 
-Antu has a sibling project, **Kuyen**, built later as a from-scratch reapplication of what Antu's growth taught: minimal dependencies, no scripts, no reference docs, no multi-vault machinery — just skills. Both are "vault" suites; neither depends on the other. Pick per vault, not once for everything you do:
-
-| Axis | Antu | Kuyen |
-|---|---|---|
-| Vault size / lifespan | Large, multi-session, expected to accumulate substantial knowledge over time | Small or short-lived — a scratch vault, a single project's notes |
-| Feature needs | Provenance tracking, multi-vault resolution, research mode, semantic search, planned MCP integration | Ingest / query / handoff, nothing beyond that |
-| Latency / dependency tolerance | Fine waiting on heavier operations for more capability | Wants near-instant operations with no external dependencies |
-
-Conventions the two suites deliberately share (not features — just shared shape, like log entry formatting) are tracked in [`docs/family-conventions.md`](docs/family-conventions.md).
+Antu has a sibling suite, **[Kuyen](https://github.com/itsmistermoon/almagest-kuyen)**, built later as a from-scratch reapplication of what Antu's growth taught: minimal dependencies, no scripts, no reference docs, no multi-vault machinery — just skills (installed as `kyn-*` so both suites coexist on the same machine). Both are Almagest vault suites; neither depends on the other. Pick per vault, not once for everything you do — the canonical chooser table lives in the [Almagest README](https://github.com/itsmistermoon/almagest), and conventions the two suites deliberately share (not features — just shared shape, like log entry formatting) are tracked in Almagest's [`docs/family-conventions.md`](https://github.com/itsmistermoon/almagest/blob/main/docs/family-conventions.md).
 
 ## Multi-vault
 
-Skills resolve the target vault from wherever you are — no `cd` required. The global config at `~/.cortex-forge/config.yml` maps names to a path and locale:
+Skills resolve the target vault from wherever you are — no `cd` required. The global config at `~/.almagest/config.yml` maps names to a path and locale:
 
 ```yaml
 vaults:
@@ -166,8 +160,8 @@ Skills resolve the vault automatically: if you're inside a registered vault → 
 | Skill | Explicit vault arg |
 |---|---|
 | `/wiki-ingest` | ✅ `/wiki-ingest <vault-name> <url-or-file>` |
-| `/wiki-recall` | ✅ `/wiki-recall <vault-name> <query>` |
+| `/wiki-query` | ✅ `/wiki-query <vault-name> <query>` |
 | `/hot-handoff` | ✅ `/hot-handoff <vault-name> [project-name] [next: <focus>]` |
 | `/wiki-imprint` | ✅ `/wiki-imprint <vault-name>` |
-| `/wiki-prune` | ✅ `/wiki-prune <vault-name>` — asks for confirmation before proceeding |
+| `/wiki-lint` | ✅ `/wiki-lint <vault-name>` — asks for confirmation before proceeding |
 | `/hot-triage` | ⛔ — resolves the active repo (nearest `.git`), not a vault |

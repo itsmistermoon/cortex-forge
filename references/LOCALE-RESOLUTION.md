@@ -6,7 +6,7 @@ Skills that generate content stored in the vault must write it in the vault's ow
 
 ## Fallback chain
 
-Read `locale:` from the vault's entry in `~/.cortex-forge/config.yml`. Use it for all agent-generated content.
+Read `locale:` from the vault's entry in `~/.almagest/config.yml`. Use it for all agent-generated content.
 
 If absent, apply in order:
 1. `.hot/HANDOFF.md` title line — look for `— locale: {lang}` in the first heading

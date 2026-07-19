@@ -1,22 +1,22 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "antu",
-  "displayName": "Antu",
+  "displayName": "Almagest Antu",
   "description": "LLM-native personal wiki — ingest sources, synthesize wiki pages, and recall knowledge across sessions from a vault that lives anywhere.",
   "author": {
     "name": "itsmistermoon"
   },
-  "homepage": "https://github.com/itsmistermoon/cortex-forge",
-  "repository": "https://github.com/itsmistermoon/cortex-forge",
+  "homepage": "https://github.com/itsmistermoon/almagest-antu",
+  "repository": "https://github.com/itsmistermoon/almagest-antu",
   "license": "MIT",
   "keywords": ["knowledge-base", "wiki", "vault", "memory", "second-brain", "rag"],
   "skills": [
     "./skills/hot-handoff",
     "./skills/hot-triage",
     "./skills/wiki-ingest",
-    "./skills/wiki-recall",
+    "./skills/wiki-query",
     "./skills/wiki-imprint",
-    "./skills/wiki-prune",
+    "./skills/wiki-lint",
     "./skills/wiki-setup"
   ]
 }

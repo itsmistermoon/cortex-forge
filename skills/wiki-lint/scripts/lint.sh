@@ -1,6 +1,6 @@
 #!/bin/bash
-# prune.sh — health check for an Antu vault wiki/
-# Usage: prune.sh [vault-path]
+# lint.sh — health check for an Antu vault wiki/
+# Usage: lint.sh [vault-path]
 # Exit: 0 = no HIGH findings, 1 = HIGH findings exist
 
 set -uo pipefail
@@ -351,7 +351,7 @@ VALIDATE_SCRIPT="$(dirname "$0")/validate-schema.sh"
 if [ -x "$VALIDATE_SCRIPT" ]; then
   "$VALIDATE_SCRIPT" "$VAULT" "$FINDINGS"
 else
-  echo "WARNING: validate-schema.sh not found next to prune.sh ($VALIDATE_SCRIPT) — schema drift checks skipped. Reinstall the wiki-prune skill to restore it." >&2
+  echo "WARNING: validate-schema.sh not found next to lint.sh ($VALIDATE_SCRIPT) — schema drift checks skipped. Reinstall the wiki-lint skill to restore it." >&2
 fi
 
 # ── Output ────────────────────────────────────────────────────────────────────
@@ -376,7 +376,7 @@ echo "── Summary ───────────────────�
 echo "HIGH: $HIGH  MEDIUM: $MED  LOW: $LOW"
 
 # ── vault-report.json ─────────────────────────────────────────────────────────
-# Canonical schema defined in skills/wiki-prune/references/VAULT-REPORT-SCHEMA.md
+# Canonical schema defined in skills/wiki-lint/references/VAULT-REPORT-SCHEMA.md
 # Written atomically (temp file in the same dir + rename) so a kill/crash
 # mid-write never leaves a truncated/corrupt vault-report.json behind.
 mkdir -p "$WIKI/meta"

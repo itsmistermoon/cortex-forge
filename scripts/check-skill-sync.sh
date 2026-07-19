@@ -87,14 +87,14 @@ while IFS= read -r file; do
 done < <(grep -lriE "creat(e|es|ing)? (a |the |new )*page|saved to \`\{?vault\}?/?wiki|writ(e|es|ing) (the |a |new )*page" "$SKILLS_DIR"/*/SKILL.md | sort -u)
 
 # ---------------------------------------------------------------------------
-# 4. vault-report.json schema fields consistent between wiki-prune and AGENTS.md
+# 4. vault-report.json schema fields consistent between wiki-lint and AGENTS.md
 # ---------------------------------------------------------------------------
 check "vault-report-schema"
-PRUNE_SCHEMA="$SKILLS_DIR/wiki-prune/references/VAULT-REPORT-SCHEMA.md"
+PRUNE_SCHEMA="$SKILLS_DIR/wiki-lint/references/VAULT-REPORT-SCHEMA.md"
 HANDOFF_FILE="$SKILLS_DIR/hot-handoff/SKILL.md"
 
 if [[ ! -f "$PRUNE_SCHEMA" ]]; then
-  fail "wiki-prune/references/VAULT-REPORT-SCHEMA.md not found"
+  fail "wiki-lint/references/VAULT-REPORT-SCHEMA.md not found"
 elif [[ ! -f "$HANDOFF_FILE" ]]; then
   fail "hot-handoff/SKILL.md not found — cannot verify vault-report.json consumer"
 else
@@ -111,12 +111,12 @@ else
     all_ok=true
     while IFS= read -r field; do
       if ! grep -q "$field" "$HANDOFF_FILE"; then
-        fail "vault-report field '$field' declared in wiki-prune schema but not referenced in hot-handoff/SKILL.md"
+        fail "vault-report field '$field' declared in wiki-lint schema but not referenced in hot-handoff/SKILL.md"
         all_ok=false
       fi
     done <<< "$prune_fields"
     if $all_ok; then
-      ok "vault-report.json schema fields consistent between wiki-prune and hot-handoff"
+      ok "vault-report.json schema fields consistent between wiki-lint and hot-handoff"
     fi
   fi
 fi
@@ -140,7 +140,7 @@ done
 # ---------------------------------------------------------------------------
 # 6. Every script listed in "## Available scripts" actually exists (same dir)
 # ---------------------------------------------------------------------------
-# Catches exactly the 2026-07-03 regression: prune.sh was relocated but
+# Catches exactly the 2026-07-03 regression: lint.sh was relocated but
 # validate-schema.sh (which it calls as a sibling) was left in bin/,
 # silently disabling schema-drift checks for every install. Scans the
 # "## Available scripts" section structurally rather than grepping for the
@@ -193,7 +193,7 @@ _check_synced() {  # $1: subdir ("scripts" or "references"), $2: filename, $3..$
   done
   [[ -n "$first" ]] && ok "$script identical across: $*"
 }
-_check_synced "scripts" "embeddings.py" wiki-setup wiki-recall wiki-ingest
+_check_synced "scripts" "embeddings.py" wiki-setup wiki-query wiki-ingest
 _check_synced "scripts" "index.py" wiki-setup wiki-ingest
 
 # ---------------------------------------------------------------------------
@@ -204,7 +204,7 @@ _check_synced "scripts" "index.py" wiki-setup wiki-ingest
 # duplicated-script-sync above), but that only applied to the installability
 # concern, not the E006 security concern — these are inert docs, nothing
 # executes them. Moved to a single canonical copy at references/ (repo root),
-# synced by wiki-setup into ~/.cortex-forge/references/ (see
+# synced by wiki-setup into ~/.almagest/references/ (see
 # skills/wiki-setup/references/UPSTREAM-SYNC.md). This check guards against
 # a skill silently re-introducing a local copy that could drift.
 check "no-reintroduced-reference-duplicates"
@@ -216,7 +216,7 @@ for shared_doc in VAULT-RESOLUTION.md LOCALE-RESOLUTION.md HANDOFF-FORMAT.md PLA
     [[ -f "$f" ]] && found="$found $name"
   done
   if [[ -n "$found" ]]; then
-    fail "$shared_doc: re-duplicated locally in:$found — should be removed and referenced from ~/.cortex-forge/references/ instead"
+    fail "$shared_doc: re-duplicated locally in:$found — should be removed and referenced from ~/.almagest/references/ instead"
   else
     ok "$shared_doc: no local copies re-introduced"
   fi

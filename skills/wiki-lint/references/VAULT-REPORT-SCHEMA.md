@@ -1,8 +1,8 @@
 # vault-report.json — schema reference
 
-Reference for `wiki-prune` (step 5). Read when adding fields or checking what the Layer 1 script persists.
+Reference for `wiki-lint` (step 5). Read when adding fields or checking what the Layer 1 script persists.
 
-`{vault}/wiki/meta/vault-report.json` is the session-startup health signal read in `AGENTS.md`. Gitignored — a local artifact, not versioned content. Written by `scripts/prune.sh` on every Layer 1 run — the agent never writes it directly.
+`{vault}/wiki/meta/vault-report.json` is the session-startup health signal read in `AGENTS.md`. Gitignored — a local artifact, not versioned content. Written by `scripts/lint.sh` on every Layer 1 run — the agent never writes it directly.
 
 ## Schema
 

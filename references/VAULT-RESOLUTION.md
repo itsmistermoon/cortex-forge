@@ -4,7 +4,7 @@ Reference for skills that need to identify which vault to operate on. Read when 
 
 ## Fallback chain
 
-Read `~/.cortex-forge/config.yml`. Config format: `vaults: {name: {path, locale}, ...}` + `default: name`.
+Read `~/.almagest/config.yml`. Config format: `vaults: {name: {path, locale}, ...}` + `default: name`.
 
 Apply in order:
 1. If the first argument matches a registered vault name → use that vault.

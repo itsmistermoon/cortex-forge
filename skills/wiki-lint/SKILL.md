@@ -1,5 +1,5 @@
 ---
-name: wiki-prune
+name: wiki-lint
 license: MIT
 compatibility: Requires bash with jq, git, and python3 (structural check script)
 description: Vault health check — detects dead links, orphan pages, missing provenance, and unprocessed sources.
@@ -7,7 +7,7 @@ disable-model-invocation: true
 argument-hint: "[vault-name]"
 ---
 
-Start your response with the flavor line `Pruning vault...`, translated to the language of the user's current message (Spanish: `Podando el vault...`), with nothing before it. Use that same language for every prompt, question, menu, and confirmation this skill produces — persisted vault content (if any) still follows the vault's locale, not the conversation language.
+Start your response with the flavor line `Linting vault...`, translated to the language of the user's current message (Spanish: `Revisando el vault...`), with nothing before it. Use that same language for every prompt, question, menu, and confirmation this skill produces — persisted vault content (if any) still follows the vault's locale, not the conversation language.
 
 Health check the active vault in three layers: structural (script), semantic (agents), and drift (metadata comparison).
 
@@ -15,16 +15,16 @@ Health check the active vault in three layers: structural (script), semantic (ag
 
 Paths are relative to this skill's directory.
 
-- **`scripts/prune.sh`** — Layer 1 structural check; single writer of `wiki/meta/vault-report.json` (step 2)
-- **`scripts/validate-schema.sh`** — Validates `vault-report.json` schema drift, called by `prune.sh` as a sibling
+- **`scripts/lint.sh`** — Layer 1 structural check; single writer of `wiki/meta/vault-report.json` (step 2)
+- **`scripts/validate-schema.sh`** — Validates `vault-report.json` schema drift, called by `lint.sh` as a sibling
 
 ## Steps
 
-1. **Resolve vault** — per `~/.cortex-forge/references/VAULT-RESOLUTION.md` (synced by `/wiki-setup` — if missing, run `/wiki-setup` first). If the first argument matches a registered vault name (e.g., `/wiki-prune personal`), use that vault.
+1. **Resolve vault** — per `~/.almagest/references/VAULT-RESOLUTION.md` (synced by `/wiki-setup` — if missing, run `/wiki-setup` first). If the first argument matches a registered vault name (e.g., `/wiki-lint personal`), use that vault.
 
    **Confirmation gate:** if the vault was resolved from an explicit argument (not from CWD), confirm with the user before proceeding: "About to prune `{vault-name}` at `{path}`. Continue?" — do not proceed until confirmed.
 
-2. **Layer 1 — Structural check**: Run `bash scripts/prune.sh {vault}`. If the script is missing, the skill installation is incomplete — run `/wiki-setup`, sub-task `skills`, to reinstall.
+2. **Layer 1 — Structural check**: Run `bash scripts/lint.sh {vault}`. If the script is missing, the skill installation is incomplete — run `/wiki-setup`, sub-task `skills`, to reinstall.
 
 3. **Layer 2 — Semantic analysis**: Run the semantic checks below (L2a–L2e) — read the actual pages, never reason about relationships from memory alone.
 
@@ -98,7 +98,7 @@ Report verdict as MEDIUM. Never auto-apply — always requires user confirmation
 
 Reads `wiki/meta/log.md`, not vault pages — a different data source from L2a–L2d, but still bounded by the same hard cap.
 
-1. Collect `**[YYYY-MM-DD] recall-miss** | {query}` entries from the last 30 days (or the most recent 20, whichever is fewer).
+1. Collect `**[YYYY-MM-DD] query-miss** | {query}` entries from the last 30 days (or the most recent 20, whichever is fewer).
 2. Group by topic similarity — same or near-identical query text, or queries a reasonable reading would consider the same underlying question asked differently.
 3. Report any group with 2+ occurrences as MEDIUM: "`{N}` recall misses on `{topic}` since `{earliest-date}` — propose `/wiki-ingest` for a source, or confirm a wiki page should exist." Single-occurrence misses are normal noise — discard them.
 
@@ -120,7 +120,7 @@ Reads `wiki/meta/log.md`, not vault pages — a different data source from L2a�
 - Create missing concept/entity pages (check L2c verdict: NEEDS_PAGE)
 - Merge pages (check L2d verdict: MERGE or RESTRUCTURE)
 - Resolve a contradiction (check L2a verdict: CONTRADICTION) — present both excerpts, let the user decide which stands, both, or neither
-- Act on a recurring recall-miss group (check L2e) — propose `/wiki-ingest` or a new page, per the user's call
+- Act on a recurring query-miss group (check L2e) — propose `/wiki-ingest` or a new page, per the user's call
 - Delete orphan pages
 - Fix a dead `[[wikilink]]` — search the vault for a page with a matching slug or title; propose retargeting there, or propose removal if none found
 - Synthesize an unprocessed `.raw/` file — propose invoking `/wiki-ingest {vault} .raw/{slug}.md` within this session
@@ -132,7 +132,7 @@ Reads `wiki/meta/log.md`, not vault pages — a different data source from L2a�
 
 ---
 
-## Detection criteria — Layer 1 (prune.sh)
+## Detection criteria — Layer 1 (lint.sh)
 
 | Severity | Check |
 |---|---|
@@ -159,5 +159,5 @@ Reads `wiki/meta/log.md`, not vault pages — a different data source from L2a�
 - Orphan sources are normal if freshly ingested and not yet linked from concepts/entities
 - Debate pattern (L2d) only triggers on genuine ambiguity — not on clear component relationships
 - L2a's contradiction check flags factual conflicts, not differences in emphasis, scope, or vintage — when in doubt, classify CONSISTENT
-- L2e skips `wiki/meta/log.md` entirely if it has no `recall-miss` entries — this is the normal case for a vault where every query has been answered
+- L2e skips `wiki/meta/log.md` entirely if it has no `query-miss` entries — this is the normal case for a vault where every query has been answered
 - Layer 3 drift findings are informational — never auto-re-synthesize; always ask the user

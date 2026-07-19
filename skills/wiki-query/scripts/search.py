@@ -3,7 +3,7 @@
 antu-search: Semantic search over the vault index.
 Usage: python {vault}/.hot/db/search.py "query" [--top-k N] [--vault PATH]
 Installed to {vault}/.hot/db/ by wiki-setup. Source co-located with the
-wiki-recall skill (skills/wiki-recall/scripts/).
+wiki-query skill (skills/wiki-query/scripts/).
 """
 import argparse
 import json
@@ -15,7 +15,7 @@ from pathlib import Path
 def _resolve_embeddings_dir() -> Path:
     """Find the directory containing embeddings.py — always a sibling of this
     script (co-located with the skill, or copied alongside it into a vault's
-    .hot/db/ or ~/.cortex-forge/bin/ — either way, always a sibling)."""
+    .hot/db/ or ~/.almagest/bin/ — either way, always a sibling)."""
     here = Path(__file__).parent
     if (here / "embeddings.py").exists():
         return here

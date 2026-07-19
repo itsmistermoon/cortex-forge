@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # antu-embed: Bootstrap semantic index for a vault.
 # Usage: antu-embed [vault_name|vault_path]
-#   No args → uses default vault from ~/.cortex-forge/config.yml
+#   No args → uses default vault from ~/.almagest/config.yml
 #   vault_name → looks up path in config.yml
 #   vault_path → uses path directly
 set -euo pipefail
 
-CONFIG="$HOME/.cortex-forge/config.yml"
+CONFIG="$HOME/.almagest/config.yml"
 [ -f "$CONFIG" ] || { echo "ERROR: $CONFIG not found — run /wiki-setup first." >&2; exit 1; }
 
 # embeddings.py/index.py are co-located with the wiki-setup skill,
@@ -32,7 +32,7 @@ else
 fi
 
 if [[ -z "$SKILL_DIR" ]]; then
-  echo "ERROR: Cannot locate skills/wiki-setup/embeddings.py. Check ~/.cortex-forge/config.yml." >&2
+  echo "ERROR: Cannot locate skills/wiki-setup/embeddings.py. Check ~/.almagest/config.yml." >&2
   exit 1
 fi
 

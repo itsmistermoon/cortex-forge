@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # Post-commit hook: re-index vault embeddings when wiki/ files change.
-# Install: ln -sf ~/.cortex-forge/bin/hooks/reindex-post-commit.sh \
+# Install: ln -sf ~/.almagest/bin/hooks/reindex-post-commit.sh \
 #          <vault>/.git/hooks/post-commit
 set -euo pipefail
 
 VAULT_ROOT="$(git rev-parse --show-toplevel)"
 DB="$VAULT_ROOT/.hot/db/vault.db"
-# Runs the stable runtime copy at ~/.cortex-forge/bin/ — never a script from
+# Runs the stable runtime copy at ~/.almagest/bin/ — never a script from
 # inside the vault. The vault is a data source (vault.db), never a code source.
-INDEXER="${HOME}/.cortex-forge/bin/index.py"
+INDEXER="${HOME}/.almagest/bin/index.py"
 LOG="$VAULT_ROOT/.git/antu-reindex.log"
 
 # Only run if semantic search is enabled for this vault

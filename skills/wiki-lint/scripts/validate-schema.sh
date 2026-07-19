@@ -2,7 +2,7 @@
 # validate-schema.sh — validate frontmatter completeness against schema v0.3
 # Usage: validate-schema.sh [vault-path] [findings-file]
 #   vault-path     defaults to git root or pwd
-#   findings-file  if given, findings are APPENDED there (same format as prune.sh)
+#   findings-file  if given, findings are APPENDED there (same format as lint.sh)
 #                  if omitted, findings are printed to stdout
 # Exit: 0 always — severity is communicated via findings content
 

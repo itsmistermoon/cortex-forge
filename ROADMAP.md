@@ -11,13 +11,13 @@ Goal: Hot Cache Protocol working identically across coding agents, via a manual 
 
 - [x] `.hot/` — single mutable zone for session state
 - [x] `HANDOFF.md` / `PLAYBOOK.md` split — session state vs. accumulated conventions (`## Working context` on a 15-day TTL; `## Permanent` has no TTL)
-- [x] Multi-vault — `~/.cortex-forge/config.yml` with `vaults:` + `default:`; CWD-first resolution
+- [x] Multi-vault — `~/.almagest/config.yml` with `vaults:` + `default:`; CWD-first resolution
 - [x] Schema versioning — `schema_version: "0.3"` in `AGENTS.md` and all templates
 - [x] `agent:` field in snapshot frontmatter — identifies last writer in multi-agent vaults
 - [x] Stale cache detection — `playbook_stale_days:` in config (global); checked at HANDOFF.md read time per AGENTS.md protocol
-- [x] Compliance guardrails — verifiable contracts in `AGENTS.md`; mandatory output format in `wiki-recall`, `wiki-ingest`, `hot-handoff`
+- [x] Compliance guardrails — verifiable contracts in `AGENTS.md`; mandatory output format in `wiki-query`, `wiki-ingest`, `hot-handoff`
 - [x] Context fencing in `wiki-imprint` — source hierarchy (session > `.raw/` > `wiki/` reference only); circular synthesis test; `raw:` provenance field
-- [x] Link-count scan — orphan page detection in `prune.sh`; `orphan_pages` in `vault-report.json`, surfaced via `AGENTS.md`'s mandatory read protocol
+- [x] Link-count scan — orphan page detection in `lint.sh`; `orphan_pages` in `vault-report.json`, surfaced via `AGENTS.md`'s mandatory read protocol
 - [x] Post-commit git hooks (opt-in) — prune refreshes `vault-report.json`; reindex updates `vault.db`, both gated on `wiki/` changes
 - [x] "Attempted and failed" section in handoff template
 - [x] Sanitization in `wiki-ingest` — `bin/sanitize.sh`; scans invisible Unicode, HTML comments, base64, egress commands
@@ -26,7 +26,7 @@ Goal: Hot Cache Protocol working identically across coding agents, via a manual 
 ## Phase 3 — Adoptability
 
 - [x] License added to public repo
-- [x] Distribution via `npx skills add itsmistermoon/cortex-forge` — installs skills for all detected agents; supports `--skill X` for standalone installs
+- [x] Distribution via `npx skills add itsmistermoon/almagest-antu` — installs skills for all detected agents; supports `--skill X` for standalone installs
 - [x] Changesets for `CHANGELOG.md` — one changeset per notable change, consolidated at release time (`npx changeset version`); no `npm publish` step, this repo isn't on the npm registry
 - [x] PR-based workflow for skill changes — branch → PR (with its changeset) → merge, even solo; each change gets an auditable page instead of a buried commit. `.github/workflows/changesets.yml` opens/updates the "Version Packages" PR on push to `main`
 - [ ] Install the [Changeset bot GitHub App](https://github.com/apps/changeset-bot) — comments on a PR if it's missing a changeset; manual step, can't be done via CLI/API
@@ -35,7 +35,7 @@ Goal: Hot Cache Protocol working identically across coding agents, via a manual 
 - [ ] `wiki/prompts/` page type — archive effective agent invocations with sample output
 - [ ] MOCs per topic area — `wiki/concepts/_index.md`, `wiki/entities/_index.md` as navigable area indexes
 
-## Phase 3.5 — wiki-prune dual mode
+## Phase 3.5 — wiki-lint dual mode
 
 **Gate:** Phase 3 example pages (they double as the held-out validation set).
 
@@ -45,7 +45,7 @@ Vault maintenance: orphan pages, broken wikilinks, stale hot cache.
 ### `prune-antu` (new)
 Self-optimization: reads transcripts where skills failed → proposes targeted edits to `SKILL.md` → validation gate accepts only edits that improve the held-out set.
 
-Skills suitable (verifiable outputs): `wiki-recall`, `wiki-ingest`.
+Skills suitable (verifiable outputs): `wiki-query`, `wiki-ingest`.
 Skills not suitable (subjective): `hot-handoff`, `wiki-imprint`.
 
 Reference: `wiki/concepts/skillopt-text-space-optimization.md`
@@ -66,7 +66,7 @@ Reference: `wiki/concepts/skillopt-text-space-optimization.md`
 - [x] `embeddings.py` — backend selector with per-backend error messages (co-located with `wiki-setup`)
 - [x] `index.py` — heading-based chunking + 500-word/100-overlap sub-chunks; atomic updates; auto-threshold calibration (co-located with `wiki-setup`)
 - [x] `search.py` — KNN two-step; `--top-k`, `--threshold`, `--json` flags (co-located with `wiki-setup`)
-- [x] `wiki-recall` updated — invokes `search.py` if `vault.db` exists; fallback to index read
+- [x] `wiki-query` updated — invokes `search.py` if `vault.db` exists; fallback to index read
 - [x] Post-commit reindex hook — re-indexes only `wiki/` files touched in each commit
 - [x] `.hot/` fully gitignored
 - [ ] Validate in second vault: initial index + test query + incremental reindex after `wiki-ingest`
@@ -75,37 +75,37 @@ Reference: `wiki/concepts/skillopt-text-space-optimization.md`
 ## Phase 4 — Accumulated intelligence
 
 - [x] History archive (simple layer) — entries >15 days → `.hot/HISTORY.md` (append-only, not injected at startup)
-- [ ] History archive (structured layer) — when `HISTORY.md` exceeds N entries, handoff parses to JSON `{ts, agent, trigger, tags, files, decisions, discarded, fragile}`; queryable via `/wiki-recall`
+- [ ] History archive (structured layer) — when `HISTORY.md` exceeds N entries, handoff parses to JSON `{ts, agent, trigger, tags, files, decisions, discarded, fragile}`; queryable via `/wiki-query`
 - [ ] Cross-session pattern detection — recurring topics in `.hot/` that never reach `wiki/`; propose imprint candidates at handoff time
-- [ ] Progressive loading in `wiki-recall` — navigate wiki by relevance instead of loading full index at startup
+- [ ] Progressive loading in `wiki-query` — navigate wiki by relevance instead of loading full index at startup
 
-### `wiki-prune` — LRU-based archiving
+### `wiki-lint` — LRU-based archiving
 
-Gap flagged by external review (Gemini): at vault scale (hundreds of pages), `wiki-prune`'s reports risk becoming unmanageable — the "maintenance ratchet" where too many findings cause the user to abandon upkeep entirely. Today's hard caps (20 candidate pairs per Layer 2 check) bound the report size but don't reduce the underlying page count driving it.
+Gap flagged by external review (Gemini): at vault scale (hundreds of pages), `wiki-lint`'s reports risk becoming unmanageable — the "maintenance ratchet" where too many findings cause the user to abandon upkeep entirely. Today's hard caps (20 candidate pairs per Layer 2 check) bound the report size but don't reduce the underlying page count driving it.
 
-**Gate:** don't build until a real vault approaches this scale — premature at today's size, and `wiki-prune`'s existing caps + severity grouping already cover the near-term version of this risk.
+**Gate:** don't build until a real vault approaches this scale — premature at today's size, and `wiki-lint`'s existing caps + severity grouping already cover the near-term version of this risk.
 
-**Idea:** pages unread by `/wiki-recall` for 6+ months get silently moved to a `wiki/archive/` (or type-specific `archive/` subfolder), out of Layer 2's default scan scope but not deleted — index and embeddings updated accordingly, physical file preserved. Needs a way to track last-accessed per page (today nothing records recall hits, only misses in `log.md`).
+**Idea:** pages unread by `/wiki-query` for 6+ months get silently moved to a `wiki/archive/` (or type-specific `archive/` subfolder), out of Layer 2's default scan scope but not deleted — index and embeddings updated accordingly, physical file preserved. Needs a way to track last-accessed per page (today nothing records recall hits, only misses in `log.md`).
 
 - [ ] Design last-accessed tracking — recall hits are not logged today (only misses, per the L2e entry below); decide whether to log every hit (cost: `log.md` noise) or maintain a lighter per-page `last_accessed:` frontmatter field updated on cite
 - [ ] Archiving mechanism — move + reindex + exclude from default Layer 2 scope, reversible
 - [ ] Validate against a vault large enough to need it
 
-### `wiki-recall` — offer to persist, rarely
+### `wiki-query` — offer to persist, rarely
 
 Gap vs. the source pattern this project draws from (Karpathy's LLM-wiki gist): a good query answer should be able to compound into the wiki, not dead-end in chat. Design borrowed from `moon-kuyen/skills/kuyen-query`, which solves this leanly — an occasional offer, never automatic writing.
 
-**Implementation:** add a 4th step to `wiki-recall/SKILL.md`, after "Answer":
+**Implementation:** add a 4th step to `wiki-query/SKILL.md`, after "Answer":
 - Trigger only when the answer combines ≥2 existing pages into an insight not written down anywhere, or fills a real gap the wiki had no page for.
 - Skip when the answer is satisfied by pointing at a single existing page verbatim — this must stay rare, not a footer on every response.
 - On trigger, end the response with one line: "This isn't written anywhere in the vault yet — want me to save it? (`/wiki-imprint`)". No auto-write, no follow-up unless the user accepts.
 
-- [x] Add step 4 to `wiki-recall/SKILL.md` with the trigger condition above
+- [x] Add step 4 to `wiki-query/SKILL.md` with the trigger condition above
 - [ ] Verify against 10+ real queries in a populated vault: confirm the offer stays rare (not triggered on simple lookups) and fires on genuine synthesis
 
-### `wiki-prune` — contradiction detection (folded into L2a)
+### `wiki-lint` — contradiction detection (folded into L2a)
 
-Gap vs. Karpathy's gist, which lists contradictions alongside orphans and stale claims as a lint responsibility — `wiki-prune`'s Layer 2 had no check for it (L2a–L2d covered unlinked relationships, missing wikilinks, uncovered sources, and merge candidates, but never conflicting claims). Design borrowed from `moon-kuyen/skills/kuyen-lint` step 2.
+Gap vs. Karpathy's gist, which lists contradictions alongside orphans and stale claims as a lint responsibility — `wiki-lint`'s Layer 2 had no check for it (L2a–L2d covered unlinked relationships, missing wikilinks, uncovered sources, and merge candidates, but never conflicting claims). Design borrowed from `moon-kuyen/skills/kuyen-lint` step 2.
 
 **Implementation:** folded into L2a instead of a separate check — L2a already reads both pages in a candidate pair to classify RELATED/COINCIDENCE, so the contradiction judgment reuses that same read instead of opening the pages a second time:
 - For each pair L2a classifies RELATED, compare their claims on the shared subject in the same pass.
@@ -113,11 +113,11 @@ Gap vs. Karpathy's gist, which lists contradictions alongside orphans and stale 
 - Report CONTRADICTION as a separate MEDIUM: both excerpts side by side, no proposed action — this needs human judgment to resolve, not a suggested fix.
 - No separate hard cap needed — bounded by L2a's existing 20-candidate-pair cap.
 
-- [x] Fold contradiction comparison into L2a's per-pair evaluation in `wiki-prune/SKILL.md`
+- [x] Fold contradiction comparison into L2a's per-pair evaluation in `wiki-lint/SKILL.md`
 - [x] Add contradiction findings to the `## Requires confirmation` list (resolution is never auto-applied)
 - [ ] Verify against a vault with at least one known, planted contradiction
 
-### `wiki-prune` — index.md section-vs-type mismatch
+### `wiki-lint` — index.md section-vs-type mismatch
 
 Gap found manually in `moon-multivac`: `wiki/index.md` groups entries by section (Proyectos/Entidades/Conceptos/Fuentes), but nothing checks that a page's frontmatter `type:` actually matches the section it's listed under. Found several `type: concept` pages listed under "Proyectos" and "Fuentes" — harmless today (just a navigation quirk), but silently accumulates as the vault grows, and no existing Layer 1 or Layer 2 check would ever surface it (verified against the full detection criteria table and L2a–L2e — none inspect index.md's per-section membership against page type).
 
@@ -127,18 +127,18 @@ Gap found manually in `moon-multivac`: `wiki/index.md` groups entries by section
 - Report mismatches as LOW (cosmetic/navigational, not a data-integrity issue) — proposed action: move the entry to its matching section, never auto-applied (index.md structure edits go through `## Requires confirmation`).
 
 - [ ] Design the exact matching logic (a page can legitimately be cross-referenced under a related section without indicating a mismatch — needs a way to distinguish "wrong section" from "intentional cross-reference," maybe by checking whether the page is ALSO listed in its correct section)
-- [ ] Add to Layer 1 detection criteria table in `wiki-prune/SKILL.md`
+- [ ] Add to Layer 1 detection criteria table in `wiki-lint/SKILL.md`
 - [ ] Validate against `moon-multivac`'s known cases before rolling out
 
-### `wiki-recall` — log misses, not queries
+### `wiki-query` — log misses, not queries
 
 Considered logging every query (`log.md` as "record of ingests, queries, lint passes" per the gist) and rejected full logging as noise for a single-user vault — no audit need, no multi-user accountability case. The one real signal is recurring gaps: the same unanswered question surfacing across sessions is a concrete candidate for `/wiki-ingest`, and today that signal is silently lost the moment step 2's "Not in vault" response is given — nothing records that it happened.
 
 **Implementation:**
-- When `wiki-recall` step 2 finds no relevant pages ("Not in vault"), append one line to `wiki/meta/log.md`: `**[YYYY-MM-DD] recall-miss** | {query}`.
+- When `wiki-query` step 2 finds no relevant pages ("Not in vault"), append one line to `wiki/meta/log.md`: `**[YYYY-MM-DD] query-miss** | {query}`.
 - No logging on hits — only misses. This keeps `log.md` from filling with routine successful lookups.
-- `wiki-prune` gains a Layer 2 check (or extends L2c) that scans recent `recall-miss` entries for repeated/similar topics and reports them as MEDIUM candidates for `/wiki-ingest`, the same way it already surfaces `NEEDS_PAGE` sources.
+- `wiki-lint` gains a Layer 2 check (or extends L2c) that scans recent `query-miss` entries for repeated/similar topics and reports them as MEDIUM candidates for `/wiki-ingest`, the same way it already surfaces `NEEDS_PAGE` sources.
 
-- [x] Add miss-logging to `wiki-recall/SKILL.md` (landed in step 3, where the "Not in vault" case is actually decided)
-- [x] Add a recall-miss pattern check to `wiki-prune` (landed as L2e, its own check rather than an L2c extension — L2c reads vault pages, L2e reads `wiki/meta/log.md`, different enough to keep separate)
-- [ ] Verify: repeat a query with no answer 3x across sessions, confirm `wiki-prune` surfaces it as a candidate
+- [x] Add miss-logging to `wiki-query/SKILL.md` (landed in step 3, where the "Not in vault" case is actually decided)
+- [x] Add a query-miss pattern check to `wiki-lint` (landed as L2e, its own check rather than an L2c extension — L2c reads vault pages, L2e reads `wiki/meta/log.md`, different enough to keep separate)
+- [ ] Verify: repeat a query with no answer 3x across sessions, confirm `wiki-lint` surfaces it as a candidate

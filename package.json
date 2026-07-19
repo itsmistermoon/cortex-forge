@@ -5,7 +5,7 @@
   "description": "Antu skill suite — LLM-native personal wiki, distributed via npx skills add",
   "repository": {
     "type": "git",
-    "url": "https://github.com/itsmistermoon/cortex-forge"
+    "url": "https://github.com/itsmistermoon/almagest-antu"
   },
   "devDependencies": {
     "@changesets/cli": "^2.31.0"

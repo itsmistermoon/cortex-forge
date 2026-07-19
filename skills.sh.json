@@ -8,9 +8,9 @@
         "hot-handoff",
         "hot-triage",
         "wiki-ingest",
-        "wiki-recall",
+        "wiki-query",
         "wiki-imprint",
-        "wiki-prune",
+        "wiki-lint",
         "wiki-setup"
       ]
     }

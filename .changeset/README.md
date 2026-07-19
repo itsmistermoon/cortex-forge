@@ -1,6 +1,6 @@
 # Changesets
 
-This repo uses [Changesets](https://changesets.dev/) for changelog and version bumps only — there's no `npm publish` step, since Antu distributes via `npx skills add itsmistermoon/cortex-forge`, not the npm registry.
+This repo uses [Changesets](https://changesets.dev/) for changelog and version bumps only — there's no `npm publish` step, since Antu distributes via `npx skills add itsmistermoon/almagest-antu`, not the npm registry.
 
 ## Adding a changeset
 

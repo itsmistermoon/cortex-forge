@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 # No tarball artifact — Antu is distributed exclusively via
-# `npx skills add itsmistermoon/cortex-forge` (skills.sh). This workflow only
+# `npx skills add itsmistermoon/almagest-antu` (skills.sh). This workflow only
 # creates the GitHub Release object on tag push so release notes have
 # somewhere to live; notes are always hand-written afterward via `gh release
 # edit`, never the auto-generated ones.

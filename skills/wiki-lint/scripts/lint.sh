@@ -52,7 +52,7 @@ json_dead_links_array() {  # $1: file with from<TAB>target per line → JSON arr
 # ── HIGH: Dead markdown links ──────────────────────────────────────────────────
 # Antu emits only bundle-relative absolute links: [title](/wiki/...) — see
 # ADR 0005. Match the link target only, independent of the link text.
-grep -roE '\]\(/wiki/[^)]+\)' "$WIKI" --include="*.md" 2>/dev/null \
+grep -roE '\]\(/wiki/[^)]+(\([^)]*\)[^)]*)*\)' "$WIKI" --include="*.md" 2>/dev/null \
   | while IFS=: read -r src match; do
       link="${match#](/}"
       link="${link%)}"
@@ -125,7 +125,7 @@ while IFS=: read -r src match; do
   link="${link%)}"
   link="${link%.md}"
   printf '%s\t%s\n' "${src#"$VAULT"/}" "$link"
-done < <(grep -roE '\]\(/wiki/[^)]+\)' "$WIKI" --include="*.md" 2>/dev/null) > "$INCOMING_LINKS"
+done < <(grep -roE '\]\(/wiki/[^)]+(\([^)]*\)[^)]*)*\)' "$WIKI" --include="*.md" 2>/dev/null) > "$INCOMING_LINKS"
 
 # Precompute the set of pages that have at least one inbound non-self link:
 # a flat sorted list of unique target paths. Orphan detection becomes a
@@ -278,7 +278,7 @@ for line in text.splitlines():
         current = section_to_type.get(m.group(1).lower())
         listings.setdefault(current, set())
     elif current:
-        m = re.match(r"^\s*-\s*\[[^\]]*\]\((/?wiki/[^)]+)\)", line)
+        m = re.match(r"^\s*-\s*\[[^\]]*\]\((/?wiki/(?:[^)]|\([^)]*\))+)\)", line)
         if m:
             target = re.sub(r"\.md$", "", m.group(1).lstrip("/"))
             listings[current].add(target)

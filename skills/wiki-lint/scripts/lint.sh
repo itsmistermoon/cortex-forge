@@ -320,6 +320,7 @@ find "$WIKI" -name "*.md" \
       awk -v rel="$rel" '
         /^# Citations/ { incite=1; n=0; next }
         incite && /^#/ { incite=0 }
+        incite && /^---$/ { incite=0 }
         incite && NF {
           n++
           pat = "^\\[" n "\\] \\[[^]]+\\]\\(/wiki/[^)]+\\.md\\)[ \t]*$"

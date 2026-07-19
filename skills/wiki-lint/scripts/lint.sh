@@ -71,9 +71,9 @@ grep -roE '\]\(/wiki/[^)]+\)' "$WIKI" --include="*.md" 2>/dev/null \
 # .raw/ file is a single O(1) lookup (O(n)). Total: O(n + m).
 
 if [ -d "$RAW" ]; then
-  # Single pass: every `raw: .raw/foo.md` reference anywhere in the wiki.
-  grep -rho '^raw: .*\.md$' "$WIKI" --include="*.md" 2>/dev/null \
-    | sed 's/^raw:[[:space:]]*//' | sort -u > "$RAW_REFS" || true
+  # Single pass: every `.raw/foo.md` reference anywhere in the wiki (supports YAML lists).
+  grep -rho '\.raw/[^"'"'"'[:space:]]*\.md' "$WIKI" --include="*.md" 2>/dev/null \
+    | sort -u > "$RAW_REFS" || true
   # Single pass: every wiki page basename (for the filename fallback).
   find "$WIKI" -name "*.md" 2>/dev/null \
     | sed 's|.*/||; s|\.md$||' | sort -u > "$WIKI_SLUGS" || true

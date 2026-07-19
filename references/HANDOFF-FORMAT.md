@@ -7,7 +7,7 @@ Gitignored — local agent artifact, not versioned content.
 
 ## Zone 1 — Current state (MUTABLE)
 
-Updated on every `/antu-handoff`. Hard limits: **max 5 pending, max 3 active decisions**.
+Updated on every `/hot-handoff`. Hard limits: **max 5 pending, max 3 active decisions**.
 When adding an item, evaluate whether an existing one is obsolete and remove it.
 
 ```markdown
@@ -28,7 +28,7 @@ updated: {YYYY-MM-DD}
 - {decision and rationale — to avoid re-litigating it}
 ```
 
-`suite: antu` identifies Antu as the last writer — read by `/antu-handoff` itself (see `SKILL.md` step 2) to detect a foreign-suite (Kuyen) file before rotating it. Always write it, every invocation.
+`suite: antu` identifies Antu as the last writer — read by `/hot-handoff` itself (see `SKILL.md` step 2) to detect a foreign-suite (Kuyen) file before rotating it. Always write it, every invocation.
 
 `agent:` identifies who last wrote Current state. Update it on every invocation.
 

@@ -15,7 +15,7 @@ This repo is the source of truth for the Antu skill suite (`skills/`, `templates
 
 **Before your first response, in any session that starts in this repo, you MUST read `.hot/HANDOFF.md` in full** — and `.hot/PLAYBOOK.md` too, if it exists. Treat this with the same weight as your own persistent instructions file.
 
-If the latest `## History` entry in `HANDOFF.md` has a `#### Imprint candidate` line, propose imprinting it into a target vault, e.g. via `/antu-imprint {vault}`.
+If the latest `## History` entry in `HANDOFF.md` has a `#### Imprint candidate` line, propose imprinting it into a target vault, e.g. via `/wiki-imprint {vault}`.
 
 Beyond this, skills trigger themselves — each one's own `description:` states when to invoke it, and that's the single place to look, except where an Agent rule below explicitly calls one out (e.g. the skill-design-principles check).
 
@@ -53,13 +53,13 @@ Single-context. `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/do
 
 All 7 live in `skills/` here as their canonical source, and install identically via `npx skills add itsmistermoon/cortex-forge` (`--skill X` for a standalone install).
 
-- `antu-ingest` — Ingest a URL or file into a vault: saves to `.raw/`, synthesizes wiki pages, updates the index
-- `antu-recall` — Answer questions grounded in a vault's synthesized wiki content, with citations to the pages used
-- `antu-imprint` — Archive a valuable session synthesis as a permanent wiki page in a vault
-- `antu-prune` — Health check a vault: detect dead links, orphan pages, missing provenance, unprocessed sources
-- `antu-handoff` — Snapshot session context into `.hot/HANDOFF.md`; works from any repo, inside or outside a vault
-- `antu-triage` — On-demand `.hot/` hygiene: retrospective PLAYBOOK.md pruning, cross-suite pending recovery, Pending/Active decisions validity re-checks
-- `antu-setup` — Register/deregister a vault in Antu and verify global skills are installed
+- `wiki-ingest` — Ingest a URL or file into a vault: saves to `.raw/`, synthesizes wiki pages, updates the index
+- `wiki-recall` — Answer questions grounded in a vault's synthesized wiki content, with citations to the pages used
+- `wiki-imprint` — Archive a valuable session synthesis as a permanent wiki page in a vault
+- `wiki-prune` — Health check a vault: detect dead links, orphan pages, missing provenance, unprocessed sources
+- `hot-handoff` — Snapshot session context into `.hot/HANDOFF.md`; works from any repo, inside or outside a vault
+- `hot-triage` — On-demand `.hot/` hygiene: retrospective PLAYBOOK.md pruning, cross-suite pending recovery, Pending/Active decisions validity re-checks
+- `wiki-setup` — Register/deregister a vault in Antu and verify global skills are installed
 
 ## Wiki taxonomy (schema reference for downstream vaults)
 
@@ -70,6 +70,6 @@ All 7 live in `skills/` here as their canonical source, and install identically 
 | **source** | `wiki/sources/` | External artifact ingested — articles, docs, repos, videos, threads | `templates/source.md` |
 | **project** | `wiki/projects/` | Active project with operational state (repo, status, domains) | `templates/project.md` |
 
-Each page follows: YAML frontmatter + compiled truth + chronological changelog. Type disambiguation and source frontmatter fields: see `skills/antu-ingest/SKILL.md`.
+Each page follows: YAML frontmatter + compiled truth + chronological changelog. Type disambiguation and source frontmatter fields: see `skills/wiki-ingest/SKILL.md`.
 
 `wiki/meta/tags.md` (seeded from `templates/tags.md`) is not a page type — it's the vault's tag rules + registry in one self-referencing document, kept free of hard counts so it never goes stale.

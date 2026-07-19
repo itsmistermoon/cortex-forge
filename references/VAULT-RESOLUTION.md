@@ -12,7 +12,7 @@ Apply in order:
 3. If not, use the `default` vault.
 4. If no default is set and exactly one vault is registered → use that vault.
 5. If no default and multiple vaults are registered → ask the user to pick one.
-6. If no vaults registered → stop and prompt to run `/antu-setup`.
+6. If no vaults registered → stop and prompt to run `/wiki-setup`.
 
 ## Validate vault structure
 

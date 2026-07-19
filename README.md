@@ -26,7 +26,7 @@ npx skills add itsmistermoon/cortex-forge
 
 2. See the [Supported Agents table](https://github.com/vercel-labs/skills#supported-agents) to pick the exact flag value per agent.
 
-Skills install unnamespaced: `/antu-ingest`, `/antu-handoff`, `/antu-imprint`, `/antu-recall`, `/antu-prune`, `/antu-triage`, `/antu-setup`.
+Skills install unnamespaced: `/wiki-ingest`, `/hot-handoff`, `/wiki-imprint`, `/wiki-recall`, `/wiki-prune`, `/hot-triage`, `/wiki-setup`.
 
 ### Option B: Claude Code plugin
 
@@ -37,11 +37,11 @@ This repo is also a self-hosted [Claude Code plugin marketplace](https://code.cl
 /plugin install antu@antu
 ```
 
-Skills install namespaced: `/antu:antu-ingest`, `/antu:antu-handoff`, etc. To test a local checkout before installing, use `claude --plugin-dir .` from the repo root.
+Skills install namespaced: `/antu:wiki-ingest`, `/antu:hot-handoff`, etc. To test a local checkout before installing, use `claude --plugin-dir .` from the repo root.
 
 ### Then, either way
 
-Run `/antu-setup` (or `/antu:antu-setup`) in your agent — from a fresh git repo or an existing vault. This skill will:
+Run `/wiki-setup` (or `/antu:wiki-setup`) in your agent — from a fresh git repo or an existing vault. This skill will:
 - Scaffold `wiki/` and a starter `AGENTS.md` if they don't exist yet (asks first — never overwrites an existing vault), detect your locale, and register the vault in `~/.cortex-forge/config.yml`
 - Verify all seven skills are actually installed, and tell you to re-run `npx skills add` (or `/plugin update`) if any are missing
 - Offer to set up semantic search, with a dependency check that runs before asking
@@ -65,33 +65,33 @@ Six layers, each with a distinct role:
 
 Seven skills that map to how knowledge actually moves through a system.
 
-### `/antu-ingest` — Ingest
+### `/wiki-ingest` — Ingest
 
 Sources land in `.raw/`: articles, PDFs, transcripts, URLs. The agent processes them and produces structured wiki pages — the step that turns perceived input into stored, queryable knowledge.
 
 After synthesizing new pages, it scans existing wiki pages and selects those who are candidates for backward enrichment — existing concept pages, entity entries, and comparison tables that should now mention the new source but don't. An agent evaluates each candidate before any change is made.
 
-### `/antu-handoff` — Session context
+### `/hot-handoff` — Session context
 
-`.hot/HANDOFF.md` extends working memory indefinitely across two zones: a mutable `Current state` (max 5 pending items, max 3 active decisions) and an append-only `History`. The agent reads it on session start per `AGENTS.md` instructions; you invoke `/antu-handoff` at milestones and before closing a session, carrying context forward into the next one. Works from any repo, not just the vault.
+`.hot/HANDOFF.md` extends working memory indefinitely across two zones: a mutable `Current state` (max 5 pending items, max 3 active decisions) and an append-only `History`. The agent reads it on session start per `AGENTS.md` instructions; you invoke `/hot-handoff` at milestones and before closing a session, carrying context forward into the next one. Works from any repo, not just the vault.
 
-### `/antu-imprint` — Permanent archive
+### `/wiki-imprint` — Permanent archive
 
 What was worth keeping from the session becomes a stable wiki page. A memory trace is what remains after an experience ends. The session closes; the knowledge stays encoded in the vault.
 
-### `/antu-recall` — Query
+### `/wiki-recall` — Query
 
 The agent searches the vault, retrieves relevant pages, and synthesizes a response with citations, drawn from what's been ingested or imprinted into it.
 
-### `/antu-prune` — Vault hygiene
+### `/wiki-prune` — Vault hygiene
 
 Detects orphan pages, dead links, contradictory claims, stale information. Forgetting functions as maintenance: prune removes what weakens the network deliberately, so what remains stays reliable.
 
-### `/antu-triage` — Session-state hygiene
+### `/hot-triage` — Session-state hygiene
 
-On-demand deep clean of `.hot/` (the active repo's session state, not the vault): retrospective `PLAYBOOK.md` pruning, recovering pending/fragile-context items after a foreign-suite (Kuyen) write, and validity re-checks on existing `### Pending`/`### Active decisions` entries. Mirrors `/antu-prune`'s pattern — a separate hygiene skill, not folded into `/antu-handoff`'s per-session mechanics.
+On-demand deep clean of `.hot/` (the active repo's session state, not the vault): retrospective `PLAYBOOK.md` pruning, recovering pending/fragile-context items after a foreign-suite (Kuyen) write, and validity re-checks on existing `### Pending`/`### Active decisions` entries. Mirrors `/wiki-prune`'s pattern — a separate hygiene skill, not folded into `/hot-handoff`'s per-session mechanics.
 
-### `/antu-setup` — Setup and configuration
+### `/wiki-setup` — Setup and configuration
 
 Registers the vault and installs global skills. Run from inside a vault directory. Run again from the same vault to deregister.
 
@@ -118,17 +118,17 @@ Each page follows: YAML frontmatter + compiled truth + chronological changelog.
 
 Three behaviors are mandatory for any agent operating the vault, defined in `AGENTS.md`:
 
-**Handoff** — before responding to the user, read `.hot/HANDOFF.md` and `AGENTS.md`. After milestones, invoke `/antu-handoff` to snapshot current state and append a history entry.
+**Handoff** — before responding to the user, read `.hot/HANDOFF.md` and `AGENTS.md`. After milestones, invoke `/hot-handoff` to snapshot current state and append a history entry.
 
-**Ingest** — when the user provides a URL, file, or uses words like "ingest" or "process", invoke `/antu-ingest` as the first action.
+**Ingest** — when the user provides a URL, file, or uses words like "ingest" or "process", invoke `/wiki-ingest` as the first action.
 
-**Recall** — when the user asks about any topic that may exist in the vault, invoke `/antu-recall` as the first action. The skill returns synthesized knowledge with citations; treat that as the authoritative answer over active context, `grep`, or training knowledge on vault topics.
+**Recall** — when the user asks about any topic that may exist in the vault, invoke `/wiki-recall` as the first action. The skill returns synthesized knowledge with citations; treat that as the authoritative answer over active context, `grep`, or training knowledge on vault topics.
 
 ## Design principles
 
 **One consumption channel, identical everywhere.** `AGENTS.md` mandates reading `.hot/HANDOFF.md` (hard size caps) before the first response, on every agent, with no hook wiring required. The guarantee comes from the protocol itself — unconditional, explicit, and simple enough to follow the same way across any coding agent.
 
-**State and lessons as separate artifacts.** Session-end snapshots capture *state* — pending work, decisions, fragile context. Lessons get a dedicated path: at session end, `/antu-handoff` flags imprint candidates in the history entry, invoked manually with full context; at the next session start, reading `.hot/HANDOFF.md` surfaces that flag and the agent proposes `/antu-imprint` with fresh eyes. Detection happens where context is richest; the decision happens where judgment is freshest.
+**State and lessons as separate artifacts.** Session-end snapshots capture *state* — pending work, decisions, fragile context. Lessons get a dedicated path: at session end, `/hot-handoff` flags imprint candidates in the history entry, invoked manually with full context; at the next session start, reading `.hot/HANDOFF.md` surfaces that flag and the agent proposes `/wiki-imprint` with fresh eyes. Detection happens where context is richest; the decision happens where judgment is freshest.
 
 **Memory as an audited surface.** `.raw/` stays immutable, keeping provenance auditable at every point. Ingestion scans foreign content for hidden Unicode, embedded payloads, and egress commands before it enters the vault. The handoff-flags → imprint-proposes step defaults to *suggest*, putting a human approval step between session output and anything becoming ground truth.
 
@@ -165,9 +165,9 @@ Skills resolve the vault automatically: if you're inside a registered vault → 
 
 | Skill | Explicit vault arg |
 |---|---|
-| `/antu-ingest` | ✅ `/antu-ingest <vault-name> <url-or-file>` |
-| `/antu-recall` | ✅ `/antu-recall <vault-name> <query>` |
-| `/antu-handoff` | ✅ `/antu-handoff <vault-name> [project-name] [next: <focus>]` |
-| `/antu-imprint` | ✅ `/antu-imprint <vault-name>` |
-| `/antu-prune` | ✅ `/antu-prune <vault-name>` — asks for confirmation before proceeding |
-| `/antu-triage` | ⛔ — resolves the active repo (nearest `.git`), not a vault |
+| `/wiki-ingest` | ✅ `/wiki-ingest <vault-name> <url-or-file>` |
+| `/wiki-recall` | ✅ `/wiki-recall <vault-name> <query>` |
+| `/hot-handoff` | ✅ `/hot-handoff <vault-name> [project-name] [next: <focus>]` |
+| `/wiki-imprint` | ✅ `/wiki-imprint <vault-name>` |
+| `/wiki-prune` | ✅ `/wiki-prune <vault-name>` — asks for confirmation before proceeding |
+| `/hot-triage` | ⛔ — resolves the active repo (nearest `.git`), not a vault |

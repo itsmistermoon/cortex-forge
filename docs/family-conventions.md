@@ -2,7 +2,7 @@
 
 Antu and [Kuyen](https://github.com/itsmistermoon/moon-reflex) are sibling vault suites — Antu is the full-feature option (provenance, multi-vault, semantic search, planned MCP integration), Kuyen is the lite option (tabula-rasa rebuild, minimal dependencies, fast). See the README's "Full vs. lite" table for how to choose between them for a given vault.
 
-They are **not** merged: Kuyen does not depend on or reference `antu-*` skills, and Antu does not depend on `kuyen-*` skills. This document exists so that conventions the two suites happen to share stay in sync deliberately, instead of drifting apart or being re-discovered by accident.
+They are **not** merged: Kuyen does not depend on or reference Antu's skills, and Antu does not depend on Kuyen's `kuyen-*` skills. This document exists so that conventions the two suites happen to share stay in sync deliberately, instead of drifting apart or being re-discovered by accident.
 
 ## What belongs here
 
@@ -20,7 +20,8 @@ A convention that:
 - **`source.md` omits `aliases:`**: unlike concept/entity pages, a source page doesn't get aliases — it's referenced by title, not looked up by alternate names. True in both suites' templates already; recorded here so a future cleanup doesn't "restore" it as a missing field.
 - **Page changelog line has no author tag**: `- {{date:YYYY-MM-DD}}: description`, not `- {{date}} [{agent}]: description`. Kuyen dropped the agent tag deliberately (commit `14504be`); Antu's template never had one. The focus is the record of what changed, not which agent did it — kept as the shared convention 2026-07-12 even though some already-created pages in both vaults still carry the older `[agent]`-tagged lines from before this was settled.
 - **Session-state directory and file names**: `.hot/` holding `HANDOFF.md` (session snapshot) and `HISTORY.md` (rotated/archived entries), resolved from the nearest `.git` root rather than the literal CWD. Antu renamed from `.cortex/`, `MEMORY.md`, `CONSOLIDATED.md`; Kuyen already used `.hot/` but also renamed `MEMORY.md`→`HANDOFF.md` and `CONSOLIDATED.md`→`HISTORY.md` to match, and adopted nearest-`.git` resolution in place of literal CWD. `.hot/` is never tracked in either suite — both add it to `.gitignore`. Antu's `PLAYBOOK.md` (renamed from `PRAXIS.md`) has no Kuyen equivalent, see "Explicitly not shared" below. Unified per ADR 0001 (`docs/adr/0001-unify-session-state-antu-kuyen.md`), implemented 2026-07-16.
-- **Cross-suite `suite:` marker**: `antu-handoff` and `kuyen-handoff` each write a one-line `suite: antu` / `suite: kuyen` marker identifying who last wrote `HANDOFF.md`, so either skill can detect foreign content without parsing the other's schema. Neither suite adopts the other's format — Antu keeps frontmatter + fixed sections, Kuyen keeps free text. On finding the other suite's marker (or none at all), each skill archives the prior `HANDOFF.md` whole into `HISTORY.md` and calls this out explicitly in its confirmation, instead of attempting to merge or recover it automatically. Formalized in ADR 0001, implemented 2026-07-16.
+- **Cross-suite `suite:` marker**: `hot-handoff` and `kuyen-handoff` each write a one-line `suite: antu` / `suite: kuyen` marker identifying who last wrote `HANDOFF.md`, so either skill can detect foreign content without parsing the other's schema. Neither suite adopts the other's format — Antu keeps frontmatter + fixed sections, Kuyen keeps free text. On finding the other suite's marker (or none at all), each skill archives the prior `HANDOFF.md` whole into `HISTORY.md` and calls this out explicitly in its confirmation, instead of attempting to merge or recover it automatically. Formalized in ADR 0001, implemented 2026-07-16.
+- **Skill naming: `hot-` / `wiki-`, not a suite-brand prefix**: a skill's name is prefixed by the memory domain it's primarily responsible for, not by the suite it belongs to — `hot-` for a skill whose primary responsibility is `.hot/` (session state), `wiki-` for a skill whose primary responsibility is `wiki/` (persistent knowledge). Antu renamed all 7 skills from `antu-*` accordingly (`hot-handoff`, `hot-triage`, `wiki-ingest`, `wiki-recall`, `wiki-imprint`, `wiki-prune`, `wiki-setup`). Kuyen applies the same rule to its own, smaller skill inventory (no `triage` or `imprint` equivalent) rather than adopting Antu's exact name list. Hard cut, no aliases for the old `antu-*`/`kuyen-*`-style names. Formalized in ADR 0003 (`docs/adr/0003-hot-wiki-skill-naming.md`).
 
 ## Shared frontmatter schema (concept / entity / source)
 
@@ -50,11 +51,11 @@ When editing a template field in one suite, check the table above before assumin
 
 These were reviewed during the 2026-07-12 audit (#22) and kept suite-specific on purpose — do not "fix" them into alignment:
 
-- **Credential/injection sanitization** (`antu-sanitize.sh`) — Antu only. Kuyen has no equivalent script; the ligereza tradeoff means no automated safety net here.
+- **Credential/injection sanitization** (`sanitize.sh`) — Antu only. Kuyen has no equivalent script; the ligereza tradeoff means no automated safety net here.
 - **`project` page type** — Antu only. Kuyen vaults are scoped smaller and don't track projects as their own page type.
 - **Multi-vault resolution, research mode, semantic/embedding search** — Antu only, out of scope for Kuyen by design.
-- **`raw:`/mtime drift check** (antu-prune Layer 3, detects a source re-fetched after being synthesized) — Antu only. Reasonable to skip for Kuyen's smaller, shorter-lived vaults.
-- **`antu-triage` and `PLAYBOOK.md`** — Antu only. On-demand `.hot/` hygiene (`PLAYBOOK.md` pruning, foreign-suite pending recovery, Pending/Active decisions re-checks) mirrors the existing `antu-prune` pattern. Kuyen has no `PLAYBOOK.md`, no structured Pending to recover, and no equivalent skill — deliberately asymmetric per ADR 0001, decision 5.
+- **`raw:`/mtime drift check** (wiki-prune Layer 3, detects a source re-fetched after being synthesized) — Antu only. Reasonable to skip for Kuyen's smaller, shorter-lived vaults.
+- **`hot-triage` and `PLAYBOOK.md`** — Antu only. On-demand `.hot/` hygiene (`PLAYBOOK.md` pruning, foreign-suite pending recovery, Pending/Active decisions re-checks) mirrors the existing `wiki-prune` pattern. Kuyen has no `PLAYBOOK.md`, no structured Pending to recover, and no equivalent skill — deliberately asymmetric per ADR 0001, decision 5.
 
 ## Open items
 

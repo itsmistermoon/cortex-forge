@@ -51,7 +51,7 @@ Per OKF §11, a bundle root `index.md` MAY declare the spec version it targets �
 
 ### 8. Migration of existing content: out of scope for this ADR
 
-A full migration of already-installed vaults (existing `wiki/` content written under the old conventions) is wanted eventually, but as separate, later work — explicitly triggered by the user, not automatically undertaken by whichever agent implements this ADR's format decisions. This ADR only changes what `wiki-*` skills produce and expect going forward.
+A full migration of already-installed vaults (existing `wiki/` content written under the old conventions) is wanted eventually, but as separate, later work — explicitly triggered by the user, not automatically undertaken by whichever agent implements this ADR's format decisions. This ADR only changes what `wiki-*` skills produce and expect going forward. The runbook for that later task, written so any agent can execute it once authorized, lives at `skills/wiki-setup/references/OKF-MIGRATION.md`.
 
 ## Consequences
 
@@ -69,7 +69,7 @@ A full migration of already-installed vaults (existing `wiki/` content written u
 2. Update `wiki-ingest`, `wiki-query`, `wiki-imprint`, `wiki-lint`, `wiki-setup` (SKILL.md and `references/`) for: markdown-link syntax (decision 1), `# Citations` generation/parsing incl. `wiki-lint`'s format validation (decision 2), `wiki/log.md` path (decision 3), `meta/` as a `wiki/`-sibling (decision 4), `wiki/index.md` scaffold including `okf_version: "0.1"` (decision 6).
 3. Update `AGENTS.md`'s wiki taxonomy section and any other cross-references to `wiki/meta/`.
 4. File a changeset and open a PR, per this repo's standard workflow (`AGENTS.md` Agent rules).
-5. **Not in this implementation pass**: migrating already-installed vaults' existing content (decision 8) — a separate task, started only when explicitly authorized.
+5. **Not in this implementation pass**: migrating already-installed vaults' existing content (decision 8) — a separate task, started only when explicitly authorized. The runbook is written and ready (`skills/wiki-setup/references/OKF-MIGRATION.md`); its execution against any specific vault is not.
 
 ## Open questions
 

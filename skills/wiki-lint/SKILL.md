@@ -110,7 +110,7 @@ Reads `wiki/log.md`, not vault pages — a different data source from L2a–L2d,
 - Add missing `tags:` to source pages
 - Add a markdown link to a body mention identified in check L2b
 - Add entry to `wiki/index.md` for unindexed pages
-- Add `wiki/log.md` entry: `**[YYYY-MM-DD] prune** | {N} findings`
+- Add `wiki/log.md` entry: `**[YYYY-MM-DD] lint** | {N} findings`
 
 `meta/vault-report.json` — written automatically by Layer 1 (step 2); not a correction, needs no confirmation.
 

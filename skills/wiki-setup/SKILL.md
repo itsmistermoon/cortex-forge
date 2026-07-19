@@ -123,5 +123,6 @@ For a maintenance-menu run, confirm only the items for operations that actually 
 
 - Always run from inside the vault directory — never ask for a path manually
 - Never write to an *existing* `wiki/`, `.raw/`, or `AGENTS.md` — those are vault content, not this skill's to touch once they exist. The one exception is step 1's new-vault scaffold (`references/NEW-VAULT-SCAFFOLD.md`), which creates them from nothing, only on explicit confirmation, and never overwrites either if already present. Everything else this skill writes (global config, `templates/`, `.hot/db/`, git hooks) is infrastructure
+- **`references/OKF-MIGRATION.md`** is a second, narrower exception to the rule above: it rewrites an *existing* vault's `wiki/` content to the OKF format (ADR 0005). Never run it off your own initiative — not from a `wiki-lint` finding, not from noticing stale format, nothing short of the user explicitly authorizing migration of that specific vault right now
 - Never hand-roll skill installation or agent-specific symlinks — `npx skills add` is the sole installer, for every agent it supports
 - Post-commit git hooks (prune, reindex — step 5a) are the only hooks this skill installs

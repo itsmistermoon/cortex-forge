@@ -1,5 +1,5 @@
 ---
-"almagest-antu": minor
+"antu": minor
 ---
 
 Define the minimal vault AGENTS.md and wire handoff auto-loading into every repo:

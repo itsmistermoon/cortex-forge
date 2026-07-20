@@ -35,9 +35,13 @@ Deep hygiene pass over `.hot/` in the active repo (the nearest `.git`) — judgm
      <!-- /antu:session-start -->
      ```
 
-     If no `AGENTS.md` exists at all, offer to create one containing a `# AGENTS.md` title line and this block. Never auto-apply; always confirm first. In a vault, `/wiki-setup` adds the same block plus vault-specific rules from `templates/AGENTS-vault.md` — mention that as the alternative if the repo is a vault.
+     If no `AGENTS.md` exists at all, branch on whether the repo is a vault (a `wiki/` directory is present — the same signal `wiki-setup` uses):
+       - **Vault** → do not create a bare file here. A vault's `AGENTS.md` should come from `templates/AGENTS-vault.md` (title + session-start block + vault rules + identity placeholder), not a stunted stub. Tell the user to run `/wiki-setup`, which scaffolds it properly, and stop — don't write anything.
+       - **Non-vault repo** → offer to create `AGENTS.md` with a `# AGENTS.md` title line and this block.
 
-   **Done when:** the check ran and either the instruction is present, the append was proposed, or the user declined.
+     Never auto-apply; always confirm first. **On confirmation** (append or non-vault creation): perform the write, then re-read `AGENTS.md` and verify the `<!-- antu:session-start -->` marker is now present. If the write failed or the marker is still absent, report the error — never claim success without the verified marker.
+
+   **Done when:** the instruction was already present, or the user declined, or — on confirmation — the block was written and the marker verified present, or the repo was a vault missing `AGENTS.md` and the user was routed to `/wiki-setup`.
 
 7. **Deep HISTORY.md cleanup** — scan for near-duplicate archived blocks (overlapping date range, overlapping "What was done" bullets — likely a rotation artifact or repeated re-statement of the same fact). `HISTORY.md` is append-only per `~/.almagest/references/HANDOFF-FORMAT.md` — never edit, merge, or remove an existing block. Propose appending a superseding note instead: `### {today} — hot-triage` / `Supersedes {earlier timestamps}: {one-line summary of what the duplicate blocks actually recorded}`. Never auto-apply. **Done when:** every archived block has been compared against the others for near-duplication — none left unchecked.
 

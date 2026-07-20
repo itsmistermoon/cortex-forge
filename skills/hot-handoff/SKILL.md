@@ -18,7 +18,7 @@ Save a session snapshot to `.hot/HANDOFF.md` in the active repo (the nearest `.g
 
    Determine mode: `wiki/` + `AGENTS.md` present → standard mode; otherwise → cross-vault mode.
 
-2. **Prepare state** — create `.hot/` if it doesn't exist and add it to `.gitignore`. Read `.hot/HANDOFF.md` in full if it exists.
+2. **Prepare state** — create `.hot/` if it doesn't exist and add it to `.gitignore`. Note whether `.hot/` already existed before this run — step 4's nudge uses it. Read `.hot/HANDOFF.md` in full if it exists.
 
    Check its frontmatter `suite:` marker:
    - **`suite: kuyen`, or no marker at all** (this also covers malformed/missing frontmatter — no separate fragile-context path for it anymore): the file wasn't written by Antu last. Archive its entire prior content as one dated entry into `.hot/HISTORY.md` (if it doesn't exist, create it with a one-line header — `# {vault-name} — consolidated history`), headed by this exact line so `/hot-triage` can find it later: `> previous HANDOFF.md was Kuyen's (free text) — archived in full, no pending/decisions recovered automatically` — followed by the prior content verbatim below it. Then start `HANDOFF.md` fresh in step 4. Repeat the same note in the final confirmation: "previous HANDOFF.md was Kuyen's (free text) — archived in full, no pending/decisions recovered automatically; check HISTORY.md manually if needed." Skip the per-entry rotation below — there's nothing left in `HANDOFF.md` to rotate.
@@ -30,10 +30,11 @@ Save a session snapshot to `.hot/HANDOFF.md` in the active repo (the nearest `.g
 4. **Write the snapshot** — update Current state and append the History entry in `.hot/HANDOFF.md`, per `~/.almagest/references/HANDOFF-FORMAT.md` (always write `suite: antu` in the frontmatter); never modify previous History entries.
    - If an argument with `next: <focus>` was provided (e.g., `/hot-handoff next: PostToolUse hook`), mention relevant skills inline and tailor `### Pending` toward the declared next focus.
    - **Vault health triage** — if `meta/vault-report.json` exists and any of `health.dead_links`, `health.raw_without_source_page`, `health.orphan_pages`, or `health.missing_confidence` is non-empty, add a dated entry to `### Pending` (if full, this takes priority over the least-recent item): `- [ ] Vault health: {N} finding(s) unresolved ({types}) — see meta/vault-report.json`. If a Pending item for vault health already exists, update its count instead of duplicating; if the report has zero findings and a prior item exists, remove it. Never optional to report — call it out explicitly in the confirmation whenever the report has non-empty findings, don't fold it silently into a generic summary.
-   - **`hot-triage` nudge** — add a `### Pending` suggestion (same cap rules as above) in either of these cases:
+   - **`hot-triage` nudge** — add a `### Pending` suggestion (same cap rules as above) in any of these cases:
      - Step 2 archived a whole prior `HANDOFF.md` block due to a foreign-suite marker mismatch: `- [ ] Recover pending/fragile-context from the archived HANDOFF.md block — run /hot-triage`.
      - `.hot/PLAYBOOK.md` exists and its oldest `### YYYY-MM-DD` entry under `## Working context` is more than 30 days old: `- [ ] PLAYBOOK.md pruning is {N} days overdue — run /hot-triage`.
-     If neither condition holds, skip silently — this is not a default Pending item.
+     - **First handoff in this repo** (`.hot/` did not exist before this run, per step 2) **and** the repo-root `AGENTS.md` lacks the `<!-- antu:session-start -->` marker (nor an equivalent read-`.hot/HANDOFF.md`-at-session-start instruction the user wrote themselves): add `- [ ] AGENTS.md doesn't auto-load handoffs at session start — run /wiki-setup to add it` if the repo is a vault (a `wiki/` directory is present), otherwise `- [ ] AGENTS.md doesn't auto-load handoffs at session start — run /hot-triage to add it`. In a vault, `/wiki-setup` is preferred because it adds the session-start block *plus* the vault-specific rules from `templates/AGENTS-vault.md`; `/hot-triage` adds only the session-start block and is the right target for non-vault repos. This is a one-line nudge only — never write to `AGENTS.md` from this skill. Skip if there's no `.hot/`-was-just-created signal.
+     If none hold, skip silently — this is not a default Pending item.
 
 ## Cross-vault update
 

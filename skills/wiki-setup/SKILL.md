@@ -39,6 +39,7 @@ Always end with the relevant subset of ## Output format.
    - Required: `.git/`.
    - If `.git/` is missing, report it and stop.
    - If `wiki/` and/or `AGENTS.md` are missing, don't stop — see `references/NEW-VAULT-SCAFFOLD.md` to disambiguate a new vault from a broken one, and scaffold on confirmation.
+   - If `AGENTS.md` exists but doesn't tell agents to read `.hot/HANDOFF.md` at session start (no `<!-- antu:session-start -->` marker and no hand-written equivalent), offer to append the minimal Antu block per the "Existing AGENTS.md without the Antu block" section of `references/NEW-VAULT-SCAFFOLD.md` — append-only, never rewrite.
    - Derive vault name from `basename` of CWD (e.g., `/Users/jp/second-brain` → `second-brain`).
 
 2. **Read existing config** — from `~/.almagest/config.yml`, if it exists.
@@ -109,7 +110,8 @@ Always end with the relevant subset of ## Output format.
 ## Output format
 
 Confirm:
-- Scaffold (if run): what was created (`wiki/` structure, `AGENTS.md` stub, `meta/tags.md`) — remind the user to fill in `AGENTS.md`'s "Vault identity" section themselves
+- Scaffold (if run): what was created (`wiki/` structure, `AGENTS.md` stub from `templates/AGENTS-vault.md`, `meta/tags.md`) — remind the user to fill in `AGENTS.md`'s "Vault identity" section themselves
+- AGENTS.md Antu block (if offered on an existing file): appended / declined (handoff auto-loading stays off until the session-start instruction exists)
 - Registered vaults: list all entries in `vaults:` with their paths and locales, marking the default
 - Skills: all 7 present / missing {list} (with the `npx skills add` command to fix it)
 - Semantic search: active (backend: Ollama/mlx-embeddings/sentence-transformers, N chunks indexed) / not active (declined or skipped — how to enable later)
@@ -122,7 +124,7 @@ For a maintenance-menu run, confirm only the items for operations that actually 
 ## Rules
 
 - Always run from inside the vault directory — never ask for a path manually
-- Never write to an *existing* `wiki/`, `.raw/`, or `AGENTS.md` — those are vault content, not this skill's to touch once they exist. The one exception is step 1's new-vault scaffold (`references/NEW-VAULT-SCAFFOLD.md`), which creates them from nothing, only on explicit confirmation, and never overwrites either if already present. Everything else this skill writes (global config, `templates/`, `.hot/db/`, git hooks) is infrastructure
+- Never write to an *existing* `wiki/`, `.raw/`, or `AGENTS.md` — those are vault content, not this skill's to touch once they exist. Two exceptions, both in `references/NEW-VAULT-SCAFFOLD.md` and both confirmation-gated: step 1's new-vault scaffold, which creates them from nothing and never overwrites; and the append-only Antu block added at the end of an existing `AGENTS.md` that lacks the session-start marker — nothing above the appended block is ever edited. Everything else this skill writes (global config, `templates/`, `.hot/db/`, git hooks) is infrastructure
 - **`references/OKF-MIGRATION.md`** is a second, narrower exception to the rule above: it rewrites an *existing* vault's `wiki/` content to the OKF format (ADR 0005). Never run it off your own initiative — not from a `wiki-lint` finding, not from noticing stale format, nothing short of the user explicitly authorizing migration of that specific vault right now
 - Never hand-roll skill installation or agent-specific symlinks — `npx skills add` is the sole installer, for every agent it supports
 - Post-commit git hooks (prune, reindex — step 5a) are the only hooks this skill installs

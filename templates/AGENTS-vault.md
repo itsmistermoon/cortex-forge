@@ -11,7 +11,7 @@ Before your first response, in any session that starts in this repo, you MUST re
 <!-- antu:vault-rules -->
 ## Working with the vault
 
-- Skills trigger themselves — each installed Antu skill's `description:` states when to invoke it. Close every work session with `/hot-handoff`.
+- Antu skills are user-invoked — run them yourself by name when the task calls for it (`/wiki-query`, `/wiki-ingest`, `/wiki-imprint`, `/wiki-lint`, `/wiki-setup`). Close every work session with `/hot-handoff`.
 - New wiki pages follow the templates in `templates/` (concept, entity, source, project) and live under the matching `wiki/` subdirectory; `wiki/index.md` is the master index.
 - Cross-reference pages with bundle-relative absolute markdown links (`[title](/wiki/entities/x.md)`), never `[[wikilinks]]`.
 - Tag rules and registry: `meta/tags.md`.

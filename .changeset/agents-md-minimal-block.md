@@ -9,3 +9,4 @@ Define the minimal vault AGENTS.md and wire handoff auto-loading into every repo
 - `wiki-setup`: existing AGENTS.md without the marker gets a confirmation-gated append-only offer of the Antu block (new-vault flow and maintenance menu option 11).
 - `hot-handoff`: on the first handoff in a repo (when `.hot/` is created), offers once to add the session-start instruction to AGENTS.md — works in any repo, vault or not.
 - `hot-triage`: new step checks that repos with a `HANDOFF.md` also have the session-start instruction, proposing the append as backfill.
+- Fixed deprecated vocabulary in the repo's own `AGENTS.md` (Principle 5, skill-design-principles): "skills trigger themselves" → user-invoked wording (skills are `disable-model-invocation: true`), and a stale `/cortex-recall` invocation → `/wiki-query`.

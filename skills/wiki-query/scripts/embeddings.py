@@ -114,7 +114,8 @@ def embed(text: str, prefix: str = "") -> list[float]:
         import mlx.core as mx
         tokens = _mlx_tokenizer(full_text, return_tensors="mlx", padding=True, truncation=True)
         output = _mlx_model(**tokens)
-        vec = output.last_hidden_state[0].mean(axis=0).tolist()
+        hidden = output.last_hidden_state[0]
+        vec = hidden.mean(axis=0).tolist() if len(hidden.shape) == 2 else hidden.tolist()
 
     elif backend == "sentence-transformers":
         vec = _st_model.encode(full_text, normalize_embeddings=True).tolist()

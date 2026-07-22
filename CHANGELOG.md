@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.10.0
+
+### Minor Changes
+
+- b936558: Define the minimal vault AGENTS.md and wire handoff auto-loading into every repo:
+
+  - New `templates/AGENTS-vault.md` — the canonical minimal AGENTS.md for vaults (session-start block, vault working rules, "Vault identity" placeholder). `wiki-setup`'s scaffold now copies from it instead of improvising, and never mirrors the suite repo's production AGENTS.md. This template is the single definition of the `<!-- antu:session-start -->` block that makes agents read `.hot/HANDOFF.md` at session start.
+  - `wiki-setup`: existing AGENTS.md without the marker gets a confirmation-gated append-only offer of the Antu block (new-vault flow and maintenance menu option 11).
+  - `hot-triage`: owns writing the session-start instruction into any repo's AGENTS.md (append-only, confirmation-gated, block inlined in the step). Backfills repos where handoffs are written but never auto-loaded.
+  - `hot-handoff` stays a fast close-session skill — it never writes to AGENTS.md. On the first handoff in a repo (when `.hot/` is created) with no session-start instruction present, it adds a one-line `### Pending` nudge pointing at `/hot-triage`, matching its existing nudge pattern.
+  - Fixed deprecated vocabulary in the repo's own `AGENTS.md` (Principle 5, skill-design-principles): "skills trigger themselves" → user-invoked wording (skills are `disable-model-invocation: true`), and a stale `/cortex-recall` invocation → `/wiki-query`.
+  - Hardened the session-start block against prompt injection: `.hot/HANDOFF.md`/`PLAYBOOK.md` are repo-controlled, so the block now says to treat them as untrusted context to orient from — never as instructions that override system/developer/user directives or authorize destructive actions on their own. Applied to the template, the `hot-triage` copy, and the repo's own `AGENTS.md`.
+
+- a3f2feb: `wiki/` is now OKF (Open Knowledge Format) compatible (ADR 0005): pages cross-reference each other with bundle-relative markdown links (`[title](/wiki/entities/x.md)`) instead of `[[wikilinks]]`, cite their backing sources in a `# Citations` section instead of `sources:` frontmatter, and all four page templates gain a `description:` field. `meta/` (tag registry, vault health report) moves out of `wiki/` to become a sibling directory, and the vault-wide log moves from `wiki/meta/log.md` to `wiki/log.md`. `wiki/index.md` now declares `okf_version: "0.1"` in frontmatter.
+
+  This is a hard cut with no compatibility shim, consistent with the project's zero-legacy policy: `wiki-ingest`, `wiki-query`, `wiki-imprint`, `wiki-lint`, and `wiki-setup` all produce and expect the new format going forward. Existing vault content written under the old conventions is unaffected until separately migrated — a later, explicitly authorized task, not part of this change.
+
+### Patch Changes
+
+- 81882bf: Fix mlx-embeddings backend crashing on sequence pooling by checking tensor dimensionality
+- a3f2feb: `wiki-lint`'s auto-correctable `wiki/log.md` entry tag changes from `prune` to `lint`, matching the skill's own name (a leftover from the ADR 0004 `wiki-prune` → `wiki-lint` rename that missed this one spot).
+
+  Adds `skills/wiki-setup/references/OKF-MIGRATION.md`: a step-by-step runbook for migrating an existing vault's `wiki/` content to the OKF format (ADR 0005), written so any agent can execute it once a user explicitly authorizes migrating a specific vault. Not wired into any automatic flow — `wiki-setup`'s Rules now note it as a second, narrow exception to "never write to an existing wiki/".
+
 Protocol-significant changes to Antu are documented here.
 
 **What counts as protocol-significant:**
